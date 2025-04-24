@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 type Props = {
   onAddMeow: (text: string) => void
@@ -7,14 +7,17 @@ type Props = {
 const MeowForm = ({ onAddMeow }: Props) => {
   const [text, setText] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault()
 
-    if (text.trim() === '') return
+      if (text.trim() === '') return
 
-    onAddMeow(text.trim()) // ส่งข้อความไปยัง MeowList
-    setText('') // ล้างช่อง input
-  }
+      onAddMeow(text.trim()) // ส่งข้อความไปยัง MeowList
+      setText('') // ล้างช่อง input
+    },
+    [onAddMeow, text],
+  )
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2 mb-4">

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
 
 type SavedText = {
@@ -6,11 +6,13 @@ type SavedText = {
   timestamp: string
   done: boolean
 }
+const MAX_LENGTH = 50
+
 const TodoList = () => {
   const [text, setText] = useState('')
   const [savedTexts, setSavedTexts] = useState<SavedText[]>([])
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (text.trim() !== '') {
       const newItem: SavedText = {
         text,
@@ -23,16 +25,23 @@ const TodoList = () => {
       setSavedTexts([newItem, ...savedTexts])
       setText('')
     }
-  }
-  const handleDelete = (toDelete: number) => {
-    setSavedTexts(savedTexts.filter((_, index) => index !== toDelete))
-  }
-  const MAX_LENGTH = 50
-  const toggleDone = (index: number) => {
-    const updated = [...savedTexts]
-    updated[index].done = !updated[index].done
-    setSavedTexts(updated)
-  }
+  }, [savedTexts, text])
+
+  const handleDelete = useCallback(
+    (toDelete: number) => {
+      setSavedTexts(savedTexts.filter((_, index) => index !== toDelete))
+    },
+    [savedTexts],
+  )
+
+  const toggleDone = useCallback(
+    (index: number) => {
+      const updated = [...savedTexts]
+      updated[index].done = !updated[index].done
+      setSavedTexts(updated)
+    },
+    [savedTexts],
+  )
 
   return (
     <div className="max-w-md mx-auto mt-10 p-4 text-center bg-amber-300 shadow rounded-xl">

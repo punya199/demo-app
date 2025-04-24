@@ -1,13 +1,13 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
-import About from './components/About'
-import Contract from './components/Contract'
-import MeowList from './components/project1/MeowList'
-import TodoList from './components/project2/TodoList'
 import Allprojects from './layouts/Allprojects'
 import Home from './layouts/Home'
 import Pnotfound from './layouts/Pnotfound'
 import RootLayout from './layouts/RootLayout'
+import About from './pages/PageAbout'
+import Contract from './pages/PageContract'
+import PageMeowList from './pages/project1/PageMeowList'
+import TodoList from './pages/project2/PageTodoList'
 
 const router = createBrowserRouter([
   {
@@ -33,7 +33,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/p1',
-        element: <MeowList />,
+        element: <PageMeowList />,
       },
       {
         path: '/p2',

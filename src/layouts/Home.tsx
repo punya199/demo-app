@@ -1,4 +1,4 @@
-import TodoList from '../components/project2/TodoList'
+import TodoList from '../pages/project2/PageTodoList'
 
 const Home = () => {
   return <TodoList />

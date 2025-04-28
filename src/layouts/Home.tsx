@@ -1,7 +1,5 @@
-import TodoList from '../pages/project2/PageTodoList'
-
 const Home = () => {
-  return <TodoList />
+  return <div>Home</div>
 }
 
 export default Home

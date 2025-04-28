@@ -10,6 +10,9 @@ const Allprojects = () => {
         <Link to="/p2">
           <li className="text-3xl p-2 hover:bg-amber-400">Project 2 : Todo</li>
         </Link>
+        <Link to="/p3">
+          <li className="text-3xl p-2 hover:bg-amber-400">Project 3 : MyFriends</li>
+        </Link>
       </ul>
     </div>
   )

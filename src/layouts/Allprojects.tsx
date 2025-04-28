@@ -17,6 +17,10 @@ const defaultData: Projects[] = [
     name: 'MyFriends',
     link: '/p3',
   },
+  {
+    name: 'Quiz',
+    link: '/p4',
+  },
 ]
 
 const Allprojects = () => {

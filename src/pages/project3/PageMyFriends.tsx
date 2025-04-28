@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import FriendCard from './FriendCard'
 
 export interface SavedFriend {
@@ -28,7 +28,7 @@ const PageMyFriends = () => {
   const [formName, setFormName] = useState('')
   const [formAge, setFormAge] = useState('')
   const [formOnline, setFormOnline] = useState(false)
-  const handleAddFriend = () => {
+  const handleAddFriend = useCallback(() => {
     if (!formName.trim()) return
     if (!formAge.trim() || Number(formAge) <= 0) {
       return
@@ -37,28 +37,31 @@ const PageMyFriends = () => {
     setFormName('')
     setFormAge('')
     setFormOnline(false)
-  }
-  const handleEditFriend = (index: number, newdata: SavedFriend) => {
-    const editFriend = savedFriend.map((friend, i) => {
-      if (i === index) {
-        return newdata
-      }
-      return friend
-    })
-    setSavedFriend(editFriend)
-  }
+  }, [formAge, formName, formOnline, savedFriend])
+  const handleEditFriend = useCallback(
+    (index: number, newdata: SavedFriend) => {
+      const editFriend = savedFriend.map((friend, i) => {
+        if (i === index) {
+          return newdata
+        }
+        return friend
+      })
+      setSavedFriend(editFriend)
+    },
+    [savedFriend],
+  )
 
   return (
-    <div>
+    <div className="p-2 flex flex-col gap-2">
       <div className="items-center text-center my-2">
         <p className="text-4xl">MYFRIEND</p>
       </div>
-      <div className="bg-green-300 flex items-center justify-between gap-x-2 p-4 rounded-xl">
+      <div className="bg-gray-300 flex items-center justify-between gap-2 p-4 rounded-xl flex-wrap">
         <input
           value={formName}
           placeholder="กรอกชื่อ"
           type="text"
-          className="border px-3 py-2 rounded w-40 truncate"
+          className="border px-3 py-2 rounded flex-1/3 truncate"
           onChange={(e) => {
             setFormName(e.target.value)
           }}
@@ -69,7 +72,7 @@ const PageMyFriends = () => {
           placeholder="กรอกอายุ"
           max={100}
           min={1}
-          className="border px-3 py-2 rounded w-28"
+          className="border px-3 py-2 rounded w-40"
           onChange={(e) => {
             let value = Number(e.target.value)
             if (value > 100) value = 100
@@ -77,7 +80,7 @@ const PageMyFriends = () => {
           }}
         />
         <div className="flex items-center gap-x-3">
-          <p className="text-white text-lg font-medium">สถานะออนไลน์</p>
+          <p className=" text-lg font-medium">สถานะออนไลน์</p>
           <input
             type="checkbox"
             checked={formOnline}
@@ -89,12 +92,12 @@ const PageMyFriends = () => {
         </div>
         <button
           onClick={handleAddFriend}
-          className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-full shadow-lg transform transition-all hover:scale-105 "
+          className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-full shadow-lg  transition-all hover:scale-105 "
         >
           เพิ่มเพื่อน
         </button>
       </div>
-      <ul>
+      <ul className="flex flex-col gap-2">
         {savedFriend.map((dataFriend, index) => (
           <FriendCard
             key={index}

@@ -1,29 +1,42 @@
-import { useState } from 'react'
-import { QuizData } from './PageQuiz'
+import { QuizData } from './quiz-data'
 
 interface QuizCardProps {
   data: QuizData
+  questionNumber: number
+  selectedChoice: number | null
+  onSelectChoice: (choiceIndex: number) => void
+  className?: string
 }
 const QuizCard = (props: QuizCardProps) => {
-  const [selectedChoice, setSelectedChoice] = useState<number | null>(null)
   return (
-    <div>
+    <div className="p-4 border rounded-lg shadow-md my-4 animate-shake">
       <div>
-        <p>ข้อที่ 1 {props.data.name}</p>
-        <ul>
-          {props.data.choices.map((e, index) => {
-            return (
-              <li key={index} onClick={() => setSelectedChoice(index)}>
-                <input type="radio" value={index} checked={selectedChoice === index} />
-
-                <span>
-                  คำตอบที่ {index + 1} {e.name}
-                </span>
-              </li>
-            )
-          })}
-        </ul>
+        <p className="text-xl font-semibold mb-2 h-15">
+          ข้อที่ {props.questionNumber} {props.data.name}
+        </p>
       </div>
+      <ul className="flex flex-col gap-2">
+        {props.data.choices.map((choice, index) => (
+          <li
+            key={index}
+            onClick={() => props.onSelectChoice(index)}
+            className="flex items-baseline gap-2 border shadow rounded-2xl px-3 py-1 cursor-pointer hover:bg-gray-300"
+          >
+            <input
+              type="radio"
+              name={`quiz-${props.questionNumber}`}
+              value={index}
+              checked={props.selectedChoice === index}
+              className="w-4 h-4 accent-green-500 cursor-pointer"
+              onChange={() => props.onSelectChoice(index)}
+            />
+
+            <span>
+              {index + 1}. {choice.name}
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

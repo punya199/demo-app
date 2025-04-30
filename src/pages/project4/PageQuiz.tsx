@@ -1,5 +1,5 @@
 import { shuffle } from 'lodash'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import QuizCard from './QuizCard'
 import { QuizData, quizList } from './quiz-data'
 
@@ -12,17 +12,17 @@ const PageQuiz = () => {
     const randomQuiz = [...quizList]
     return shuffle(randomQuiz).map((e): QuizData => ({ ...e, choices: shuffle(e.choices) }))
   }, [])
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (answers[currentIndex] === null) {
       alert('ต้องเลือกคำตอบก่อนครับ')
       return
     }
     setCurrentIndex((prev) => prev + 1)
-  }
-  const handleBack = () => {
+  }, [answers, currentIndex])
+  const handleBack = useCallback(() => {
     setCurrentIndex((prev) => prev - 1)
-  }
-  const handleSubmit = () => {
+  }, [])
+  const handleSubmit = useCallback(() => {
     const confirmSubmit = confirm('ส่งคำตอบไหม')
     if (!confirmSubmit) return
     let tempScore = 0
@@ -33,44 +33,20 @@ const PageQuiz = () => {
       }
     }
     setScore(tempScore)
-  }
-  const handleSelectChoice = (choiceIndex: number) => {
-    const newAnswers = [...answers]
-    newAnswers[currentIndex] = choiceIndex
-    setAnswers(newAnswers)
-  }
-  const handleReset = () => {
+  }, [answers, shuffleQuiz])
+  const handleSelectChoice = useCallback(
+    (choiceIndex: number) => {
+      const newAnswers = [...answers]
+      newAnswers[currentIndex] = choiceIndex
+      setAnswers(newAnswers)
+    },
+    [answers, currentIndex],
+  )
+  const handleReset = useCallback(() => {
     setScore(null)
     setAnswers([null])
     setCurrentIndex(0)
-  }
-
-  // useEffect(() => {
-  //   // const q = {
-  //   //   a: 1,
-  //   //   b: 2,
-  //   // }
-  //   // const w = {
-  //   //   b: 10,
-  //   //   c: 9,
-  //   // }
-
-  //   // const e = { ...q, ...w }
-
-  //   // console.log({
-  //   //   q,
-  //   //   w,
-  //   //   e,
-  //   // })
-  //   // for (let i = 0; i < quizList.length; i++) {
-  //   //   const e = quizList[i]
-  //   //   console.log({ i, e })
-  //   // }
-
-  //   quizList.map((e, i) => {
-  //     console.log({ i, e })
-  //   })
-  // }, [])
+  }, [])
 
   return (
     <div>

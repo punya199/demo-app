@@ -10,6 +10,7 @@ import PageMeowList from './pages/project1/PageMeowList'
 import TodoList from './pages/project2/PageTodoList'
 import PageMyFriends from './pages/project3/PageMyFriends'
 import PageQuiz from './pages/project4/PageQuiz'
+import CardGame from './pages/project5/CardGame'
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         path: '/p4',
         element: <PageQuiz />,
+      },
+      {
+        path: '/p5',
+        element: <CardGame />,
       },
     ],
   },

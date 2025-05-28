@@ -11,6 +11,7 @@ import TodoList from './pages/project2/PageTodoList'
 import PageMyFriends from './pages/project3/PageMyFriends'
 import PageQuiz from './pages/project4/PageQuiz'
 import CardGame from './pages/project5/CardGame'
+import Omama from './pages/project6/Omama'
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,7 @@ const router = createBrowserRouter([
         path: '/p5',
         element: <CardGame />,
       },
+      { path: '/p6', element: <Omama /> }, // Omama project
     ],
   },
 ])

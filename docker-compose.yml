@@ -1,0 +1,8 @@
+name: yaya-app
+
+services:
+  app:
+    image: acelectic/yaya-developer:latest
+    build:
+      context: .
+      dockerfile: Dockerfile

@@ -1,3 +1,11 @@
+## [1.1.18](https://github.com/punya199/test1/compare/v1.1.17...v1.1.18) (2025-05-29)
+
+
+### Fix
+
+* edit ci ([39ad99c](https://github.com/punya199/test1/commit/39ad99c0d186495b92eeea8911dbd578983a7f2e))
+* edit ci ([e94b7a1](https://github.com/punya199/test1/commit/e94b7a140f50355eb00d81d75edca099aee308c7))
+
 ## [1.1.17](https://github.com/punya199/test1/compare/v1.1.16...v1.1.17) (2025-05-29)
 
 

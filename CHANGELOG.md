@@ -1,3 +1,10 @@
+## [1.1.6](https://github.com/punya199/test1/compare/v1.1.5...v1.1.6) (2025-05-29)
+
+
+### Fix
+
+* edit something ([328abfc](https://github.com/punya199/test1/commit/328abfc47a90d259dd054f1d8ca0c8445792e3ce))
+
 ## [1.1.5](https://github.com/punya199/test1/compare/v1.1.4...v1.1.5) (2025-05-29)
 
 

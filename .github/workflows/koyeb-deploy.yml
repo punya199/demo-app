@@ -1,0 +1,25 @@
+name: Deploy to Koyeb
+
+on:
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - name: Install Koyeb CLI
+        run: |
+          curl -fsSL https://cli.koyeb.com/install.sh | bash
+          echo "$HOME/.koyeb/bin" >> $GITHUB_PATH
+
+      - name: Deploy to Koyeb
+        env:
+          KOYEB_TOKEN: aclhu4www5xc3nxlyrutl6feospyrqj26xjwv2nh5q1trsf57e28dpyiz77xou09
+        run: |
+          koyeb login --token $KOYEB_TOKEN
+          koyeb service redeploy electronic-elset/yaya-developer

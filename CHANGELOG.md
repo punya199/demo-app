@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/punya199/test1/compare/v1.1.6...v1.1.7) (2025-05-29)
+
+
+### Fix
+
+* add app version ([375aa64](https://github.com/punya199/test1/commit/375aa64d0c91d7b7eedd010ebc2ca41102285bd2))
+
 ## [1.1.6](https://github.com/punya199/test1/compare/v1.1.5...v1.1.6) (2025-05-29)
 
 

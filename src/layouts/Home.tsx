@@ -9,7 +9,7 @@ console.log(sum)
 const Home = () => {
   return (
     <div>
-      <div>สวัสดี ฉันค่อย ๆ ปรากฏขึ้น...?</div>
+      <div>สวัสดี ฉันค่อย ๆ ปรากฏขึ้น...???</div>
     </div>
   )
 }

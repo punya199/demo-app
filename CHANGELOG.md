@@ -1,3 +1,10 @@
+## [1.1.17](https://github.com/punya199/test1/compare/v1.1.16...v1.1.17) (2025-05-29)
+
+
+### Fix
+
+* no console ([7827e1e](https://github.com/punya199/test1/commit/7827e1ef76d69c1b8abbf3806405b05368558929))
+
 ## [1.1.16](https://github.com/punya199/test1/compare/v1.1.15...v1.1.16) (2025-05-29)
 
 

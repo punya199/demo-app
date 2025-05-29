@@ -1,3 +1,10 @@
+## [1.1.14](https://github.com/punya199/test1/compare/v1.1.13...v1.1.14) (2025-05-29)
+
+
+### Fix
+
+* change image png to webp ([612b185](https://github.com/punya199/test1/commit/612b1856ac65763bc7a834665b636bc5ff006b79))
+
 ## [1.1.13](https://github.com/punya199/test1/compare/v1.1.12...v1.1.13) (2025-05-29)
 
 

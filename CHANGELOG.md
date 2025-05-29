@@ -1,3 +1,10 @@
+## [1.1.13](https://github.com/punya199/test1/compare/v1.1.12...v1.1.13) (2025-05-29)
+
+
+### Fix
+
+* edit text home ([254fff1](https://github.com/punya199/test1/commit/254fff10f408b472ed48db071d26ba4b51ee37ce))
+
 ## [1.1.12](https://github.com/punya199/test1/compare/v1.1.11...v1.1.12) (2025-05-29)
 
 

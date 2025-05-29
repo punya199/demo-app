@@ -1,3 +1,10 @@
+## [1.1.19](https://github.com/punya199/test1/compare/v1.1.18...v1.1.19) (2025-05-29)
+
+
+### Fix
+
+* edit cd ([b26dfb6](https://github.com/punya199/test1/commit/b26dfb680d669c57fded2925e02d2d797ca5fd47))
+
 ## [1.1.18](https://github.com/punya199/test1/compare/v1.1.17...v1.1.18) (2025-05-29)
 
 

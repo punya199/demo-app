@@ -32,3 +32,6 @@ dist-ssr
 !.yarn/sdks
 !.yarn/versions
 .qodo
+
+
+.env*

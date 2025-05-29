@@ -12,14 +12,10 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
     steps:
-      - name: Install Koyeb CLI
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/master/install.sh | sh
-          echo "$HOME/.koyeb/bin" >> $GITHUB_PATH
-
+      - name: Install and configure the Koyeb CLI
+        uses: koyeb-community/koyeb-actions@v2
+        with:
+          api_token: aclhu4www5xc3nxlyrutl6feospyrqj26xjwv2nh5q1trsf57e28dpyiz77xou09
       - name: Deploy to Koyeb
-        env:
-          KOYEB_TOKEN: aclhu4www5xc3nxlyrutl6feospyrqj26xjwv2nh5q1trsf57e28dpyiz77xou09
         run: |
-          koyeb login --token $KOYEB_TOKEN
           koyeb service redeploy electronic-elset/yaya-developer

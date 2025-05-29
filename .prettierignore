@@ -21,3 +21,5 @@ coverage
 # Misc
 .DS_Store
 *.pem 
+
+package*.json

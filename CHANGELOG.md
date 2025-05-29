@@ -1,3 +1,10 @@
+## [1.1.8](https://github.com/punya199/test1/compare/v1.1.7...v1.1.8) (2025-05-29)
+
+
+### Fix
+
+* cd deploy koyeb ([6a48448](https://github.com/punya199/test1/commit/6a48448c30590d1a0a27caffc736a2d1bf4cdd64))
+
 ## [1.1.7](https://github.com/punya199/test1/compare/v1.1.6...v1.1.7) (2025-05-29)
 
 

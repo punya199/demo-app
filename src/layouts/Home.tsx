@@ -5,7 +5,7 @@ for (let i = 1; i < nums.length; i++) {
     sum.push(nums[i])
   }
 }
-console.log(sum)
+
 const Home = () => {
   return (
     <div>

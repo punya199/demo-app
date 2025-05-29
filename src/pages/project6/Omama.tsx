@@ -65,7 +65,6 @@ const Omama = () => {
       setSpecialCardOwner(prev => ({ ...prev, J: nameIndex }))
     }
   }
-  console.log(specialCardOwner)
 
   return (
     <div>

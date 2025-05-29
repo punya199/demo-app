@@ -23,6 +23,12 @@
       }
     ],
     [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "eslint"
+      }
+    ],
+    [
       "@semantic-release/changelog",
       {
         "changelogFile": "CHANGELOG.md"

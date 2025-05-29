@@ -5,7 +5,9 @@
   "doubleQuote": false,
   "printWidth": 100,
   "tabWidth": 2,
-  "trailingComma": "all",
+  "trailingComma": "es5",
   "useTabs": false,
-  "parser": "typescript"
+  "parser": "typescript",
+  "bracketSpacing": true,
+  "arrowParens": "avoid"
 }

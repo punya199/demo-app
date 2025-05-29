@@ -1,5 +1,8 @@
 FROM docker.io/node:20.18.3-alpine3.21 AS builder
 
+ARG VITE_APP_VERSION
+ENV VITE_APP_VERSION=$VITE_APP_VERSION
+
 ENV YARN_CACHE_FOLDER=/root/.yarn
 
 WORKDIR /usr/src/app

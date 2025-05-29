@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/punya199/test1/compare/v1.1.1...v1.1.2) (2025-05-29)
+
+
+### Fix
+
+* Adds package*.json to Prettier ignore list ([8b8c45a](https://github.com/punya199/test1/commit/8b8c45a2e35f0318c67b2e25d46f8315fe22a859))
+
 ## [1.1.1](https://github.com/punya199/test1/compare/v1.1.0...v1.1.1) (2025-05-29)
 
 

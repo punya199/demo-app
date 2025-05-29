@@ -46,7 +46,9 @@ jobs:
 
       - name: Release
         id: semantic
-        uses: cycjimmy/semantic-release-action@v3
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          semantic_version: 24.2.5
         env:
           GITHUB_TOKEN: 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
 

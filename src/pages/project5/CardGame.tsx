@@ -1,13 +1,10 @@
 import { useState } from 'react'
-import { cardDeck } from './cardGame-data'
-type Card = {
-  name: string
-  image: string
-}
+import back_dark from '../../assets/images/cards/back_dark.webp'
+import { cardDeck, ICardData } from './cardGame-data'
 
 const CardGame = () => {
-  const [deck, setDeck] = useState<Card[]>(cardDeck)
-  const [currentCard, setCurrentCard] = useState<Card | null>(null)
+  const [deck, setDeck] = useState<ICardData[]>(cardDeck)
+  const [currentCard, setCurrentCard] = useState<ICardData | null>(null)
 
   const drawCard = () => {
     if (deck.length === 0) return
@@ -33,7 +30,8 @@ const CardGame = () => {
           <div className="mt-8">
             <p className="text-xl font-semibold text-gray-800 mb-4">ไพ่ที่ได้</p>
             <img
-              src={`/images/cards/${currentCard.image}`}
+              // src={`/images/cards/${currentCard.image}`}
+              src={currentCard.image}
               alt={currentCard.name}
               className="w-56 mx-auto drop-shadow-lg"
             />
@@ -43,11 +41,7 @@ const CardGame = () => {
         ) : (
           <div className="mt-8">
             <p className="text-xl font-semibold text-gray-800 mb-4">เริ่มสุ่มไพ่</p>
-            <img
-              src={`/images/cards/back_dark.png`}
-              alt={'zero'}
-              className="w-56 mx-auto opacity-70"
-            />
+            <img src={back_dark} alt={'zero'} className="w-56 mx-auto opacity-70" />
 
             <p className="mt-4 text-sm text-gray-500">ทั้งหมด {deck.length} ใบ</p>
           </div>

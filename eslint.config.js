@@ -18,6 +18,9 @@ export default tseslint.config(
       '*.config.ts',
       '*.d.ts',
       '.yarn',
+      'vite.config.ts',
+      'tsconfig*.json',
+      'tailwind.config.ts',
     ],
   },
   {

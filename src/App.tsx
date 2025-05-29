@@ -1,3 +1,4 @@
+import { lazy } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
 import Allprojects from './layouts/Allprojects'
@@ -10,8 +11,9 @@ import PageMeowList from './pages/project1/PageMeowList'
 import TodoList from './pages/project2/PageTodoList'
 import PageMyFriends from './pages/project3/PageMyFriends'
 import PageQuiz from './pages/project4/PageQuiz'
-import CardGame from './pages/project5/CardGame'
-import Omama from './pages/project6/Omama'
+
+const Omama = lazy(() => import('./pages/project6/Omama'))
+const CardGame = lazy(() => import('./pages/project5/CardGame'))
 
 const router = createBrowserRouter([
   {

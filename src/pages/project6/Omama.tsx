@@ -1,11 +1,9 @@
 import { chunk, shuffle } from 'lodash'
 import { useEffect, useState } from 'react'
-import { cardDeck } from '../project5/cardGame-data'
+import black_dark from '../../assets/images/cards/back_dark.webp'
+import black_light from '../../assets/images/cards/back_light.webp'
+import { cardDeck, ICardData } from '../project5/cardGame-data'
 
-interface Card {
-  name: string
-  image: string
-}
 interface SpecialCardOwner {
   K: number | null
   Q: number | null
@@ -14,8 +12,8 @@ interface SpecialCardOwner {
 
 const spiteCardNumber = 18
 const Omama = () => {
-  const [cardlist, setCardlist] = useState<Card[][]>([])
-  const [currentCard, setCurrentCard] = useState<Card | null>(null)
+  const [cardlist, setCardlist] = useState<ICardData[][]>([])
+  const [currentCard, setCurrentCard] = useState<ICardData | null>(null)
   const [userNameList, setUserNameList] = useState<string[]>([])
   const [inputName, setInputName] = useState('')
   const [nameIndex, setNameIndex] = useState(0)
@@ -36,7 +34,7 @@ const Omama = () => {
     setInputName('')
   }
   const removeUserName = (name: string) => {
-    setUserNameList(userNameList.filter((e) => e !== name))
+    setUserNameList(userNameList.filter(e => e !== name))
   }
   const onRandom = () => {
     const a = shuffle(cardDeck)
@@ -58,13 +56,13 @@ const Omama = () => {
     setCurrentCard(card)
     nextName()
     if (card.name.startsWith('K')) {
-      setSpecialCardOwner((prev) => ({ ...prev, K: nameIndex }))
+      setSpecialCardOwner(prev => ({ ...prev, K: nameIndex }))
     }
     if (card.name.startsWith('Q')) {
-      setSpecialCardOwner((prev) => ({ ...prev, Q: nameIndex }))
+      setSpecialCardOwner(prev => ({ ...prev, Q: nameIndex }))
     }
     if (card.name.startsWith('J')) {
-      setSpecialCardOwner((prev) => ({ ...prev, J: nameIndex }))
+      setSpecialCardOwner(prev => ({ ...prev, J: nameIndex }))
     }
   }
   console.log(specialCardOwner)
@@ -77,7 +75,7 @@ const Omama = () => {
           placeholder="กรอกชื่อ"
           className="border-2"
           value={inputName}
-          onChange={(e) => {
+          onChange={e => {
             setInputName(e.target.value)
           }}
         />
@@ -108,7 +106,7 @@ const Omama = () => {
               }}
             >
               <img
-                src={`${e.length === 0 ? '/images/cards/back_light.png' : `/images/cards/back_dark.png`}`}
+                src={e.length === 0 ? black_light : black_dark}
                 alt="back"
                 className="w-32  object-cover rounded-lg"
               />
@@ -133,7 +131,7 @@ const Omama = () => {
           <div className="mt-6 text-center">
             <p className="text-xl font-semibold text-gray-800 mb-4">ไพ่ที่ได้</p>
             <img
-              src={`/images/cards/${currentCard.image}`}
+              src={currentCard.image}
               alt={currentCard.name}
               className="w-40 mx-auto drop-shadow-lg"
             />
@@ -142,11 +140,7 @@ const Omama = () => {
         ) : (
           <div className="mt-6 text-center">
             <p className="text-xl font-semibold text-gray-800 mb-4">ไพ่ที่ได้</p>
-            <img
-              src={`/images/cards/back_dark.png`}
-              alt={'dark'}
-              className="w-40 mx-auto drop-shadow-lg"
-            />
+            <img src={black_dark} alt={'dark'} className="w-40 mx-auto drop-shadow-lg" />
             <p className="mt-4 text-sm text-gray-600">เหลือ 52 ใบ</p>
           </div>
         )}

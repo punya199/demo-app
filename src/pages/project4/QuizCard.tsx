@@ -6,7 +6,6 @@ interface QuizCardProps {
   selectedChoice: number | null
   onSelectChoice: (choiceIndex: number) => void
   className?: string
-  h?: number
 }
 const QuizCard = (props: QuizCardProps) => {
   return (

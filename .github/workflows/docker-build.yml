@@ -23,8 +23,10 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          # username: ${{ secrets.DOCKERHUB_USERNAME }}
+          # password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: acelectic
+          password: dckr_pat_IpJ-aO5nhXY2IZ_vjBZx-zrY1oo
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta

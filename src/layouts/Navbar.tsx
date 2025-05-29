@@ -46,6 +46,9 @@ const Navbar = () => {
             >
               <a className=" hover:text-amber-300 duration-400">Register</a>
               <a className=" hover:text-amber-300 duration-400">Login</a>
+              <div className="text-xs bg-black text-white px-2 py-1 rounded-md">
+                Version: {import.meta.env.VITE_APP_VERSION || 'unknown'}
+              </div>
             </div>
           </div>
           <div className="text-3xl lg:hidden">

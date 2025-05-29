@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/punya199/test1/compare/v1.1.2...v1.1.3) (2025-05-29)
+
+
+### Fix
+
+* Updates display text on the home page. ([a6c2be0](https://github.com/punya199/test1/commit/a6c2be085d7ae9f2ad232154ddf7020be3868d5b))
+
 ## [1.1.2](https://github.com/punya199/test1/compare/v1.1.1...v1.1.2) (2025-05-29)
 
 

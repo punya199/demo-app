@@ -1,3 +1,10 @@
+## [1.1.16](https://github.com/punya199/test1/compare/v1.1.15...v1.1.16) (2025-05-29)
+
+
+### Fix
+
+* edit chuck bundle assets image cards ([3fe96db](https://github.com/punya199/test1/commit/3fe96db8c9c776e3fed5952a3a48fde9d2ce2da7))
+
 ## [1.1.15](https://github.com/punya199/test1/compare/v1.1.14...v1.1.15) (2025-05-29)
 
 

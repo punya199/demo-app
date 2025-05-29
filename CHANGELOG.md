@@ -1,3 +1,10 @@
+## [1.1.11](https://github.com/punya199/test1/compare/v1.1.10...v1.1.11) (2025-05-29)
+
+
+### Fix
+
+* edit dockerfiel ([b5d1719](https://github.com/punya199/test1/commit/b5d171927f739de13ff8b01d5ab1bcf2acdf4f78))
+
 ## [1.1.10](https://github.com/punya199/test1/compare/v1.1.9...v1.1.10) (2025-05-29)
 
 

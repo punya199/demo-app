@@ -17,17 +17,17 @@ const PageQuiz = () => {
       alert('ต้องเลือกคำตอบก่อนครับ')
       return
     }
-    setCurrentIndex((prev) => prev + 1)
+    setCurrentIndex(prev => prev + 1)
   }, [answers, currentIndex])
   const handleBack = useCallback(() => {
-    setCurrentIndex((prev) => prev - 1)
+    setCurrentIndex(prev => prev - 1)
   }, [])
   const handleSubmit = useCallback(() => {
     const confirmSubmit = confirm('ส่งคำตอบไหม')
     if (!confirmSubmit) return
     let tempScore = 0
     for (let i = 0; i < quizList.length; i++) {
-      const correctChoiceIndex = shuffleQuiz[i].choices.findIndex((choice) => choice.isCorrect)
+      const correctChoiceIndex = shuffleQuiz[i].choices.findIndex(choice => choice.isCorrect)
       if (answers[i] === correctChoiceIndex) {
         tempScore += 1
       }
@@ -40,7 +40,7 @@ const PageQuiz = () => {
       newAnswers[currentIndex] = choiceIndex
       setAnswers(newAnswers)
     },
-    [answers, currentIndex],
+    [answers, currentIndex]
   )
   const handleReset = useCallback(() => {
     setScore(null)

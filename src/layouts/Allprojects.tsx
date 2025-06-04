@@ -18,15 +18,15 @@ const defaultData: Projects[] = [
     link: '/p3',
   },
   {
-    name: 'Quiz',
+    name: 'Quiz Meaow',
     link: '/p4',
   },
   {
-    name: 'CardGame',
+    name: 'Random Card',
     link: '/p5',
   },
   {
-    name: 'omama',
+    name: 'Game Omama',
     link: '/p6',
   },
 ]

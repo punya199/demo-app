@@ -1,3 +1,5 @@
+import { Button } from 'antd'
+
 const nums = [3, 5, 6, 9, 10, 12, 15]
 const sum = []
 for (let i = 1; i < nums.length; i++) {
@@ -8,8 +10,8 @@ for (let i = 1; i < nums.length; i++) {
 
 const Home = () => {
   return (
-    <div>
-      <div>สวัสดี ฉันค่อย ๆ ปรากฏขึ้นมาแล้วจ้า...!!! ^ ^</div>
+    <div style={{ padding: '2rem' }}>
+      <Button type="primary">กดฉันสิ</Button>
     </div>
   )
 }

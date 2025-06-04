@@ -29,6 +29,10 @@ const defaultData: Projects[] = [
     name: 'Game Omama',
     link: '/p6',
   },
+  {
+    name: '9 gea',
+    link: '/p7',
+  },
 ]
 
 const Allprojects = () => {

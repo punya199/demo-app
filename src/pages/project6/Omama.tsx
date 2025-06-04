@@ -84,10 +84,10 @@ const Omama = () => {
     },
     [cardlist, nameIndex, nextName]
   )
-  const randomIndex = () => {
+  const randomIndex = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * userNameList.length)
     setNameIndex(randomIndex)
-  }
+  }, [userNameList.length])
   const classNameButton =
     'bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-xl shadow transition-all duration-200'
 

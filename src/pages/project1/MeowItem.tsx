@@ -1,38 +1,40 @@
-type Meow = {
-  id: number
-  text: string
-  done: boolean
+import { Button } from 'antd'
+import { FormValues } from './MeowFrom'
+
+interface ContractProps {
+  prices: FormValues[]
+  onRemove: (index: number) => void
 }
 
-type Props = {
-  meows: Meow[]
-  onDelete: (id: number) => void
-  onToggle: (id: number) => void
-}
-
-const MeowItems = ({ meows, onDelete, onToggle }: Props) => {
-  if (meows.length === 0) return <p className="text-center text-gray-400">ยังไม่มีเลยเมี๊ยว</p>
-
+const MeowItems = ({ prices, onRemove }: ContractProps) => {
   return (
-    <ul className="space-y-2">
-      {meows.map((meow) => (
-        <li
-          key={meow.id}
-          className="flex justify-between items-center bg-white p-3 rounded-xl shadow"
-        >
-          <div className="flex items-center gap-2">
-            <input type="checkbox" checked={meow.done} onChange={() => onToggle(meow.id)} />
-            <span className={meow.done ? 'line-through text-gray-400' : ''}>{meow.text}</span>
+    <div>
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        {prices.map((f, index) => (
+          <div key={index} className="bg-white rounded-xl shadow-md p-4 border-l-4 border-blue-500">
+            <div>
+              <h3 className="text-lg font-semibold text-blue-700 mb-2">สินค้า #{index + 1}</h3>
+              <p className="text-gray-700">
+                <span className="font-medium">ชื่อสินค้า:</span> {f.product}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-medium">ราคา:</span> {f.price.toLocaleString()} บาท
+              </p>
+              <p className="text-gray-700">
+                <span className="font-medium">หมวดหมู่:</span> {f.Category}
+              </p>
+            </div>
+            <Button
+              onClick={() => {
+                onRemove(index)
+              }}
+            >
+              ลบ
+            </Button>
           </div>
-          <button
-            onClick={() => onDelete(meow.id)}
-            className="text-red-500 hover:text-red-700 text-sm"
-          >
-            ลบ
-          </button>
-        </li>
-      ))}
-    </ul>
+        ))}
+      </div>
+    </div>
   )
 }
 

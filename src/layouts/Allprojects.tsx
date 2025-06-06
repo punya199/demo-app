@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
-interface Projects {
+interface ProjectList {
   name: string
   link: string
 }
 
-const defaultData: Projects[] = [
+const defaultData: ProjectList[] = [
   {
     name: 'MeowList',
     link: '/p1',

@@ -7,7 +7,7 @@ import Pnotfound from './layouts/Pnotfound'
 import RootLayout from './layouts/RootLayout'
 import About from './pages/PageAbout'
 import Contract from './pages/PageContract'
-import PageMeowList from './pages/project1/PageMeowList'
+import PageListItem from './pages/project1/PageMeowList'
 import TodoList from './pages/project2/PageTodoList'
 import PageMyFriends from './pages/project3/PageMyFriends'
 import PageQuiz from './pages/project4/PageQuiz'
@@ -40,7 +40,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/p1',
-        element: <PageMeowList />,
+        element: <PageListItem />,
       },
       {
         path: '/p2',

@@ -26,11 +26,11 @@ const AddPlayer = ({ onChange }: AddPlayerProps) => {
     onChange(updatedPlayers)
     form.resetFields()
   }
-  const removePlayer = (id: string) => {
-    const updatedPlayers = players.filter(p => p.id !== id)
-    setPlayers(updatedPlayers)
-    onChange(updatedPlayers)
-  }
+  // const removePlayer = (id: string) => {
+  //   const updatedPlayers = players.filter(p => p.id !== id)
+  //   setPlayers(updatedPlayers)
+  //   onChange(updatedPlayers)
+  // }
 
   return (
     <div>
@@ -48,7 +48,7 @@ const AddPlayer = ({ onChange }: AddPlayerProps) => {
           </Button>
         </Form.Item>
       </Form>
-      <ul className="mt-4 space-y-1 text-gray-700  ">
+      {/* <ul className="mt-4 space-y-1 text-gray-700  ">
         {players.map(p => (
           <li
             key={p.id}
@@ -64,7 +64,7 @@ const AddPlayer = ({ onChange }: AddPlayerProps) => {
             </Button>
           </li>
         ))}
-      </ul>
+      </ul> */}
     </div>
   )
 }

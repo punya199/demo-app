@@ -1,37 +1,38 @@
-import { useCallback, useState } from 'react'
+import { Button, Form, Input } from 'antd'
 
-type Props = {
-  onAddMeow: (text: string) => void
+interface AboutProps {
+  child: (mag: FormValues) => void
+}
+export interface FormValues {
+  product: string
+  price: number
+  Category: string
 }
 
-const MeowForm = ({ onAddMeow }: Props) => {
-  const [text, setText] = useState('')
-
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault()
-
-      if (text.trim() === '') return
-
-      onAddMeow(text.trim()) // ส่งข้อความไปยัง MeowList
-      setText('') // ล้างช่อง input
-    },
-    [onAddMeow, text],
-  )
-
+const MeowForm = ({ child }: AboutProps) => {
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
-      <input
-        type="text"
-        className="flex-1 px-4 py-2 border rounded-xl"
-        placeholder="พิมพ์สิ่งที่แมวต้องทำ..."
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-      <button type="submit" className="bg-orange-400 text-white px-4 py-2 rounded-xl">
-        Add Meow
-      </button>
-    </form>
+    <div>
+      <Form<FormValues>
+        onFinish={values => {
+          child(values)
+        }}
+      >
+        <Form.Item name={'product'}>
+          <Input placeholder="ชื่อสินค้า"></Input>
+        </Form.Item>
+        <Form.Item name={'price'}>
+          <Input placeholder="ราคา" type="number"></Input>
+        </Form.Item>
+        <Form.Item name={'Category'} rules={[{ required: true }]}>
+          <Input placeholder="หมวดหมู่"></Input>
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            ส่งข้อความ
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   )
 }
 

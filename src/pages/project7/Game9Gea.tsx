@@ -2,6 +2,7 @@ import { Button } from 'antd'
 import { shuffle } from 'lodash'
 import { useState } from 'react'
 import { cardDeck } from '../project5/cardGame-data'
+
 export interface Player {
   id: string
   name: string
@@ -13,18 +14,50 @@ interface Game9GeaProps {
 
 const Game9Gea = (props: Game9GeaProps) => {
   const [cardList, setCardList] = useState(cardDeck)
-
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0)
+  const [player, setPlayer] = useState<Player[]>([])
   const onRandom = () => {
     const a = shuffle(cardDeck)
     setCardList(a)
+    setPlayer(props.players)
+  }
+  const dealCards = () => {
+    const cardOnDeal = cardList[0]
+    const updatedPlayers = player[currentPlayerIndex]
+    const newCardInHand = [...(updatedPlayers.cardInHand || []), cardOnDeal.name]
+    const newPlayer = [...player]
+    newPlayer[currentPlayerIndex] = {
+      ...updatedPlayers,
+      cardInHand: newCardInHand,
+    }
+
+    setCardList(cardList.slice(1))
+    setCurrentPlayerIndex(prev => (prev + 1) % player.length)
+    setPlayer(newPlayer)
+  }
+
+  if (props.players.length === 0) {
+    return <div>กรุณาเพิ่มผู้เล่นก่อน</div>
+  }
+  if (cardList.length === 0) {
+    return <div>กรุณากดปุ่มสุ่มการ์ดก่อน</div>
   }
   return (
     <div>
       <Button onClick={onRandom}>สุ่ม</Button>
-      <div className="grid grid-cols-3 gap-2 mt-4">
-        {cardList.map((card, index) => (
-          <div key={index} className="border p-2 rounded bg-gray-100 text-center">
-            {card.name}
+      <Button onClick={dealCards}>แจก</Button>
+      <div className="mt-4 space-y-1 text-gray-700">
+        {props.players.map((p, index) => (
+          <div
+            key={p.id}
+            className="border p-2 rounded bg-gray-100 flex items-center justify-between"
+          >
+            <h3>
+              {index + 1}. {p.name}
+            </h3>
+            <ul className="list-disc pl-5">
+              {p.cardInHand?.map((card, cardIndex) => <li key={cardIndex}>{card}</li>)}
+            </ul>
           </div>
         ))}
       </div>

@@ -34,7 +34,7 @@ const Navbar = () => {
         </Link>
 
         {/* กลาง: เมนู Desktop */}
-        <div className="sm:hidden lg:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-8">
           <Menu mode="horizontal" selectable={false} className="!bg-transparent">
             <Menu.Item key="about">
               <Link className="text-white hover:text-cyan-300" to="about">

@@ -9,7 +9,7 @@ for (let i = 1; i < nums.length; i++) {
 const Home = () => {
   return (
     <div>
-      <div>สวัสดี ฉันค่อย ๆ ปรากฏขึ้น pcx</div>
+      <div>สวัสดี ฉันค่อย ๆ ปรากฏขึ้น pcx gta</div>
     </div>
   )
 }

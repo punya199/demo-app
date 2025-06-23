@@ -1,3 +1,10 @@
+## [1.1.25](https://github.com/punya199/test1/compare/v1.1.24...v1.1.25) (2025-06-23)
+
+
+### Fix
+
+* edit argo sync payload ([6ef0636](https://github.com/punya199/test1/commit/6ef0636b8af3af3e8de89707c0fa6adc94ec379c))
+
 ## [1.1.24](https://github.com/punya199/test1/compare/v1.1.23...v1.1.24) (2025-06-23)
 
 

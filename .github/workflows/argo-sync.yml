@@ -20,11 +20,37 @@ jobs:
         env:
           ARGOCD_WEBHOOK_SECRET: ${{ secrets.ARGOCD_WEBHOOK_SECRET }}
           ARGOCD_WEBHOOK_URL: https://argo.dev4ever.app/api/webhook
-          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_REF: ${{ github.ref }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_ACTOR: ${{ github.actor }}
         run: |
-          REPO_URL="https://github.com/$GITHUB_REPO.git"
-          PAYLOAD=$(printf '{"ref":"%s","repository":{"full_name":"%s","clone_url":"%s"}}' "$GITHUB_REF" "$GITHUB_REPO" "$REPO_URL")
+          REPO_URL="https://github.com/$GITHUB_REPOSITORY.git"
+
+          PAYLOAD=$(jq -n \
+            --arg ref "$GITHUB_REF" \
+            --arg after "$GITHUB_SHA" \
+            --arg before "" \
+            --arg full_name "$GITHUB_REPOSITORY" \
+            --arg clone_url "$REPO_URL" \
+            --arg pusher_name "$GITHUB_ACTOR" \
+            '{
+              ref: $ref,
+              after: $after,
+              before: $before,
+              repository: {
+                full_name: $full_name,
+                clone_url: $clone_url
+              },
+              pusher: {
+                name: $pusher_name
+              },
+              head_commit: null,
+              commits: [],
+              created: false,
+              deleted: false,
+              forced: false
+            }')
 
           SIGNATURE=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "$ARGOCD_WEBHOOK_SECRET" | sed 's/^.* //')
 

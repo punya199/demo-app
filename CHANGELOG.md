@@ -1,3 +1,10 @@
+## [1.1.22](https://github.com/punya199/test1/compare/v1.1.21...v1.1.22) (2025-06-23)
+
+
+### Fix
+
+* remove text ([2cf5895](https://github.com/punya199/test1/commit/2cf58958182ac0e1365f28fb70de085fe9de5ead))
+
 ## [1.1.21](https://github.com/punya199/test1/compare/v1.1.20...v1.1.21) (2025-06-23)
 
 

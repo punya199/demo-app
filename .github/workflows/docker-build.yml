@@ -50,7 +50,7 @@ jobs:
         with:
           semantic_version: 24.2.5
         env:
-          GITHUB_TOKEN: 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
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-and-push:
     needs: release
@@ -66,8 +66,8 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: acelectic
-          password: dckr_pat_IpJ-aO5nhXY2IZ_vjBZx-zrY1oo
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta

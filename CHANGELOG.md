@@ -1,3 +1,10 @@
+## [1.1.23](https://github.com/punya199/test1/compare/v1.1.22...v1.1.23) (2025-06-23)
+
+
+### Fix
+
+* edit argo sync ([24b5227](https://github.com/punya199/test1/commit/24b522708a31014a36c59e097aafebcbe675ba18))
+
 ## [1.1.22](https://github.com/punya199/test1/compare/v1.1.21...v1.1.22) (2025-06-23)
 
 

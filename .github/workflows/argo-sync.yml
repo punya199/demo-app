@@ -1,0 +1,23 @@
+name: ArgoCD Sync
+
+on:
+  workflow_run:
+    workflows: ["Release and Build Docker Image"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  notify-argocd:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Notify ArgoCD
+        run: |
+          curl -X POST https://argo.dev4ever.app/api/webhook \
+            -H "Content-Type: application/json" \
+            -H "X-ARGOCD-TOKEN: ${{ secrets.ARGOCD_WEBHOOK_SECRET }}" 

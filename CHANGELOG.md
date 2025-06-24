@@ -1,3 +1,10 @@
+## [1.1.29](https://github.com/punya199/test1/compare/v1.1.28...v1.1.29) (2025-06-24)
+
+
+### Fix
+
+* edit yaya service ([5fce38b](https://github.com/punya199/test1/commit/5fce38bb2d4cd577d927561f4f244378315968c6))
+
 ## [1.1.28](https://github.com/punya199/test1/compare/v1.1.27...v1.1.28) (2025-06-23)
 
 

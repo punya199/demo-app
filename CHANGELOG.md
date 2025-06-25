@@ -1,3 +1,10 @@
+## [1.1.36](https://github.com/punya199/test1/compare/v1.1.35...v1.1.36) (2025-06-25)
+
+
+### Fix
+
+* test ([637f245](https://github.com/punya199/test1/commit/637f2459a40ef6e397ddc61ff9ac6c6052845725))
+
 ## [1.1.35](https://github.com/punya199/test1/compare/v1.1.34...v1.1.35) (2025-06-25)
 
 

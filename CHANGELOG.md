@@ -1,3 +1,10 @@
+## [1.1.42](https://github.com/punya199/test1/compare/v1.1.41...v1.1.42) (2025-06-30)
+
+
+### Fix
+
+* edit server error when eslint error ([0f541e3](https://github.com/punya199/test1/commit/0f541e3eef899e40162adec6a138683b9ebb4d27))
+
 ## [1.1.41](https://github.com/punya199/test1/compare/v1.1.40...v1.1.41) (2025-06-30)
 
 

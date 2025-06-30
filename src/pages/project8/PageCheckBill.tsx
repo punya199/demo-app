@@ -11,11 +11,10 @@ const PageCheckBill = () => {
 
   const handleAddItem = (item: Item) => {
     setItems([...items, item])
+
   }
   const handleAddFriend = (friend: Friend) => {
     setFriends([...friends, friend])
-    const total = items.reduce((acc, item) => acc + item.price, 0)
-    const bill = total / friends.length
     setFriends([...friends, { name: friend.name, bill: 0 }])
     message.success("Friend added successfully")
 
@@ -53,7 +52,7 @@ const PageCheckBill = () => {
   console.log(itemToFriends)
   return (
     <div className="p-4 bg-white rounded-lg shadow-md flex flex-col gap-4">
-      <AddItem onAddItem={handleAddItem} />
+      <AddItem onAddItem={handleAddItem} items={items} />
       <AddFriends onAddFriend={handleAddFriend} />
       <div className="flex flex-col gap-2">
         {items.map((item, index) => (

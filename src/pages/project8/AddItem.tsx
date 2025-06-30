@@ -7,7 +7,7 @@ export interface Item {
 
 interface AddItemProps {
   onAddItem: (item: Item) => void
-
+  items: Item[]
 }
 
 export const AddItem = ({ onAddItem }: AddItemProps) => {

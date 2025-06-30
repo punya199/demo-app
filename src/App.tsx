@@ -12,6 +12,7 @@ import TodoList from './pages/project2/PageTodoList'
 import PageMyFriends from './pages/project3/PageMyFriends'
 import PageQuiz from './pages/project4/PageQuiz'
 import PageGame9Gea from './pages/project7/PageGame9Gea'
+import PageCheckBill from './pages/project8/PageCheckBill'
 
 const Omama = lazy(() => import('./pages/project6/Omama'))
 const CardGame = lazy(() => import('./pages/project5/CardGame'))
@@ -58,8 +59,12 @@ const router = createBrowserRouter([
         path: '/p5',
         element: <CardGame />,
       },
-      { path: '/p6', element: <Omama /> }, // Omama project
-      { path: '/p7', element: <PageGame9Gea /> }, // 9 gea project
+      { path: '/p6', element: <Omama /> },
+      { path: '/p7', element: <PageGame9Gea /> },
+      {
+        path: '/p8',
+        element: <PageCheckBill />,
+      },
     ],
   },
 ])

@@ -33,6 +33,10 @@ const defaultData: ProjectList[] = [
     name: '9 gea',
     link: '/p7',
   },
+  {
+    name: 'Check Bill',
+    link: '/p8',
+  },
 ]
 
 const Allprojects = () => {

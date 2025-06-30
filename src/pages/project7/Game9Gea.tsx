@@ -24,6 +24,7 @@ const Game9Gea = (props: Game9GeaProps) => {
   const dealCards = () => {
     const cardOnDeal = cardList[0]
     const updatedPlayers = player[currentPlayerIndex]
+
     const newCardInHand = [...(updatedPlayers.cardInHand || []), cardOnDeal.name]
     const newPlayer = [...player]
     newPlayer[currentPlayerIndex] = {
@@ -42,12 +43,13 @@ const Game9Gea = (props: Game9GeaProps) => {
   if (cardList.length === 0) {
     return <div>กรุณากดปุ่มสุ่มการ์ดก่อน</div>
   }
+
   return (
     <div>
       <Button onClick={onRandom}>สุ่ม</Button>
       <Button onClick={dealCards}>แจก</Button>
       <div className="mt-4 space-y-1 text-gray-700">
-        {props.players.map((p, index) => (
+        {player.map((p, index) => (
           <div
             key={p.id}
             className="border p-2 rounded bg-gray-100 flex items-center justify-between"

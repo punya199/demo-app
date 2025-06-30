@@ -5,7 +5,7 @@ const Home = () => {
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
       <Link to="about">
         <Button type="primary" className="!bg-cyan-500 !border-cyan-500 hover:!bg-cyan-600">
-          ภาษาไทย
+          hi
         </Button>
       </Link>
     </div>

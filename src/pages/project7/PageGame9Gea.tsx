@@ -8,7 +8,7 @@ const PageGame9Gea = () => {
     setPlayers(newPlayers)
   }
   return (
-    <div>
+    <div className="m-1  p-4 border-2 rounded-2xl shadow-2xl">
       <AddPlayer onChange={onChangePlayers} />
       <Game9Gea players={players} />
     </div>

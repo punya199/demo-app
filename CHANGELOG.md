@@ -1,3 +1,10 @@
+## [1.1.43](https://github.com/punya199/test1/compare/v1.1.42...v1.1.43) (2025-06-30)
+
+
+### Fix
+
+* update UI project 8 ([b88c0e1](https://github.com/punya199/test1/commit/b88c0e191671fce29b7a460bf9e8a63b4d524743))
+
 ## [1.1.42](https://github.com/punya199/test1/compare/v1.1.41...v1.1.42) (2025-06-30)
 
 

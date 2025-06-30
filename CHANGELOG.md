@@ -1,3 +1,10 @@
+## [1.1.40](https://github.com/punya199/test1/compare/v1.1.39...v1.1.40) (2025-06-30)
+
+
+### Fix
+
+* add prettier ([44a969a](https://github.com/punya199/test1/commit/44a969aa0e073f80e374763e611fc20cc04542f9))
+
 ## [1.1.39](https://github.com/punya199/test1/compare/v1.1.38...v1.1.39) (2025-06-30)
 
 

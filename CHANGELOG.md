@@ -1,3 +1,10 @@
+## [1.1.44](https://github.com/punya199/test1/compare/v1.1.43...v1.1.44) (2025-07-01)
+
+
+### Fix
+
+* Update Project 8 and change foder Project ([2af968d](https://github.com/punya199/test1/commit/2af968d078ae5f634c6a4677741eee4ef058d6d0))
+
 ## [1.1.43](https://github.com/punya199/test1/compare/v1.1.42...v1.1.43) (2025-06-30)
 
 

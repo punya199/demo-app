@@ -33,7 +33,7 @@ const Game9Gea = (props: Game9GeaProps) => {
     }
 
     setCardList(cardList.slice(1))
-    setCurrentPlayerIndex(prev => (prev + 1) % player.length)
+    setCurrentPlayerIndex((prev) => (prev + 1) % player.length)
     setPlayer(newPlayer)
   }
 
@@ -58,7 +58,9 @@ const Game9Gea = (props: Game9GeaProps) => {
               {index + 1}. {p.name}
             </h3>
             <ul className="list-disc pl-5">
-              {p.cardInHand?.map((card, cardIndex) => <li key={cardIndex}>{card}</li>)}
+              {p.cardInHand?.map((card, cardIndex) => (
+                <li key={cardIndex}>{card}</li>
+              ))}
             </ul>
           </div>
         ))}

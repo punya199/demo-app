@@ -1,8 +1,9 @@
 import { Button, Form, Input } from 'antd'
+import { v4 } from 'uuid'
 
 export interface Friend {
   name: string
-  bill: number
+  id: string
 }
 
 interface AddFriendsProps {
@@ -15,9 +16,9 @@ export const AddFriends = ({ onAddFriend, friends }: AddFriendsProps) => {
   const name = Form.useWatch('name', form)
 
   const onFinish = (values: Friend) => {
-    onAddFriend(values)
+    onAddFriend({ ...values, id: v4() })
     form.resetFields()
-    form.setFieldsValue({ name: '', bill: 0 })
+    form.setFieldsValue({ name: '' })
   }
 
   const disabledButton = () => {
@@ -26,13 +27,13 @@ export const AddFriends = ({ onAddFriend, friends }: AddFriendsProps) => {
 
   return (
     <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-      <h3 className="text-lg font-semibold mb-2">เพิ่มเพื่อนร่วมจ่าย</h3>
+      <h3 className="text-lg font-semibold mb-2">เพิ่มเพื่อน</h3>
       <Form onFinish={onFinish} form={form} layout="inline" className="flex flex-wrap gap-4">
         <Form.Item
           name="name"
           label="ชื่อเพื่อน"
           rules={[
-            { required: true, message: 'กรุณาใส่ชื่อเพื่อน' },
+            { required: true, message: 'กรุณาใส่ชื่อ' },
             {
               validator(_rule, value) {
                 if (friends.some((n) => n.name === value)) {

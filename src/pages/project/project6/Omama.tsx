@@ -2,7 +2,7 @@ import { chunk, shuffle } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import black_dark from '../../assets/images/cards/back_dark.webp'
 import black_light from '../../assets/images/cards/back_light.webp'
-import { cardDeck, ICardData } from '../project5/cardGame-data'
+import { cardDeck, ICardData } from '../project/project5/cardGame-data'
 
 interface SpecialCardOwner {
   K: number | null
@@ -37,8 +37,8 @@ const Omama = () => {
     [userNameList]
   )
   const removeUserName = (name: string) => {
-    setUserNameList(prev => {
-      const newList = prev.filter(e => e !== name)
+    setUserNameList((prev) => {
+      const newList = prev.filter((e) => e !== name)
       if (newList.length === 0) {
         setNameIndex(0)
       } else if (nameIndex >= newList.length) {
@@ -73,13 +73,13 @@ const Omama = () => {
       setCurrentCard(card)
       nextName()
       if (card.name.startsWith('K')) {
-        setSpecialCardOwner(prev => ({ ...prev, K: nameIndex }))
+        setSpecialCardOwner((prev) => ({ ...prev, K: nameIndex }))
       }
       if (card.name.startsWith('Q')) {
-        setSpecialCardOwner(prev => ({ ...prev, Q: nameIndex }))
+        setSpecialCardOwner((prev) => ({ ...prev, Q: nameIndex }))
       }
       if (card.name.startsWith('J')) {
-        setSpecialCardOwner(prev => ({ ...prev, J: nameIndex }))
+        setSpecialCardOwner((prev) => ({ ...prev, J: nameIndex }))
       }
     },
     [cardlist, nameIndex, nextName]
@@ -102,7 +102,7 @@ const Omama = () => {
           className="border-2 rounded-xl px-4 py-2 w-full md:w-1/2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
           autoFocus
           value={inputName}
-          onChange={e => setInputName(e.target.value)}
+          onChange={(e) => setInputName(e.target.value)}
         />
         <button onClick={() => addUserName(inputName)} className={classNameButton}>
           เพิ่มชื่อ

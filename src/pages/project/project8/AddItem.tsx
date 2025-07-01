@@ -1,8 +1,10 @@
 import { Button, Form, Input } from 'antd'
+import { v4 } from 'uuid'
 
 export interface Item {
   name: string
   price: number
+  id: string
 }
 
 interface AddItemProps {
@@ -15,7 +17,7 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
   const name = Form.useWatch('name', form)
 
   const onFinish = (values: Item) => {
-    onAddItem(values)
+    onAddItem({ ...values, id: v4() })
     form.resetFields()
     form.setFieldsValue({ name: '' })
   }
@@ -26,7 +28,7 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
 
   return (
     <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-      <h3 className="text-lg font-semibold mb-2">เพิ่มรายการสินค้า</h3>
+      <h3 className="text-lg font-semibold mb-2">เพิ่มรายการ</h3>
       <Form onFinish={onFinish} form={form} layout="inline" className="flex flex-wrap gap-4">
         <Form.Item
           name="name"

@@ -1,21 +1,21 @@
 import { lazy } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
-import Allprojects from './layouts/Allprojects'
-import Home from './layouts/Home'
 import Pnotfound from './layouts/Pnotfound'
 import RootLayout from './layouts/RootLayout'
+import Allprojects from './pages/Allprojects'
+import Home from './pages/Home'
 import About from './pages/PageAbout'
 import Contract from './pages/PageContract'
-import PageListItem from './pages/project1/PageMeowList'
-import TodoList from './pages/project2/PageTodoList'
-import PageMyFriends from './pages/project3/PageMyFriends'
-import PageQuiz from './pages/project4/PageQuiz'
-import PageGame9Gea from './pages/project7/PageGame9Gea'
-import PageCheckBill from './pages/project8/PageCheckBill'
+import PageListItem from './pages/project/project1/PageMeowList'
+import TodoList from './pages/project/project2/PageTodoList'
+import PageMyFriends from './pages/project/project3/PageMyFriends'
+import PageQuiz from './pages/project/project4/PageQuiz'
+import PageGame9Gea from './pages/project/project7/PageGame9Gea'
+import PageCheckBill from './pages/project/project8/PageCheckBill'
 
-const Omama = lazy(() => import('./pages/project6/Omama'))
-const CardGame = lazy(() => import('./pages/project5/CardGame'))
+const Omama = lazy(() => import('./pages/project/project6/Omama'))
+const CardGame = lazy(() => import('./pages/project/project5/CardGame'))
 
 const router = createBrowserRouter([
   {

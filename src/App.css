@@ -1,2 +1,6 @@
 @import "tailwindcss";
 @import "tailwindcss-animated";
+
+.ant-form-item-required::before {
+  display: none !important;
+}

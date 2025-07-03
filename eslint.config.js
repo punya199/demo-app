@@ -51,7 +51,7 @@ export default tseslint.config(
         },
       ],
       'react/no-unused-prop-types': 'warn',
-      'no-console': 'error',
+      'no-console': 'warn',
     },
   }
 )

@@ -1,152 +1,304 @@
 import { Button, Divider, message, Select, SelectProps, Typography } from 'antd'
+import { keyBy, round } from 'lodash'
 import { useMemo, useState } from 'react'
+import { MdDelete } from 'react-icons/md'
 import AddFriends, { Friend } from './AddFriends'
 import { AddItem, Item } from './AddItem'
 
 const PageCheckBill = () => {
-  const [items, setItems] = useState<Item[]>([]) //ที่เก็บข้อมูลรายการ
-  const [friends, setFriends] = useState<Friend[]>([]) //ที่เก็บข้อมูล รายชื่อเพื่อน
-  const [itemToFriends, setItemToFriends] = useState<Record<string, string[]>>({}) //เป็บข้อมูลว่ารายการไหนที่เพื่อนต้องหาร
+  const [items, setItems] = useState<Item[]>([])
+  const [friends, setFriends] = useState<Friend[]>([])
+  const [itemToFriends, setItemToFriends] = useState<Record<string, string[]>>({})
+  const [friendPayByItem, setFriendPayByItem] = useState<Record<string, string>>({})
 
   const handleAddItem = (item: Item) => {
-    setItems([...items, item]) //เพิ่มไอเทมใหม่ลงในไอเทมเก่า
+    setItems([...items, item])
   }
 
   const handleAddFriend = (friend: Friend) => {
-    setFriends([...friends, friend]) //เพิ่มรายชื่อเพื่อนใหม่
-    message.success('เพิ่มเพื่อนเรียบร้อยแล้ว') //ส่งข้อความบอกว่าสำเร็จ แต่ไม่รุ้ส่งไปไหน
+    setFriends([...friends, { ...friend }])
+    message.success('เพิ่มเพื่อนเรียบร้อยแล้ว')
+  }
+
+  const handleDeleteItem = (id: string) => {
+    setItems(items.filter((item) => item.id !== id))
+    const updated = { ...friendPayByItem }
+    delete updated[id]
+    setFriendPayByItem(updated)
+
+    const updatedSplit = { ...itemToFriends }
+    delete updatedSplit[id]
+    setItemToFriends(updatedSplit)
+  }
+
+  const handleDeleteFriend = (id: string) => {
+    setFriends(friends.filter((friend) => friend.id !== id))
+    setItemToFriends(
+      Object.entries(itemToFriends).reduce(
+        (acc, [itemId, friendIds]) => {
+          acc[itemId] = friendIds.filter((fid) => fid !== id)
+          return acc
+        },
+        {} as Record<string, string[]>
+      )
+    )
+
+    setFriendPayByItem(
+      Object.entries(friendPayByItem).reduce(
+        (acc, [itemId, payerId]) => {
+          if (payerId !== id) acc[itemId] = payerId
+          return acc
+        },
+        {} as Record<string, string>
+      )
+    )
   }
 
   const handleChange = (friendNames: string[], id: string) => {
-    setItemToFriends({ ...itemToFriends, [id]: friendNames }) //เก็บข้อมูลว่าเพื่อนอยู่รายการไหน
+    setItemToFriends({ ...itemToFriends, [id]: friendNames })
   }
-  const handleDeleteItem = (id: string) => {
-    setItems(items.filter((item) => item.id !== id)) //ลบรายการออก
-  }
-  const handleDeleteFriend = (id: string) => {
-    setFriends(friends.filter((friend) => friend.id !== id)) //ลบชื่อเพื่อนออกจาก state friends
-    setItemToFriends(
-      Object.entries(itemToFriends).reduce((acc, curr) => {
-        const [itemId, friendIds] = curr
-        acc[itemId] = friendIds.filter((e) => e !== id)
 
-        return acc
-      }, itemToFriends) //ลบรายชื่อเพื่อนตาม id
-    )
+  const handleAddPay = (payerId: string, itemId: string) => {
+    setFriendPayByItem({ ...friendPayByItem, [itemId]: payerId })
   }
 
   const handleReset = () => {
     setItems([])
     setFriends([])
     setItemToFriends({})
-  } //รีเซ็ตข้อมูลทั้งหมด
-
-  const options: SelectProps['options'] = friends.map((friend) => ({
-    label: friend.name,
-    value: friend.id,
-  })) // ตัวเลือกของ ดอบดาว <Select> ตามรายชื่อเพื่อน
-
+    setFriendPayByItem({})
+  }
+  const handleJ = () => {
+    setItems([
+      { name: 'รี', price: 500, id: '1' },
+      { name: 'ข้าว', price: 500, id: '2' },
+      { name: 'โซดา', price: 250, id: '3' },
+    ])
+    setFriends([
+      { name: 'ton', id: '1' },
+      { name: 'boom', id: '2' },
+      { name: 'gon', id: '3' },
+    ])
+  }
   const friendBill = useMemo(() => {
-    const newFriendBill: Record<string, number> = {} //สร้างตัวแปรมาเก็บข้อมูล
-    friends.forEach((friend) => {
-      newFriendBill[friend.id] = 0 //กำหนดค่าเริ่มต้นให้เป็น 0
-    })
+    const newFriendBill: Record<string, number> = {}
+    friends.forEach((f) => (newFriendBill[f.id] = 0))
 
     items.forEach((item) => {
-      const shared = itemToFriends[item.id]
-      if (!shared || shared.length === 0) return //ไม่มีเพื่อนไม่ทำ
-      const pricePerPerson = item.price / shared.length //เอาราคามาหารด้วยจำนวนคน
-      shared.forEach((id) => {
-        newFriendBill[id] += pricePerPerson //เอาค่าใหม่ + ค่าเก่า
+      const split = itemToFriends[item.id]
+      if (!split || split.length === 0) return
+
+      const pricePerPerson = round(item.price / split.length)
+      split.forEach((fid) => {
+        newFriendBill[fid] += pricePerPerson
       })
     })
 
     return newFriendBill
   }, [friends, itemToFriends, items])
 
+  console.log(friendBill)
+
+  const friendPaid = useMemo(() => {
+    const newFriendPaid: Record<string, number> = {}
+
+    friends.forEach((friend) => {
+      newFriendPaid[friend.id] = 0
+    })
+
+    items.forEach((item) => {
+      const payerId = friendPayByItem[item.id]
+      if (payerId) {
+        newFriendPaid[payerId] += item.price
+      }
+    })
+
+    return newFriendPaid
+  }, [friends, items, friendPayByItem])
+
+  console.log(friendPaid)
+
+  useMemo(() => {
+    const trueFriend: Record<string, number> = {} //เก็บคนที่ต้องได้เงินคืน
+    const eatFriend: Record<string, number> = {} //คนที่ต้องจ่ายเงิน
+
+    friends.forEach((fri) => {
+      const paid = friendPaid[fri.id] //ยอดที่ออกก่อน
+      const bill = friendBill[fri.id] //ยอดที่ต้องจ่าย
+      if (paid > bill) {
+        trueFriend[fri.id] = paid - bill
+      } else if (paid < bill) {
+        eatFriend[fri.id] = bill
+      }
+    })
+    const friendHash = keyBy(friends, 'id')
+    for (const [tfId, vT] of Object.entries(trueFriend)) {
+      let vTbalance = vT
+      for (const [efId, vEF] of Object.entries(eatFriend)) {
+        let vEFBalance = vEF
+        if (vEFBalance === 0 || vTbalance === 0) {
+          continue
+        }
+        if (vTbalance >= vEFBalance) {
+          vTbalance = vTbalance - vEFBalance
+          vEFBalance = 0
+          eatFriend[efId] = 0
+          trueFriend[tfId] = vTbalance
+        } else {
+          vEFBalance = vEFBalance - vTbalance
+          vTbalance = 0
+          trueFriend[tfId] = 0
+          eatFriend[efId] = vEFBalance
+        }
+        console.table({
+          tf: friendHash[tfId].name,
+          tfId,
+          vT,
+          vTbalance,
+          ef: friendHash[efId].name,
+          efId,
+          vEF,
+          vEFBalance,
+        })
+      }
+    }
+
+    console.log({ trueFriend, eatFriend })
+  }, [friendBill, friendPaid, friends])
+
+  const options: SelectProps['options'] = friends.map((f) => ({
+    label: f.name,
+    value: f.id,
+  }))
+
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl shadow-2xl space-y-6 transition-all duration-500 hover:shadow-3xl">
-      <Typography.Title level={3} className="!text-center text-blue-600 animate-pulse">
+    <div className="hover:shadow-3xl mx-auto max-w-full space-y-6 rounded-3xl bg-gradient-to-br from-blue-100 via-white to-blue-200 p-4 shadow-2xl transition-all duration-500 md:max-w-3xl md:p-6">
+      <Typography.Title
+        level={3}
+        className="animate-pulse !text-center text-blue-600 drop-shadow-md"
+      >
         แบ่งบิลเพื่อนแบบกำหนดเอง
       </Typography.Title>
-      <div className="flex flex-col gap-4">
+
+      <div className="flex flex-col gap-6">
         <AddItem onAddItem={handleAddItem} items={items} />
         <AddFriends onAddFriend={handleAddFriend} friends={friends} />
       </div>
+
       {items.length > 0 && <Divider className="border-blue-300">รายการและผู้ร่วมจ่าย</Divider>}
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {items.map((item, index) => (
           <div
             key={index}
-            className="p-4 bg-gray-100 rounded-xl shadow-lg flex flex-row justify-between items-center transform transition-transform duration-300 hover:scale-105"
+            className="flex flex-col items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-md ring-1 ring-blue-200 transition-transform duration-300 hover:scale-[1.02] md:flex-row"
           >
-            <div className="flex flex-col gap-2 w-7/8">
-              <div className="font-medium text-lg flex justify-between text-gray-700">
-                <div>
-                  รายการที่ {index + 1} : {item.name}
+            <div className="flex w-full flex-col gap-4 md:w-11/12">
+              <div className="flex flex-col justify-between gap-1 text-base font-medium text-gray-700 md:flex-row md:items-center">
+                <div className="font-semibold">
+                  <span>รายการที่ {index + 1}</span> {item.name}
                 </div>
-                <div> {item.price} บาท</div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm text-gray-500">คนที่ออกเงิน:</span>
+                  <Select
+                    showSearch
+                    placeholder="เลือกผู้จ่าย"
+                    optionFilterProp="label"
+                    value={friendPayByItem[item.id]}
+                    onChange={(value) => handleAddPay(value, item.id)}
+                    options={options}
+                    className="min-w-[140px]"
+                  />
+                </div>
+                <div className="text-blue-600">
+                  จำนวนเงิน {new Intl.NumberFormat().format(item.price)} บาท
+                </div>
               </div>
+
               <Select
                 mode="multiple"
                 allowClear
-                style={{ width: '100%' }}
                 placeholder="เลือกเพื่อนที่ร่วมจ่าย"
                 value={itemToFriends[item.id]}
                 onChange={(value) => handleChange(value, item.id)}
                 options={options}
-                className="transition-all duration-300 hover:border-blue-400"
+                className="w-full transition-all duration-300 hover:border-blue-400"
               />
             </div>
 
             <Button
               type="link"
               onClick={() => handleDeleteItem(item.id)}
-              className="text-red-500 hover:text-red-700"
+              className="!text-red-500 hover:scale-110"
             >
-              ลบ
+              <MdDelete size={26} />
             </Button>
           </div>
         ))}
       </div>
+
       {friends.length > 0 && (
-        <Divider className="border-green-300 text-lg font-semibold text-center my-4">
+        <Divider className="my-4 border-green-300 text-center text-lg font-semibold">
           ยอดที่แต่ละคนต้องจ่าย
         </Divider>
       )}
 
-      <div className="space-y-2">
-        {friends.map((friend, index) => (
+      <div className="space-y-3">
+        {friends.map((friend) => (
           <div
-            key={index}
-            className="bg-green-100 text-green-900 rounded-md px-4 py-2 shadow-md flex justify-between transform transition-transform duration-300 hover:scale-105"
+            key={friend.id}
+            className="flex flex-row items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-green-800 shadow ring-1 ring-green-200 transition-all duration-300 hover:scale-[1.01] md:flex-row md:items-center md:justify-between"
           >
-            <span className="font-medium">{friend.name}</span>
-            <span>{friendBill[friend.id]} บาท</span>
-            <Button
-              type="link"
-              onClick={() => handleDeleteFriend(friend.id)}
-              className="text-red-400 !hover:text-red-700"
-            >
-              ลบ
-            </Button>
+            <div className="flex w-full flex-col md:flex-row md:items-center md:gap-4">
+              <div className="font-medium">{friend.name}</div>
+              {friendPaid[friend.id] > 0 && (
+                <div className="text-sm text-gray-500">
+                  ชำระเงินไปแล้ว {Math.floor(friendPaid[friend.id]).toLocaleString()} บาท
+                </div>
+              )}
+              <div className="font-semibold text-gray-500">
+                ยอดที่ต้องชำระ {Math.floor(friendBill[friend.id]).toLocaleString()} บาท
+              </div>
+            </div>
+            <div>
+              {friendPaid[friend.id] > friendBill[friend.id] && (
+                <div>
+                  {`ต้องได้เงินคืน: ${Math.floor(friendPaid[friend.id] - friendBill[friend.id]).toLocaleString()} บาท`}
+                </div>
+              )}
+              {friendPaid[friend.id] < friendBill[friend.id] && (
+                <div className="text-red-500">
+                  {`ยอดค้างชำระ: ${Math.floor(friendBill[friend.id] - friendPaid[friend.id]).toLocaleString()} บาท`}
+                </div>
+              )}
+            </div>
+            <div className="md:ml-auto">
+              <Button
+                type="link"
+                onClick={() => handleDeleteFriend(friend.id)}
+                className="!text-red-400 hover:scale-110"
+              >
+                <MdDelete size={20} />
+              </Button>
+            </div>
           </div>
         ))}
       </div>
-      {!(friends.length === 0 && items.length === 0) && (
-        <div className="pt-4 flex justify-center">
+      <div>
+        <Button onClick={handleJ}>สร้างข้อมูล</Button>
+      </div>
+      {(friends.length > 0 || items.length > 0) && (
+        <div className="flex justify-center pt-6">
           <Button
             type="primary"
             onClick={handleReset}
-            className="bg-blue-500 hover:bg-blue-700 text-white transition-all duration-300"
+            className="rounded-full bg-blue-500 px-6 py-2 text-lg text-white shadow-lg transition-all duration-300 hover:bg-blue-600"
           >
-            ล้างข้อมูล
+            ล้างข้อมูลทั้งหมด
           </Button>
         </div>
       )}
     </div>
   )
 }
-
 export default PageCheckBill

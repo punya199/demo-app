@@ -2,9 +2,9 @@ import { Button } from 'antd'
 import { Link } from 'react-router-dom'
 const Home = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <Link to="about">
-        <Button type="primary" className="!bg-cyan-500 !border-cyan-500 hover:!bg-cyan-600">
+    <div className="flex h-screen flex-col items-center justify-center bg-gray-100">
+      <Link to="Allprojects">
+        <Button type="primary" className="!border-cyan-500 !bg-cyan-500 hover:!bg-cyan-600">
           hi
         </Button>
       </Link>

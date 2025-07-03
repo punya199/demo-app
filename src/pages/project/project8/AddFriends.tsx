@@ -26,9 +26,14 @@ export const AddFriends = ({ onAddFriend, friends }: AddFriendsProps) => {
   }
 
   return (
-    <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-      <h3 className="text-lg font-semibold mb-2">เพิ่มเพื่อน</h3>
-      <Form onFinish={onFinish} form={form} layout="inline" className="flex flex-wrap gap-4">
+    <div className="rounded-lg bg-gray-50 p-4 shadow-sm">
+      <h3 className="mb-2 text-lg font-semibold">เพิ่มเพื่อน</h3>
+      <Form
+        onFinish={onFinish}
+        form={form}
+        layout="inline"
+        className="!flex flex-wrap justify-between"
+      >
         <Form.Item
           name="name"
           label="ชื่อเพื่อน"
@@ -44,7 +49,7 @@ export const AddFriends = ({ onAddFriend, friends }: AddFriendsProps) => {
             },
           ]}
         >
-          <Input placeholder="ชื่อเพื่อน" />
+          <Input placeholder="คนที่ต้องจ่าย" />
         </Form.Item>
 
         <Form.Item>

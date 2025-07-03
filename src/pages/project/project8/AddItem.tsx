@@ -1,5 +1,6 @@
 import { Button, Form, Input } from 'antd'
 import { v4 } from 'uuid'
+import { AppInputNumber } from '../../../components/AppInputNumber'
 
 export interface Item {
   name: string
@@ -17,9 +18,13 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
   const name = Form.useWatch('name', form)
 
   const onFinish = (values: Item) => {
-    onAddItem({ ...values, id: v4() })
+    const item: Item = {
+      id: v4(),
+      name: values.name,
+      price: values.price,
+    }
+    onAddItem(item)
     form.resetFields()
-    form.setFieldsValue({ name: '' })
   }
 
   const disabledButton = () => {
@@ -27,12 +32,18 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
   }
 
   return (
-    <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-      <h3 className="text-lg font-semibold mb-2">เพิ่มรายการ</h3>
-      <Form onFinish={onFinish} form={form} layout="inline" className="flex flex-wrap gap-4">
+    <div className="rounded-lg bg-gray-50 p-4 shadow-sm">
+      <h3 className="mb-2 text-lg font-semibold">เพิ่มรายการ</h3>
+      <Form
+        onFinish={onFinish}
+        form={form}
+        layout="inline"
+        className="flex flex-wrap justify-between"
+      >
         <Form.Item
           name="name"
           label="ชื่อ"
+          validateTrigger="onChange"
           rules={[
             { required: true, message: 'กรุณาใส่ชื่อสินค้า' },
             {
@@ -45,11 +56,21 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
             },
           ]}
         >
-          <Input placeholder="เช่น ข้าวมันไก่" />
+          <Input placeholder="เช่น รีเจนซี่" />
         </Form.Item>
 
         <Form.Item name="price" label="ราคา" rules={[{ required: true, message: 'กรุณาใส่ราคา' }]}>
-          <Input type="number" placeholder="ราคา (บาท)" min={0} max={1000000} />
+          <AppInputNumber
+            thousandSeparator=","
+            allowNegative={false}
+            decimalScale={0}
+            allowLeadingZeros={false}
+            placeholder="(บาท)"
+            valueIsNumericString
+            isAllowed={({ floatValue }) =>
+              floatValue === undefined || (floatValue >= 0 && floatValue <= 1000000)
+            }
+          />
         </Form.Item>
 
         <Form.Item>

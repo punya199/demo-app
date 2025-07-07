@@ -41,12 +41,16 @@ const defaultData: ProjectList[] = [
 
 const Allprojects = () => {
   return (
-    <div className="bg-amber-100">
-      <ul className="p-2">
+    <div className="flex h-full items-center justify-center bg-gray-100">
+      <ul className="mt-5 rounded-lg bg-white p-4 shadow-lg">
         {defaultData.map((e, index) => {
           return (
-            <Link key={index} to={e.link}>
-              <li className="text-3xl p-2 hover:bg-amber-400">
+            <Link
+              key={index}
+              to={e.link}
+              className="block transition duration-300 ease-in-out hover:bg-gray-200"
+            >
+              <li className="border-b p-4 text-2xl font-semibold text-gray-800 last:border-none">
                 Project {index + 1} : {e.name}
               </li>
             </Link>

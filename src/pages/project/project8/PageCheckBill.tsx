@@ -1,5 +1,5 @@
 import { Button, Divider, message, Select, SelectProps, Typography } from 'antd'
-import { keyBy, round } from 'lodash'
+import { round } from 'lodash'
 import { useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
 import AddFriends, { Friend } from './AddFriends'
@@ -118,53 +118,82 @@ const PageCheckBill = () => {
 
   console.log(friendPaid)
 
-  useMemo(() => {
-    const trueFriend: Record<string, number> = {} //เก็บคนที่ต้องได้เงินคืน
-    const eatFriend: Record<string, number> = {} //คนที่ต้องจ่ายเงิน
+  // useMemo(() => {
+  //   const trueFriend: Record<string, number> = {} //เก็บคนที่ต้องได้เงินคืน
+  //   const eatFriend: Record<string, number> = {} //คนที่ต้องจ่ายเงิน
 
-    friends.forEach((fri) => {
-      const paid = friendPaid[fri.id] //ยอดที่ออกก่อน
-      const bill = friendBill[fri.id] //ยอดที่ต้องจ่าย
-      if (paid > bill) {
-        trueFriend[fri.id] = paid - bill
-      } else if (paid < bill) {
-        eatFriend[fri.id] = bill
+  //   friends.forEach((fri) => {
+  //     const paid = friendPaid[fri.id] //ยอดที่ออกก่อน
+  //     const bill = friendBill[fri.id] //ยอดที่ต้องจ่าย
+  //     if (paid > bill) {
+  //       trueFriend[fri.id] = paid - bill
+  //     } else if (paid < bill) {
+  //       eatFriend[fri.id] = bill
+  //     }
+  //   })
+  //   const friendHash = keyBy(friends, 'id')
+  //   for (const [tfId, vT] of Object.entries(trueFriend)) {
+  //     let vTbalance = vT
+  //     for (const [efId, vEF] of Object.entries(eatFriend)) {
+  //       let vEFBalance = vEF
+  //       if (vEFBalance === 0 || vTbalance === 0) {
+  //         continue
+  //       }
+  //       if (vTbalance >= vEFBalance) {
+  //         vTbalance = vTbalance - vEFBalance
+  //         vEFBalance = 0
+  //         eatFriend[efId] = 0
+  //         trueFriend[tfId] = vTbalance
+  //       } else {
+  //         vEFBalance = vEFBalance - vTbalance
+  //         vTbalance = 0
+  //         trueFriend[tfId] = 0
+  //         eatFriend[efId] = vEFBalance
+  //       }
+
+  //     }
+  //   }
+  // }, [friendBill, friendPaid, friends])
+
+  const transactions = useMemo(() => {
+    const result: { from: string; to: string; amount: number }[] = []
+
+    const payers: Record<string, number> = {}
+    const receivers: Record<string, number> = {}
+
+    friends.forEach((friend) => {
+      const paid = friendPaid[friend.id] || 0
+      const bill = friendBill[friend.id] || 0
+      const diff = Math.round(paid - bill)
+
+      if (diff > 0) {
+        receivers[friend.id] = diff // ได้เงินคืน
+      } else if (diff < 0) {
+        payers[friend.id] = -diff // ต้องจ่าย
       }
     })
-    const friendHash = keyBy(friends, 'id')
-    for (const [tfId, vT] of Object.entries(trueFriend)) {
-      let vTbalance = vT
-      for (const [efId, vEF] of Object.entries(eatFriend)) {
-        let vEFBalance = vEF
-        if (vEFBalance === 0 || vTbalance === 0) {
-          continue
-        }
-        if (vTbalance >= vEFBalance) {
-          vTbalance = vTbalance - vEFBalance
-          vEFBalance = 0
-          eatFriend[efId] = 0
-          trueFriend[tfId] = vTbalance
-        } else {
-          vEFBalance = vEFBalance - vTbalance
-          vTbalance = 0
-          trueFriend[tfId] = 0
-          eatFriend[efId] = vEFBalance
-        }
-        console.table({
-          tf: friendHash[tfId].name,
-          tfId,
-          vT,
-          vTbalance,
-          ef: friendHash[efId].name,
-          efId,
-          vEF,
-          vEFBalance,
-        })
+
+    const receiverIds = Object.keys(receivers)
+    const payerIds = Object.keys(payers)
+
+    for (const payerId of payerIds) {
+      for (const receiverId of receiverIds) {
+        const payAmount = payers[payerId]
+        const receiveAmount = receivers[receiverId]
+
+        if (payAmount === 0 || receiveAmount === 0) continue
+
+        const amount = Math.min(payAmount, receiveAmount)
+
+        result.push({ from: payerId, to: receiverId, amount })
+
+        payers[payerId] -= amount
+        receivers[receiverId] -= amount
       }
     }
 
-    console.log({ trueFriend, eatFriend })
-  }, [friendBill, friendPaid, friends])
+    return result
+  }, [friendPaid, friendBill, friends])
 
   const options: SelectProps['options'] = friends.map((f) => ({
     label: f.name,
@@ -243,47 +272,79 @@ const PageCheckBill = () => {
         </Divider>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {friends.map((friend) => (
           <div
             key={friend.id}
-            className="flex flex-row items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-green-800 shadow ring-1 ring-green-200 transition-all duration-300 hover:scale-[1.01] md:flex-row md:items-center md:justify-between"
+            className="rounded-2xl bg-green-50 px-5 py-4 shadow ring-1 ring-green-200 transition-all duration-300 hover:scale-[1.01]"
           >
-            <div className="flex w-full flex-col md:flex-row md:items-center md:gap-4">
-              <div className="font-medium">{friend.name}</div>
-              {friendPaid[friend.id] > 0 && (
-                <div className="text-sm text-gray-500">
-                  ชำระเงินไปแล้ว {Math.floor(friendPaid[friend.id]).toLocaleString()} บาท
+            <div className="flex flex-row items-center justify-between">
+              {/* Left section */}
+              <div className="w-1/2 space-y-1">
+                <div className="text-lg font-bold text-green-700">{friend.name}</div>
+                {friendPaid[friend.id] > 0 && (
+                  <div className="text-sm text-gray-600">
+                    ชำระไปแล้ว {Math.floor(friendPaid[friend.id]).toLocaleString()} บาท
+                  </div>
+                )}
+                <div className="text-sm text-gray-600">
+                  ยอดที่ต้องชำระ {Math.floor(friendBill[friend.id]).toLocaleString()} บาท
                 </div>
-              )}
-              <div className="font-semibold text-gray-500">
-                ยอดที่ต้องชำระ {Math.floor(friendBill[friend.id]).toLocaleString()} บาท
+
+                {friendPaid[friend.id] > friendBill[friend.id] && (
+                  <div className="text-sm font-medium text-blue-700">
+                    ต้องได้เงินคืน{' '}
+                    {(friendPaid[friend.id] - friendBill[friend.id]).toLocaleString()} บาท
+                  </div>
+                )}
+                {friendPaid[friend.id] < friendBill[friend.id] && (
+                  <div className="text-sm font-medium text-red-500">
+                    ยอดค้างชำระ {(friendBill[friend.id] - friendPaid[friend.id]).toLocaleString()}{' '}
+                    บาท
+                  </div>
+                )}
+              </div>
+
+              {/* Delete button */}
+              <div className="mt-2 md:mt-0 md:ml-auto">
+                <Button
+                  type="link"
+                  onClick={() => handleDeleteFriend(friend.id)}
+                  className="!text-red-400 hover:scale-110"
+                >
+                  <MdDelete size={22} />
+                </Button>
               </div>
             </div>
-            <div>
-              {friendPaid[friend.id] > friendBill[friend.id] && (
-                <div>
-                  {`ต้องได้เงินคืน: ${Math.floor(friendPaid[friend.id] - friendBill[friend.id]).toLocaleString()} บาท`}
-                </div>
-              )}
-              {friendPaid[friend.id] < friendBill[friend.id] && (
-                <div className="text-red-500">
-                  {`ยอดค้างชำระ: ${Math.floor(friendBill[friend.id] - friendPaid[friend.id]).toLocaleString()} บาท`}
-                </div>
-              )}
-            </div>
-            <div className="md:ml-auto">
-              <Button
-                type="link"
-                onClick={() => handleDeleteFriend(friend.id)}
-                className="!text-red-400 hover:scale-110"
-              >
-                <MdDelete size={20} />
-              </Button>
+
+            {/* Transactions */}
+            <div className="mt-3 border-t border-dashed border-green-300 pt-2 text-sm text-gray-600">
+              {transactions
+                .filter((t) => t.from === friend.id || t.to === friend.id)
+                .map((t, i) => {
+                  const from = friends.find((f) => f.id === t.from)?.name
+                  const to = friends.find((f) => f.id === t.to)?.name
+                  const isPayer = t.from === friend.id
+
+                  return (
+                    <div key={i}>
+                      {isPayer ? (
+                        <span>
+                          ต้องจ่าย <b>{to}</b> จำนวน <b>{t.amount.toLocaleString()}</b> บาท
+                        </span>
+                      ) : (
+                        <span>
+                          จะได้รับจาก <b>{from}</b> จำนวน <b>{t.amount.toLocaleString()}</b> บาท
+                        </span>
+                      )}
+                    </div>
+                  )
+                })}
             </div>
           </div>
         ))}
       </div>
+
       <div>
         <Button onClick={handleJ}>สร้างข้อมูล</Button>
       </div>

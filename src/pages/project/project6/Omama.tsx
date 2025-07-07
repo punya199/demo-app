@@ -1,8 +1,8 @@
 import { chunk, shuffle } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
-import black_dark from '../../assets/images/cards/back_dark.webp'
-import black_light from '../../assets/images/cards/back_light.webp'
-import { cardDeck, ICardData } from '../project/project5/cardGame-data'
+import black_dark from '../../../assets/images/cards/back_dark.webp'
+import black_light from '../../../assets/images/cards/back_light.webp'
+import { cardDeck, ICardData } from '../project5/cardGame-data'
 
 interface SpecialCardOwner {
   K: number | null
@@ -92,14 +92,14 @@ const Omama = () => {
     'bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-xl shadow transition-all duration-200'
 
   return (
-    <div className="max-w-5xl mx-auto p-4 space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6 p-4">
       {/* Input + Add Name */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-center">
-        <p className=" rounded-2xl py-2 px-4 bg-blue-400 font-bold text-2xl">Game Omama</p>
+      <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+        <p className="rounded-2xl bg-blue-400 px-4 py-2 text-2xl font-bold">Game Omama</p>
         <input
           type="text"
           placeholder="กรอกชื่อผู้เล่น"
-          className="border-2 rounded-xl px-4 py-2 w-full md:w-1/2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full rounded-xl border-2 px-4 py-2 text-gray-700 focus:ring-2 focus:ring-blue-400 focus:outline-none md:w-1/2"
           autoFocus
           value={inputName}
           onChange={(e) => setInputName(e.target.value)}
@@ -114,17 +114,17 @@ const Omama = () => {
         <button onClick={onRandom} className={classNameButton}>
           สุ่มไพ่ใหม่
         </button>
-        <p className="text-lg font-semibold text-gray-700 w-80 text-center">
+        <p className="w-80 text-center text-lg font-semibold text-gray-700">
           ผู้เล่นที่ต้องจั่ว : <span className="text-blue-700">{userNameList[nameIndex]}</span>
         </p>
       </div>
 
       {/* Card Stack */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         {cardlist.map((e, index) => (
           <div
             key={index}
-            className={`bg-white rounded-xl shadow-md p-4 transition hover:shadow-xl flex flex-col items-center ${
+            className={`flex flex-col items-center rounded-xl bg-white p-4 shadow-md transition hover:shadow-xl ${
               userNameList.length > 0 ? 'cursor-pointer hover:scale-105' : ''
             }`}
             onClick={() => {
@@ -135,7 +135,7 @@ const Omama = () => {
             <img
               src={e.length === 0 ? black_light : black_dark}
               alt="back"
-              className="w-28 object-cover rounded-lg drop-shadow-lg"
+              className="w-28 rounded-lg object-cover drop-shadow-lg"
             />
             <p className="mt-3 text-sm text-gray-600">เหลือ {e.length} ใบ</p>
           </div>
@@ -143,22 +143,22 @@ const Omama = () => {
       </div>
 
       {/* Current Card + Info */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow p-6 text-center">
-          <p className="text-xl font-semibold text-gray-800 mb-4">ไพ่ที่ได้</p>
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="rounded-xl bg-white p-6 text-center shadow">
+          <p className="mb-4 text-xl font-semibold text-gray-800">ไพ่ที่ได้</p>
           <img
             src={currentCard ? currentCard.image : black_light}
             alt={currentCard?.name || 'back'}
-            className="w-40 mx-auto drop-shadow-lg"
+            className="mx-auto w-40 drop-shadow-lg"
           />
           <p className="mt-4 text-sm text-gray-600">เหลือ {cardlist.flat().length} ใบ</p>
         </div>
 
         {/* Player Info */}
-        <div className="bg-white rounded-xl shadow p-6 space-y-4">
+        <div className="space-y-4 rounded-xl bg-white p-6 shadow">
           <div>
-            <p className="text-lg font-semibold mb-2">คนที่ได้ไพ่พิเศษ </p>
-            <ul className="list-disc list-inside space-y-1 text-gray-700">
+            <p className="mb-2 text-lg font-semibold">คนที่ได้ไพ่พิเศษ </p>
+            <ul className="list-inside list-disc space-y-1 text-gray-700">
               {Object.entries(specialCardOwner).map(([cardType, ownerIndex]) => (
                 <li key={cardType}>
                   {cardType} : {userNameList[ownerIndex] || 'ยังไม่มีคนได้'}
@@ -167,8 +167,8 @@ const Omama = () => {
             </ul>
           </div>
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-lg font-semibold mb-2">รายชื่อผู้เล่น </p>
+            <div className="mb-4 flex items-center justify-between">
+              <p className="mb-2 text-lg font-semibold">รายชื่อผู้เล่น </p>
               <button onClick={randomIndex} className={classNameButton}>
                 สุ่มคนเริ่ม
               </button>
@@ -181,7 +181,7 @@ const Omama = () => {
                   </span>
                   <button
                     onClick={() => removeUserName(name)}
-                    className="border border-red-500 text-red-500 px-3  rounded-lg hover:bg-red-500 hover:text-white transition duration-200 text-sm"
+                    className="rounded-lg border border-red-500 px-3 text-sm text-red-500 transition duration-200 hover:bg-red-500 hover:text-white"
                   >
                     ลบ
                   </button>

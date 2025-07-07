@@ -1,3 +1,14 @@
+## [1.1.45](https://github.com/punya199/test1/compare/v1.1.44...v1.1.45) (2025-07-07)
+
+
+### Enhance
+
+* Integrate react-number-format for numeric input and update UI components in Project 8 ([543cc4e](https://github.com/punya199/test1/commit/543cc4e8d03169c5402e7e52dbe68b3765c83690))
+
+### Fix
+
+* Remove lazy loading for CardGame and Omama components, update UI styles in Allprojects, and enhance PageCheckBill with transaction handling ([263cc13](https://github.com/punya199/test1/commit/263cc13b393a9a91319e5c51e74de3d3b52794e0))
+
 ## [1.1.44](https://github.com/punya199/test1/compare/v1.1.43...v1.1.44) (2025-07-01)
 
 

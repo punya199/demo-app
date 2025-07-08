@@ -27,7 +27,6 @@ const Login = () => {
       password: values.password,
     })
     setTimeout(() => {
-      console.log('Logged in with:', values)
       setLoading(false)
     }, 1000)
 

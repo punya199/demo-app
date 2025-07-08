@@ -99,8 +99,6 @@ const PageCheckBill = () => {
     return newFriendBill
   }, [friends, itemToFriends, items])
 
-  console.log(friendBill)
-
   const friendPaid = useMemo(() => {
     const newFriendPaid: Record<string, number> = {}
 
@@ -117,8 +115,6 @@ const PageCheckBill = () => {
 
     return newFriendPaid
   }, [friends, items, friendPayByItem])
-
-  console.log(friendPaid)
 
   const transactions = useMemo(() => {
     const result: { from: string; to: string; amount: number }[] = []

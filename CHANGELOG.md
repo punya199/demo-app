@@ -1,3 +1,10 @@
+## [1.1.46](https://github.com/punya199/test1/compare/v1.1.45...v1.1.46) (2025-07-08)
+
+
+### Fix
+
+* Add authentication with react-query, implement login functionality, and update UI components across the application ([28816a9](https://github.com/punya199/test1/commit/28816a9cb7f2888efb026ebde7cb4f15fd3b16c1))
+
 ## [1.1.45](https://github.com/punya199/test1/compare/v1.1.44...v1.1.45) (2025-07-07)
 
 

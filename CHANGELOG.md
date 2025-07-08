@@ -1,3 +1,10 @@
+## [1.1.47](https://github.com/punya199/test1/compare/v1.1.46...v1.1.47) (2025-07-08)
+
+
+### Fix
+
+* Change document title to 'Yaya', add app version meta tag, and include environment configuration script ([8d95fc0](https://github.com/punya199/test1/commit/8d95fc0feb635fc7f0641ae58174fe17c850ba44))
+
 ## [1.1.46](https://github.com/punya199/test1/compare/v1.1.45...v1.1.46) (2025-07-08)
 
 

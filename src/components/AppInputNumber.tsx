@@ -12,7 +12,6 @@ export const AppInputNumber = (props: IAppInputNumberProps) => {
       {...restProps}
       customInput={Input}
       onValueChange={(v) => {
-        console.log({ v })
         onChange?.(v.floatValue)
       }}
     />

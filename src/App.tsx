@@ -1,9 +1,11 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
 import Pnotfound from './layouts/Pnotfound'
 import RootLayout from './layouts/RootLayout'
 import Allprojects from './pages/Allprojects'
 import Home from './pages/Home'
+import Login from './pages/Login'
 import About from './pages/PageAbout'
 import Contract from './pages/PageContract'
 import PageListItem from './pages/project/project1/PageMeowList'
@@ -63,15 +65,19 @@ const router = createBrowserRouter([
         path: '/p8',
         element: <PageCheckBill />,
       },
+      {
+        path: '/login',
+        element: <Login />,
+      },
     ],
   },
 ])
-
+const queryClient = new QueryClient()
 function App() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-    </>
+    </QueryClientProvider>
   )
 }
 

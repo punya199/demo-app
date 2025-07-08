@@ -1,115 +1,116 @@
 import { MenuOutlined } from '@ant-design/icons'
-import { Button, Drawer, Dropdown, Menu, Space, Typography } from 'antd'
+import { useQueryClient } from '@tanstack/react-query'
+import { Button, Drawer, Menu, Space, Typography } from 'antd'
+import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-
+import { projectList } from '../pages/Allprojects'
+import { useGetMe } from '../service'
 const { Title } = Typography
 
 const Navbar = () => {
   const [open, setOpen] = useState(false)
-
+  const { data: user } = useGetMe()
+  const isLoggedIn = !!user?.user.id
+  const queryClient = useQueryClient()
   const showDrawer = () => setOpen(true)
   const onClose = () => setOpen(false)
 
-  const projectMenu = {
-    items: [
-      { key: 'p1', label: <Link to="/p1">MeowList</Link> },
-      { key: 'p2', label: <Link to="/p2">Todo</Link> },
-      { key: 'p3', label: <Link to="/p3">MyFriends</Link> },
-      { key: 'p4', label: <Link to="/p4">Quiz Meaow</Link> },
-      { key: 'p5', label: <Link to="/p5">Random Card</Link> },
-      { key: 'p6', label: <Link to="/p6">Game Omama</Link> },
-      { key: 'p7', label: <Link to="/p7">9 gea</Link> },
-    ],
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken')
+    queryClient.removeQueries()
   }
 
   return (
-    <nav className="bg-cyan-800 px-6 py-3">
-      <div className="flex justify-between items-center">
-        {/* ซ้าย: โลโก้ */}
+    <nav className="bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 shadow-lg">
+      <div className="flex items-center justify-between">
+        {/* Left: Logo */}
         <Link to="/">
-          <Title level={3} className="!m-0 !text-white">
-            LOGO
-          </Title>
+          <motion.div whileHover={{ scale: 1.1 }}>
+            <Title level={3} className="!m-0 !text-white">
+              LOGO
+            </Title>
+          </motion.div>
         </Link>
+        <div className="hidden lg:block"> s</div>
 
-        {/* กลาง: เมนู Desktop */}
-        <div className="hidden lg:flex items-center gap-8">
-          <Menu mode="horizontal" selectable={false} className="!bg-transparent">
-            <Menu.Item key="about">
-              <Link className="text-white hover:text-cyan-300" to="about">
-                About
-              </Link>
-            </Menu.Item>
-            <Menu.Item key="projects">
-              <Dropdown menu={projectMenu} trigger={['click']} placement="bottom">
-                <Button type="text" className="text-white hover:!bg-cyan-700">
-                  Project
-                </Button>
-              </Dropdown>
-            </Menu.Item>
-            <Menu.Item key="contract">
-              <Link className="text-white hover:text-cyan-300" to="contract">
-                Contract
-              </Link>
-            </Menu.Item>
-          </Menu>
-        </div>
-
-        {/* ขวา: ปุ่ม Register/Login + ไอคอนมือถือ */}
         <div className="flex items-center gap-4">
-          {/* Desktop ปุ่ม */}
-          <div className="hidden lg:flex items-center gap-2">
-            <Button type="link" className="!text-white hover:!text-cyan-300">
-              Register
-            </Button>
-            <Button type="link" className="!text-white hover:!text-cyan-300">
-              Login
-            </Button>
-            <div className="text-xs bg-black text-white px-2 py-1 rounded">
+          {isLoggedIn && user.user.username}
+          <div className="hidden items-center gap-2 lg:flex">
+            {isLoggedIn ? (
+              <motion.div whileHover={{ scale: 1.1 }}>
+                <Button
+                  type="link"
+                  className="!text-white hover:!text-cyan-300"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </motion.div>
+            ) : (
+              <Link to="/login">
+                <motion.div whileHover={{ scale: 1.1 }}>
+                  <Button type="link" className="!text-white hover:!text-cyan-300">
+                    Login
+                  </Button>
+                </motion.div>
+              </Link>
+            )}
+            <div className="rounded bg-black px-2 py-1 text-xs text-white">
               Version: {import.meta.env.VITE_APP_VERSION || 'unknown'}
             </div>
           </div>
 
-          {/* ไอคอนเมนูมือถือ */}
-          <Button
-            className="lg:hidden"
-            type="text"
-            icon={<MenuOutlined className="text-white text-xl" />}
-            onClick={showDrawer}
-          />
+          {/* Mobile Menu Icon */}
+          <motion.div whileTap={{ scale: 0.9 }}>
+            <div className="lg:hidden">
+              <Button
+                type="text"
+                icon={<MenuOutlined className="text-xl text-white" />}
+                onClick={showDrawer}
+              />
+            </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Drawer มือถือ */}
+      {/* Mobile Drawer */}
       <Drawer
-        title="Menu"
-        placement="left"
+        title="Project List"
+        placement="right"
         onClose={onClose}
         open={open}
         classNames={{ body: 'p-0' }}
       >
         <Menu mode="vertical" selectable={false}>
-          <Menu.Item key="about" onClick={onClose}>
-            <Link to="about">About</Link>
-          </Menu.Item>
-          <Menu.Item key="projects" onClick={onClose}>
-            <Link to="allprojects">Project</Link>
-          </Menu.Item>
-          <Menu.Item key="contract" onClick={onClose}>
-            <Link to="contract">Contract</Link>
-          </Menu.Item>
+          {projectList.map((project, index) => (
+            <Menu.Item key={index} onClick={onClose}>
+              <Link to={project.link}>{project.name}</Link>
+            </Menu.Item>
+          ))}
         </Menu>
 
         <div className="p-4">
           <Space direction="vertical" size="middle" className="w-full">
-            <Button type="link" block>
-              Register
-            </Button>
-            <Button type="link" block>
-              Login
-            </Button>
-            <div className="text-xs bg-black text-white px-2 py-1 rounded">
+            {isLoggedIn ? (
+              <Button
+                type="link"
+                block
+                onClick={() => {
+                  handleLogout()
+                  onClose()
+                }}
+              >
+                Logout
+              </Button>
+            ) : (
+              <Link to="/login">
+                <Button type="link" block onClick={onClose}>
+                  Login
+                </Button>
+              </Link>
+            )}
+            <div className="rounded bg-black px-2 py-1 text-xs text-white">
               Version: {import.meta.env.VITE_APP_VERSION || 'unknown'}
             </div>
           </Space>

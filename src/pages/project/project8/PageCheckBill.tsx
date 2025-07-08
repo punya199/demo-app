@@ -2,6 +2,7 @@ import { Button, Divider, message, Select, SelectProps, Typography } from 'antd'
 import { round } from 'lodash'
 import { useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
+import { useGetMe } from '../../../service'
 import AddFriends, { Friend } from './AddFriends'
 import { AddItem, Item } from './AddItem'
 
@@ -10,7 +11,8 @@ const PageCheckBill = () => {
   const [friends, setFriends] = useState<Friend[]>([])
   const [itemToFriends, setItemToFriends] = useState<Record<string, string[]>>({})
   const [friendPayByItem, setFriendPayByItem] = useState<Record<string, string>>({})
-
+  const { data: user } = useGetMe()
+  const isLoggedIn = !!user?.user.id
   const handleAddItem = (item: Item) => {
     setItems([...items, item])
   }
@@ -68,18 +70,18 @@ const PageCheckBill = () => {
     setItemToFriends({})
     setFriendPayByItem({})
   }
-  const handleJ = () => {
-    setItems([
-      { name: 'รี', price: 500, id: '1' },
-      { name: 'ข้าว', price: 500, id: '2' },
-      { name: 'โซดา', price: 250, id: '3' },
-    ])
-    setFriends([
-      { name: 'ton', id: '1' },
-      { name: 'boom', id: '2' },
-      { name: 'gon', id: '3' },
-    ])
-  }
+  // const handleJ = () => {
+  //   setItems([
+  //     { name: 'รี', price: 500, id: '1' },
+  //     { name: 'ข้าว', price: 500, id: '2' },
+  //     { name: 'โซดา', price: 250, id: '3' },
+  //   ])
+  //   setFriends([
+  //     { name: 'ton', id: '1' },
+  //     { name: 'boom', id: '2' },
+  //     { name: 'gon', id: '3' },
+  //   ])
+  // }
   const friendBill = useMemo(() => {
     const newFriendBill: Record<string, number> = {}
     friends.forEach((f) => (newFriendBill[f.id] = 0))
@@ -117,43 +119,6 @@ const PageCheckBill = () => {
   }, [friends, items, friendPayByItem])
 
   console.log(friendPaid)
-
-  // useMemo(() => {
-  //   const trueFriend: Record<string, number> = {} //เก็บคนที่ต้องได้เงินคืน
-  //   const eatFriend: Record<string, number> = {} //คนที่ต้องจ่ายเงิน
-
-  //   friends.forEach((fri) => {
-  //     const paid = friendPaid[fri.id] //ยอดที่ออกก่อน
-  //     const bill = friendBill[fri.id] //ยอดที่ต้องจ่าย
-  //     if (paid > bill) {
-  //       trueFriend[fri.id] = paid - bill
-  //     } else if (paid < bill) {
-  //       eatFriend[fri.id] = bill
-  //     }
-  //   })
-  //   const friendHash = keyBy(friends, 'id')
-  //   for (const [tfId, vT] of Object.entries(trueFriend)) {
-  //     let vTbalance = vT
-  //     for (const [efId, vEF] of Object.entries(eatFriend)) {
-  //       let vEFBalance = vEF
-  //       if (vEFBalance === 0 || vTbalance === 0) {
-  //         continue
-  //       }
-  //       if (vTbalance >= vEFBalance) {
-  //         vTbalance = vTbalance - vEFBalance
-  //         vEFBalance = 0
-  //         eatFriend[efId] = 0
-  //         trueFriend[tfId] = vTbalance
-  //       } else {
-  //         vEFBalance = vEFBalance - vTbalance
-  //         vTbalance = 0
-  //         trueFriend[tfId] = 0
-  //         eatFriend[efId] = vEFBalance
-  //       }
-
-  //     }
-  //   }
-  // }, [friendBill, friendPaid, friends])
 
   const transactions = useMemo(() => {
     const result: { from: string; to: string; amount: number }[] = []
@@ -345,9 +310,9 @@ const PageCheckBill = () => {
         ))}
       </div>
 
-      <div>
+      {/* <div>
         <Button onClick={handleJ}>สร้างข้อมูล</Button>
-      </div>
+      </div> */}
       {(friends.length > 0 || items.length > 0) && (
         <div className="flex justify-center pt-6">
           <Button
@@ -359,6 +324,7 @@ const PageCheckBill = () => {
           </Button>
         </div>
       )}
+      {isLoggedIn && <div>save</div>}
     </div>
   )
 }

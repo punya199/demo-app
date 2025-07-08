@@ -4,7 +4,7 @@ interface ProjectList {
   link: string
 }
 
-const defaultData: ProjectList[] = [
+export const projectList: ProjectList[] = [
   {
     name: 'MeowList',
     link: '/p1',
@@ -41,9 +41,9 @@ const defaultData: ProjectList[] = [
 
 const Allprojects = () => {
   return (
-    <div className="flex h-full items-center justify-center bg-gray-100">
-      <ul className="mt-5 rounded-lg bg-white p-4 shadow-lg">
-        {defaultData.map((e, index) => {
+    <div className="flex h-full justify-center bg-gray-100">
+      <ul className="mt-5 h-fit rounded-lg bg-white p-4 shadow-lg">
+        {projectList.map((e, index) => {
           return (
             <Link
               key={index}

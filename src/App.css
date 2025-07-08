@@ -4,3 +4,7 @@
 .ant-form-item-required::before {
   display: none !important;
 }
+
+body{
+  height: 100vh;
+}

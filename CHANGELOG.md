@@ -1,3 +1,10 @@
+## [1.1.48](https://github.com/punya199/test1/compare/v1.1.47...v1.1.48) (2025-07-08)
+
+
+### Fix
+
+* Remove console.log statements from Login and PageCheckBill components to clean up code ([7bf6886](https://github.com/punya199/test1/commit/7bf6886fe00e7d5f79c423eec2d79bdb9d0db6f5))
+
 ## [1.1.47](https://github.com/punya199/test1/compare/v1.1.46...v1.1.47) (2025-07-08)
 
 

@@ -1,6 +1,6 @@
 import { Button, Divider, message, Select, SelectProps, Typography } from 'antd'
 import { round } from 'lodash'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
 import { useGetMe } from '../../../service'
 import AddFriends, { Friend } from './AddFriends'
@@ -12,76 +12,98 @@ const PageCheckBill = () => {
   const [itemToFriends, setItemToFriends] = useState<Record<string, string[]>>({})
   const [friendPayByItem, setFriendPayByItem] = useState<Record<string, string>>({})
   const { data: user } = useGetMe()
-  const isLoggedIn = !!user?.user.id
-  const handleAddItem = (item: Item) => {
-    setItems([...items, item])
-  }
+  const isLoggedIn = useMemo(() => {
+    return !!user?.user.id
+  }, [user?.user.id])
 
-  const handleAddFriend = (friend: Friend) => {
-    setFriends([...friends, { ...friend }])
-    message.success('เพิ่มเพื่อนเรียบร้อยแล้ว')
-  }
+  const handleAddItem = useCallback(
+    (item: Item) => {
+      setItems([...items, item])
+    },
+    [items]
+  )
 
-  const handleDeleteItem = (id: string) => {
-    setItems(items.filter((item) => item.id !== id))
-    const updated = { ...friendPayByItem }
-    delete updated[id]
-    setFriendPayByItem(updated)
+  const handleAddFriend = useCallback(
+    (friend: Friend) => {
+      setFriends([...friends, { ...friend }])
+      message.success('เพิ่มเพื่อนเรียบร้อยแล้ว')
+    },
+    [friends]
+  )
 
-    const updatedSplit = { ...itemToFriends }
-    delete updatedSplit[id]
-    setItemToFriends(updatedSplit)
-  }
+  const handleDeleteItem = useCallback(
+    (id: string) => {
+      setItems(items.filter((item) => item.id !== id))
+      const updated = { ...friendPayByItem }
+      delete updated[id]
+      setFriendPayByItem(updated)
 
-  const handleDeleteFriend = (id: string) => {
-    setFriends(friends.filter((friend) => friend.id !== id))
-    setItemToFriends(
-      Object.entries(itemToFriends).reduce(
-        (acc, [itemId, friendIds]) => {
-          acc[itemId] = friendIds.filter((fid) => fid !== id)
-          return acc
-        },
-        {} as Record<string, string[]>
+      const updatedSplit = { ...itemToFriends }
+      delete updatedSplit[id]
+      setItemToFriends(updatedSplit)
+    },
+    [friendPayByItem, itemToFriends, items]
+  )
+
+  const handleDeleteFriend = useCallback(
+    (id: string) => {
+      setFriends(friends.filter((friend) => friend.id !== id))
+      setItemToFriends(
+        Object.entries(itemToFriends).reduce(
+          (acc, [itemId, friendIds]) => {
+            acc[itemId] = friendIds.filter((fid) => fid !== id)
+            return acc
+          },
+          {} as Record<string, string[]>
+        )
       )
-    )
 
-    setFriendPayByItem(
-      Object.entries(friendPayByItem).reduce(
-        (acc, [itemId, payerId]) => {
-          if (payerId !== id) acc[itemId] = payerId
-          return acc
-        },
-        {} as Record<string, string>
+      setFriendPayByItem(
+        Object.entries(friendPayByItem).reduce(
+          (acc, [itemId, payerId]) => {
+            if (payerId !== id) acc[itemId] = payerId
+            return acc
+          },
+          {} as Record<string, string>
+        )
       )
-    )
-  }
+    },
+    [friendPayByItem, friends, itemToFriends]
+  )
 
-  const handleChange = (friendNames: string[], id: string) => {
-    setItemToFriends({ ...itemToFriends, [id]: friendNames })
-  }
+  const handleChange = useCallback(
+    (friendNames: string[], id: string) => {
+      setItemToFriends({ ...itemToFriends, [id]: friendNames })
+    },
+    [itemToFriends]
+  )
 
-  const handleAddPay = (payerId: string, itemId: string) => {
-    setFriendPayByItem({ ...friendPayByItem, [itemId]: payerId })
-  }
+  const handleAddPay = useCallback(
+    (payerId: string, itemId: string) => {
+      setFriendPayByItem({ ...friendPayByItem, [itemId]: payerId })
+    },
+    [friendPayByItem]
+  )
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setItems([])
     setFriends([])
     setItemToFriends({})
     setFriendPayByItem({})
-  }
-  // const handleJ = () => {
-  //   setItems([
-  //     { name: 'รี', price: 500, id: '1' },
-  //     { name: 'ข้าว', price: 500, id: '2' },
-  //     { name: 'โซดา', price: 250, id: '3' },
-  //   ])
-  //   setFriends([
-  //     { name: 'ton', id: '1' },
-  //     { name: 'boom', id: '2' },
-  //     { name: 'gon', id: '3' },
-  //   ])
-  // }
+  }, [])
+  const handleJ = useCallback(() => {
+    setItems([
+      { name: 'รี', price: 500, id: '1' },
+      { name: 'ข้าว', price: 500, id: '2' },
+      { name: 'โซดา', price: 250, id: '3' },
+    ])
+    setFriends([
+      { name: 'ton', id: '1' },
+      { name: 'boom', id: '2' },
+      { name: 'gon', id: '3' },
+    ])
+  }, [])
+
   const friendBill = useMemo(() => {
     const newFriendBill: Record<string, number> = {}
     friends.forEach((f) => (newFriendBill[f.id] = 0))
@@ -156,10 +178,12 @@ const PageCheckBill = () => {
     return result
   }, [friendPaid, friendBill, friends])
 
-  const options: SelectProps['options'] = friends.map((f) => ({
-    label: f.name,
-    value: f.id,
-  }))
+  const options: SelectProps['options'] = useMemo(() => {
+    return friends.map((f) => ({
+      label: f.name,
+      value: f.id,
+    }))
+  }, [friends])
 
   return (
     <div className="hover:shadow-3xl mx-auto max-w-full space-y-6 rounded-3xl bg-gradient-to-br from-blue-100 via-white to-blue-200 p-4 shadow-2xl transition-all duration-500 md:max-w-3xl md:p-6">
@@ -306,9 +330,6 @@ const PageCheckBill = () => {
         ))}
       </div>
 
-      {/* <div>
-        <Button onClick={handleJ}>สร้างข้อมูล</Button>
-      </div> */}
       {(friends.length > 0 || items.length > 0) && (
         <div className="flex justify-center pt-6">
           <Button
@@ -320,7 +341,13 @@ const PageCheckBill = () => {
           </Button>
         </div>
       )}
-      {isLoggedIn && <div>save</div>}
+
+      {isLoggedIn && (
+        <div>
+          <Button onClick={handleJ}>สร้างข้อมูล</Button>
+          <Button>Save</Button>
+        </div>
+      )}
     </div>
   )
 }

@@ -3,14 +3,14 @@ import { round } from 'lodash'
 import { useCallback, useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
 import { useGetMe } from '../../../service'
+import { apiClient } from '../../../utils/api-client'
 import AddFriends, { Friend } from './AddFriends'
 import { AddItem, Item } from './AddItem'
 
 const PageCheckBill = () => {
   const [items, setItems] = useState<Item[]>([])
   const [friends, setFriends] = useState<Friend[]>([])
-  const [itemToFriends, setItemToFriends] = useState<Record<string, string[]>>({})
-  const [friendPayByItem, setFriendPayByItem] = useState<Record<string, string>>({})
+
   const { data: user } = useGetMe()
   const isLoggedIn = useMemo(() => {
     return !!user?.user.id
@@ -34,63 +34,61 @@ const PageCheckBill = () => {
   const handleDeleteItem = useCallback(
     (id: string) => {
       setItems(items.filter((item) => item.id !== id))
-      const updated = { ...friendPayByItem }
-      delete updated[id]
-      setFriendPayByItem(updated)
-
-      const updatedSplit = { ...itemToFriends }
-      delete updatedSplit[id]
-      setItemToFriends(updatedSplit)
     },
-    [friendPayByItem, itemToFriends, items]
+    [items]
   )
 
   const handleDeleteFriend = useCallback(
-    (id: string) => {
-      setFriends(friends.filter((friend) => friend.id !== id))
-      setItemToFriends(
-        Object.entries(itemToFriends).reduce(
-          (acc, [itemId, friendIds]) => {
-            acc[itemId] = friendIds.filter((fid) => fid !== id)
-            return acc
-          },
-          {} as Record<string, string[]>
-        )
-      )
-
-      setFriendPayByItem(
-        Object.entries(friendPayByItem).reduce(
-          (acc, [itemId, payerId]) => {
-            if (payerId !== id) acc[itemId] = payerId
-            return acc
-          },
-          {} as Record<string, string>
-        )
+    (removeFriendId: string) => {
+      setFriends(friends.filter((friend) => friend.id !== removeFriendId))
+      setItems(
+        items.map((item) => {
+          const itemFriend = item.friendIds || []
+          const friendPay = item.payerId
+          item.friendIds = itemFriend.filter((e) => e !== removeFriendId)
+          if (item.payerId === friendPay) {
+            item.payerId = ''
+          }
+          return item
+        })
       )
     },
-    [friendPayByItem, friends, itemToFriends]
-  )
-
-  const handleChange = useCallback(
-    (friendNames: string[], id: string) => {
-      setItemToFriends({ ...itemToFriends, [id]: friendNames })
-    },
-    [itemToFriends]
+    [friends, items]
   )
 
   const handleAddPay = useCallback(
     (payerId: string, itemId: string) => {
-      setFriendPayByItem({ ...friendPayByItem, [itemId]: payerId })
+      setItems(
+        items.map((item) => {
+          if (item.id === itemId) {
+            item.payerId = payerId
+          }
+          return item
+        })
+      )
     },
-    [friendPayByItem]
+    [items]
+  )
+
+  const handleChange = useCallback(
+    (friendIds: string[], itemId: string) => {
+      setItems(
+        items.map((item) => {
+          if (item.id === itemId) {
+            item.friendIds = friendIds
+          }
+          return item
+        })
+      )
+    },
+    [items]
   )
 
   const handleReset = useCallback(() => {
     setItems([])
     setFriends([])
-    setItemToFriends({})
-    setFriendPayByItem({})
   }, [])
+
   const handleJ = useCallback(() => {
     setItems([
       { name: 'รี', price: 500, id: '1' },
@@ -103,13 +101,22 @@ const PageCheckBill = () => {
       { name: 'gon', id: '3' },
     ])
   }, [])
+  console.log(items)
+  const onSave = async () => {
+    interface SaveBody {
+      items: Item[]
+      friends: Friend[]
+    }
+    const body: SaveBody = { items, friends }
+    await apiClient.post(`/bill`, body)
+  }
 
   const friendBill = useMemo(() => {
     const newFriendBill: Record<string, number> = {}
     friends.forEach((f) => (newFriendBill[f.id] = 0))
 
     items.forEach((item) => {
-      const split = itemToFriends[item.id]
+      const split = item.friendIds
       if (!split || split.length === 0) return
 
       const pricePerPerson = round(item.price / split.length)
@@ -119,7 +126,7 @@ const PageCheckBill = () => {
     })
 
     return newFriendBill
-  }, [friends, itemToFriends, items])
+  }, [friends, items])
 
   const friendPaid = useMemo(() => {
     const newFriendPaid: Record<string, number> = {}
@@ -129,14 +136,14 @@ const PageCheckBill = () => {
     })
 
     items.forEach((item) => {
-      const payerId = friendPayByItem[item.id]
+      const payerId = item.payerId
       if (payerId) {
         newFriendPaid[payerId] += item.price
       }
     })
 
     return newFriendPaid
-  }, [friends, items, friendPayByItem])
+  }, [friends, items])
 
   const transactions = useMemo(() => {
     const result: { from: string; to: string; amount: number }[] = []
@@ -218,7 +225,7 @@ const PageCheckBill = () => {
                     showSearch
                     placeholder="เลือกผู้จ่าย"
                     optionFilterProp="label"
-                    value={friendPayByItem[item.id]}
+                    value={item.payerId}
                     onChange={(value) => handleAddPay(value, item.id)}
                     options={options}
                     className="min-w-[140px]"
@@ -233,7 +240,7 @@ const PageCheckBill = () => {
                 mode="multiple"
                 allowClear
                 placeholder="เลือกเพื่อนที่ร่วมจ่าย"
-                value={itemToFriends[item.id]}
+                value={item.friendIds}
                 onChange={(value) => handleChange(value, item.id)}
                 options={options}
                 className="w-full transition-all duration-300 hover:border-blue-400"
@@ -341,11 +348,11 @@ const PageCheckBill = () => {
           </Button>
         </div>
       )}
-
+      <Button onClick={handleJ}>สร้างข้อมูล</Button>
       {isLoggedIn && (
         <div>
           <Button onClick={handleJ}>สร้างข้อมูล</Button>
-          <Button>Save</Button>
+          <Button onClick={onSave}>Save</Button>
         </div>
       )}
     </div>

@@ -2,7 +2,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Button, Form, Input } from 'antd'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { appConfig } from '../config/app-config'
 import { useGetMe } from '../service'
 import { apiClient } from '../utils/api-client'
 type Data = {
@@ -22,7 +21,7 @@ const Login = () => {
   }, [navigate, user?.user.id])
   const onFinish = async (values: { username: string; password: string }) => {
     setLoading(true)
-    const { data } = await apiClient.post<Data>(`${appConfig().VITE_API_DOMAIN}/users/login`, {
+    const { data } = await apiClient.post<Data>(`/users/login`, {
       username: values.username,
       password: values.password,
     })

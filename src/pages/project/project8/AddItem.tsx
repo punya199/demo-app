@@ -6,6 +6,8 @@ export interface Item {
   name: string
   price: number
   id: string
+  payerId?: string
+  friendIds?: string[]
 }
 
 interface AddItemProps {

@@ -1,3 +1,11 @@
+## [1.1.49](https://github.com/punya199/test1/compare/v1.1.48...v1.1.49) (2025-07-09)
+
+
+### Fix
+
+* Refactor Login and PageCheckBill components to simplify API calls and state management. Add payerId and friendIds to Item interface in AddItem component for better data handling. ([82ad4df](https://github.com/punya199/test1/commit/82ad4df0e04d049eae8bf4d42d68f833daea632a))
+* Refactor PageAbout component with improved layout and content, and optimize PageCheckBill component by using useCallback and useMemo for better performance ([0c6ee3f](https://github.com/punya199/test1/commit/0c6ee3f76b7e787856db7e2c41dc0b58080b8b9b))
+
 ## [1.1.48](https://github.com/punya199/test1/compare/v1.1.47...v1.1.48) (2025-07-08)
 
 

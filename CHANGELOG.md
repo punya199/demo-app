@@ -1,3 +1,11 @@
+## [1.1.51](https://github.com/punya199/test1/compare/v1.1.50...v1.1.51) (2025-07-17)
+
+
+### Fix
+
+* Add zustand for state management and refactor PageCheckBill component to utilize zustand store for items and friends, simplifying state handling. ([5333cc1](https://github.com/punya199/test1/commit/5333cc15aced618d9fabd527c8cd28e81276b12a))
+* Update import statements in main.tsx, enhance layout and styling in AddFriends and AddItem components, and improve modal confirmation and notification handling in PageCheckBill component. ([47f28ec](https://github.com/punya199/test1/commit/47f28ec6d008e71c896ec4a73965b5c5da47cb57))
+
 ## [1.1.50](https://github.com/punya199/test1/compare/v1.1.49...v1.1.50) (2025-07-17)
 
 

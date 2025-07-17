@@ -1,24 +1,38 @@
-import {
-  Button,
-  Divider,
-  message,
-  Modal,
-  notification,
-  Select,
-  SelectProps,
-  Typography,
-} from 'antd'
+import { Button, Divider, message, Modal, Select, SelectProps, Typography } from 'antd'
 import { round } from 'lodash'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { MdDelete } from 'react-icons/md'
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { useGetMe } from '../../../service'
 import { apiClient } from '../../../utils/api-client'
 import AddFriends, { Friend } from './AddFriends'
 import { AddItem, Item } from './AddItem'
+type PositionStoreState = { items: Item[]; friends: Friend[] }
+
+type PositionStoreActions = {
+  setItems: (nextPosition: PositionStoreState['items']) => void
+  setFriends: (nextPosition: PositionStoreState['friends']) => void
+}
+
+type PositionStore = PositionStoreState & PositionStoreActions
+
+const useCheckBillStore = create<PositionStore>()(
+  persist(
+    (set) => ({
+      items: [],
+      friends: [],
+      setItems: (items) => set({ items }),
+      setFriends: (friends) => set({ friends }),
+    }),
+    { name: 'position-storage' }
+  )
+)
 
 const PageCheckBill = () => {
-  const [items, setItems] = useState<Item[]>([])
-  const [friends, setFriends] = useState<Friend[]>([])
+  // const [items, setItems] = useState<Item[]>([])
+  // const [friends, setFriends] = useState<Friend[]>([])
+  const { items, friends, setFriends, setItems } = useCheckBillStore()
 
   const { data: user } = useGetMe()
   const isLoggedIn = useMemo(() => {
@@ -29,7 +43,7 @@ const PageCheckBill = () => {
     (item: Item) => {
       setItems([...items, item])
     },
-    [items]
+    [items, setItems]
   )
 
   const handleAddFriend = useCallback(
@@ -37,31 +51,26 @@ const PageCheckBill = () => {
       setFriends([...friends, { ...friend }])
       message.success('เพิ่มเพื่อนเรียบร้อยแล้ว')
     },
-    [friends]
+    [friends, setFriends]
   )
 
-  const handleDeleteItem = useCallback((id: string) => {
-    Modal.confirm({
-      title: 'ยืนยันการลบ',
-      content: 'คุณต้องการลบรายการนี้จริงหรือไม่?',
-      okText: 'ลบเลย',
-      okType: 'danger',
-      cancelText: 'ยกเลิก',
-      getContainer: () => document.body,
-      onOk: async () => {
-        await new Promise((resolve) => setTimeout(resolve, 300)) // mock delay
-        setItems((prev) => prev.filter((item) => item.id !== id))
-      },
-    })
-    notification.success({ message: 'a' })
-    message.success('ลบรายการแล้ว')
-    console.log('Modal opened')
-  }, [])
-
-  useEffect(() => {
-    const bodyStyle = getComputedStyle(document.body)
-    console.log('body overflow:', bodyStyle.overflow)
-  }, [])
+  const handleDeleteItem = useCallback(
+    (id: string) => {
+      Modal.confirm({
+        title: 'ยืนยันการลบ',
+        content: 'คุณต้องการลบรายการนี้จริงหรือไม่?',
+        okText: 'ลบเลย',
+        okType: 'danger',
+        cancelText: 'ยกเลิก',
+        getContainer: () => document.body,
+        onOk: async () => {
+          await new Promise((resolve) => setTimeout(resolve, 300)) // mock delay
+          setItems(items.filter((item) => item.id !== id))
+        },
+      })
+    },
+    [items, setItems]
+  )
 
   const handleDeleteFriend = useCallback(
     (removeFriendId: string) => {
@@ -78,7 +87,7 @@ const PageCheckBill = () => {
         })
       )
     },
-    [friends, items]
+    [friends, items, setFriends, setItems]
   )
 
   const handleAddPay = useCallback(
@@ -92,7 +101,7 @@ const PageCheckBill = () => {
         })
       )
     },
-    [items]
+    [items, setItems]
   )
 
   const handleChange = useCallback(
@@ -106,13 +115,13 @@ const PageCheckBill = () => {
         })
       )
     },
-    [items]
+    [items, setItems]
   )
 
   const handleReset = useCallback(() => {
     setItems([])
     setFriends([])
-  }, [])
+  }, [setFriends, setItems])
 
   const initializeSampleData = useCallback(() => {
     setItems([
@@ -125,7 +134,7 @@ const PageCheckBill = () => {
       { name: 'boom', id: '2' },
       { name: 'gon', id: '3' },
     ])
-  }, [])
+  }, [setFriends, setItems])
 
   const onSave = async () => {
     interface SaveBody {

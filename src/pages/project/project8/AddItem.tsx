@@ -40,12 +40,13 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
         onFinish={onFinish}
         form={form}
         layout="inline"
-        className="flex flex-wrap justify-between"
+        className="flex flex-wrap justify-between gap-2"
       >
         <Form.Item
           name="name"
           label="ชื่อ"
           validateTrigger="onChange"
+          className="w-full"
           rules={[
             { required: true, message: 'กรุณาใส่ชื่อสินค้า' },
             {
@@ -61,7 +62,12 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
           <Input placeholder="เช่น รีเจนซี่" />
         </Form.Item>
 
-        <Form.Item name="price" label="ราคา" rules={[{ required: true, message: 'กรุณาใส่ราคา' }]}>
+        <Form.Item
+          name="price"
+          label="ราคา"
+          rules={[{ required: true, message: 'กรุณาใส่ราคา' }]}
+          className="w-full"
+        >
           <AppInputNumber
             thousandSeparator=","
             allowNegative={false}
@@ -75,8 +81,8 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
           />
         </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit" disabled={disabledButton()}>
+        <Form.Item className="w-full text-center">
+          <Button type="primary" htmlType="submit" disabled={disabledButton()} className="!w-35">
             เพิ่มรายการ
           </Button>
         </Form.Item>

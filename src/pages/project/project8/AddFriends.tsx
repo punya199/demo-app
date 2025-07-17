@@ -32,11 +32,12 @@ export const AddFriends = ({ onAddFriend, friends }: AddFriendsProps) => {
         onFinish={onFinish}
         form={form}
         layout="inline"
-        className="!flex flex-wrap justify-between"
+        className="flex flex-wrap justify-between"
       >
         <Form.Item
           name="name"
           label="ชื่อเพื่อน"
+          className="w-full sm:w-7/10"
           rules={[
             { required: true, message: 'กรุณาใส่ชื่อ' },
             {
@@ -52,8 +53,8 @@ export const AddFriends = ({ onAddFriend, friends }: AddFriendsProps) => {
           <Input placeholder="คนที่ต้องจ่าย" />
         </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit" disabled={disabledButton()}>
+        <Form.Item className="w-full text-center sm:w-2/10">
+          <Button type="primary" htmlType="submit" disabled={disabledButton()} className="!w-35">
             เพิ่มเพื่อน
           </Button>
         </Form.Item>

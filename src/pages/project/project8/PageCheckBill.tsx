@@ -1,6 +1,15 @@
-import { Button, Divider, message, Select, SelectProps, Typography } from 'antd'
+import {
+  Button,
+  Divider,
+  message,
+  Modal,
+  notification,
+  Select,
+  SelectProps,
+  Typography,
+} from 'antd'
 import { round } from 'lodash'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
 import { useGetMe } from '../../../service'
 import { apiClient } from '../../../utils/api-client'
@@ -31,12 +40,28 @@ const PageCheckBill = () => {
     [friends]
   )
 
-  const handleDeleteItem = useCallback(
-    (id: string) => {
-      setItems(items.filter((item) => item.id !== id))
-    },
-    [items]
-  )
+  const handleDeleteItem = useCallback((id: string) => {
+    Modal.confirm({
+      title: 'ยืนยันการลบ',
+      content: 'คุณต้องการลบรายการนี้จริงหรือไม่?',
+      okText: 'ลบเลย',
+      okType: 'danger',
+      cancelText: 'ยกเลิก',
+      getContainer: () => document.body,
+      onOk: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 300)) // mock delay
+        setItems((prev) => prev.filter((item) => item.id !== id))
+      },
+    })
+    notification.success({ message: 'a' })
+    message.success('ลบรายการแล้ว')
+    console.log('Modal opened')
+  }, [])
+
+  useEffect(() => {
+    const bodyStyle = getComputedStyle(document.body)
+    console.log('body overflow:', bodyStyle.overflow)
+  }, [])
 
   const handleDeleteFriend = useCallback(
     (removeFriendId: string) => {
@@ -89,7 +114,7 @@ const PageCheckBill = () => {
     setFriends([])
   }, [])
 
-  const handleJ = useCallback(() => {
+  const initializeSampleData = useCallback(() => {
     setItems([
       { name: 'รี', price: 500, id: '1' },
       { name: 'ข้าว', price: 500, id: '2' },
@@ -101,7 +126,7 @@ const PageCheckBill = () => {
       { name: 'gon', id: '3' },
     ])
   }, [])
-  console.log(items)
+
   const onSave = async () => {
     interface SaveBody {
       items: Item[]
@@ -196,7 +221,7 @@ const PageCheckBill = () => {
     <div className="hover:shadow-3xl mx-auto max-w-full space-y-6 rounded-3xl bg-gradient-to-br from-blue-100 via-white to-blue-200 p-4 shadow-2xl transition-all duration-500 md:max-w-3xl md:p-6">
       <Typography.Title
         level={3}
-        className="animate-pulse !text-center text-blue-600 drop-shadow-md"
+        className="animate-pulse !text-center text-blue-700 drop-shadow-md"
       >
         แบ่งบิลเพื่อนแบบกำหนดเอง
       </Typography.Title>
@@ -206,51 +231,74 @@ const PageCheckBill = () => {
         <AddFriends onAddFriend={handleAddFriend} friends={friends} />
       </div>
 
-      {items.length > 0 && <Divider className="border-blue-300">รายการและผู้ร่วมจ่าย</Divider>}
+      {items.length > 0 && <Divider className="border-blue-400">รายการและผู้ร่วมจ่าย</Divider>}
 
       <div className="space-y-6">
         {items.map((item, index) => (
           <div
             key={index}
-            className="flex flex-col items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-md ring-1 ring-blue-200 transition-transform duration-300 hover:scale-[1.02] md:flex-row"
+            className="flex flex-col items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-md ring-1 ring-blue-300 transition-transform duration-300 hover:scale-[1.02] md:flex-row"
           >
-            <div className="flex w-full flex-col gap-4 md:w-11/12">
-              <div className="flex flex-col justify-between gap-1 text-base font-medium text-gray-700 md:flex-row md:items-center">
-                <div className="font-semibold">
-                  <span>รายการที่ {index + 1}</span> {item.name}
+            <div className="flex w-full flex-col gap-2 md:w-11/12">
+              <div className="flex flex-row justify-between py-2">
+                <div className="font-semibold text-gray-700">
+                  รายการที่ {index + 1} {item.name}
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm text-gray-500">คนที่ออกเงิน:</span>
-                  <Select
-                    showSearch
-                    placeholder="เลือกผู้จ่าย"
-                    optionFilterProp="label"
-                    value={item.payerId}
-                    onChange={(value) => handleAddPay(value, item.id)}
-                    options={options}
-                    className="min-w-[140px]"
-                  />
-                </div>
-                <div className="text-blue-600">
+                <div className="text-blue-700">
                   จำนวนเงิน {new Intl.NumberFormat().format(item.price)} บาท
                 </div>
               </div>
 
-              <Select
-                mode="multiple"
-                allowClear
-                placeholder="เลือกเพื่อนที่ร่วมจ่าย"
-                value={item.friendIds}
-                onChange={(value) => handleChange(value, item.id)}
-                options={options}
-                className="w-full transition-all duration-300 hover:border-blue-400"
-              />
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-gray-600">คนที่ออกเงิน</span>
+                <Select
+                  showSearch
+                  placeholder="เลือกผู้จ่าย"
+                  optionFilterProp="label"
+                  value={item.payerId}
+                  onChange={(value) => handleAddPay(value, item.id)}
+                  options={options}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-gray-600">คนที่ต้องหาร</span>
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder="เลือกเพื่อนที่ร่วมจ่าย"
+                  value={item.friendIds}
+                  onChange={(value) => handleChange(value, item.id)}
+                  options={options}
+                  className="w-full transition-all duration-300 hover:border-blue-500"
+                  popupRender={(menu) => {
+                    const allSelected = (item.friendIds ?? []).length === friends.length
+
+                    return (
+                      <>
+                        {menu}
+                        <Divider style={{ margin: '8px 0' }} />
+                        <div className="flex justify-center p-2">
+                          <Button
+                            size="small"
+                            type="link"
+                            onClick={() =>
+                              handleChange(allSelected ? [] : friends.map((f) => f.id), item.id)
+                            }
+                          >
+                            {allSelected ? 'ยกเลิกการเลือกทั้งหมด' : 'เลือกเพื่อนทั้งหมด'}
+                          </Button>
+                        </div>
+                      </>
+                    )
+                  }}
+                />
+              </div>
             </div>
 
             <Button
               type="link"
               onClick={() => handleDeleteItem(item.id)}
-              className="!text-red-500 hover:scale-110"
+              className="!text-red-600 hover:scale-110"
             >
               <MdDelete size={26} />
             </Button>
@@ -259,7 +307,7 @@ const PageCheckBill = () => {
       </div>
 
       {friends.length > 0 && (
-        <Divider className="my-4 border-green-300 text-center text-lg font-semibold">
+        <Divider className="my-4 border-green-400 text-center text-lg font-semibold">
           ยอดที่แต่ละคนต้องจ่าย
         </Divider>
       )}
@@ -268,29 +316,31 @@ const PageCheckBill = () => {
         {friends.map((friend) => (
           <div
             key={friend.id}
-            className="rounded-2xl bg-green-50 px-5 py-4 shadow ring-1 ring-green-200 transition-all duration-300 hover:scale-[1.01]"
+            className="rounded-2xl bg-green-100 px-5 py-4 shadow ring-1 ring-green-300 transition-all duration-300 hover:scale-[1.01]"
           >
             <div className="flex flex-row items-center justify-between">
               {/* Left section */}
-              <div className="w-1/2 space-y-1">
-                <div className="text-lg font-bold text-green-700">{friend.name}</div>
+              <div className="space-y-1">
+                <div className="text-lg font-bold text-green-800">{friend.name}</div>
                 {friendPaid[friend.id] > 0 && (
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-700">
                     ชำระไปแล้ว {Math.floor(friendPaid[friend.id]).toLocaleString()} บาท
                   </div>
                 )}
-                <div className="text-sm text-gray-600">
-                  ยอดที่ต้องชำระ {Math.floor(friendBill[friend.id]).toLocaleString()} บาท
-                </div>
+                {friendBill[friend.id] !== 0 && (
+                  <div className="text-sm text-gray-700">
+                    ยอดที่ต้องชำระทั้งหมด {Math.floor(friendBill[friend.id]).toLocaleString()} บาท
+                  </div>
+                )}
 
                 {friendPaid[friend.id] > friendBill[friend.id] && (
-                  <div className="text-sm font-medium text-blue-700">
+                  <div className="text-sm font-medium text-blue-800">
                     ต้องได้เงินคืน{' '}
                     {(friendPaid[friend.id] - friendBill[friend.id]).toLocaleString()} บาท
                   </div>
                 )}
                 {friendPaid[friend.id] < friendBill[friend.id] && (
-                  <div className="text-sm font-medium text-red-500">
+                  <div className="text-sm font-medium text-red-600">
                     ยอดค้างชำระ {(friendBill[friend.id] - friendPaid[friend.id]).toLocaleString()}{' '}
                     บาท
                   </div>
@@ -302,7 +352,7 @@ const PageCheckBill = () => {
                 <Button
                   type="link"
                   onClick={() => handleDeleteFriend(friend.id)}
-                  className="!text-red-400 hover:scale-110"
+                  className="!text-red-600 hover:scale-110"
                 >
                   <MdDelete size={22} />
                 </Button>
@@ -310,7 +360,7 @@ const PageCheckBill = () => {
             </div>
 
             {/* Transactions */}
-            <div className="mt-3 border-t border-dashed border-green-300 pt-2 text-sm text-gray-600">
+            <div className="mt-3 border-t border-dashed border-green-400 pt-2 text-sm text-gray-700">
               {transactions
                 .filter((t) => t.from === friend.id || t.to === friend.id)
                 .map((t, i) => {
@@ -348,10 +398,10 @@ const PageCheckBill = () => {
           </Button>
         </div>
       )}
-      <Button onClick={handleJ}>สร้างข้อมูล</Button>
+      <Button onClick={initializeSampleData}>สร้างข้อมูล</Button>
       {isLoggedIn && (
         <div>
-          <Button onClick={handleJ}>สร้างข้อมูล</Button>
+          <Button onClick={initializeSampleData}>สร้างข้อมูล</Button>
           <Button onClick={onSave}>Save</Button>
         </div>
       )}

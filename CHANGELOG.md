@@ -1,3 +1,10 @@
+## [1.1.50](https://github.com/punya199/test1/compare/v1.1.49...v1.1.50) (2025-07-17)
+
+
+### Fix
+
+* downgrade react 19 to 18 ([1365e08](https://github.com/punya199/test1/commit/1365e08ddda5f6da51ef1fb2b2fd9214b727ee93))
+
 ## [1.1.49](https://github.com/punya199/test1/compare/v1.1.48...v1.1.49) (2025-07-09)
 
 

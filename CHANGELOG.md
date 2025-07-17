@@ -1,3 +1,10 @@
+## [1.1.52](https://github.com/punya199/test1/compare/v1.1.51...v1.1.52) (2025-07-17)
+
+
+### Fix
+
+* Enhance delete confirmation modal in PageCheckBill component and streamline friend removal logic for improved user experience. ([67bcbba](https://github.com/punya199/test1/commit/67bcbba4dab53127aaec2ebfe3984b92d666eea1))
+
 ## [1.1.51](https://github.com/punya199/test1/compare/v1.1.50...v1.1.51) (2025-07-17)
 
 

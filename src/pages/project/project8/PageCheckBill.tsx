@@ -62,7 +62,6 @@ const PageCheckBill = () => {
         okText: 'ลบเลย',
         okType: 'danger',
         cancelText: 'ยกเลิก',
-        getContainer: () => document.body,
         onOk: async () => {
           await new Promise((resolve) => setTimeout(resolve, 300)) // mock delay
           setItems(items.filter((item) => item.id !== id))
@@ -74,18 +73,28 @@ const PageCheckBill = () => {
 
   const handleDeleteFriend = useCallback(
     (removeFriendId: string) => {
-      setFriends(friends.filter((friend) => friend.id !== removeFriendId))
-      setItems(
-        items.map((item) => {
-          const itemFriend = item.friendIds || []
-          const friendPay = item.payerId
-          item.friendIds = itemFriend.filter((e) => e !== removeFriendId)
-          if (item.payerId === friendPay) {
-            item.payerId = ''
-          }
-          return item
-        })
-      )
+      Modal.confirm({
+        title: 'ยืนยันการลบ',
+        content: 'คุณต้องการลบเพื่อนคนนี้จริงหรือไม่?',
+        okText: 'ลบเลย',
+        okType: 'danger',
+        cancelText: 'ยกเลิก',
+        onOk: async () => {
+          await new Promise((resolve) => setTimeout(resolve, 300)) // mock delay
+          setFriends(friends.filter((friend) => friend.id !== removeFriendId))
+          setItems(
+            items.map((item) => {
+              const itemFriend = item.friendIds || []
+              const friendPay = item.payerId
+              item.friendIds = itemFriend.filter((e) => e !== removeFriendId)
+              if (item.payerId === friendPay) {
+                item.payerId = ''
+              }
+              return item
+            })
+          )
+        },
+      })
     },
     [friends, items, setFriends, setItems]
   )
@@ -407,7 +416,7 @@ const PageCheckBill = () => {
           </Button>
         </div>
       )}
-      <Button onClick={initializeSampleData}>สร้างข้อมูล</Button>
+
       {isLoggedIn && (
         <div>
           <Button onClick={initializeSampleData}>สร้างข้อมูล</Button>

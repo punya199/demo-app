@@ -26,7 +26,7 @@ export const AddFriends = ({ onAddFriend, friends }: AddFriendsProps) => {
   }
 
   return (
-    <div className="rounded-lg bg-gray-50 p-4 shadow-sm">
+    <div className="rounded-lg bg-gray-50 p-4 shadow-sm md:px-8 md:py-4">
       <h3 className="mb-2 text-lg font-semibold">เพิ่มเพื่อน</h3>
       <Form
         onFinish={onFinish}
@@ -44,6 +44,9 @@ export const AddFriends = ({ onAddFriend, friends }: AddFriendsProps) => {
               validator(_rule, value) {
                 if (friends.some((n) => n.name === value)) {
                   return Promise.reject('ชื่อนี้ถูกใช้ไปแล้ว')
+                }
+                if (value && value.length > 12) {
+                  return Promise.reject('ชื่อต้องไม่เกิน 12 ตัวอักษร')
                 }
                 return Promise.resolve()
               },

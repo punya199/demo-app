@@ -34,7 +34,7 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
   }
 
   return (
-    <div className="rounded-lg bg-gray-50 p-4 shadow-sm">
+    <div className="rounded-lg bg-gray-50 p-4 shadow-sm md:px-8 md:py-4">
       <h3 className="mb-2 text-lg font-semibold">เพิ่มรายการ</h3>
       <Form
         onFinish={onFinish}
@@ -44,7 +44,7 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
       >
         <Form.Item
           name="name"
-          label="ชื่อ"
+          label={<span style={{ display: 'inline-block', width: '30px' }}>ชื่อ</span>}
           validateTrigger="onChange"
           className="w-full"
           rules={[
@@ -53,6 +53,9 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
               validator(_rule, value) {
                 if (items.some((n) => n.name === value)) {
                   return Promise.reject('ชื่อนี้ถูกใช้ไปแล้ว')
+                }
+                if (value && value.length > 20) {
+                  return Promise.reject('ชื่อต้องไม่เกิน 20 ตัวอักษร')
                 }
                 return Promise.resolve()
               },
@@ -64,7 +67,7 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
 
         <Form.Item
           name="price"
-          label="ราคา"
+          label={<span style={{ display: 'inline-block', width: '30px' }}>ราคา</span>}
           rules={[{ required: true, message: 'กรุณาใส่ราคา' }]}
           className="w-full"
         >

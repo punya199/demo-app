@@ -1,3 +1,10 @@
+## [1.1.53](https://github.com/punya199/test1/compare/v1.1.52...v1.1.53) (2025-07-18)
+
+
+### Fix
+
+* Update framer-motion to version 12.23.6, enhance styling in AddFriends and AddItem components, and implement character limit validation for friend and item names in PageCheckBill component. ([fb6402c](https://github.com/punya199/test1/commit/fb6402c501a4af3b3c916594b2cb5060ebf6f0f5))
+
 ## [1.1.52](https://github.com/punya199/test1/compare/v1.1.51...v1.1.52) (2025-07-17)
 
 

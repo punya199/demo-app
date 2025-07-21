@@ -1,10 +1,10 @@
 import { MenuOutlined } from '@ant-design/icons'
 import { useQueryClient } from '@tanstack/react-query'
-import { Button, Drawer, Menu, Space, Typography } from 'antd'
+import { Button, Drawer, Dropdown, Menu, MenuProps, Space, Typography } from 'antd'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { projectList } from '../pages/Allprojects'
+import { appPath } from '../config/app-paths'
 import { useGetMe } from '../service'
 const { Title } = Typography
 
@@ -21,18 +21,39 @@ const Navbar = () => {
     queryClient.removeQueries()
   }
 
+  const items: MenuProps['items'] = [
+    {
+      label: <Link to={appPath.randomCard}>RandomCard</Link>,
+      key: '0',
+    },
+    {
+      label: <Link to={appPath.omamaGame}>Game Omama</Link>,
+      key: '1',
+    },
+    {
+      label: <Link to={appPath.checkBillPage}>Check Bill</Link>,
+      key: '2',
+    },
+  ]
+
   return (
     <nav className="bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 shadow-lg">
       <div className="flex items-center justify-between">
         {/* Left: Logo */}
-        <Link to="/">
+        <Link to={appPath.home}>
           <motion.div whileHover={{ scale: 1.1 }}>
             <Title level={3} className="!m-0 !text-white">
-              LOGO
+              YAYA
             </Title>
           </motion.div>
         </Link>
-        <div className="hidden lg:block"> s</div>
+        <div className="hidden md:block">
+          <Dropdown menu={{ items }}>
+            <a onClick={(e) => e.preventDefault()}>
+              <Button className="text-blue-500 hover:text-blue-700">Game</Button>
+            </a>
+          </Dropdown>
+        </div>
 
         <div className="flex items-center gap-4">
           {isLoggedIn && user.user.username}
@@ -48,7 +69,7 @@ const Navbar = () => {
                 </Button>
               </motion.div>
             ) : (
-              <Link to="/login">
+              <Link to={appPath.login}>
                 <motion.div whileHover={{ scale: 1.1 }}>
                   <Button type="link" className="!text-white hover:!text-cyan-300">
                     Login
@@ -61,7 +82,6 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Mobile Menu Icon */}
           <motion.div whileTap={{ scale: 0.9 }}>
             <div className="lg:hidden">
               <Button
@@ -74,20 +94,25 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Drawer */}
       <Drawer
-        title="Project List"
+        title="Menu"
         placement="right"
         onClose={onClose}
         open={open}
+        width={300} // Reduced width for the Drawer
         classNames={{ body: 'p-0' }}
       >
         <Menu mode="vertical" selectable={false}>
-          {projectList.map((project, index) => (
-            <Menu.Item key={index} onClick={onClose}>
-              <Link to={project.link}>{project.name}</Link>
-            </Menu.Item>
-          ))}
+          <Menu.Item onClick={onClose}>
+            <Link to="/RandomCard">RandomCard</Link>
+          </Menu.Item>
+          <Menu.Item onClick={onClose}>
+            <Link to="/Omama">Game Omama</Link>
+          </Menu.Item>
+
+          <Menu.Item onClick={onClose}>
+            <Link to="/CheckBillPage">Check Bill</Link>
+          </Menu.Item>
         </Menu>
 
         <div className="p-4">
@@ -104,7 +129,7 @@ const Navbar = () => {
                 Logout
               </Button>
             ) : (
-              <Link to="/login">
+              <Link to={appPath.login}>
                 <Button type="link" block onClick={onClose}>
                   Login
                 </Button>

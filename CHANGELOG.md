@@ -1,3 +1,10 @@
+## [1.1.54](https://github.com/punya199/test1/compare/v1.1.53...v1.1.54) (2025-07-21)
+
+
+### Fix
+
+* Introduce appPath configuration for routing, update Navbar and App components to use new paths, and clean up unused routes. Simplify Home component by removing project link. ([69b9586](https://github.com/punya199/test1/commit/69b958664ec8fc41cf44133050df6b7b91f7397c))
+
 ## [1.1.53](https://github.com/punya199/test1/compare/v1.1.52...v1.1.53) (2025-07-18)
 
 

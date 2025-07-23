@@ -23,15 +23,15 @@ const Navbar = () => {
 
   const items: MenuProps['items'] = [
     {
-      label: <Link to={appPath.randomCard}>RandomCard</Link>,
+      label: <Link to={appPath.randomCard()}>RandomCard</Link>,
       key: '0',
     },
     {
-      label: <Link to={appPath.omamaGame}>Game Omama</Link>,
+      label: <Link to={appPath.omamaGame()}>Game Omama</Link>,
       key: '1',
     },
     {
-      label: <Link to={appPath.checkBillPage}>Check Bill</Link>,
+      label: <Link to={appPath.checkBillPage()}>Check Bill</Link>,
       key: '2',
     },
   ]
@@ -40,7 +40,7 @@ const Navbar = () => {
     <nav className="bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 shadow-lg">
       <div className="flex items-center justify-between">
         {/* Left: Logo */}
-        <Link to={appPath.home}>
+        <Link to={appPath.home()}>
           <motion.div whileHover={{ scale: 1.1 }}>
             <Title level={3} className="!m-0 !text-white">
               YAYA
@@ -69,7 +69,7 @@ const Navbar = () => {
                 </Button>
               </motion.div>
             ) : (
-              <Link to={appPath.login}>
+              <Link to={appPath.login()}>
                 <motion.div whileHover={{ scale: 1.1 }}>
                   <Button type="link" className="!text-white hover:!text-cyan-300">
                     Login
@@ -129,7 +129,7 @@ const Navbar = () => {
                 Logout
               </Button>
             ) : (
-              <Link to={appPath.login}>
+              <Link to={appPath.login()}>
                 <Button type="link" block onClick={onClose}>
                   Login
                 </Button>

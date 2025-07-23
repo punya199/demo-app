@@ -8,7 +8,8 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import CardGame from './pages/project/project5/CardGame'
 import Omama from './pages/project/project6/Omama'
-import PageCheckBill from './pages/project/project8/PageCheckBill'
+import PageAllBill from './pages/project/project8/PageAllBill'
+import PageEditBill from './pages/project/project8/PageEditBill'
 
 const router = createBrowserRouter([
   {
@@ -17,7 +18,7 @@ const router = createBrowserRouter([
     errorElement: <Pnotfound />,
     children: [
       {
-        path: appPath.home,
+        path: appPath.home(),
         element: <Home />,
       },
 
@@ -46,17 +47,21 @@ const router = createBrowserRouter([
       //   element: <PageQuiz />,
       // },
       {
-        path: appPath.randomCard,
+        path: appPath.randomCard(),
         element: <CardGame />,
       },
-      { path: appPath.omamaGame, element: <Omama /> },
+      { path: appPath.omamaGame(), element: <Omama /> },
       // { path: '/p7', element: <PageGame9Gea /> },
       {
-        path: appPath.checkBillPage,
-        element: <PageCheckBill />,
+        path: appPath.checkBillPageEdit(),
+        element: <PageEditBill />,
       },
       {
-        path: appPath.login,
+        path: appPath.checkBillPage(),
+        element: <PageAllBill />,
+      },
+      {
+        path: appPath.login(),
         element: <Login />,
       },
     ],

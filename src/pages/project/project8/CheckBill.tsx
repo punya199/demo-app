@@ -1,14 +1,14 @@
-import { Button, Divider, message, Modal, Select, SelectProps, Typography } from 'antd'
+import { Button, Divider, Input, message, Modal, Select, SelectProps, Typography } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
 import { round } from 'lodash'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { useGetMe } from '../../../service'
-import { apiClient } from '../../../utils/api-client'
 import AddFriends, { Friend } from './AddFriends'
 import { AddItem, Item } from './AddItem'
+import { Bill } from './PageAllBill'
 
 type PositionStoreState = { items: Item[]; friends: Friend[] }
 
@@ -18,6 +18,15 @@ type PositionStoreActions = {
 }
 
 type PositionStore = PositionStoreState & PositionStoreActions
+export interface SaveBody {
+  items: Item[]
+  friends: Friend[]
+  title: string
+}
+interface CheckBillPorps {
+  bill?: Bill
+  onSave: (data: SaveBody) => void
+}
 
 const useCheckBillStore = create<PositionStore>()(
   persist(
@@ -31,10 +40,18 @@ const useCheckBillStore = create<PositionStore>()(
   )
 )
 
-const PageCheckBill = () => {
+const CheckBill = (props: CheckBillPorps) => {
   // const [items, setItems] = useState<Item[]>([])
   // const [friends, setFriends] = useState<Friend[]>([])
+
   const { items, friends, setFriends, setItems } = useCheckBillStore()
+  useEffect(() => {
+    if (props.bill) {
+      setItems(props.bill.items)
+      setFriends(props.bill.friends)
+    }
+  }, [props.bill, setFriends, setItems])
+
   const [openDelete, setOpenDelete] = useState(false)
 
   const { data: user } = useGetMe()
@@ -157,6 +174,31 @@ const PageCheckBill = () => {
     })
   }, [setFriends, setItems])
 
+  const handleSave = useCallback(() => {
+    let inputTitle = ''
+    Modal.confirm({
+      title: 'ชื่อบิล',
+      content: (
+        <Input
+          placeholder="กรุณากรองชื่อ"
+          defaultValue={props.bill?.title}
+          onChange={(e) => {
+            inputTitle = e.target.value
+          }}
+        />
+      ),
+      okText: 'บันทึก',
+
+      okType: 'primary',
+      cancelText: 'ยกเลิก',
+      icon: null,
+      onOk: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 300)) // mock delay
+        props.onSave({ friends, items, title: inputTitle })
+      },
+    })
+  }, [friends, items, props])
+
   const initializeSampleData = useCallback(() => {
     setItems([
       { name: 'รี', price: 500, id: '1' },
@@ -169,15 +211,6 @@ const PageCheckBill = () => {
       { name: 'gon', id: '3' },
     ])
   }, [setFriends, setItems])
-
-  const onSave = async () => {
-    interface SaveBody {
-      items: Item[]
-      friends: Friend[]
-    }
-    const body: SaveBody = { items, friends }
-    await apiClient.post(`/bill`, body)
-  }
 
   const friendBill = useMemo(() => {
     const newFriendBill: Record<string, number> = {}
@@ -262,32 +295,16 @@ const PageCheckBill = () => {
 
   return (
     <div className="hover:shadow-3xl mx-auto max-w-full space-y-6 rounded-3xl bg-gradient-to-br from-blue-100 via-white to-blue-200 p-3 shadow-2xl transition-all duration-500 md:max-w-3xl md:p-6">
-      <Typography.Title
-        level={3}
-        className="animate-in fade-in-0 slide-in-from-top-2 !text-center text-blue-700 drop-shadow-md duration-700"
-      >
+      <Typography.Title level={3} className="!text-center text-blue-700 drop-shadow-md">
         แบ่งบิลเพื่อนแบบกำหนดเอง
       </Typography.Title>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="flex flex-col gap-6"
-      >
+      <div className="flex flex-col gap-6">
         <AddItem onAddItem={handleAddItem} items={items} />
         <AddFriends onAddFriend={handleAddFriend} friends={friends} />
-      </motion.div>
+      </div>
 
-      {items.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <Divider className="border-blue-400">รายการและผู้ร่วมจ่าย</Divider>
-        </motion.div>
-      )}
+      {items.length > 0 && <Divider className="border-blue-400">รายการและผู้ร่วมจ่าย</Divider>}
 
       <AnimatePresence mode="popLayout">
         {items.map((item, index) => (
@@ -328,12 +345,7 @@ const PageCheckBill = () => {
             <div className="flex w-full flex-col gap-2">
               <div className="flex flex-col gap-1">
                 {openDelete ? (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex items-start justify-between gap-2"
-                  >
+                  <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-1 flex-col md:flex-row">
                       <div className="flex min-w-0 flex-1 items-center text-xl font-semibold text-gray-700">
                         <span className="word-wrap w-full break-words">
@@ -357,7 +369,7 @@ const PageCheckBill = () => {
                         <MdDelete size={24} />
                       </Button>
                     </motion.div>
-                  </motion.div>
+                  </div>
                 ) : (
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex min-w-0 flex-1 items-center text-xl font-semibold text-gray-700">
@@ -365,24 +377,14 @@ const PageCheckBill = () => {
                         รายการที่ {index + 1} {item.name}
                       </span>
                     </div>
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: 0.2 }}
-                      className="flex flex-shrink-0 items-center whitespace-nowrap text-blue-700"
-                    >
+                    <div className="flex flex-shrink-0 items-center whitespace-nowrap text-blue-700">
                       {new Intl.NumberFormat().format(item.price)} บาท
-                    </motion.div>
+                    </div>
                   </div>
                 )}
               </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.3 }}
-                className="flex items-center gap-1"
-              >
+              <div className="flex items-center gap-1">
                 <span className="w-20 flex-shrink-0 text-sm text-gray-600">คนที่ออกเงิน</span>
                 <div className="min-w-0 flex-1">
                   <Select
@@ -394,14 +396,9 @@ const PageCheckBill = () => {
                     className="w-full"
                   />
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.4 }}
-                className="flex items-center gap-1"
-              >
+              <div className="flex items-center gap-1">
                 <span className="w-20 flex-shrink-0 text-sm text-gray-600">คนที่ต้องหาร</span>
                 <div className="min-w-0 flex-1">
                   <Select
@@ -436,26 +433,28 @@ const PageCheckBill = () => {
                     }}
                   />
                 </div>
-              </motion.div>
+              </div>
             </div>
           </motion.div>
         ))}
+        <div className="flex flex-col items-center justify-between gap-3 rounded-2xl bg-gray-100 p-4 shadow-md ring-1 ring-blue-300 transition-shadow duration-300 hover:shadow-lg md:px-8 md:py-4">
+          ยอดที่จ่ายทั้งหมด{' '}
+          {items.reduce((acc, curr) => {
+            acc += curr.price
+            return acc
+          }, 0)}{' '}
+          บาท
+        </div>
       </AnimatePresence>
 
       {friends.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Divider className="my-4 border-green-400 text-center text-lg font-semibold">
-            ยอดที่แต่ละคนต้องจ่าย
-          </Divider>
-        </motion.div>
+        <Divider className="my-4 border-green-400 text-center text-lg font-semibold">
+          ยอดที่แต่ละคนต้องจ่าย
+        </Divider>
       )}
 
       <AnimatePresence mode="popLayout">
-        <motion.div layout className="space-y-4">
+        <div className="space-y-4">
           {friends.map((friend, index) => (
             <motion.div
               key={friend.id}
@@ -493,18 +492,10 @@ const PageCheckBill = () => {
             >
               <div className="w-full rounded-2xl bg-green-100 p-4 shadow-2xl ring-1 ring-green-300 transition-all duration-300 hover:shadow-xl md:px-8 md:py-4">
                 <div className="space-y-1">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="flex items-center justify-between text-2xl font-bold"
-                  >
+                  <div className="flex items-center justify-between text-2xl font-bold">
                     {friend.name}
                     {openDelete && (
                       <motion.div
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: 0.1 }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleDeleteFriend(friend.id)}
@@ -515,13 +506,9 @@ const PageCheckBill = () => {
                         </Button>
                       </motion.div>
                     )}
-                  </motion.div>
+                  </div>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.3 }}
-                  >
+                  <div>
                     {friendPaid[friend.id] > 0 && (
                       <div className="text-sm text-gray-700">
                         ชำระไปแล้ว {Math.floor(friendPaid[friend.id]).toLocaleString()} บาท
@@ -534,36 +521,21 @@ const PageCheckBill = () => {
                       </div>
                     )}
                     {friendPaid[friend.id] > friendBill[friend.id] && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: 0.4 }}
-                        className="text-sm font-medium text-blue-800"
-                      >
+                      <div className="text-sm font-medium text-blue-800">
                         ต้องได้เงินคืน{' '}
                         {(friendPaid[friend.id] - friendBill[friend.id]).toLocaleString()} บาท
-                      </motion.div>
+                      </div>
                     )}
                     {friendPaid[friend.id] < friendBill[friend.id] && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: 0.4 }}
-                        className="text-sm font-medium text-red-600"
-                      >
+                      <div className="text-sm font-medium text-red-600">
                         ยอดค้างชำระ{' '}
                         {(friendBill[friend.id] - friendPaid[friend.id]).toLocaleString()} บาท
-                      </motion.div>
+                      </div>
                     )}
-                  </motion.div>
+                  </div>
                 </div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.5 }}
-                  className="mt-3 border-t border-dashed border-green-400"
-                >
+                <div className="mt-3 border-t border-dashed border-green-400">
                   <AnimatePresence>
                     {transactions
                       .filter((t) => t.from === friend.id || t.to === friend.id)
@@ -595,20 +567,15 @@ const PageCheckBill = () => {
                         )
                       })}
                   </AnimatePresence>
-                </motion.div>
+                </div>
               </div>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </AnimatePresence>
 
       {(friends.length > 0 || items.length > 0) && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex items-center justify-center gap-4"
-        >
+        <div className="flex items-center justify-center gap-4">
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               type="primary"
@@ -631,25 +598,20 @@ const PageCheckBill = () => {
               ล้างข้อมูลทั้งหมด
             </Button>
           </motion.div>
-        </motion.div>
+        </div>
       )}
 
       {isLoggedIn && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="flex gap-2"
-        >
+        <div className="flex gap-2">
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button onClick={initializeSampleData}>สร้างข้อมูล</Button>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button onClick={onSave}>Save</Button>
+            <Button onClick={handleSave}>Save </Button>
           </motion.div>
-        </motion.div>
+        </div>
       )}
     </div>
   )
 }
-export default PageCheckBill
+export default CheckBill

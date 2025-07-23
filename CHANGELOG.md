@@ -1,3 +1,10 @@
+## [1.1.55](https://github.com/punya199/test1/compare/v1.1.54...v1.1.55) (2025-07-23)
+
+
+### Fix
+
+* Enhance routing and state management: Introduce new pages for bill creation and editing, update appPath configuration for dynamic routing, and integrate zustand for state management in CheckBill component. Add dependencies for URL sanitization and query string handling. ([3ca0ab7](https://github.com/punya199/test1/commit/3ca0ab778a1e7d31166b92c1b09a51fd20689f53))
+
 ## [1.1.54](https://github.com/punya199/test1/compare/v1.1.53...v1.1.54) (2025-07-21)
 
 

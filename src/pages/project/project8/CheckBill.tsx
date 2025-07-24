@@ -1,4 +1,4 @@
-import { Button, Divider, Input, message, Modal, Select, SelectProps, Typography } from 'antd'
+import { Button, Divider, Input, message, Modal, Select, SelectProps } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
 import { round } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -85,7 +85,7 @@ const CheckBill = (props: CheckBillPorps) => {
     (id: string) => {
       Modal.confirm({
         title: 'ยืนยันการลบ',
-        content: 'คุณต้องการลบรายการนี้จริงหรือไม่?',
+        content: 'คุณต้องการลบรายการนี้หรือไม่?',
         okText: 'ลบเลย',
         okType: 'danger',
         cancelText: 'ยกเลิก',
@@ -103,7 +103,7 @@ const CheckBill = (props: CheckBillPorps) => {
     (removeFriendId: string) => {
       Modal.confirm({
         title: 'ยืนยันการลบ',
-        content: 'คุณต้องการลบเพื่อนคนนี้จริงหรือไม่?',
+        content: 'คุณต้องการลบหรือไม่?',
         okText: 'ลบเลย',
         okType: 'danger',
         cancelText: 'ยกเลิก',
@@ -161,7 +161,7 @@ const CheckBill = (props: CheckBillPorps) => {
   const handleReset = useCallback(() => {
     Modal.confirm({
       title: 'ยืนยันการรีเซ็ต',
-      content: 'คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตสินค้าทั้งหมดและเพื่อนทั้งหมด?',
+      content: 'คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตทั้งหมด ?',
       cancelText: 'ไม่',
       okText: 'ใช่',
       okType: 'danger',
@@ -199,18 +199,18 @@ const CheckBill = (props: CheckBillPorps) => {
     })
   }, [friends, items, props])
 
-  const initializeSampleData = useCallback(() => {
-    setItems([
-      { name: 'รี', price: 500, id: '1' },
-      { name: 'ข้าว', price: 500, id: '2' },
-      { name: 'โซดา', price: 250, id: '3' },
-    ])
-    setFriends([
-      { name: 'ton', id: '1' },
-      { name: 'boom', id: '2' },
-      { name: 'gon', id: '3' },
-    ])
-  }, [setFriends, setItems])
+  // const initializeSampleData = useCallback(() => {
+  //   setItems([
+  //     { name: 'รี', price: 500, id: '1' },
+  //     { name: 'ข้าว', price: 500, id: '2' },
+  //     { name: 'โซดา', price: 250, id: '3' },
+  //   ])
+  //   setFriends([
+  //     { name: 'ton', id: '1' },
+  //     { name: 'boom', id: '2' },
+  //     { name: 'gon', id: '3' },
+  //   ])
+  // }, [setFriends, setItems])
 
   const friendBill = useMemo(() => {
     const newFriendBill: Record<string, number> = {}
@@ -295,11 +295,7 @@ const CheckBill = (props: CheckBillPorps) => {
 
   return (
     <div className="hover:shadow-3xl mx-auto max-w-full space-y-6 rounded-3xl bg-gradient-to-br from-blue-100 via-white to-blue-200 p-3 shadow-2xl transition-all duration-500 md:max-w-3xl md:p-6">
-      <Typography.Title level={3} className="!text-center text-blue-700 drop-shadow-md">
-        แบ่งบิลเพื่อนแบบกำหนดเอง
-      </Typography.Title>
-
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2 md:gap-4">
         <AddItem onAddItem={handleAddItem} items={items} />
         <AddFriends onAddFriend={handleAddFriend} friends={friends} />
       </div>
@@ -340,7 +336,7 @@ const CheckBill = (props: CheckBillPorps) => {
               y: -2,
               transition: { duration: 0.2 },
             }}
-            className="flex flex-col items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-md ring-1 ring-blue-300 transition-shadow duration-300 hover:shadow-lg md:px-8 md:py-4"
+            className="my-2 flex flex-col items-center justify-between rounded-2xl bg-white p-4 shadow-md ring-1 ring-blue-300 transition-shadow duration-300 hover:shadow-lg md:px-8 md:py-4"
           >
             <div className="flex w-full flex-col gap-2">
               <div className="flex flex-col gap-1">
@@ -437,14 +433,18 @@ const CheckBill = (props: CheckBillPorps) => {
             </div>
           </motion.div>
         ))}
-        <div className="flex flex-col items-center justify-between gap-3 rounded-2xl bg-gray-100 p-4 shadow-md ring-1 ring-blue-300 transition-shadow duration-300 hover:shadow-lg md:px-8 md:py-4">
-          ยอดที่จ่ายทั้งหมด{' '}
-          {items.reduce((acc, curr) => {
-            acc += curr.price
-            return acc
-          }, 0)}{' '}
-          บาท
-        </div>
+        {items.length > 0 && (
+          <div className="flex items-center justify-center gap-2 rounded-2xl bg-gray-100 p-2 shadow-md ring-1 ring-blue-300 transition-shadow duration-300 hover:shadow-lg md:px-8 md:py-4">
+            ยอดที่จ่ายทั้งหมด
+            <span className="font-bold">
+              {items.reduce((acc, curr) => {
+                acc += curr.price
+                return acc
+              }, 0)}{' '}
+            </span>
+            บาท
+          </div>
+        )}
       </AnimatePresence>
 
       {friends.length > 0 && (
@@ -598,17 +598,15 @@ const CheckBill = (props: CheckBillPorps) => {
               ล้างข้อมูลทั้งหมด
             </Button>
           </motion.div>
-        </div>
-      )}
-
-      {isLoggedIn && (
-        <div className="flex gap-2">
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button onClick={initializeSampleData}>สร้างข้อมูล</Button>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button onClick={handleSave}>Save </Button>
-          </motion.div>
+          {isLoggedIn && (
+            <div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button type="primary" onClick={handleSave}>
+                  Save
+                </Button>
+              </motion.div>
+            </div>
+          )}
         </div>
       )}
     </div>

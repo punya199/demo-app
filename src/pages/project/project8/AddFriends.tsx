@@ -32,7 +32,7 @@ export const AddFriends = ({ onAddFriend, friends }: AddFriendsProps) => {
         onFinish={onFinish}
         form={form}
         layout="inline"
-        className="flex flex-wrap justify-between"
+        className="flex flex-wrap justify-between gap-1"
       >
         <Form.Item
           name="name"

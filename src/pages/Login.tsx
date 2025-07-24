@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Button, Form, Input } from 'antd'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { appPath } from '../config/app-paths'
 import { useGetMe } from '../service'
 import { apiClient } from '../utils/api-client'
 type Data = {
@@ -16,7 +17,7 @@ const Login = () => {
   const queryClient = useQueryClient()
   useEffect(() => {
     if (user?.user.id) {
-      navigate('/')
+      navigate(appPath.home())
     }
   }, [navigate, user?.user.id])
   const onFinish = async (values: { username: string; password: string }) => {

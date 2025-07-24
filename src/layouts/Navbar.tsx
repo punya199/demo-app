@@ -18,7 +18,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken')
-    queryClient.removeQueries()
+    queryClient.resetQueries()
   }
 
   const items: MenuProps['items'] = [
@@ -104,14 +104,14 @@ const Navbar = () => {
       >
         <Menu mode="vertical" selectable={false}>
           <Menu.Item onClick={onClose}>
-            <Link to="/RandomCard">RandomCard</Link>
+            <Link to={appPath.randomCard()}>RandomCard</Link>
           </Menu.Item>
           <Menu.Item onClick={onClose}>
-            <Link to="/Omama">Game Omama</Link>
+            <Link to={appPath.omamaGame()}>Game Omama</Link>
           </Menu.Item>
 
           <Menu.Item onClick={onClose}>
-            <Link to="/CheckBillPage">Check Bill</Link>
+            <Link to={appPath.checkBillPage()}>Check Bill</Link>
           </Menu.Item>
         </Menu>
 

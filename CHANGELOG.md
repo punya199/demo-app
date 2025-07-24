@@ -1,3 +1,10 @@
+## [1.1.56](https://github.com/punya199/test1/compare/v1.1.55...v1.1.56) (2025-07-24)
+
+
+### Fix
+
+* Add dayjs for date handling, implement new PageCreateBill component, and enhance routing in Navbar and App components. Update CheckBill component for improved user experience and styling adjustments in PageAllBill. ([e5d5864](https://github.com/punya199/test1/commit/e5d5864bdb44d0cc556e904f01e8825bae531973))
+
 ## [1.1.55](https://github.com/punya199/test1/compare/v1.1.54...v1.1.55) (2025-07-23)
 
 

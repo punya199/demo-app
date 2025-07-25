@@ -1,8 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { Button, Divider, Typography } from 'antd'
+import { Button, Divider, Modal, Table, Typography } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { IoSearchCircleSharp } from 'react-icons/io5'
+import { MdDelete } from 'react-icons/md'
+import { TbEdit } from 'react-icons/tb'
+import { Link, useNavigate } from 'react-router-dom'
 import { appPath } from '../../../config/app-paths'
 import { useGetMe } from '../../../service'
 import { apiClient } from '../../../utils/api-client'
@@ -24,6 +28,8 @@ type GetBillsResponse = {
 }
 
 const PageAllBill = () => {
+  const navigate = useNavigate()
+
   const { data } = useQuery({
     queryKey: ['BillList'],
     queryFn: async () => {
@@ -33,16 +39,118 @@ const PageAllBill = () => {
   })
 
   const { data: user } = useGetMe()
-  const isLoggedIn = useMemo(() => {
-    return !!user?.user.id
-  }, [user?.user.id])
+  const isLoggedIn = useMemo(() => !!user?.user.id, [user?.user.id])
+
+  const handleViewClick = (billId: number) => {
+    navigate(appPath.checkBillPageSave({ param: { billId } }))
+  }
+  const handleEditClick = (billId: number) => {
+    if (isLoggedIn) {
+      navigate(appPath.checkBillPageEdit({ param: { billId } }))
+    } else {
+      Modal.confirm({
+        title: 'คุณยังไม่ได้เข้าสู่ระบบ',
+        content: 'คุณต้องเข้าสู่ระบบก่อนจึงจะแก้ไขได้ ',
+        cancelText: 'ไม่',
+        okText: 'ไปหน้าเข้าสู่ระบบ',
+
+        icon: null,
+        onOk: () => {
+          navigate(appPath.login())
+        },
+      })
+    }
+  }
+
+  const handleDeleteClick = (billId: number) => {
+    if (isLoggedIn) {
+      navigate(appPath.checkBillPageEdit({ param: { billId } })) //api delete
+    } else {
+      Modal.confirm({
+        title: 'ยังไม่ได้เข้าสู่ระบบ',
+        content: 'คุณต้องเข้าสู่ระบบก่อนจึงจะลบได้ ',
+        cancelText: 'ไม่',
+        okText: 'ไปหน้าเข้าสู่ระบบ',
+
+        icon: null,
+        onOk: () => {
+          navigate(appPath.login())
+        },
+      })
+    }
+  }
+
+  const columns: ColumnsType<Bill> = [
+    {
+      title: 'Date',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: '10%',
+      render: (value: string) => dayjs(value).format('DD/MM/YYYY'),
+    },
+    {
+      title: 'Name',
+      dataIndex: 'title',
+      key: 'title',
+      render: (text: string) => (
+        <div
+          style={{
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+            maxWidth: 150, // จำกัดไม่ให้กว้างเกิน 200px
+          }}
+        >
+          {text}
+        </div>
+      ),
+    },
+    {
+      title: 'View',
+      key: 'view',
+      width: '10%',
+      align: 'center',
+      render: (_, record) => (
+        <Button type="link" onClick={() => handleViewClick(record.id)} className="!text-2xl">
+          <IoSearchCircleSharp />
+        </Button>
+      ),
+    },
+    {
+      title: 'Edit',
+      key: 'edit',
+      width: '10%',
+      align: 'center',
+      render: (_, record) => (
+        <Button type="link" onClick={() => handleEditClick(record.id)} className="!text-2xl">
+          <TbEdit />
+        </Button>
+      ),
+    },
+    {
+      title: 'Delete',
+      key: 'delete',
+      width: '10%',
+      align: 'center',
+      render: (_, record) => (
+        <Button
+          type="link"
+          danger
+          onClick={() => handleDeleteClick(record.id)}
+          className="!text-2xl"
+        >
+          <MdDelete />
+        </Button>
+      ),
+    },
+  ]
 
   return (
-    <div className="mx-1 mt-4 flex flex-col gap-2">
+    <div className="mx-1 mt-4 flex flex-col gap-4">
       <Typography.Title level={3} className="!text-center text-blue-700 drop-shadow-md">
         แบ่งบิลเพื่อนแบบกำหนดเอง
       </Typography.Title>
-      <div className="mb-4">
+
+      <div>
         <Link to={appPath.checkBillPageCreate()} className="flex-1">
           <Button
             type="primary"
@@ -52,18 +160,21 @@ const PageAllBill = () => {
           </Button>
         </Link>
       </div>
+
       <Divider className="text-center text-lg font-semibold">รายการที่เคยสร้าง</Divider>
-      {data?.bills.map((bill) => (
-        <div className="flex items-center gap-1 rounded-lg bg-gray-50 px-3 py-2 shadow-sm md:px-8 md:py-4">
-          <div>{dayjs(bill.createdAt).format('DD/MM/YYYY')}</div>
-          <div className="flex-1">{bill.title}</div>
-          {isLoggedIn && (
-            <Link className="" to={appPath.checkBillPageEdit({ param: { billId: bill.id } })}>
-              <Button>แก้ไข</Button>
-            </Link>
-          )}
-        </div>
-      ))}
+
+      {/* ห่อ Table ด้วย div overflow-x-auto เพื่อให้ scroll แนวนอน */}
+      <div className="overflow-x-auto">
+        <Table
+          rowKey="id"
+          columns={columns}
+          dataSource={data?.bills || []}
+          pagination={false}
+          className="rounded-xl shadow"
+          scroll={{ x: 'max-content' }} // เปิด scroll แนวนอนอัตโนมัติเมื่อเกินขนาดหน้าจอ
+          tableLayout="fixed"
+        />
+      </div>
     </div>
   )
 }

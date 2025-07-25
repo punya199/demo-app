@@ -3,8 +3,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { round } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
+import { Link } from 'react-router-dom'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { appPath } from '../../../config/app-paths'
 import { useGetMe } from '../../../service'
 import AddFriends, { Friend } from './AddFriends'
 import { AddItem, Item } from './AddItem'
@@ -17,7 +19,7 @@ type PositionStoreActions = {
   setFriends: (nextPosition: PositionStoreState['friends']) => void
 }
 
-type PositionStore = PositionStoreState & PositionStoreActions
+export type PositionStore = PositionStoreState & PositionStoreActions
 export interface SaveBody {
   items: Item[]
   friends: Friend[]
@@ -180,7 +182,7 @@ const CheckBill = (props: CheckBillPorps) => {
       title: 'ชื่อบิล',
       content: (
         <Input
-          placeholder="กรุณากรองชื่อ"
+          placeholder="กรุณากรอกชื่อ"
           defaultValue={props.bill?.title}
           onChange={(e) => {
             inputTitle = e.target.value
@@ -198,19 +200,6 @@ const CheckBill = (props: CheckBillPorps) => {
       },
     })
   }, [friends, items, props])
-
-  // const initializeSampleData = useCallback(() => {
-  //   setItems([
-  //     { name: 'รี', price: 500, id: '1' },
-  //     { name: 'ข้าว', price: 500, id: '2' },
-  //     { name: 'โซดา', price: 250, id: '3' },
-  //   ])
-  //   setFriends([
-  //     { name: 'ton', id: '1' },
-  //     { name: 'boom', id: '2' },
-  //     { name: 'gon', id: '3' },
-  //   ])
-  // }, [setFriends, setItems])
 
   const friendBill = useMemo(() => {
     const newFriendBill: Record<string, number> = {}
@@ -295,6 +284,15 @@ const CheckBill = (props: CheckBillPorps) => {
 
   return (
     <div className="hover:shadow-3xl mx-auto max-w-full space-y-6 rounded-3xl bg-gradient-to-br from-blue-100 via-white to-blue-200 p-3 shadow-2xl transition-all duration-500 md:max-w-3xl md:p-6">
+      {props.bill?.title && (
+        <div className="m-0">
+          <div className="flex-1 justify-center text-center text-2xl font-bold drop-shadow-md">
+            แก้ไขรายการชื่อ {props.bill.title}
+          </div>
+
+          <Divider />
+        </div>
+      )}
       <div className="flex flex-col gap-2 md:gap-4">
         <AddItem onAddItem={handleAddItem} items={items} />
         <AddFriends onAddFriend={handleAddFriend} friends={friends} />
@@ -437,10 +435,12 @@ const CheckBill = (props: CheckBillPorps) => {
           <div className="flex items-center justify-center gap-2 rounded-2xl bg-gray-100 p-2 shadow-md ring-1 ring-blue-300 transition-shadow duration-300 hover:shadow-lg md:px-8 md:py-4">
             ยอดที่จ่ายทั้งหมด
             <span className="font-bold">
-              {items.reduce((acc, curr) => {
-                acc += curr.price
-                return acc
-              }, 0)}{' '}
+              {items
+                .reduce((acc, curr) => {
+                  acc += curr.price
+                  return acc
+                }, 0)
+                .toLocaleString()}{' '}
             </span>
             บาท
           </div>
@@ -448,7 +448,7 @@ const CheckBill = (props: CheckBillPorps) => {
       </AnimatePresence>
 
       {friends.length > 0 && (
-        <Divider className="my-4 border-green-400 text-center text-lg font-semibold">
+        <Divider className="my-4 border-green-200 text-center text-lg font-semibold">
           ยอดที่แต่ละคนต้องจ่าย
         </Divider>
       )}
@@ -490,7 +490,7 @@ const CheckBill = (props: CheckBillPorps) => {
               }}
               className="flex"
             >
-              <div className="w-full rounded-2xl bg-green-100 p-4 shadow-2xl ring-1 ring-green-300 transition-all duration-300 hover:shadow-xl md:px-8 md:py-4">
+              <div className="w-full rounded-2xl bg-green-50 p-4 shadow-2xl ring-1 ring-green-300 transition-all duration-300 hover:shadow-xl md:px-8 md:py-4">
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-2xl font-bold">
                     {friend.name}
@@ -573,42 +573,46 @@ const CheckBill = (props: CheckBillPorps) => {
           ))}
         </div>
       </AnimatePresence>
-
-      {(friends.length > 0 || items.length > 0) && (
-        <div className="flex items-center justify-center gap-4">
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              type="primary"
-              onClick={handleOpenButtonDelete}
-              className="transition-all duration-200"
+      <div className="flex justify-center gap-2">
+        <Link to={appPath.checkBillPage()}>
+          <Button className="transition-all duration-200">กลับ</Button>
+        </Link>
+        {(friends.length > 0 || items.length > 0) && (
+          <div className="flex items-center justify-center gap-2">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                type="primary"
+                onClick={handleOpenButtonDelete}
+                className="transition-all duration-200"
+              >
+                ลบบางรายการ
+              </Button>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex justify-center"
             >
-              ลบบางรายการ
-            </Button>
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex justify-center"
-          >
-            <Button
-              type="primary"
-              onClick={handleReset}
-              className="rounded-full bg-blue-500 px-6 py-2 text-lg text-white shadow-lg transition-all duration-300 hover:bg-blue-600"
-            >
-              ล้างข้อมูลทั้งหมด
-            </Button>
-          </motion.div>
-          {isLoggedIn && (
-            <div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button type="primary" onClick={handleSave}>
-                  Save
-                </Button>
-              </motion.div>
-            </div>
-          )}
-        </div>
-      )}
+              <Button
+                type="primary"
+                onClick={handleReset}
+                className="rounded-full bg-blue-500 px-6 py-2 text-lg text-white shadow-lg transition-all duration-300 hover:bg-blue-600"
+              >
+                ล้างข้อมูลทั้งหมด
+              </Button>
+            </motion.div>
+            {isLoggedIn && (
+              <div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button type="primary" onClick={handleSave}>
+                    Save
+                  </Button>
+                </motion.div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

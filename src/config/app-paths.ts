@@ -6,7 +6,7 @@ export const appPath = {
   omamaGame: generatePath('/omama'),
   checkBillPage: generatePath('/check-bill'),
   checkBillPageCreate: generatePath('/check-bill/create'),
-  checkBillPageEdit: generatePath<{ param: { billId: number } }>('/check-bill/:billId'),
-
+  checkBillPageEdit: generatePath<{ param: { billId: number } }>('/check-bill/edit/:billId'),
+  checkBillPageSave: generatePath<{ param: { billId: number } }>('/check-bill/save-image/:billId'),
   login: generatePath('/login'),
 }

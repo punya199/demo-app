@@ -11,6 +11,7 @@ import Omama from './pages/project/project6/Omama'
 import PageAllBill from './pages/project/project8/PageAllBill'
 import PageCreateBill from './pages/project/project8/PageCreateBill'
 import PageEditBill from './pages/project/project8/PageEditBill'
+import PageSaveBillToImage from './pages/project/project8/PageSaveBillToImage'
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: appPath.login(),
         element: <Login />,
+      },
+      {
+        path: appPath.checkBillPageSave(),
+        element: <PageSaveBillToImage />,
       },
     ],
   },

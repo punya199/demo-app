@@ -1,3 +1,10 @@
+## [1.1.57](https://github.com/punya199/test1/compare/v1.1.56...v1.1.57) (2025-07-25)
+
+
+### Fix
+
+* Add PageSaveBillToImage for saving bills as images, update appPath for new routes, and improve CheckBill and PageAllBill components with better navigation and user experience adjustments. ([9f125fe](https://github.com/punya199/test1/commit/9f125fef2df3e05e926227bc20ef5d8581ed8377))
+
 ## [1.1.56](https://github.com/punya199/test1/compare/v1.1.55...v1.1.56) (2025-07-24)
 
 

@@ -1,3 +1,10 @@
+## [1.1.59](https://github.com/punya199/test1/compare/v1.1.58...v1.1.59) (2025-07-29)
+
+
+### Fix
+
+* Implement detailed breakdown of bill payments among friends, including individual contributions and transaction summaries. Improve UI layout for better readability and user experience. ([20bdd1c](https://github.com/punya199/test1/commit/20bdd1c88d84e6687dd64971ad5d271b6d25249a))
+
 ## [1.1.58](https://github.com/punya199/test1/compare/v1.1.57...v1.1.58) (2025-07-29)
 
 

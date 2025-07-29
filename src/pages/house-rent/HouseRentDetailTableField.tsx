@@ -17,7 +17,6 @@ interface IHouseRentDetailTableFieldProps {
 export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps) => {
   const { value, onChange } = props
   const [isInit, setIsInit] = useState(false)
-  const [tempData, setTempData] = useState<IHouseRentDetailData[]>(value || [])
   const { md } = Grid.useBreakpoint()
 
   const form = Form.useFormInstance<IHouseRentFormValues>()
@@ -25,13 +24,12 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
 
   useEffect(() => {
     if (!isInit && value?.length) {
-      setTempData(value || [])
       setIsInit(true)
     }
   }, [value, isInit])
 
   const onAdd = useCallback(() => {
-    const newData = [...(tempData || [])]
+    const newData = [...(value || [])]
     newData.push({
       month: dayjs(),
       houseRentPrice: 0,
@@ -41,23 +39,21 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
         unit: 0,
       },
     } as IHouseRentDetailData)
-    setTempData(newData)
     onChange?.(newData)
-  }, [tempData, onChange])
+  }, [value, onChange])
 
   const onDelete = useCallback(
     (recordIndex: number) => {
-      const newData = [...(tempData || [])]
+      const newData = [...(value || [])]
       newData.splice(recordIndex, 1)
-      setTempData(newData)
       onChange?.(newData)
     },
-    [tempData, onChange]
+    [value, onChange]
   )
 
   const onValueChange = useCallback(
     (dataIndex: string, recordIndex: number, newValue: unknown) => {
-      const newData = [...(tempData || [])]
+      const newData = [...(value || [])]
       const oldData = newData[recordIndex]
       if (dataIndex.includes('.')) {
         set(oldData, dataIndex, newValue)
@@ -65,10 +61,9 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
         newData[recordIndex] = { ...oldData, [dataIndex]: newValue }
       }
       newData[recordIndex].id = oldData.id || v4()
-      setTempData(newData)
       onChange?.(newData)
     },
-    [tempData, onChange]
+    [value, onChange]
   )
 
   const renderCell = useCallback(
@@ -167,7 +162,7 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
           </Button>
         </Flex>
       )}
-      rowKey={(record) => record.id}
+      rowKey="id"
       pagination={false}
       css={css`
         .ant-table-cell {
@@ -184,38 +179,44 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
           }
         }
       `}
-      dataSource={tempData}
+      dataSource={value}
       tableLayout="fixed"
       columns={columns}
-      summary={(data) => (
-        <Table.Summary.Row
-          css={css`
-            background-color: #f0f0f0;
-          `}
-        >
-          <Table.Summary.Cell index={0} align="center" />
-          <Table.Summary.Cell index={1} align="right">
-            <Typography.Text strong>
-              {sumBy(data, 'houseRentPrice')?.toLocaleString()}
-            </Typography.Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={2} align="right">
-            <Typography.Text strong>{sumBy(data, 'waterPrice').toLocaleString()}</Typography.Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={3} align="right">
-            <Typography.Text strong>
-              {sumBy(data, 'electricity.totalPrice').toLocaleString()}
-            </Typography.Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={4} align="right">
-            <Typography.Text strong>
-              {sumBy(data, 'electricity.unit').toLocaleString()}
-            </Typography.Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={5} align="center" />
-        </Table.Summary.Row>
-      )}
+      summary={(data) => {
+        if (!data?.length) return null
+
+        return (
+          <Table.Summary.Row
+            css={css`
+              background-color: #f0f0f0;
+            `}
+          >
+            <Table.Summary.Cell index={0} align="center" />
+            <Table.Summary.Cell index={1} align="right">
+              <Typography.Text strong>
+                {sumBy(data, 'houseRentPrice')?.toLocaleString()}
+              </Typography.Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={2} align="right">
+              <Typography.Text strong>{sumBy(data, 'waterPrice').toLocaleString()}</Typography.Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={3} align="right">
+              <Typography.Text strong>
+                {sumBy(data, 'electricity.totalPrice').toLocaleString()}
+              </Typography.Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={4} align="right">
+              <Typography.Text strong>
+                {sumBy(data, 'electricity.unit').toLocaleString()}
+              </Typography.Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={5} align="center" />
+          </Table.Summary.Row>
+        )
+      }}
       footer={(data) => {
+        if (!data || data.length === 0) return null
+
         const totalHouseRent = sumBy(data, 'houseRentPrice') || 0
         const totalElectricity = sumBy(data, 'electricity.totalPrice')
         const totalInternet = (internet?.pricePerMonth || 0) * data.length

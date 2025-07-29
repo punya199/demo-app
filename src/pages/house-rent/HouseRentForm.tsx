@@ -1,7 +1,9 @@
+import { SaveOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
-import { Button, Col, Divider, Form, Grid, Row } from 'antd'
+import { Button, Col, Divider, Flex, Form, Grid, Row } from 'antd'
 import { keyBy } from 'lodash'
 import { useCallback, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { useGetMe } from '../../service'
@@ -84,7 +86,7 @@ interface IHouseRentFormProps {
 }
 export const HouseRentForm = (props: IHouseRentFormProps) => {
   const { defaultValues, onSubmit, isSubmitting } = props
-
+  const navigate = useNavigate()
   const { data: getMeData } = useGetMe()
   const isLoggedIn = !!getMeData?.user?.id
   const { data, setData, setElectricitySummary } = useHouseRentStore()
@@ -128,14 +130,16 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
 
   const handleSubmit = useCallback(async () => {
     await form.validateFields()
-    onSubmit?.(data)
-  }, [data, form, onSubmit])
+    if (isLoggedIn) {
+      onSubmit?.(data)
+    }
+  }, [data, form, onSubmit, isLoggedIn])
 
   return (
     <div
       className="space-y-4 py-6 md:p-4"
       css={css`
-        background-color: #f3f3f3;
+        background-color: #edfcff;
         height: 100%;
       `}
     >
@@ -156,11 +160,6 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
               <HouseRentDetailTableField />
             </Form.Item>
           </Col>
-          {/* <Col xs={24} md={24}>
-            <Form.Item name="people" noStyle>
-              <HouseRentMemberTableField summary={data.electricitySummary} />
-            </Form.Item>
-          </Col> */}
           <Col xs={24} md={24}>
             <Form.Item name="members" noStyle>
               <HouseRentMemberTableField summary={data.electricitySummary} />
@@ -177,10 +176,36 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
           <Col xs={24} md={24}>
             <HouseRentReportSummary data={data} />
           </Col>
+          <Col span={24}>
+            <Flex
+              justify="space-between"
+              gap={8}
+              css={css`
+                background-color: #fff;
+                padding: 16px;
+                border-radius: 8px;
+              `}
+            >
+              <Button type="default" htmlType="button" onClick={() => navigate(-1)}>
+                {defaultValues?.id ? 'ย้อนกลับ' : 'ยกเลิก'}
+              </Button>
+              <div>
+                {isLoggedIn && (
+                  <Button
+                    variant="solid"
+                    color="green"
+                    htmlType="submit"
+                    loading={isSubmitting}
+                    disabled={isSubmitting}
+                    icon={<SaveOutlined />}
+                  >
+                    บันทึก
+                  </Button>
+                )}
+              </div>
+            </Flex>
+          </Col>
         </Row>
-        <Button type="primary" htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
-          บันทึก
-        </Button>
       </Form>
     </div>
   )

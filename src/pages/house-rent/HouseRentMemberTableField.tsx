@@ -254,7 +254,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
           </Button>
         </Flex>
       )}
-      rowKey={(record) => record.id}
+      rowKey="id"
       pagination={false}
       css={css`
         .ant-table-cell {
@@ -274,6 +274,8 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
       dataSource={value}
       tableLayout="fixed"
       summary={(d) => {
+        if (!d?.length) return null
+
         const totalUnit = sumBy(d, 'electricityUnit.diff')
         const totalPrice = round(totalUnit * (summary?.pricePerUnit || 0), 0)
         return (

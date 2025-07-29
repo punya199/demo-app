@@ -247,6 +247,8 @@ export const HouseRentReportSummary = (props: IHouseRentReportSummaryProps) => {
         rowKey="id"
         scroll={{ x: 'max-content' }}
         summary={(data) => {
+          if (!data?.length) return null
+
           return (
             <Table.Summary.Row
               css={css`

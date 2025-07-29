@@ -7,7 +7,12 @@ import eslint from 'vite-plugin-eslint2'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      jsxImportSource: '@emotion/react', // Instructs Vite to use Emotion's jsx function
+      babel: {
+        plugins: ['@emotion/babel-plugin'], // Required for the 'css' prop
+      },
+    }),
     tailwindcss(),
     eslint({
       lintOnStart: true,

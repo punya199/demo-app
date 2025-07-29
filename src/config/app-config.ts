@@ -6,5 +6,6 @@ const getEnv = (key: string) => get(_env_, key, import.meta.env[key])
 export const appConfig = () => {
   return {
     VITE_API_DOMAIN: getEnv('VITE_API_DOMAIN'),
+    VITE_IS_DEVELOPMENT: getEnv('VITE_IS_DEVELOPMENT') === 'true',
   }
 }

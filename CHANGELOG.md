@@ -1,3 +1,10 @@
+## [1.1.61](https://github.com/punya199/test1/compare/v1.1.60...v1.1.61) (2025-07-29)
+
+
+### Fix
+
+* Update HouseRentForm to conditionally submit data based on user login status, enhancing form submission logic. ([193fd42](https://github.com/punya199/test1/commit/193fd427a7e676b108d2e9e90e2c8406f79759ab))
+
 ## [1.1.60](https://github.com/punya199/test1/compare/v1.1.59...v1.1.60) (2025-07-29)
 
 

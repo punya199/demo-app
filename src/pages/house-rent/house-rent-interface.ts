@@ -18,7 +18,7 @@ export interface IHouseRentDetailData {
   }
 }
 
-export interface IHouseRentPeopleData {
+export interface IHouseRentMemberData {
   id: string
   name: string
   airConditionUnit: number
@@ -35,7 +35,7 @@ export interface IHouseRentFormValues {
   id?: string
   name: string
   rents: IHouseRentDetailData[]
-  people: IHouseRentPeopleData[]
+  members: IHouseRentMemberData[]
   electricitySummary: IElectricitySummaryData
   baseHouseRent: number
   paymentFee: number
@@ -46,4 +46,9 @@ export interface IHouseRentFormValues {
     pricePerUnit: number
     unit: number
   }
+  attachments: {
+    id: string
+    name: string
+    url: string
+  }[]
 }

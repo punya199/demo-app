@@ -2,18 +2,18 @@ import { round, sumBy } from 'lodash'
 import {
   IElectricitySummaryData,
   IHouseRentDetailData,
-  IHouseRentPeopleData,
+  IHouseRentMemberData,
 } from './house-rent-interface'
 
 export const calculateElectricitySummary = (
   rents: IHouseRentDetailData[],
-  people: IHouseRentPeopleData[]
+  members: IHouseRentMemberData[]
 ): IElectricitySummaryData => {
   const totalUnit = sumBy(rents, 'electricity.unit')
   const totalPrice = sumBy(rents, 'electricity.totalPrice')
   const pricePerUnit = round(totalPrice / totalUnit, 2)
-  const totalPeopleUnit = sumBy(people, 'electricityUnit.diff')
-  const shareUnit = totalUnit - totalPeopleUnit
+  const totalMemberUnit = sumBy(members, 'electricityUnit.diff')
+  const shareUnit = totalUnit - totalMemberUnit
   return {
     totalUnit,
     totalPrice,

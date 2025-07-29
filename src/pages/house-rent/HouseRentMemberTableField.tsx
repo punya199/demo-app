@@ -10,19 +10,19 @@ import { CustomCell, ICustomCellInputType } from './CustomCell'
 import {
   IElectricitySummaryData,
   IHouseRentFormValues,
-  IHouseRentPeopleData,
+  IHouseRentMemberData,
 } from './house-rent-interface'
 
-interface IHouseRentPeopleTableFieldProps {
-  value?: IHouseRentPeopleData[]
-  onChange?: (value: IHouseRentPeopleData[]) => void
+interface IHouseRentMemberTableFieldProps {
+  value?: IHouseRentMemberData[]
+  onChange?: (value: IHouseRentMemberData[]) => void
   summary?: IElectricitySummaryData
 }
 
-export const HouseRentPeopleTableField = (props: IHouseRentPeopleTableFieldProps) => {
+export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps) => {
   const { value, onChange, summary } = props
   const [isInit, setIsInit] = useState(false)
-  // const [tempData, setTempData] = useState<IHouseRentPeopleData[]>(value || [])
+  // const [tempData, setTempData] = useState<IHouseRentMemberData[]>(value || [])
   const { md } = Grid.useBreakpoint()
 
   const form = Form.useFormInstance<IHouseRentFormValues>()
@@ -45,7 +45,7 @@ export const HouseRentPeopleTableField = (props: IHouseRentPeopleTableFieldProps
         current: 0,
         diff: 0,
       },
-    } as IHouseRentPeopleData)
+    } as IHouseRentMemberData)
     // setTempData(newData)
     onChange?.(newData)
   }, [value, onChange])
@@ -87,7 +87,7 @@ export const HouseRentPeopleTableField = (props: IHouseRentPeopleTableFieldProps
         align?: 'left' | 'center' | 'right'
       }
     ) =>
-      (value: T, _record: IHouseRentPeopleData, recordIndex: number) => {
+      (value: T, _record: IHouseRentMemberData, recordIndex: number) => {
         return (
           <CustomCell
             dataIndex={dataIndex}
@@ -118,7 +118,7 @@ export const HouseRentPeopleTableField = (props: IHouseRentPeopleTableFieldProps
       .value()
   }, [rents])
 
-  const columns = useMemo((): ColumnType<IHouseRentPeopleData>[] => {
+  const columns = useMemo((): ColumnType<IHouseRentMemberData>[] => {
     return [
       {
         title: 'ชื่อ',
@@ -182,7 +182,7 @@ export const HouseRentPeopleTableField = (props: IHouseRentPeopleTableFieldProps
         align: 'right',
         render: (
           payInternetMonthIds: string[],
-          _record: IHouseRentPeopleData,
+          _record: IHouseRentMemberData,
           recordIndex: number
         ) => {
           return (
@@ -210,7 +210,7 @@ export const HouseRentPeopleTableField = (props: IHouseRentPeopleTableFieldProps
         align: 'right',
         render: (
           payElectricityMonthIds: string[],
-          _record: IHouseRentPeopleData,
+          _record: IHouseRentMemberData,
           recordIndex: number
         ) => {
           return (
@@ -236,7 +236,7 @@ export const HouseRentPeopleTableField = (props: IHouseRentPeopleTableFieldProps
         title: 'จัดการ',
         dataIndex: 'action',
         align: 'center',
-        render: (_, _record: IHouseRentPeopleData, recordIndex: number) => (
+        render: (_, _record: IHouseRentMemberData, recordIndex: number) => (
           <Flex gap={6} justify="center">
             <Button danger size="small" onClick={() => onDelete(recordIndex)}>
               ลบ

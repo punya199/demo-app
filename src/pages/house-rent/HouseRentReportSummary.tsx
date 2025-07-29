@@ -138,97 +138,101 @@ export const HouseRentReportSummary = (props: IHouseRentReportSummaryProps) => {
   }, [])
 
   const dataSource = useMemo(() => {
-    const totalMonth = data.rents.length
-    const totalPeople = data.people.length
+    const totalMonth = data.rents?.length || 0
+    const totalMember = data.members?.length || 0
 
     // house rent
-    const houseRent = round((data.baseHouseRent * totalMonth) / totalPeople, 0)
+    const houseRent = round((data.baseHouseRent * totalMonth) / totalMember, 0)
 
     // internet
     const totalInternetPrice = round(data.internet.pricePerMonth * totalMonth, 0)
-    const internet = round(totalInternetPrice / totalPeople, 0)
+    const internet = round(totalInternetPrice / totalMember, 0)
 
     // water
     const totalWaterPrice = sumBy(data.rents, 'waterPrice')
-    const water = round(totalWaterPrice / totalPeople, 0)
+    const water = round(totalWaterPrice / totalMember, 0)
 
     // electricity share
     const electricityShare = round(
-      (data.electricitySummary.shareUnit * data.electricitySummary.pricePerUnit) / totalPeople,
+      (data.electricitySummary.shareUnit * data.electricitySummary.pricePerUnit) / totalMember,
       0
     )
 
     // payment fee
-    const paymentFee = round((data.paymentFee * totalMonth) / totalPeople, 0)
+    const paymentFee = round((data.paymentFee * totalMonth) / totalMember, 0)
 
     const rentsHash = keyBy(data.rents, 'id')
 
-    return data.people.reduce((acc: IHouseRentReportSummaryData[], person) => {
-      // air condition
-      const airCondition = round(
-        data.airCondition.pricePerUnit * person.airConditionUnit * totalMonth,
-        0
-      )
+    return chain(data.members || [])
+      .reduce((acc: IHouseRentReportSummaryData[], member) => {
+        // air condition
+        const airCondition = round(
+          data.airCondition.pricePerUnit * member.airConditionUnit * totalMonth,
+          0
+        )
 
-      // electricity
-      const electricity = round(
-        person.electricityUnit.diff * data.electricitySummary.pricePerUnit,
-        0
-      )
+        // electricity
+        const electricity = round(
+          member.electricityUnit.diff * data.electricitySummary.pricePerUnit,
+          0
+        )
 
-      // debuct
-      const deductInternet =
-        filter(person.payInternetMonthIds, (payInternetMonthId) => !!rentsHash[payInternetMonthId])
-          .length * data.internet.pricePerMonth
+        // debuct
+        const deductInternet =
+          filter(
+            member.payInternetMonthIds,
+            (payInternetMonthId) => !!rentsHash[payInternetMonthId]
+          ).length * data.internet.pricePerMonth
 
-      const deductElectricity = chain(person.payElectricityMonthIds)
-        .sumBy((id) => {
-          const rent = rentsHash[id]
-          return rent?.electricity.totalPrice || 0
+        const deductElectricity = chain(member.payElectricityMonthIds)
+          .sumBy((id) => {
+            const rent = rentsHash[id]
+            return rent?.electricity.totalPrice || 0
+          })
+          .round(0)
+          .value()
+
+        // total
+        const total = round(
+          houseRent + airCondition + internet + water + electricity + paymentFee + electricityShare,
+          0
+        )
+
+        // total after deduct
+        const totalAfterDeduct = round(total - deductInternet - deductElectricity, 0)
+
+        // total separate
+        const totalSeparate = round(totalAfterDeduct / totalMonth, 0)
+
+        acc.push({
+          id: member.id,
+          name: member.name,
+          houseRent,
+          airCondition,
+          internet,
+          water,
+          electricity,
+          electricityShare,
+          paymentFee,
+          total,
+          totalAfterDeduct,
+          totalSeparate,
+          deductInternet,
+          deductElectricity,
+          finalPayment: totalSeparate,
         })
-        .round(0)
-        .value()
-
-      // total
-      const total = round(
-        houseRent + airCondition + internet + water + electricity + paymentFee + electricityShare,
-        0
-      )
-
-      // total after deduct
-      const totalAfterDeduct = round(total - deductInternet - deductElectricity, 0)
-
-      // total separate
-      const totalSeparate = round(totalAfterDeduct / totalMonth, 0)
-
-      acc.push({
-        id: person.id,
-        name: person.name,
-        houseRent,
-        airCondition,
-        internet,
-        water,
-        electricity,
-        electricityShare,
-        paymentFee,
-        total,
-        totalAfterDeduct,
-        totalSeparate,
-        deductInternet,
-        deductElectricity,
-        finalPayment: totalSeparate,
-      })
-      return acc
-    }, [])
+        return acc
+      }, [])
+      .value()
   }, [
-    data.airCondition.pricePerUnit,
-    data.baseHouseRent,
-    data.electricitySummary.pricePerUnit,
-    data.electricitySummary.shareUnit,
-    data.internet.pricePerMonth,
-    data.paymentFee,
-    data.people,
     data.rents,
+    data.baseHouseRent,
+    data.internet.pricePerMonth,
+    data.electricitySummary.shareUnit,
+    data.electricitySummary.pricePerUnit,
+    data.paymentFee,
+    data.members,
+    data.airCondition.pricePerUnit,
   ])
 
   return (

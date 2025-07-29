@@ -1,3 +1,10 @@
+## [1.1.58](https://github.com/punya199/test1/compare/v1.1.57...v1.1.58) (2025-07-29)
+
+
+### Fix
+
+* Integrate Emotion for styling, add house rent management features, and enhance responsive design. Introduced new components for house rent details, electricity summary, and report generation. Updated app configuration for development mode and improved state management with zustand. ([e75081d](https://github.com/punya199/test1/commit/e75081dca86ed617ec30a0f16dc6af8eae9835ca))
+
 ## [1.1.57](https://github.com/punya199/test1/compare/v1.1.56...v1.1.57) (2025-07-25)
 
 

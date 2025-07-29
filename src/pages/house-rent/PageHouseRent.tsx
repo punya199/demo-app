@@ -1,116 +1,103 @@
+import { CopyOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
-import { Col, Divider, Form, Grid, Row } from 'antd'
-import { keyBy } from 'lodash'
-import { useCallback, useEffect } from 'react'
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { useGetMe } from '../../service'
-import { calculateElectricitySummary } from './house-rent-helper'
-import {
-  IHouseRentDetailData,
-  IHouseRentFormValues,
-  IHouseRentMemberData,
-} from './house-rent-interface'
-import { HouseRentDetailTableField } from './HouseRentDetailTableField'
-import { HouseRentMasterDataField } from './HouseRentMasterDataField'
-import { HouseRentMemberTableField } from './HouseRentMemberTableField'
-import { HouseRentReportSummary } from './HouseRentReportSummary'
-import { UploadFiles } from './UploadFiles'
-
-type IHouseRentStoreState = {
-  data: IHouseRentFormValues
-}
-
-type IHouseRentStoreActions = {
-  setData: (data: IHouseRentStoreState['data']) => void
-  setRents: (rents: IHouseRentDetailData[]) => void
-  setMembers: (members: IHouseRentMemberData[]) => void
-  setElectricitySummary: (electricitySummary: IHouseRentFormValues['electricitySummary']) => void
-}
-
-export type IHouseRentStore = IHouseRentStoreState & IHouseRentStoreActions
-
-const useHouseRentStore = create<IHouseRentStore>()(
-  persist(
-    (set) => ({
-      data: {
-        name: '',
-        rents: [],
-        members: [],
-        baseHouseRent: 0,
-        paymentFee: 0,
-        electricitySummary: {
-          totalUnit: 0,
-          totalPrice: 0,
-          pricePerUnit: 0,
-          shareUnit: 0,
-        },
-        internet: {
-          pricePerMonth: 0,
-        },
-        airCondition: {
-          pricePerUnit: 0,
-          unit: 0,
-        },
-        attachments: [],
-      },
-      setData: (data) => set((state) => ({ ...state, data: { ...state.data, ...data } })),
-      setRents: (rents) =>
-        set((state) => ({
-          ...state,
-          data: { ...state.data, rents },
-        })),
-      setMembers: (members) =>
-        set((state) => ({
-          ...state,
-          data: { ...state.data, members },
-        })),
-      setElectricitySummary: (electricitySummary) =>
-        set((state) => ({
-          ...state,
-          data: { ...state.data, electricitySummary },
-        })),
-    }),
-    {
-      name: 'house-rent-storage',
-    }
-  )
-)
+import { Button, Flex, Table, TableColumnType, Typography } from 'antd'
+import dayjs from 'dayjs'
+import { sumBy } from 'lodash'
+import { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { appPath } from '../../config/app-paths'
+import { formatCurrency } from '../../utils/format-currency'
+import { IHouseRentDetailData, IHouseRentMemberData } from './house-rent-interface'
+import { IHouseRentDataResponse, useGetHouseRentList } from './house-rent-service'
 
 export const PageHouseRent = () => {
-  const { data: getMeData } = useGetMe()
-  const isLoggedIn = !!getMeData?.user?.id
-  const { data, setData, setElectricitySummary } = useHouseRentStore()
-  const { md } = Grid.useBreakpoint()
-  const [form] = Form.useForm()
+  const { data: houseRentListData, isLoading } = useGetHouseRentList()
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    if (data) {
-      form.setFieldsValue(data)
-    }
-  }, [data, form])
-
-  useEffect(() => {
-    const electricitySummary = calculateElectricitySummary(data.rents, data.members)
-    setElectricitySummary(electricitySummary)
-  }, [data.rents, data.members, setElectricitySummary])
-
-  const onValuesChange = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (_: any, data: IHouseRentFormValues) => {
-      const rentsHash = keyBy(data.rents, 'id')
-      setData({
-        ...data,
-        members: (data.members || []).map((member) => ({
-          ...member,
-          payInternetMonthIds: (member.payInternetMonthIds || []).filter((id) => !!rentsHash[id]),
-          payElectricityMonthIds: (member.payElectricityMonthIds || []).filter(
-            (id) => !!rentsHash[id]
-          ),
-        })),
-      })
-    },
-    [setData]
+  const columns = useMemo(
+    (): TableColumnType<IHouseRentDataResponse>[] => [
+      {
+        title: 'ลำดับ',
+        dataIndex: 'id',
+        key: 'id',
+        render: (_, __, index) => index + 1,
+      },
+      {
+        title: 'ชื่อรายการ',
+        dataIndex: 'name',
+        key: 'name',
+      },
+      {
+        title: 'เดือน',
+        dataIndex: 'rents',
+        key: 'rents',
+        align: 'center',
+        render: (value: IHouseRentDetailData[]) =>
+          value.map((item) => dayjs(item.month).format('MM/YYYY')).join(', '),
+      },
+      {
+        title: 'ผู้เช่า',
+        dataIndex: 'members',
+        key: 'members',
+        align: 'center',
+        render: (value: IHouseRentMemberData[]) => value.map((item) => item.name).join(', '),
+      },
+      {
+        title: 'ยอดรวม',
+        dataIndex: 'total',
+        key: 'total',
+        align: 'right',
+        render: (_value, record: IHouseRentDataResponse) => {
+          const data = record.rents
+          const totalHouseRent = sumBy(data, 'houseRentPrice') || 0
+          const totalElectricity = sumBy(data, 'electricity.totalPrice')
+          const totalInternet = (record.internet?.pricePerMonth || 0) * data.length
+          const total = totalHouseRent + totalElectricity + totalInternet
+          return formatCurrency(total, {
+            decimal: 0,
+          })
+        },
+      },
+      {
+        title: 'วันที่สร้าง',
+        dataIndex: 'createdAt',
+        key: 'createdAt',
+        align: 'center',
+        render: (value) => dayjs(value).format('DD/MM/YYYY HH:mm'),
+      },
+      {
+        title: 'วันที่แก้ไขล่าสุด',
+        dataIndex: 'updatedAt',
+        key: 'updatedAt',
+        align: 'center',
+        render: (value) => dayjs(value).format('DD/MM/YYYY HH:mm'),
+      },
+      {
+        title: 'จัดการ',
+        dataIndex: 'id',
+        key: 'id',
+        align: 'center',
+        render: (value) => (
+          <Flex gap={4} justify="center">
+            <Button
+              type="link"
+              icon={<EyeOutlined />}
+              onClick={() => navigate(appPath.houseRentDetail({ param: { houseRentId: value } }))}
+              title="ดูรายละเอียด"
+            />
+            <Button
+              type="link"
+              icon={<CopyOutlined />}
+              onClick={() =>
+                navigate(appPath.houseRentDetailClone({ param: { houseRentId: value } }))
+              }
+              title="คัดลอก"
+            />
+          </Flex>
+        ),
+      },
+    ],
+    [navigate]
   )
 
   return (
@@ -121,44 +108,25 @@ export const PageHouseRent = () => {
         height: 100%;
       `}
     >
-      <Form
-        form={form}
-        onValuesChange={onValuesChange}
-        size={md ? 'large' : 'small'}
-        layout="vertical"
-      >
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={8}>
-            <HouseRentMasterDataField />
-          </Col>
-          <Col xs={24} md={16}>
-            <Form.Item name="rents" noStyle>
-              <HouseRentDetailTableField />
-            </Form.Item>
-          </Col>
-          {/* <Col xs={24} md={24}>
-            <Form.Item name="people" noStyle>
-              <HouseRentMemberTableField summary={data.electricitySummary} />
-            </Form.Item>
-          </Col> */}
-          <Col xs={24} md={24}>
-            <Form.Item name="members" noStyle>
-              <HouseRentMemberTableField summary={data.electricitySummary} />
-            </Form.Item>
-          </Col>
-          {isLoggedIn && (
-            <Col xs={24} md={24}>
-              <Form.Item name="attachments">
-                <UploadFiles />
-              </Form.Item>
-            </Col>
-          )}
-          <Divider />
-          <Col xs={24} md={24}>
-            <HouseRentReportSummary data={data} />
-          </Col>
-        </Row>
-      </Form>
+      <Table
+        title={() => (
+          <Flex justify="space-between" align="center" gap={16}>
+            <Typography.Title level={4}>รายการค่าเช่าบ้าน</Typography.Title>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate(appPath.houseRentCreate())}
+            >
+              เพิ่มรายการ
+            </Button>
+          </Flex>
+        )}
+        rowKey="id"
+        tableLayout="fixed"
+        dataSource={houseRentListData?.houseRents}
+        columns={columns}
+        loading={isLoading}
+      />
     </div>
   )
 }

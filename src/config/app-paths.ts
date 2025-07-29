@@ -10,4 +10,9 @@ export const appPath = {
   checkBillPageSave: generatePath<{ param: { billId: number } }>('/check-bill/save-image/:billId'),
   login: generatePath('/login'),
   houseRent: generatePath('/house-rent'),
+  houseRentCreate: generatePath('/house-rent/create'),
+  houseRentDetail: generatePath<{ param: { houseRentId: string } }>('/house-rent/:houseRentId'),
+  houseRentDetailClone: generatePath<{ param: { houseRentId: string } }>(
+    '/house-rent/:houseRentId/clone'
+  ),
 }

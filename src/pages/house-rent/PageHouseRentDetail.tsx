@@ -1,0 +1,55 @@
+import { message, Spin } from 'antd'
+import { useCallback, useMemo } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { appPath } from '../../config/app-paths'
+import { calculateElectricitySummary } from './house-rent-helper'
+import { IHouseRentFormValues } from './house-rent-interface'
+import { useGetHouseRent, useUpdateHouseRent } from './house-rent-service'
+import { HouseRentForm } from './HouseRentForm'
+
+export const PageHouseRentDetail = () => {
+  const { houseRentId } = useParams<{ houseRentId: string }>()
+  const { data: houseRentData, isLoading } = useGetHouseRent(houseRentId)
+
+  const { mutate: saveHouseRent, isPending } = useUpdateHouseRent()
+  const navigate = useNavigate()
+
+  const handleSubmit = useCallback(
+    (data: IHouseRentFormValues) => {
+      saveHouseRent(data, {
+        onSuccess: () => {
+          message.success('บันทึกข้อมูลสำเร็จ')
+          navigate(appPath.houseRent(), {
+            replace: true,
+          })
+        },
+      })
+    },
+    [saveHouseRent, navigate]
+  )
+
+  const defaultValues = useMemo((): IHouseRentFormValues | undefined => {
+    if (!houseRentData) return undefined
+    return {
+      ...houseRentData.houseRent,
+      electricitySummary: calculateElectricitySummary(
+        houseRentData.houseRent.rents,
+        houseRentData.houseRent.members
+      ),
+    }
+  }, [houseRentData])
+
+  return (
+    <>
+      {isLoading ? (
+        <Spin />
+      ) : (
+        <HouseRentForm
+          defaultValues={defaultValues}
+          onSubmit={handleSubmit}
+          isSubmitting={isPending}
+        />
+      )}
+    </>
+  )
+}

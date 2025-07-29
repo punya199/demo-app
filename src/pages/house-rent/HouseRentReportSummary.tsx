@@ -238,16 +238,7 @@ export const HouseRentReportSummary = (props: IHouseRentReportSummaryProps) => {
   return (
     <div>
       <Table
-        title={() => (
-          <Typography.Text
-            strong
-            css={css`
-              font-size: 1.2rem;
-            `}
-          >
-            รายงานค่าเช่า
-          </Typography.Text>
-        )}
+        title={() => <Typography.Title level={4}>สรุปรายการ</Typography.Title>}
         pagination={false}
         columns={columns}
         dataSource={dataSource}

@@ -1,3 +1,4 @@
+import { PlusOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
 import { Button, Flex, Form, Grid, Select, Table, Typography } from 'antd'
 import { DefaultOptionType } from 'antd/es/select'
@@ -22,7 +23,6 @@ interface IHouseRentMemberTableFieldProps {
 export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps) => {
   const { value, onChange, summary } = props
   const [isInit, setIsInit] = useState(false)
-  // const [tempData, setTempData] = useState<IHouseRentMemberData[]>(value || [])
   const { md } = Grid.useBreakpoint()
 
   const form = Form.useFormInstance<IHouseRentFormValues>()
@@ -30,7 +30,6 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
 
   useEffect(() => {
     if (!isInit && value?.length) {
-      // setTempData(value || [])
       setIsInit(true)
     }
   }, [value, isInit])
@@ -46,7 +45,6 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
         diff: 0,
       },
     } as IHouseRentMemberData)
-    // setTempData(newData)
     onChange?.(newData)
   }, [value, onChange])
 
@@ -54,7 +52,6 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
     (recordIndex: number) => {
       const newData = [...(value || [])]
       newData.splice(recordIndex, 1)
-      // setTempData(newData)
       onChange?.(newData)
     },
     [value, onChange]
@@ -72,7 +69,6 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
       newData[recordIndex].electricityUnit.diff =
         newData[recordIndex].electricityUnit.current - newData[recordIndex].electricityUnit.prev
       newData[recordIndex].id = oldData.id || v4()
-      // setTempData(newData)
       onChange?.(newData)
     },
     [value, onChange]
@@ -251,16 +247,9 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
     <Table
       size={md ? 'large' : 'small'}
       title={() => (
-        <Flex justify="space-between">
-          <Typography.Text
-            css={css`
-              font-size: 1.2rem;
-            `}
-            strong
-          >
-            ข้อมูลผู้เช่า
-          </Typography.Text>
-          <Button type="primary" onClick={onAdd}>
+        <Flex justify="space-between" align="center" gap={16}>
+          <Typography.Title level={4}>ข้อมูลผู้เช่า</Typography.Title>
+          <Button type="primary" icon={<PlusOutlined />} onClick={onAdd}>
             เพิ่ม
           </Button>
         </Flex>

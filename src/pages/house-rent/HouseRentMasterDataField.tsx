@@ -32,40 +32,32 @@ export const HouseRentMasterDataField = () => {
           </Form.Item>
           <Form.Item
             name="baseHouseRent"
-            label="ค่าเช่าบ้านต่อเดือน"
-            rules={[{ required: true, message: 'กรุณากรอกค่าเช่าบ้านต่อเดือน' }]}
+            label="ค่าเช่าบ้าน/เดือน"
+            rules={[{ required: true, message: 'กรุณากรอกค่าเช่าบ้าน/เดือน' }]}
             required
           >
             <AppInputNumber tabIndex={1} thousandSeparator="," allowNegative={false} min={0} />
           </Form.Item>
           <Form.Item
             name="paymentFee"
-            label="ค่าธรรมเนียมการชำระต่อเดือน"
-            rules={[{ required: true, message: 'กรุณากรอกค่าธรรมเนียมการชำระต่อเดือน' }]}
+            label="ค่าธรรมเนียมการชำระ/เดือน"
+            rules={[{ required: true, message: 'กรุณากรอกค่าธรรมเนียมการชำระ/เดือน' }]}
             required
           >
             <AppInputNumber tabIndex={1} thousandSeparator="," allowNegative={false} min={0} />
           </Form.Item>
           <Form.Item
             name={['internet', 'pricePerMonth']}
-            label="ค่าอินเทอร์เน็ตต่อเดือน"
-            rules={[{ required: true, message: 'กรุณากรอกค่าอินเทอร์เน็ตต่อเดือน' }]}
+            label="ค่าอินเทอร์เน็ต/เดือน"
+            rules={[{ required: true, message: 'กรุณากรอกค่าอินเทอร์เน็ต/เดือน' }]}
             required
           >
             <AppInputNumber tabIndex={1} thousandSeparator="," allowNegative={false} min={0} />
           </Form.Item>
           <Form.Item
             name={['airCondition', 'pricePerUnit']}
-            label="ค่าแอร์ต่อตัว"
-            rules={[{ required: true, message: 'กรุณากรอกค่าแอร์ต่อตัว' }]}
-            required
-          >
-            <AppInputNumber tabIndex={1} thousandSeparator="," allowNegative={false} min={0} />
-          </Form.Item>
-          <Form.Item
-            name={['airCondition', 'unit']}
-            label="จำนวนแอร์"
-            rules={[{ required: true, message: 'กรุณากรอกจำนวนแอร์' }]}
+            label="ค่าแอร์/ห้อง/เดือน"
+            rules={[{ required: true, message: 'กรุณากรอกค่าแอร์/ห้อง/เดือน' }]}
             required
           >
             <AppInputNumber tabIndex={1} thousandSeparator="," allowNegative={false} min={0} />

@@ -1,3 +1,4 @@
+import { PlusOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
 import { Button, Flex, Form, Grid, Table, Typography } from 'antd'
 import { ColumnType } from 'antd/es/table'
@@ -33,7 +34,7 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
     const newData = [...(tempData || [])]
     newData.push({
       month: dayjs(),
-      houseRent: 0,
+      houseRentPrice: 0,
       waterPrice: 0,
       electricity: {
         totalPrice: 0,
@@ -110,9 +111,9 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
       },
       {
         title: 'ค่าเช่าบ้าน',
-        dataIndex: 'houseRent',
+        dataIndex: 'houseRentPrice',
         align: 'right',
-        render: renderCell<number>('houseRent', 'inputNumber', {
+        render: renderCell<number>('houseRentPrice', 'inputNumber', {
           align: 'right',
         }),
       },
@@ -160,15 +161,8 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
       size={md ? 'large' : 'small'}
       title={() => (
         <Flex justify="space-between">
-          <Typography.Text
-            css={css`
-              font-size: 1.2rem;
-            `}
-            strong
-          >
-            ค่าเช่าบ้าน
-          </Typography.Text>
-          <Button type="primary" onClick={onAdd}>
+          <Typography.Title level={4}>ค่าเช่าบ้าน</Typography.Title>
+          <Button type="primary" icon={<PlusOutlined />} onClick={onAdd}>
             เพิ่ม
           </Button>
         </Flex>
@@ -201,7 +195,9 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
         >
           <Table.Summary.Cell index={0} align="center" />
           <Table.Summary.Cell index={1} align="right">
-            <Typography.Text strong>{sumBy(data, 'houseRent').toLocaleString()}</Typography.Text>
+            <Typography.Text strong>
+              {sumBy(data, 'houseRentPrice')?.toLocaleString()}
+            </Typography.Text>
           </Table.Summary.Cell>
           <Table.Summary.Cell index={2} align="right">
             <Typography.Text strong>{sumBy(data, 'waterPrice').toLocaleString()}</Typography.Text>
@@ -220,7 +216,7 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
         </Table.Summary.Row>
       )}
       footer={(data) => {
-        const totalHouseRent = sumBy(data, 'houseRent')
+        const totalHouseRent = sumBy(data, 'houseRentPrice') || 0
         const totalElectricity = sumBy(data, 'electricity.totalPrice')
         const totalInternet = (internet?.pricePerMonth || 0) * data.length
         const total = totalHouseRent + totalElectricity + totalInternet

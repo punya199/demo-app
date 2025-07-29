@@ -10,7 +10,7 @@ export interface IElectricitySummaryData {
 export interface IHouseRentDetailData {
   id: string
   month: Dayjs
-  houseRent: number // ค่าเช่าบ้าน
+  houseRentPrice: number // ค่าเช่าบ้าน
   waterPrice: number // ค่าน้ำ
   electricity: {
     totalPrice: number

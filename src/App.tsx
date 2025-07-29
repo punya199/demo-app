@@ -9,6 +9,9 @@ import RootLayout from './layouts/RootLayout'
 import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
 import Home from './pages/Home'
 import { PageHouseRent } from './pages/house-rent/PageHouseRent'
+import { PageHouseRentCreate } from './pages/house-rent/PageHouseRentCreate'
+import { PageHouseRentDetail } from './pages/house-rent/PageHouseRentDetail'
+import { PageHouseRentDetailClone } from './pages/house-rent/PageHouseRentDetailClone'
 import Login from './pages/Login'
 import CardGame from './pages/project/project5/CardGame'
 import Omama from './pages/project/project6/Omama'
@@ -51,6 +54,18 @@ const router = createBrowserRouter([
       {
         path: appPath.checkBillPageSave(),
         element: <PageSaveBillToImage />,
+      },
+      {
+        path: appPath.houseRentCreate(),
+        element: <PageHouseRentCreate />,
+      },
+      {
+        path: appPath.houseRentDetailClone(),
+        element: <PageHouseRentDetailClone />,
+      },
+      {
+        path: appPath.houseRentDetail(),
+        element: <PageHouseRentDetail />,
       },
       {
         path: appPath.houseRent(),

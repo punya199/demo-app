@@ -1,3 +1,11 @@
+## [1.1.60](https://github.com/punya199/test1/compare/v1.1.59...v1.1.60) (2025-07-29)
+
+
+### Fix
+
+* house rent management: Add new pages for creating, viewing, and cloning house rent entries. Update routing and appPath configuration for new routes. Introduce house rent service and store for state management. Refactor house rent detail fields and improve data handling in forms. ([b122cca](https://github.com/punya199/test1/commit/b122cca6e9bcbafd832eeaf2a3ee585392c8165d))
+* Remove ElectricitySummary component, rename IHouseRentPeopleData to IHouseRentMemberData, and update related components for consistency. Introduce HouseRentMemberTableField for managing member data and integrate file upload functionality in PageHouseRent. ([ef68558](https://github.com/punya199/test1/commit/ef6855894eaf94d6eee1c88bee20d27642f32c36))
+
 ## [1.1.59](https://github.com/punya199/test1/compare/v1.1.58...v1.1.59) (2025-07-29)
 
 

@@ -121,7 +121,8 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
         dataIndex: 'name',
         key: 'name',
         align: 'center',
-        width: 150,
+        width: 100,
+        fixed: 'left',
         render: renderCell<string>('name', 'inputText', {
           align: 'left',
         }),
@@ -307,6 +308,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
         )
       }}
       columns={columns}
+      scroll={{ x: 'max-content' }}
     />
   )
 }

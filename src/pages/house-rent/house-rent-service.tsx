@@ -3,12 +3,28 @@ import { useGetMe } from '../../service'
 import { apiClient } from '../../utils/api-client'
 import {
   IHouseRentDetailData,
-  IHouseRentFormValues,
   IHouseRentMemberData,
+  ISaveHouseRentParams,
 } from './house-rent-interface'
 
-export interface IHouseRentDataResponse {
+interface IBaseData {
   id: string
+  createdAt: string
+  updatedAt: string
+  deletedAt?: string
+  creatorId?: string
+  updaterId?: string
+  deleterId?: string
+}
+interface IHouseRentAttachmentData extends IBaseData {
+  attachableId?: string
+  attachableType?: string
+  fileName: string
+  filePath: string
+  mimeType: string
+  size: number
+}
+export interface IHouseRentDataResponse extends IBaseData {
   name: string
   baseHouseRent: number
   paymentFee: number
@@ -21,17 +37,7 @@ export interface IHouseRentDataResponse {
   }
   rents: IHouseRentDetailData[]
   members: IHouseRentMemberData[]
-  attachments: {
-    id: string
-    name: string
-    url: string
-  }[]
-  createdAt: string
-  updatedAt: string
-  deletedAt?: string
-  creatorId?: string
-  updaterId?: string
-  deleterId?: string
+  attachments: IHouseRentAttachmentData[]
 }
 
 interface IGetHouseRentResponse {
@@ -56,8 +62,8 @@ export const useGetHouseRent = (houseRentId?: string) => {
 export const useCreateHouseRent = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (params: IHouseRentFormValues) => {
-      const { data } = await apiClient.post<IHouseRentFormValues>(`/house-rents`, params)
+    mutationFn: async (params: ISaveHouseRentParams) => {
+      const { data } = await apiClient.post<IGetHouseRentResponse>(`/house-rents`, params)
       return data
     },
     onSuccess: () => {
@@ -69,8 +75,8 @@ export const useCreateHouseRent = () => {
 export const useUpdateHouseRent = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (params: IHouseRentFormValues) => {
-      const { data } = await apiClient.put<IHouseRentFormValues>(
+    mutationFn: async (params: ISaveHouseRentParams) => {
+      const { data } = await apiClient.put<IGetHouseRentResponse>(
         `/house-rents/${params.id}`,
         params
       )

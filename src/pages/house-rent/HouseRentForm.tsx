@@ -13,11 +13,11 @@ import {
   IHouseRentFormValues,
   IHouseRentMemberData,
 } from './house-rent-interface'
+import { HouseRentAttachments } from './HouseRentAttachments'
 import { HouseRentDetailTableField } from './HouseRentDetailTableField'
 import { HouseRentMasterDataField } from './HouseRentMasterDataField'
 import { HouseRentMemberTableField } from './HouseRentMemberTableField'
 import { HouseRentReportSummary } from './HouseRentReportSummary'
-import { UploadFiles } from './UploadFiles'
 
 type IHouseRentStoreState = {
   data: IHouseRentFormValues
@@ -139,7 +139,7 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
     <div
       className="space-y-4 py-6 md:p-4"
       css={css`
-        background-color: #edfcff;
+        background-color: #585858;
         height: 100%;
       `}
     >
@@ -165,13 +165,11 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
               <HouseRentMemberTableField summary={data.electricitySummary} />
             </Form.Item>
           </Col>
-          {isLoggedIn && (
-            <Col xs={24} md={24}>
-              <Form.Item name="attachments">
-                <UploadFiles />
-              </Form.Item>
-            </Col>
-          )}
+
+          <Col xs={24} md={24}>
+            <HouseRentAttachments />
+          </Col>
+
           <Divider />
           <Col xs={24} md={24}>
             <HouseRentReportSummary data={data} />

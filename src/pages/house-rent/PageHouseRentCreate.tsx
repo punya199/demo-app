@@ -1,4 +1,5 @@
 import { message } from 'antd'
+import { chain } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
@@ -12,14 +13,24 @@ export const PageHouseRentCreate = () => {
 
   const handleSubmit = useCallback(
     (data: IHouseRentFormValues) => {
-      saveHouseRent(data, {
-        onSuccess: () => {
-          message.success('บันทึกข้อมูลสำเร็จ')
-          navigate(appPath.houseRent(), {
-            replace: true,
-          })
+      const attachmentIds = chain(data.attachments)
+        .map((attachment) => attachment.uid)
+        .compact()
+        .value()
+      saveHouseRent(
+        {
+          ...data,
+          attachmentIds,
         },
-      })
+        {
+          onSuccess: () => {
+            message.success('บันทึกข้อมูลสำเร็จ')
+            navigate(appPath.houseRent(), {
+              replace: true,
+            })
+          },
+        }
+      )
     },
     [saveHouseRent, navigate]
   )

@@ -41,7 +41,8 @@ export const HouseRentReportSummary = (props: IHouseRentReportSummaryProps) => {
         title: 'ชื่อ',
         dataIndex: 'name',
         align: 'center',
-        width: 150,
+        width: 100,
+        fixed: 'left',
         render: (value) => {
           return (
             <Flex>

@@ -1,3 +1,4 @@
+import { UploadFile } from 'antd'
 import { Dayjs } from 'dayjs'
 
 export interface IElectricitySummaryData {
@@ -30,8 +31,7 @@ export interface IHouseRentMemberData {
   payInternetMonthIds?: string[]
   payElectricityMonthIds?: string[]
 }
-
-export interface IHouseRentFormValues {
+export interface ISaveHouseRentParams {
   id?: string
   name: string
   rents: IHouseRentDetailData[]
@@ -46,9 +46,8 @@ export interface IHouseRentFormValues {
     pricePerUnit: number
     unit: number
   }
-  attachments: {
-    id: string
-    name: string
-    url: string
-  }[]
+  attachmentIds: string[]
+}
+export interface IHouseRentFormValues extends Omit<ISaveHouseRentParams, 'attachmentIds'> {
+  attachments: UploadFile[]
 }

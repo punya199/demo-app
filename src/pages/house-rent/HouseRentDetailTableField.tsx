@@ -98,7 +98,7 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
         dataIndex: 'month',
         key: 'month',
         align: 'center',
-        width: 120,
+        fixed: 'left',
         render: renderCell<Dayjs>('month', 'monthPicker', {
           displayValue: (month) => dayjs(month).format('MM/YYYY'),
           align: 'center',
@@ -229,6 +229,7 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
           </Flex>
         )
       }}
+      scroll={{ x: 'max-content' }}
     />
   )
 }

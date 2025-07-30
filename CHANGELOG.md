@@ -1,3 +1,10 @@
+## [1.1.62](https://github.com/punya199/test1/compare/v1.1.61...v1.1.62) (2025-07-30)
+
+
+### Fix
+
+* Introduce AppUploadFiles component for file uploads in house rent forms, refactor house rent interfaces to support new attachment structure, and integrate file upload functionality in HouseRentAttachments. Update form submission logic to handle attachment IDs. ([e48603a](https://github.com/punya199/test1/commit/e48603ab33d6a158596738241a99d04d110c0f2b))
+
 ## [1.1.61](https://github.com/punya199/test1/compare/v1.1.60...v1.1.61) (2025-07-29)
 
 

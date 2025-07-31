@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ConfigProvider } from 'antd'
+import { lazy } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import './App.css'
 import { appConfig } from './config/app-config'
@@ -8,10 +9,6 @@ import Pnotfound from './layouts/Pnotfound'
 import RootLayout from './layouts/RootLayout'
 import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
 import Home from './pages/Home'
-import { PageHouseRent } from './pages/house-rent/PageHouseRent'
-import { PageHouseRentCreate } from './pages/house-rent/PageHouseRentCreate'
-import { PageHouseRentDetail } from './pages/house-rent/PageHouseRentDetail'
-import { PageHouseRentDetailClone } from './pages/house-rent/PageHouseRentDetailClone'
 import Login from './pages/Login'
 import CardGame from './pages/project/project5/CardGame'
 import Omama from './pages/project/project6/Omama'
@@ -19,6 +16,25 @@ import PageAllBill from './pages/project/project8/PageAllBill'
 import PageCreateBill from './pages/project/project8/PageCreateBill'
 import PageEditBill from './pages/project/project8/PageEditBill'
 import PageSaveBillToImage from './pages/project/project8/PageSaveBillToImage'
+
+const PageHouseRent = lazy(() =>
+  import('./pages/house-rent/PageHouseRent').then((module) => ({ default: module.PageHouseRent }))
+)
+const PageHouseRentCreate = lazy(() =>
+  import('./pages/house-rent/PageHouseRentCreate').then((module) => ({
+    default: module.PageHouseRentCreate,
+  }))
+)
+const PageHouseRentDetail = lazy(() =>
+  import('./pages/house-rent/PageHouseRentDetail').then((module) => ({
+    default: module.PageHouseRentDetail,
+  }))
+)
+const PageHouseRentDetailClone = lazy(() =>
+  import('./pages/house-rent/PageHouseRentDetailClone').then((module) => ({
+    default: module.PageHouseRentDetailClone,
+  }))
+)
 
 const router = createBrowserRouter([
   {

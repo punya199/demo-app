@@ -4,7 +4,7 @@ import { Button, Flex, Table, TableColumnType, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { keyBy, sumBy } from 'lodash'
 import { useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
 import { formatCurrency } from '../../utils/format-currency'
 import { IHouseRentDetailData, IHouseRentMemberData } from './house-rent-interface'
@@ -90,25 +90,27 @@ export const PageHouseRent = () => {
         align: 'center',
         render: (value) => (
           <Flex gap={4} justify="center">
-            <Button
-              type="link"
-              icon={<EyeOutlined />}
-              onClick={() => navigate(appPath.houseRentDetail({ param: { houseRentId: value } }))}
-              title="ดูรายละเอียด"
-            />
-            <Button
-              type="link"
-              icon={<CopyOutlined />}
-              onClick={() =>
-                navigate(appPath.houseRentDetailClone({ param: { houseRentId: value } }))
-              }
-              title="คัดลอก"
-            />
+            <Link
+              to={appPath.houseRentDetail({ param: { houseRentId: value } })}
+              onMouseOver={() => {
+                import('./PageHouseRentDetail')
+              }}
+            >
+              <Button type="link" icon={<EyeOutlined />} title="ดูรายละเอียด" />
+            </Link>
+            <Link
+              to={appPath.houseRentDetailClone({ param: { houseRentId: value } })}
+              onMouseOver={() => {
+                import('./PageHouseRentDetailClone')
+              }}
+            >
+              <Button type="link" icon={<CopyOutlined />} title="คัดลอก" />
+            </Link>
           </Flex>
         ),
       },
     ],
-    [navigate, userOptionsHash]
+    [userOptionsHash]
   )
 
   return (

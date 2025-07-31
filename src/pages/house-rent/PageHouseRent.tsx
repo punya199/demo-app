@@ -1,23 +1,26 @@
-import { CopyOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
+import { CopyOutlined, DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
-import { Button, Flex, Table, TableColumnType, Typography } from 'antd'
+import { Button, Flex, Modal, Table, TableColumnType, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { keyBy, sumBy } from 'lodash'
 import { useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
+import { useGetMe, UserRole } from '../../service'
 import { formatCurrency } from '../../utils/format-currency'
 import { IHouseRentDetailData, IHouseRentMemberData } from './house-rent-interface'
 import {
   IHouseRentDataResponse,
+  useDeleteHouseRent,
   useGetHouseRentList,
   useGetUserOptions,
 } from './house-rent-service'
 
 export const PageHouseRent = () => {
+  const { data: getMeData } = useGetMe()
   const { data: houseRentListData, isLoading } = useGetHouseRentList()
   const navigate = useNavigate()
-
+  const { mutate: deleteHouseRent } = useDeleteHouseRent()
   const { data: userOptions } = useGetUserOptions()
 
   const userOptionsHash = useMemo(() => {
@@ -106,11 +109,26 @@ export const PageHouseRent = () => {
             >
               <Button type="link" icon={<CopyOutlined />} title="คัดลอก" />
             </Link>
+            {getMeData?.user.role === UserRole.ADMIN && (
+              <Button
+                type="link"
+                icon={<DeleteOutlined />}
+                title="ลบ"
+                onClick={() => {
+                  Modal.confirm({
+                    title: 'ยืนยันการลบ',
+                    content: 'คุณต้องการลบรายการนี้หรือไม่',
+                    onOk: () => deleteHouseRent(value),
+                  })
+                }}
+                danger
+              />
+            )}
           </Flex>
         ),
       },
     ],
-    [userOptionsHash]
+    [userOptionsHash, getMeData?.user.role, deleteHouseRent]
   )
 
   return (

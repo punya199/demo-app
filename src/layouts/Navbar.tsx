@@ -1,12 +1,36 @@
 import { MenuOutlined } from '@ant-design/icons'
 import { useQueryClient } from '@tanstack/react-query'
-import { Button, Drawer, Dropdown, Menu, MenuProps, Space, Typography } from 'antd'
+import { Button, Drawer, Dropdown, Menu, Space, Typography } from 'antd'
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { appPath } from '../config/app-paths'
-import { useGetMe } from '../service'
+import { useGetMe, UserRole } from '../service'
 const { Title } = Typography
+
+interface IMenuItemData {
+  name: string
+  path: string
+}
+
+const menuItemsMap: Record<string, IMenuItemData> = {
+  randomCard: {
+    name: 'RandomCard',
+    path: appPath.randomCard(),
+  },
+  omamaGame: {
+    name: 'Game Omama',
+    path: appPath.omamaGame(),
+  },
+  checkBill: {
+    name: 'Check Bill',
+    path: appPath.checkBillPage(),
+  },
+  houseRent: {
+    name: 'House Rent',
+    path: appPath.houseRent(),
+  },
+}
 
 const Navbar = () => {
   const [open, setOpen] = useState(false)
@@ -21,20 +45,25 @@ const Navbar = () => {
     queryClient.resetQueries()
   }
 
-  const items: MenuProps['items'] = [
-    {
-      label: <Link to={appPath.randomCard()}>RandomCard</Link>,
-      key: '0',
-    },
-    {
-      label: <Link to={appPath.omamaGame()}>Game Omama</Link>,
-      key: '1',
-    },
-    {
-      label: <Link to={appPath.checkBillPage()}>Check Bill</Link>,
-      key: '2',
-    },
-  ]
+  const menuItemsDesktop = useMemo((): IMenuItemData[] => {
+    const defaultItems = [menuItemsMap.randomCard, menuItemsMap.omamaGame, menuItemsMap.checkBill]
+
+    if (user?.user.role === UserRole.ADMIN) {
+      defaultItems.push(menuItemsMap.houseRent)
+    }
+
+    return defaultItems
+  }, [user?.user.role])
+
+  const menuItemsMobile: IMenuItemData[] = useMemo((): IMenuItemData[] => {
+    const defaultItems = [menuItemsMap.randomCard, menuItemsMap.omamaGame, menuItemsMap.checkBill]
+
+    if (user?.user.role === UserRole.ADMIN) {
+      defaultItems.push(menuItemsMap.houseRent)
+    }
+
+    return defaultItems
+  }, [user?.user.role])
 
   return (
     <nav className="bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 shadow-lg">
@@ -48,7 +77,14 @@ const Navbar = () => {
           </motion.div>
         </Link>
         <div className="hidden md:block">
-          <Dropdown menu={{ items }}>
+          <Dropdown
+            menu={{
+              items: menuItemsDesktop.map((item) => ({
+                label: <Link to={item.path}>{item.name}</Link>,
+                key: item.name,
+              })),
+            }}
+          >
             <a onClick={(e) => e.preventDefault()}>
               <Button className="text-blue-500 hover:text-blue-700">Game</Button>
             </a>
@@ -103,16 +139,11 @@ const Navbar = () => {
         classNames={{ body: 'p-0' }}
       >
         <Menu mode="vertical" selectable={false}>
-          <Menu.Item onClick={onClose}>
-            <Link to={appPath.randomCard()}>RandomCard</Link>
-          </Menu.Item>
-          <Menu.Item onClick={onClose}>
-            <Link to={appPath.omamaGame()}>Game Omama</Link>
-          </Menu.Item>
-
-          <Menu.Item onClick={onClose}>
-            <Link to={appPath.checkBillPage()}>Check Bill</Link>
-          </Menu.Item>
+          {menuItemsMobile.map((item) => (
+            <Menu.Item key={item.name} onClick={onClose}>
+              <Link to={item.path}>{item.name}</Link>
+            </Menu.Item>
+          ))}
         </Menu>
 
         <div className="p-4">

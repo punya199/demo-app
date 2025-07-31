@@ -128,3 +128,15 @@ export const useFetchUserOptions = () => {
     },
   })
 }
+
+export const useDeleteHouseRent = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (houseRentId: string) => {
+      await apiClient.delete(`/house-rents/${houseRentId}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['house-rents'] })
+    },
+  })
+}

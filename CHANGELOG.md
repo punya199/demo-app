@@ -1,3 +1,10 @@
+## [1.1.65](https://github.com/punya199/test1/compare/v1.1.64...v1.1.65) (2025-07-31)
+
+
+### Fix
+
+* Implement lazy loading for house rent pages to optimize performance and improve user experience. Update navigation links in PageHouseRent to use React Router's Link component for better routing management. ([67f1fcc](https://github.com/punya199/test1/commit/67f1fcc64e2d251afb9ddb7a336f8d074354b496))
+
 ## [1.1.64](https://github.com/punya199/test1/compare/v1.1.63...v1.1.64) (2025-07-31)
 
 

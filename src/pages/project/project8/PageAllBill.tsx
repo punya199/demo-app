@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, Divider, Modal, Table, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
@@ -6,7 +6,7 @@ import { useMemo } from 'react'
 import { IoSearchCircleSharp } from 'react-icons/io5'
 import { MdDelete } from 'react-icons/md'
 import { TbEdit } from 'react-icons/tb'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { appPath } from '../../../config/app-paths'
 import { useGetMe } from '../../../service'
 import { apiClient } from '../../../utils/api-client'
@@ -29,7 +29,8 @@ type GetBillsResponse = {
 
 const PageAllBill = () => {
   const navigate = useNavigate()
-
+  const queryClient = useQueryClient()
+  const location = useLocation()
   const { data } = useQuery({
     queryKey: ['BillList'],
     queryFn: async () => {
@@ -38,6 +39,14 @@ const PageAllBill = () => {
     },
   })
 
+  const { mutate: deleteBill } = useMutation({
+    mutationFn: async (billId: number) => {
+      await apiClient.delete(`bills/${billId}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['BillList'] })
+    },
+  })
   const { data: user } = useGetMe()
   const isLoggedIn = useMemo(() => !!user?.user.id, [user?.user.id])
 
@@ -56,7 +65,9 @@ const PageAllBill = () => {
 
         icon: null,
         onOk: () => {
-          navigate(appPath.login())
+          navigate(appPath.login(), {
+            state: { redirect: location.pathname },
+          })
         },
       })
     }
@@ -64,7 +75,17 @@ const PageAllBill = () => {
 
   const handleDeleteClick = (billId: number) => {
     if (isLoggedIn) {
-      navigate(appPath.checkBillPageEdit({ param: { billId } })) //api delete
+      Modal.confirm({
+        title: 'คุณต้องการจะลบใช่หรือไม่ ?',
+
+        okText: 'ลบ',
+        cancelText: 'ไม่ลบ',
+        okType: 'danger',
+        icon: null,
+        onOk: () => {
+          deleteBill(billId)
+        },
+      })
     } else {
       Modal.confirm({
         title: 'ยังไม่ได้เข้าสู่ระบบ',
@@ -74,7 +95,9 @@ const PageAllBill = () => {
 
         icon: null,
         onOk: () => {
-          navigate(appPath.login())
+          navigate(appPath.login(), {
+            state: { redirect: location.pathname },
+          })
         },
       })
     }
@@ -154,7 +177,7 @@ const PageAllBill = () => {
         <Link to={appPath.checkBillPageCreate()} className="flex-1">
           <Button
             type="primary"
-            className="w-full rounded-lg bg-blue-300 !py-5 text-white hover:bg-blue-400"
+            className="w-full rounded-lg bg-blue-300 !py-5 !text-xl text-white hover:bg-blue-400"
           >
             สร้างบิลใหม่
           </Button>

@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Button, Form, Input } from 'antd'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { appPath } from '../config/app-paths'
 import { useGetMe } from '../service'
 import { apiClient } from '../utils/api-client'
@@ -32,8 +32,13 @@ const Login = () => {
 
     localStorage.setItem('accessToken', data.accessToken)
     queryClient.refetchQueries()
+    const redirect = location.state?.redirect
+    if (redirect) {
+      navigate(redirect)
+    }
   }
-
+  const location = useLocation()
+  console.log(location)
   return (
     <div className="login-container flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-300 to-purple-400">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">

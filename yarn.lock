@@ -4751,6 +4751,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"html-to-image@npm:^1.11.13":
+  version: 1.11.13
+  resolution: "html-to-image@npm:1.11.13"
+  checksum: 10c0/03bd7192d87b99499e37ff12a8e2b41ddce4cf8e33a93dfadff18df0f213434c7f1ba8328db2158f4805da07b7aec3c90aec3152908281153217e86784218b10
+  languageName: node
+  linkType: hard
+
 "http-cache-semantics@npm:^4.1.1":
   version: 4.2.0
   resolution: "http-cache-semantics@npm:4.2.0"
@@ -9146,6 +9153,7 @@ __metadata:
     eslint-plugin-unused-imports: "npm:^4.1.4"
     framer-motion: "npm:^12.23.6"
     globals: "npm:^15.15.0"
+    html-to-image: "npm:^1.11.13"
     husky: "npm:^8.0.0"
     lint-staged: "npm:^15.2.2"
     lodash: "npm:^4.17.21"

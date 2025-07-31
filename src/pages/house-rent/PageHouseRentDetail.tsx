@@ -1,10 +1,9 @@
 import { message, Spin } from 'antd'
 import { chain } from 'lodash'
 import { useCallback, useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { NotFound } from '../../components/NotFound'
 import { appConfig } from '../../config/app-config'
-import { appPath } from '../../config/app-paths'
 import { calculateElectricitySummary } from './house-rent-helper'
 import { IHouseRentFormValues } from './house-rent-interface'
 import { useGetHouseRent, useUpdateHouseRent } from './house-rent-service'
@@ -15,7 +14,6 @@ export const PageHouseRentDetail = () => {
   const { data: houseRentData, isLoading } = useGetHouseRent(houseRentId)
 
   const { mutate: saveHouseRent, isPending } = useUpdateHouseRent()
-  const navigate = useNavigate()
 
   const handleSubmit = useCallback(
     (data: IHouseRentFormValues) => {
@@ -31,14 +29,14 @@ export const PageHouseRentDetail = () => {
         {
           onSuccess: () => {
             message.success('บันทึกข้อมูลสำเร็จ')
-            navigate(appPath.houseRent(), {
-              replace: true,
-            })
+          },
+          onError: () => {
+            message.error('บันทึกข้อมูลไม่สำเร็จ')
           },
         }
       )
     },
-    [saveHouseRent, navigate]
+    [saveHouseRent]
   )
 
   const defaultValues = useMemo((): IHouseRentFormValues | undefined => {

@@ -25,9 +25,16 @@ export const PageHouseRentCreate = () => {
         {
           onSuccess: () => {
             message.success('บันทึกข้อมูลสำเร็จ')
-            navigate(appPath.houseRent(), {
-              replace: true,
-            })
+            const houseRentId = data.id ?? ''
+            if (houseRentId) {
+              navigate(appPath.houseRentDetail({ param: { houseRentId } }), {
+                replace: true,
+              })
+            } else {
+              navigate(appPath.houseRent(), {
+                replace: true,
+              })
+            }
           },
         }
       )

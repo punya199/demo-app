@@ -10,13 +10,13 @@ interface ICustomCellProps {
   recordIndex: number
   value: unknown
   inputType: ICustomCellInputType
-  onValueChange: (dataIndex: string, recordIndex: number, newValue: unknown) => void
+  onChange: (dataIndex: string, recordIndex: number, newValue: unknown) => void
   displayValue?: string
   align?: 'left' | 'center' | 'right'
 }
 
 export const CustomCell = (props: ICustomCellProps) => {
-  const { dataIndex, recordIndex, value, inputType, onValueChange, displayValue, align } = props
+  const { dataIndex, recordIndex, value, inputType, onChange, displayValue, align } = props
   const [isEdit, setIsEdit] = useState(false)
   const [tempValue, setTempValue] = useState(value)
 
@@ -28,9 +28,9 @@ export const CustomCell = (props: ICustomCellProps) => {
 
   const handleValueChange = useCallback(
     (newValue: unknown) => {
-      onValueChange(dataIndex, recordIndex, newValue)
+      onChange(dataIndex, recordIndex, newValue)
     },
-    [onValueChange, dataIndex, recordIndex]
+    [onChange, dataIndex, recordIndex]
   )
 
   const handleBlur = useCallback(() => {

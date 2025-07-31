@@ -103,7 +103,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
             recordIndex={recordIndex}
             value={value}
             inputType={inputType}
-            onValueChange={onValueChange}
+            onChange={onValueChange}
             displayValue={options?.displayValue?.(value)}
             align={options?.align}
           />

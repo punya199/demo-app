@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/punya199/test1/compare/v1.1.68...v1.2.0) (2025-07-31)
+
+
+### Update
+
+* Login component with useMutation for improved login handling, refactor onFinish to utilize mutation, and add sleep utility for delay. Update VSCode settings to include SQL formatter. ([7177f33](https://github.com/punya199/test1/commit/7177f3379e9b8a8010bccaabd22e07821758715d))
+
 ## [1.1.68](https://github.com/punya199/test1/compare/v1.1.67...v1.1.68) (2025-07-31)
 
 

@@ -1,44 +1,58 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, Form, Input } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { appPath } from '../config/app-paths'
 import { useGetMe } from '../service'
 import { apiClient } from '../utils/api-client'
+import { sleep } from '../utils/helper'
 type Data = {
   accessToken: string
   user: { id: number; username: string; password: string }
 }
 
 const Login = () => {
-  const [loading, setLoading] = useState(false)
   const { data: user } = useGetMe()
   const navigate = useNavigate()
+  const location = useLocation()
   const queryClient = useQueryClient()
+
+  const { mutate: login, isPending } = useMutation({
+    mutationFn: async (values: { username: string; password: string }) => {
+      const [{ data }] = await Promise.all([
+        apiClient.post<Data>(`/users/login`, {
+          username: values.username,
+          password: values.password,
+        }),
+        sleep(350),
+      ])
+      return data
+    },
+    onSuccess: (data) => {
+      localStorage.setItem('accessToken', data.accessToken)
+      queryClient.refetchQueries()
+      const redirect = location.state?.redirect
+      if (redirect) {
+        navigate(redirect)
+      } else {
+        navigate(appPath.home())
+      }
+    },
+  })
+
   useEffect(() => {
     if (user?.user.id) {
       navigate(appPath.home())
     }
   }, [navigate, user?.user.id])
-  const onFinish = async (values: { username: string; password: string }) => {
-    setLoading(true)
-    const { data } = await apiClient.post<Data>(`/users/login`, {
-      username: values.username,
-      password: values.password,
-    })
-    setTimeout(() => {
-      setLoading(false)
-    }, 1000)
 
-    localStorage.setItem('accessToken', data.accessToken)
-    queryClient.refetchQueries()
-    const redirect = location.state?.redirect
-    if (redirect) {
-      navigate(redirect)
-    }
-  }
-  const location = useLocation()
-  console.log(location)
+  const onFinish = useCallback(
+    async (values: { username: string; password: string }) => {
+      login(values)
+    },
+    [login]
+  )
+
   return (
     <div className="login-container flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-300 to-purple-400">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
@@ -64,7 +78,7 @@ const Login = () => {
             <Button
               type="primary"
               htmlType="submit"
-              loading={loading}
+              loading={isPending}
               className="w-full rounded-md bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600"
             >
               Login

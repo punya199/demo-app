@@ -1,3 +1,10 @@
+## [1.1.66](https://github.com/punya199/test1/compare/v1.1.65...v1.1.66) (2025-07-31)
+
+
+### Fix
+
+* Configure QueryClient with custom options for query and mutation handling. Add NotFound component for improved error handling in house rent detail pages, replacing loading states with user-friendly messages. ([4139fe7](https://github.com/punya199/test1/commit/4139fe7338320bd31ff7937f1674dbaa6eb18c46))
+
 ## [1.1.65](https://github.com/punya199/test1/compare/v1.1.64...v1.1.65) (2025-07-31)
 
 

@@ -5,6 +5,7 @@ import { chain, filter, keyBy, round, sumBy } from 'lodash'
 import { useMemo } from 'react'
 import { AppInputNumber } from '../../components/AppInputNumber'
 import { IHouseRentFormValues } from './house-rent-interface'
+import { useGetUserOptions } from './house-rent-service'
 
 const renderNumber = (value: number | undefined) => {
   if (!value) return '-'
@@ -12,7 +13,7 @@ const renderNumber = (value: number | undefined) => {
 }
 
 interface IHouseRentReportSummaryData {
-  id: string
+  id?: string
   name: string
   houseRent: number
   airCondition: number
@@ -35,6 +36,13 @@ interface IHouseRentReportSummaryProps {
 export const HouseRentReportSummary = (props: IHouseRentReportSummaryProps) => {
   const { data } = props
   const { md } = Grid.useBreakpoint()
+
+  const { data: userOptions } = useGetUserOptions()
+
+  const userOptionsHash = useMemo(() => {
+    return keyBy(userOptions?.options, 'value')
+  }, [userOptions?.options])
+
   const columns = useMemo((): ColumnType<IHouseRentReportSummaryData>[] => {
     return [
       {
@@ -207,7 +215,7 @@ export const HouseRentReportSummary = (props: IHouseRentReportSummaryProps) => {
 
         acc.push({
           id: member.id,
-          name: member.name,
+          name: userOptionsHash[member.userId]?.label || '',
           houseRent,
           airCondition,
           internet,
@@ -227,13 +235,14 @@ export const HouseRentReportSummary = (props: IHouseRentReportSummaryProps) => {
       .value()
   }, [
     data.rents,
+    data.members,
     data.baseHouseRent,
     data.internet.pricePerMonth,
     data.electricitySummary.shareUnit,
     data.electricitySummary.pricePerUnit,
     data.paymentFee,
-    data.members,
     data.airCondition.pricePerUnit,
+    userOptionsHash,
   ])
 
   return (

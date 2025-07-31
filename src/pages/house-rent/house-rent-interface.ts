@@ -1,5 +1,4 @@
 import { UploadFile } from 'antd'
-import { DefaultOptionType } from 'antd/es/select'
 import { Dayjs } from 'dayjs'
 
 export interface IElectricitySummaryData {
@@ -58,5 +57,8 @@ export interface IGetUserOptionsParams {
 }
 
 export interface IGetUserOptionsResponse {
-  options: DefaultOptionType[]
+  options: {
+    label: string
+    value: string
+  }[]
 }

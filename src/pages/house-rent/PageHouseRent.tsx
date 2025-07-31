@@ -2,17 +2,27 @@ import { CopyOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
 import { Button, Flex, Table, TableColumnType, Typography } from 'antd'
 import dayjs from 'dayjs'
-import { sumBy } from 'lodash'
+import { keyBy, sumBy } from 'lodash'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
 import { formatCurrency } from '../../utils/format-currency'
 import { IHouseRentDetailData, IHouseRentMemberData } from './house-rent-interface'
-import { IHouseRentDataResponse, useGetHouseRentList } from './house-rent-service'
+import {
+  IHouseRentDataResponse,
+  useGetHouseRentList,
+  useGetUserOptions,
+} from './house-rent-service'
 
 export const PageHouseRent = () => {
   const { data: houseRentListData, isLoading } = useGetHouseRentList()
   const navigate = useNavigate()
+
+  const { data: userOptions } = useGetUserOptions()
+
+  const userOptionsHash = useMemo(() => {
+    return keyBy(userOptions?.options, 'value')
+  }, [userOptions?.options])
 
   const columns = useMemo(
     (): TableColumnType<IHouseRentDataResponse>[] => [
@@ -40,7 +50,8 @@ export const PageHouseRent = () => {
         dataIndex: 'members',
         key: 'members',
         align: 'center',
-        render: (value: IHouseRentMemberData[]) => value.map((item) => item.name).join(', '),
+        render: (value: IHouseRentMemberData[]) =>
+          value.map((item) => userOptionsHash[item.userId]?.label || '').join(', '),
       },
       {
         title: 'ยอดรวม',
@@ -97,7 +108,7 @@ export const PageHouseRent = () => {
         ),
       },
     ],
-    [navigate]
+    [navigate, userOptionsHash]
   )
 
   return (

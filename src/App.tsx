@@ -5,17 +5,19 @@ import { createBrowserRouter, RouterProvider } from 'react-router'
 import './App.css'
 import { appConfig } from './config/app-config'
 import { appPath } from './config/app-paths'
-import Pnotfound from './layouts/Pnotfound'
-import RootLayout from './layouts/RootLayout'
 import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
-import Home from './pages/Home'
-import Login from './pages/Login'
-import CardGame from './pages/project/project5/CardGame'
-import Omama from './pages/project/project6/Omama'
-import PageAllBill from './pages/project/project8/PageAllBill'
-import PageCreateBill from './pages/project/project8/PageCreateBill'
-import PageEditBill from './pages/project/project8/PageEditBill'
-import PageSaveBillToImage from './pages/project/project8/PageSaveBillToImage'
+
+const Pnotfound = lazy(() => import('./layouts/Pnotfound'))
+const RootLayout = lazy(() => import('./layouts/RootLayout'))
+
+const Home = lazy(() => import('./pages/Home'))
+const Login = lazy(() => import('./pages/Login'))
+const CardGame = lazy(() => import('./pages/project/project5/CardGame'))
+const Omama = lazy(() => import('./pages/project/project6/Omama'))
+const PageAllBill = lazy(() => import('./pages/project/project8/PageAllBill'))
+const PageCreateBill = lazy(() => import('./pages/project/project8/PageCreateBill'))
+const PageEditBill = lazy(() => import('./pages/project/project8/PageEditBill'))
+const PageSaveBillToImage = lazy(() => import('./pages/project/project8/PageSaveBillToImage'))
 
 const PageHouseRent = lazy(() =>
   import('./pages/house-rent/PageHouseRent').then((module) => ({ default: module.PageHouseRent }))

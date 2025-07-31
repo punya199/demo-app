@@ -1,3 +1,10 @@
+## [1.1.67](https://github.com/punya199/test1/compare/v1.1.66...v1.1.67) (2025-07-31)
+
+
+### Fix
+
+* Update event handler naming from onValueChange to onChange in CustomCell and related components for consistency. Enhance navigation logic in house rent detail pages to handle success and error states more effectively. ([409a453](https://github.com/punya199/test1/commit/409a45342b8113fda23cad2a9e42715d6cd52340))
+
 ## [1.1.66](https://github.com/punya199/test1/compare/v1.1.65...v1.1.66) (2025-07-31)
 
 

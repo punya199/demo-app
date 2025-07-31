@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/punya199/test1/compare/v1.2.0...v1.2.1) (2025-07-31)
+
+
+### Fix
+
+* Implement lazy loading for components in App.tsx to improve performance and reduce initial load time. Update tsconfig.app.json to disable source maps for production builds. ([adbd72d](https://github.com/punya199/test1/commit/adbd72dbad82d4622efe3194681fa5a4ed2f0eaf))
+
 # [1.2.0](https://github.com/punya199/test1/compare/v1.1.68...v1.2.0) (2025-07-31)
 
 

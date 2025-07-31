@@ -1,3 +1,10 @@
+## [1.1.68](https://github.com/punya199/test1/compare/v1.1.67...v1.1.68) (2025-07-31)
+
+
+### Fix
+
+* Add html-to-image dependency for image export functionality, update routing paths for bill editing and viewing, and improve user navigation in Login and PageAllBill components. Refactor PageSaveBillToImage for better layout and image saving capabilities. ([06a59e0](https://github.com/punya199/test1/commit/06a59e01c88df884c1269d08c291dc79eab43ecb))
+
 ## [1.1.67](https://github.com/punya199/test1/compare/v1.1.66...v1.1.67) (2025-07-31)
 
 

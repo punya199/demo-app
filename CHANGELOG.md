@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/punya199/test1/compare/v1.2.1...v1.2.2) (2025-07-31)
+
+
+### Fix
+
+* Introduce UserRole enum for role-based access control, update Navbar to conditionally render menu items based on user role, and implement delete functionality for house rent entries with confirmation modal. Refactor house rent page to support role-based actions. ([83a2df1](https://github.com/punya199/test1/commit/83a2df18e8629b92e5e2cae7c3a4321e51a47dc9))
+
 ## [1.2.1](https://github.com/punya199/test1/compare/v1.2.0...v1.2.1) (2025-07-31)
 
 

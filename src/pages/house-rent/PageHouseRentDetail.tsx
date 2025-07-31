@@ -2,6 +2,7 @@ import { message, Spin } from 'antd'
 import { chain } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { NotFound } from '../../components/NotFound'
 import { appConfig } from '../../config/app-config'
 import { appPath } from '../../config/app-paths'
 import { calculateElectricitySummary } from './house-rent-helper'
@@ -58,17 +59,15 @@ export const PageHouseRentDetail = () => {
     }
   }, [houseRentData])
 
+  if (isLoading) {
+    return <Spin />
+  }
+
+  if (!defaultValues) {
+    return <NotFound />
+  }
+
   return (
-    <>
-      {isLoading ? (
-        <Spin />
-      ) : (
-        <HouseRentForm
-          defaultValues={defaultValues}
-          onSubmit={handleSubmit}
-          isSubmitting={isPending}
-        />
-      )}
-    </>
+    <HouseRentForm defaultValues={defaultValues} onSubmit={handleSubmit} isSubmitting={isPending} />
   )
 }

@@ -1,4 +1,4 @@
-import { message, Spin } from 'antd'
+import { Empty, message, Spin } from 'antd'
 import { chain } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -51,17 +51,15 @@ export const PageHouseRentDetailClone = () => {
       attachments: [],
     }
   }, [houseRentData])
+
+  if (isLoading) {
+    return <Spin />
+  }
+  if (!defaultValues) {
+    return <Empty description="ไม่พบข้อมูล" />
+  }
+
   return (
-    <>
-      {isLoading ? (
-        <Spin />
-      ) : (
-        <HouseRentForm
-          defaultValues={defaultValues}
-          onSubmit={handleSubmit}
-          isSubmitting={isPending}
-        />
-      )}
-    </>
+    <HouseRentForm defaultValues={defaultValues} onSubmit={handleSubmit} isSubmitting={isPending} />
   )
 }

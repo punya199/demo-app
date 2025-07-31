@@ -90,7 +90,18 @@ const router = createBrowserRouter([
     ],
   },
 ])
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      gcTime: 1000 * 60 * 5,
+      retry: 0,
+    },
+    mutations: {
+      retry: 0,
+    },
+  },
+})
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>

@@ -1,4 +1,5 @@
 import { UploadFile } from 'antd'
+import { DefaultOptionType } from 'antd/es/select'
 import { Dayjs } from 'dayjs'
 
 export interface IElectricitySummaryData {
@@ -9,7 +10,7 @@ export interface IElectricitySummaryData {
 }
 
 export interface IHouseRentDetailData {
-  id: string
+  id?: string
   month: Dayjs
   houseRentPrice: number // ค่าเช่าบ้าน
   waterPrice: number // ค่าน้ำ
@@ -20,8 +21,7 @@ export interface IHouseRentDetailData {
 }
 
 export interface IHouseRentMemberData {
-  id: string
-  name: string
+  id?: string
   airConditionUnit: number
   electricityUnit: {
     prev: number
@@ -30,6 +30,7 @@ export interface IHouseRentMemberData {
   }
   payInternetMonthIds?: string[]
   payElectricityMonthIds?: string[]
+  userId: string
 }
 export interface ISaveHouseRentParams {
   id?: string
@@ -50,4 +51,12 @@ export interface ISaveHouseRentParams {
 }
 export interface IHouseRentFormValues extends Omit<ISaveHouseRentParams, 'attachmentIds'> {
   attachments: UploadFile[]
+}
+
+export interface IGetUserOptionsParams {
+  search?: string
+}
+
+export interface IGetUserOptionsResponse {
+  options: DefaultOptionType[]
 }

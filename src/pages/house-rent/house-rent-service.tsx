@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useGetMe } from '../../service'
 import { apiClient } from '../../utils/api-client'
 import {
+  IGetUserOptionsParams,
+  IGetUserOptionsResponse,
   IHouseRentDetailData,
   IHouseRentMemberData,
   ISaveHouseRentParams,
@@ -99,5 +101,30 @@ export const useGetHouseRentList = () => {
       return data
     },
     enabled: !!isLoggedIn,
+  })
+}
+
+export const useGetUserOptions = (params?: IGetUserOptionsParams) => {
+  return useQuery({
+    queryKey: ['user-options', params],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IGetUserOptionsResponse>(`/users/options`, {
+        params,
+      })
+      return data
+    },
+    gcTime: 0,
+    staleTime: 0,
+  })
+}
+
+export const useFetchUserOptions = () => {
+  return useMutation({
+    mutationFn: async (params?: IGetUserOptionsParams) => {
+      const { data } = await apiClient.get<IGetUserOptionsResponse>(`/users/options`, {
+        params,
+      })
+      return data
+    },
   })
 }

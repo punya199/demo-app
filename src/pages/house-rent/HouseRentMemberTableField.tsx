@@ -6,14 +6,13 @@ import { ColumnType } from 'antd/es/table'
 import dayjs, { Dayjs } from 'dayjs'
 import { chain, round, set, sumBy } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { v4 } from 'uuid'
 import { CustomCell, ICustomCellInputType } from './CustomCell'
 import {
   IElectricitySummaryData,
   IHouseRentFormValues,
   IHouseRentMemberData,
 } from './house-rent-interface'
-
+import { useGetUserOptions } from './house-rent-service'
 interface IHouseRentMemberTableFieldProps {
   value?: IHouseRentMemberData[]
   onChange?: (value: IHouseRentMemberData[]) => void
@@ -28,23 +27,37 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
   const form = Form.useFormInstance<IHouseRentFormValues>()
   const rents = Form.useWatch('rents', form)
 
+  const [search, setSearch] = useState('')
+  const { data: userOptions } = useGetUserOptions({
+    search,
+  })
+
   useEffect(() => {
     if (!isInit && value?.length) {
       setIsInit(true)
     }
   }, [value, isInit])
 
+  const dataSource = useMemo(() => {
+    return value?.map((item) => ({
+      ...item,
+    }))
+  }, [value])
+
   const onAdd = useCallback(() => {
     const newData = [...(value || [])]
-    newData.push({
-      name: '',
+    const newMember: IHouseRentMemberData = {
       airConditionUnit: 0,
       electricityUnit: {
         prev: 0,
         current: 0,
         diff: 0,
       },
-    } as IHouseRentMemberData)
+      userId: '',
+      payElectricityMonthIds: [],
+      payInternetMonthIds: [],
+    }
+    newData.push(newMember)
     onChange?.(newData)
   }, [value, onChange])
 
@@ -68,7 +81,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
       }
       newData[recordIndex].electricityUnit.diff =
         newData[recordIndex].electricityUnit.current - newData[recordIndex].electricityUnit.prev
-      newData[recordIndex].id = oldData.id || v4()
+
       onChange?.(newData)
     },
     [value, onChange]
@@ -118,14 +131,31 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
     return [
       {
         title: 'ชื่อ',
-        dataIndex: 'name',
-        key: 'name',
+        dataIndex: 'userId',
         align: 'center',
         width: 100,
         fixed: 'left',
-        render: renderCell<string>('name', 'inputText', {
-          align: 'left',
-        }),
+        render: (userId: string, _record: IHouseRentMemberData, recordIndex: number) => {
+          return (
+            <Select
+              css={css`
+                width: 100%;
+                min-width: 100px;
+              `}
+              value={userOptions?.options.find((option) => option.value === userId)}
+              options={userOptions?.options}
+              onSearch={(value) => setSearch(value)}
+              onSelect={(value) => {
+                onValueChange('userId', recordIndex, value)
+              }}
+              onClear={() => {
+                onValueChange('userId', recordIndex, '')
+              }}
+              showSearch
+              allowClear
+            />
+          )
+        },
       },
       {
         title: 'จำนวนแอร์',
@@ -242,7 +272,14 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
         ),
       },
     ]
-  }, [renderCell, summary?.pricePerUnit, internetOptions, onValueChange, onDelete])
+  }, [
+    renderCell,
+    userOptions?.options,
+    onValueChange,
+    summary?.pricePerUnit,
+    internetOptions,
+    onDelete,
+  ])
 
   return (
     <Table
@@ -255,7 +292,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
           </Button>
         </Flex>
       )}
-      rowKey="id"
+      rowKey={(record, index) => `${record.userId}-${index}`}
       pagination={false}
       css={css`
         .ant-table-cell {
@@ -272,7 +309,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
           }
         }
       `}
-      dataSource={value}
+      dataSource={dataSource}
       tableLayout="fixed"
       summary={(d) => {
         if (!d?.length) return null

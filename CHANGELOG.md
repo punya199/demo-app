@@ -1,3 +1,10 @@
+## [1.1.64](https://github.com/punya199/test1/compare/v1.1.63...v1.1.64) (2025-07-31)
+
+
+### Fix
+
+* Enhance house rent management by integrating user options fetching and updating rendering logic to display user names in reports. Refactor interfaces to support new user option structure. ([690d56d](https://github.com/punya199/test1/commit/690d56da2c8551c8487a30915b30dd2dc365f8e7))
+
 ## [1.1.63](https://github.com/punya199/test1/compare/v1.1.62...v1.1.63) (2025-07-31)
 
 

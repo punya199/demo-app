@@ -2,14 +2,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, Divider, Modal, Table, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
 import { IoSearchCircleSharp } from 'react-icons/io5'
 import { MdDelete } from 'react-icons/md'
 import { TbEdit } from 'react-icons/tb'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { appPath } from '../../../config/app-paths'
-import { useGetMe } from '../../../service'
+import { useGetMe, UserRole } from '../../../service'
 import { apiClient } from '../../../utils/api-client'
+import { checkRole } from '../../../utils/helper'
 import { Friend } from './AddFriends'
 import { Item } from './AddItem'
 
@@ -30,7 +30,7 @@ type GetBillsResponse = {
 const PageAllBill = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const location = useLocation()
+
   const { data } = useQuery({
     queryKey: ['BillList'],
     queryFn: async () => {
@@ -48,36 +48,34 @@ const PageAllBill = () => {
     },
   })
   const { data: user } = useGetMe()
-  const isLoggedIn = useMemo(() => !!user?.user.id, [user?.user.id])
 
   const handleViewClick = (billId: number) => {
     navigate(appPath.checkBillPageSave({ param: { billId } }))
   }
   const handleEditClick = (billId: number) => {
-    if (isLoggedIn) {
+    if (checkRole(UserRole.ADMIN, user?.user.role)) {
       navigate(appPath.checkBillPageEdit({ param: { billId } }))
     } else {
       Modal.confirm({
-        title: 'คุณยังไม่ได้เข้าสู่ระบบ',
-        content: 'คุณต้องเข้าสู่ระบบก่อนจึงจะแก้ไขได้ ',
-        cancelText: 'ไม่',
-        okText: 'ไปหน้าเข้าสู่ระบบ',
+        title: 'คุณไม่มีสิทธ์แก้ไขรายการ',
+        content: 'คุณต้องขอสิทธ์จึงจะแก้ไขได้ ',
+        cancelButtonProps: { style: { display: 'none' } },
+        okText: 'ok',
 
         icon: null,
-        onOk: () => {
-          navigate(appPath.login(), {
-            state: { redirect: location.pathname },
-          })
-        },
+        // onOk: () => {
+        //   navigate(appPath.login(), {
+        //     state: { redirect: location.pathname },
+        //   })
+        // },
       })
     }
   }
 
   const handleDeleteClick = (billId: number) => {
-    if (isLoggedIn) {
+    if (checkRole(UserRole.SUPER_ADMIN, user?.user.role)) {
       Modal.confirm({
         title: 'คุณต้องการจะลบใช่หรือไม่ ?',
-
         okText: 'ลบ',
         cancelText: 'ไม่ลบ',
         okType: 'danger',
@@ -88,17 +86,17 @@ const PageAllBill = () => {
       })
     } else {
       Modal.confirm({
-        title: 'ยังไม่ได้เข้าสู่ระบบ',
-        content: 'คุณต้องเข้าสู่ระบบก่อนจึงจะลบได้ ',
-        cancelText: 'ไม่',
-        okText: 'ไปหน้าเข้าสู่ระบบ',
+        title: 'คุณไม่มีสิทธ์ลบรายการ',
+        content: 'คุณต้องขอสิทธ์จึงจะลบได้ ',
+        cancelButtonProps: { style: { display: 'none' } },
+        okText: 'ok',
 
         icon: null,
-        onOk: () => {
-          navigate(appPath.login(), {
-            state: { redirect: location.pathname },
-          })
-        },
+        // onOk: () => {
+        //   navigate(appPath.login(), {
+        //     state: { redirect: location.pathname },
+        //   })
+        // },
       })
     }
   }

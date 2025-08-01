@@ -6,6 +6,8 @@ import './App.css'
 import { appConfig } from './config/app-config'
 import { appPath } from './config/app-paths'
 import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
+import PageManageUser from './pages/PageManageUser'
+import PageRegister from './pages/PageRegister'
 
 const Pnotfound = lazy(() => import('./layouts/Pnotfound'))
 const RootLayout = lazy(() => import('./layouts/RootLayout'))
@@ -70,6 +72,10 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
+        path: appPath.register(),
+        element: <PageRegister />,
+      },
+      {
         path: appPath.checkBillPageSave(),
         element: <PageSaveBillToImage />,
       },
@@ -88,6 +94,10 @@ const router = createBrowserRouter([
       {
         path: appPath.houseRent(),
         element: <PageHouseRent />,
+      },
+      {
+        path: appPath.manageUser(),
+        element: <PageManageUser />,
       },
     ],
   },

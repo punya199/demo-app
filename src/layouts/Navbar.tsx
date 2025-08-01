@@ -3,9 +3,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Button, Drawer, Dropdown, Menu, Space, Typography } from 'antd'
 import { motion } from 'framer-motion'
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { appPath } from '../config/app-paths'
 import { useGetMe, UserRole } from '../service'
+import { checkRole } from '../utils/helper'
 const { Title } = Typography
 
 interface IMenuItemData {
@@ -30,9 +31,14 @@ const menuItemsMap: Record<string, IMenuItemData> = {
     name: 'House Rent',
     path: appPath.houseRent(),
   },
+  manageUser: {
+    name: 'Manage User',
+    path: appPath.manageUser(),
+  },
 }
 
 const Navbar = () => {
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const { data: user } = useGetMe()
   const isLoggedIn = !!user?.user.id
@@ -45,21 +51,23 @@ const Navbar = () => {
     queryClient.resetQueries()
   }
 
-  const menuItemsDesktop = useMemo((): IMenuItemData[] => {
-    const defaultItems = [menuItemsMap.randomCard, menuItemsMap.omamaGame, menuItemsMap.checkBill]
+  // const menuItemsDesktop = useMemo((): IMenuItemData[] => {
+  //   const defaultItems = [menuItemsMap.randomCard, menuItemsMap.omamaGame, menuItemsMap.checkBill]
 
-    if (user?.user.role === UserRole.ADMIN) {
-      defaultItems.push(menuItemsMap.houseRent)
-    }
+  //   if (user?.user.role === UserRole.ADMIN) {
+  //     defaultItems.push(menuItemsMap.houseRent)
+  //     defaultItems.push(menuItemsMap.manageUser)
+  //   }
 
-    return defaultItems
-  }, [user?.user.role])
+  //   return defaultItems
+  // }, [user?.user.role])
 
   const menuItemsMobile: IMenuItemData[] = useMemo((): IMenuItemData[] => {
     const defaultItems = [menuItemsMap.randomCard, menuItemsMap.omamaGame, menuItemsMap.checkBill]
 
-    if (user?.user.role === UserRole.ADMIN) {
+    if (checkRole(UserRole.ADMIN, user?.user.role)) {
       defaultItems.push(menuItemsMap.houseRent)
+      defaultItems.push(menuItemsMap.manageUser)
     }
 
     return defaultItems
@@ -67,7 +75,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 shadow-lg">
-      <div className="flex items-center justify-between">
+      <div className="grid grid-cols-2 md:grid-cols-3">
         {/* Left: Logo */}
         <Link to={appPath.home()}>
           <motion.div whileHover={{ scale: 1.1 }}>
@@ -76,22 +84,31 @@ const Navbar = () => {
             </Title>
           </motion.div>
         </Link>
-        <div className="hidden md:block">
+        <div className="hidden items-center justify-center md:flex">
           <Dropdown
             menu={{
-              items: menuItemsDesktop.map((item) => ({
-                label: <Link to={item.path}>{item.name}</Link>,
-                key: item.name,
-              })),
+              items: [
+                {
+                  label: 'RandomCard',
+                  key: 'randomCard',
+                  onClick: () => navigate(appPath.randomCard()),
+                },
+                {
+                  label: 'Game Omama',
+                  key: 'omamaGame',
+                  onClick: () => navigate(appPath.omamaGame()),
+                },
+              ],
             }}
           >
             <a onClick={(e) => e.preventDefault()}>
               <Button className="text-blue-500 hover:text-blue-700">Game</Button>
             </a>
           </Dropdown>
+          <Button onClick={() => navigate(appPath.checkBillPage())}>Check Bill</Button>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-end gap-4">
           {isLoggedIn && user.user.username}
           <div className="hidden items-center gap-2 lg:flex">
             {isLoggedIn ? (
@@ -136,7 +153,7 @@ const Navbar = () => {
         onClose={onClose}
         open={open}
         width={300} // Reduced width for the Drawer
-        classNames={{ body: 'p-0' }}
+        // className="!hidden md:block" // Hide on md screens
       >
         <Menu mode="vertical" selectable={false}>
           {menuItemsMobile.map((item) => (

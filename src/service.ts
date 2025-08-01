@@ -3,7 +3,9 @@ import { apiClient } from './utils/api-client'
 export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',
+  SUPER_ADMIN = 'super_admin',
 }
+export const roleLevels: UserRole[] = [UserRole.USER, UserRole.ADMIN, UserRole.SUPER_ADMIN]
 
 interface GetMeResponse {
   user: {

@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/punya199/test1/compare/v1.2.2...v1.2.3) (2025-08-01)
+
+
+### Fix
+
+* Add user management and registration pages, enhance routing with new paths for user registration and management, and implement role-based access control in Navbar and PageAllBill components. Refactor helper functions for role checking. ([4502a4e](https://github.com/punya199/test1/commit/4502a4e78fb7a643b4ee62d2359fe6aafc33ca55))
+
 ## [1.2.2](https://github.com/punya199/test1/compare/v1.2.1...v1.2.2) (2025-07-31)
 
 

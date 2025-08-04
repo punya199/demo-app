@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/punya199/test1/compare/v1.2.3...v1.2.4) (2025-08-04)
+
+
+### Fix
+
+* Consolidate card game logic into new CardGame component, migrate card data to a dedicated file, and update routing for Omama game. Remove obsolete project files and enhance Tailwind CSS configuration for cleaner styling. ([2a024bb](https://github.com/punya199/test1/commit/2a024bba76668edb57ce6042e08190aafdd6b087))
+
 ## [1.2.3](https://github.com/punya199/test1/compare/v1.2.2...v1.2.3) (2025-08-01)
 
 

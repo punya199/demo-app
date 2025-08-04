@@ -1,7 +1,7 @@
 import { generatePath } from '../utils/generate-path'
 
 export const appPath = {
-  home: generatePath('/home'),
+  home: generatePath('/'),
   randomCard: generatePath('/random-card'),
   omamaGame: generatePath('/omama'),
   checkBillPage: generatePath('/check-bill'),

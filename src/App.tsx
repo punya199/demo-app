@@ -9,17 +9,19 @@ import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
 import PageManageUser from './pages/PageManageUser'
 import PageRegister from './pages/PageRegister'
 
+import CardGame from './pages/project/random-card/CardGame'
+
 const Pnotfound = lazy(() => import('./layouts/Pnotfound'))
 const RootLayout = lazy(() => import('./layouts/RootLayout'))
 
 const Home = lazy(() => import('./pages/Home'))
 const Login = lazy(() => import('./pages/Login'))
-const CardGame = lazy(() => import('./pages/project/project5/CardGame'))
-const Omama = lazy(() => import('./pages/project/project6/Omama'))
-const PageAllBill = lazy(() => import('./pages/project/project8/PageAllBill'))
-const PageCreateBill = lazy(() => import('./pages/project/project8/PageCreateBill'))
-const PageEditBill = lazy(() => import('./pages/project/project8/PageEditBill'))
-const PageSaveBillToImage = lazy(() => import('./pages/project/project8/PageSaveBillToImage'))
+
+const PageOmama = lazy(() => import('./pages/project/omama-game/PageOmama'))
+const PageAllBill = lazy(() => import('./pages/project/checkbill/PageAllBill'))
+const PageCreateBill = lazy(() => import('./pages/project/checkbill/PageCreateBill'))
+const PageEditBill = lazy(() => import('./pages/project/checkbill/PageEditBill'))
+const PageSaveBillToImage = lazy(() => import('./pages/project/checkbill/PageSaveBillToImage'))
 
 const PageHouseRent = lazy(() =>
   import('./pages/house-rent/PageHouseRent').then((module) => ({ default: module.PageHouseRent }))
@@ -54,7 +56,7 @@ const router = createBrowserRouter([
         path: appPath.randomCard(),
         element: <CardGame />,
       },
-      { path: appPath.omamaGame(), element: <Omama /> },
+      { path: appPath.omamaGame(), element: <PageOmama /> },
       {
         path: appPath.checkBillPageCreate(),
         element: <PageCreateBill />,
@@ -118,7 +120,13 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       {appConfig().VITE_IS_DEVELOPMENT && <ScreenSizeIndicator />}
-      <ConfigProvider>
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: '#2563EB',
+          },
+        }}
+      >
         <RouterProvider router={router} />
       </ConfigProvider>
     </QueryClientProvider>

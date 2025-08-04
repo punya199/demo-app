@@ -153,6 +153,7 @@ const Navbar = () => {
         onClose={onClose}
         open={open}
         width={300} // Reduced width for the Drawer
+
         // className="!hidden md:block" // Hide on md screens
       >
         <Menu mode="vertical" selectable={false}>
@@ -163,7 +164,7 @@ const Navbar = () => {
           ))}
         </Menu>
 
-        <div className="p-4">
+        <div className="p-3">
           <Space direction="vertical" size="middle" className="w-full">
             {isLoggedIn ? (
               <Button

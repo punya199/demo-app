@@ -54,7 +54,7 @@ const Login = () => {
   )
 
   return (
-    <div className="login-container flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-300 to-purple-400">
+    <div className="login-container flex min-h-screen items-center justify-center bg-gradient-to-r from-cyan-500 to-blue-500">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
         <h2 className="mb-6 text-center text-3xl font-bold text-gray-800">Welcome Back!</h2>
         <Form name="login" onFinish={onFinish} layout="vertical">

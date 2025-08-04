@@ -166,35 +166,37 @@ const PageAllBill = () => {
   ]
 
   return (
-    <div className="mx-1 mt-4 flex flex-col gap-4">
-      <Typography.Title level={3} className="!text-center text-blue-700 drop-shadow-md">
-        แบ่งบิลเพื่อนแบบกำหนดเอง
-      </Typography.Title>
+    <div className="mt-2 flex justify-center">
+      <div className="m-2 w-full rounded-3xl bg-gradient-to-br from-blue-100 via-white to-blue-200 p-4 shadow-2xl md:max-w-2xl">
+        <Typography.Title level={3} className="!text-center text-blue-700 drop-shadow-md">
+          แบ่งบิลเพื่อนแบบกำหนดเอง
+        </Typography.Title>
 
-      <div>
-        <Link to={appPath.checkBillPageCreate()} className="flex-1">
-          <Button
-            type="primary"
-            className="w-full rounded-lg bg-blue-300 !py-5 !text-xl text-white hover:bg-blue-400"
-          >
-            สร้างบิลใหม่
-          </Button>
-        </Link>
-      </div>
+        <div>
+          <Link to={appPath.checkBillPageCreate()} className="flex-1">
+            <Button
+              type="primary"
+              className="w-full rounded-lg !py-5 !text-lg text-white hover:bg-blue-400"
+            >
+              สร้างบิลใหม่
+            </Button>
+          </Link>
+        </div>
 
-      <Divider className="text-center text-lg font-semibold">รายการที่เคยสร้าง</Divider>
+        <Divider className="text-center text-lg font-semibold">รายการที่เคยสร้าง</Divider>
 
-      {/* ห่อ Table ด้วย div overflow-x-auto เพื่อให้ scroll แนวนอน */}
-      <div className="overflow-x-auto">
-        <Table
-          rowKey="id"
-          columns={columns}
-          dataSource={data?.bills || []}
-          pagination={false}
-          className="rounded-xl shadow"
-          scroll={{ x: 'max-content' }} // เปิด scroll แนวนอนอัตโนมัติเมื่อเกินขนาดหน้าจอ
-          tableLayout="fixed"
-        />
+        {/* ห่อ Table ด้วย div overflow-x-auto เพื่อให้ scroll แนวนอน */}
+        <div className="overflow-x-auto">
+          <Table
+            rowKey="id"
+            columns={columns}
+            dataSource={data?.bills || []}
+            pagination={false}
+            className="rounded-xl shadow"
+            scroll={{ x: 'max-content' }} // เปิด scroll แนวนอนอัตโนมัติเมื่อเกินขนาดหน้าจอ
+            tableLayout="fixed"
+          />
+        </div>
       </div>
     </div>
   )

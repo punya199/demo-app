@@ -138,7 +138,7 @@ const PageSaveBillToImage = () => {
       {/* Header */}
       <div ref={(el) => (containerRefs.current['billList'] = el)} className="mb-6 bg-white">
         <div className="mb-1 border-b pb-3 text-center">
-          <h1 className="text-2xl font-extrabold break-words text-blue-700">{data?.bill.title}</h1>
+          <h1 className="text-2xl !font-extrabold break-words text-blue-700">{data?.bill.title}</h1>
           <div className="mt-1 text-sm text-gray-600">
             ยอดที่จ่ายทั้งหมด{' '}
             <span className="font-bold text-black">
@@ -155,7 +155,7 @@ const PageSaveBillToImage = () => {
             return (
               <div
                 key={friend.id}
-                className="rounded-xl border border-green-300 bg-green-50 p-4 shadow-sm"
+                className="bg-green-30 rounded-xl border border-green-300 p-4 shadow-sm"
               >
                 <div className="mb-2 font-semibold text-green-800">
                   {friend.name} จ่าย {paidItems.length} รายการ

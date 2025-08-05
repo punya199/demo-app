@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/punya199/test1/compare/v1.2.4...v1.2.5) (2025-08-05)
+
+
+### Fix
+
+* Add @ant-design/icons dependency, implement EditCardTitle component for card title editing, and refactor AddPlayerOmama for improved player management. Update Omama game logic to utilize new state management and improve user experience. ([b44bf26](https://github.com/punya199/test1/commit/b44bf26e87eb6a2902823a4044c253f41fbec0e7))
+
 ## [1.2.4](https://github.com/punya199/test1/compare/v1.2.3...v1.2.4) (2025-08-04)
 
 

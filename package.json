@@ -16,6 +16,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@ant-design/icons": "5.x",
     "@braintree/sanitize-url": "^7.1.1",
     "@emotion/babel-plugin": "^11.13.5",
     "@emotion/react": "^11.14.0",

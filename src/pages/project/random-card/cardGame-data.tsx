@@ -51,86 +51,100 @@ import spades_J from '../../../assets/images/cards/spades_J.webp?inline'
 import spades_K from '../../../assets/images/cards/spades_K.webp?inline'
 import spades_Q from '../../../assets/images/cards/spades_Q.webp?inline'
 
+type ICardDataType = 'spades' | 'hearts' | 'diamonds' | 'clubs'
+export type INameDataType =
+  | 'A'
+  | '2'
+  | '3'
+  | '4'
+  | '5'
+  | '6'
+  | '7'
+  | '8'
+  | '9'
+  | '10'
+  | 'J'
+  | 'Q'
+  | 'K'
+
 export interface ICardData {
-  name: string
+  name: INameDataType
+  type: ICardDataType
   image: string
-  title?: string
 }
 
 export const cardDeck: ICardData[] = [
-  { name: 'Ahearts', image: hearts_A, title: 'กินคนเดียว' },
-  { name: '2hearts', image: hearts_2, title: 'หาเพื่อนกินด้วย 1 คน' },
-  { name: '3hearts', image: hearts_3, title: 'หาเพื่อนกินด้วย 2 คน' },
-  { name: '4hearts', image: hearts_4, title: 'คนขวากิน' },
-  { name: '5hearts', image: hearts_5, title: 'กินทุกคน' },
-  { name: '6hearts', image: hearts_6, title: 'คนซ้ายกิน' },
-  { name: '7hearts', image: hearts_7, title: 'เลือก 1 คนมาดวลเกมกัน คนแพ้กิน คนจับคิดเกม' },
-  { name: '8hearts', image: hearts_8, title: 'พักผ่อน' },
-  { name: '9hearts', image: hearts_9, title: 'เล่นเกมกันทั้งวง คนจับคิดเกม' },
-  { name: '10hearts', image: hearts_10, title: 'ทาแป้งให้หน้าขาว' },
-  {
-    name: 'Jhearts',
-    image: hearts_J,
-    title: 'จับหน้า ใครจับตามช้าสุดหรือผิดกิน ต่อ1การจั่วของใครก็ได้',
-  },
-  { name: 'Qhearts', image: hearts_Q, title: 'เพื่อนห้ามตอบคนที่จับได้ไพ่ใบนี้ ใครตอบมีเสียงกิน' },
-  { name: 'Khearts', image: hearts_K, title: 'สั่งใครกินก็ได้ ตามจำนวน ไพ่ K ที่ออกไปแล้ว' },
+  { name: 'A', type: 'hearts', image: hearts_A },
+  { name: '2', type: 'hearts', image: hearts_2 },
+  { name: '3', type: 'hearts', image: hearts_3 },
+  { name: '4', type: 'hearts', image: hearts_4 },
+  { name: '5', type: 'hearts', image: hearts_5 },
+  { name: '6', type: 'hearts', image: hearts_6 },
+  { name: '7', type: 'hearts', image: hearts_7 },
+  { name: '8', type: 'hearts', image: hearts_8 },
+  { name: '9', type: 'hearts', image: hearts_9 },
+  { name: '10', type: 'hearts', image: hearts_10 },
+  { name: 'J', type: 'hearts', image: hearts_J },
+  { name: 'Q', type: 'hearts', image: hearts_Q },
+  { name: 'K', type: 'hearts', image: hearts_K },
 
-  { name: 'Aclubs', image: clubs_A, title: 'กินคนเดียว' },
-  { name: '2clubs', image: clubs_2, title: 'หาเพื่อนกินด้วย 1 คน' },
-  { name: '3clubs', image: clubs_3, title: 'หาเพื่อนกินด้วย 2 คน' },
-  { name: '4clubs', image: clubs_4, title: 'คนขวากิน' },
-  { name: '5clubs', image: clubs_5, title: 'กินทุกคน' },
-  { name: '6clubs', image: clubs_6, title: 'คนซ้ายกิน' },
-  { name: '7clubs', image: clubs_7, title: 'เลือก 1 คนมาดวลเกมกัน คนแพ้กิน คนจับคิดเกม' },
-  { name: '8clubs', image: clubs_8, title: 'พักผ่อน' },
-  { name: '9clubs', image: clubs_9, title: 'เล่นเกมกันทั้งวง คนจับคิดเกม' },
-  { name: '10clubs', image: clubs_10, title: 'ทาแป้งให้หน้าขาว' },
-  {
-    name: 'Jclubs',
-    image: clubs_J,
-    title: 'จับหน้า ใครจับตามช้าสุดหรือผิดกิน ต่อ1การจั่วของใครก็ได้',
-  },
-  { name: 'Qclubs', image: clubs_Q, title: 'เพื่อนห้ามตอบคนที่จับได้ไพ่ใบนี้ ใครตอบมีเสียงกิน' },
-  { name: 'Kclubs', image: clubs_K, title: 'สั่งใครกินก็ได้ ตามจำนวน ไพ่ K ที่ออกไปแล้ว' },
+  { name: 'A', type: 'clubs', image: clubs_A },
+  { name: '2', type: 'clubs', image: clubs_2 },
+  { name: '3', type: 'clubs', image: clubs_3 },
+  { name: '4', type: 'clubs', image: clubs_4 },
+  { name: '5', type: 'clubs', image: clubs_5 },
+  { name: '6', type: 'clubs', image: clubs_6 },
+  { name: '7', type: 'clubs', image: clubs_7 },
+  { name: '8', type: 'clubs', image: clubs_8 },
+  { name: '9', type: 'clubs', image: clubs_9 },
+  { name: '10', type: 'clubs', image: clubs_10 },
+  { name: 'J', type: 'clubs', image: clubs_J },
+  { name: 'Q', type: 'clubs', image: clubs_Q },
+  { name: 'K', type: 'clubs', image: clubs_K },
 
-  { name: 'Aspades', image: spades_A, title: 'กินคนเดียว' },
-  { name: '2spades', image: spades_2, title: 'หาเพื่อนกินด้วย 1 คน' },
-  { name: '3spades', image: spades_3, title: 'หาเพื่อนกินด้วย 2 คน' },
-  { name: '4spades', image: spades_4, title: 'คนขวากิน' },
-  { name: '5spades', image: spades_5, title: 'กินทุกคน' },
-  { name: '6spades', image: spades_6, title: 'คนซ้ายกิน' },
-  { name: '7spades', image: spades_7, title: 'เลือก 1 คนมาดวลเกมกัน คนแพ้กิน คนจับคิดเกม' },
-  { name: '8spades', image: spades_8, title: 'พักผ่อน' },
-  { name: '9spades', image: spades_9, title: 'เล่นเกมกันทั้งวง คนจับคิดเกม' },
-  { name: '10spades', image: spades_10, title: 'ทาแป้งให้หน้าขาว' },
-  {
-    name: 'Jspades',
-    image: spades_J,
-    title: 'จับหน้า ใครจับตามช้าสุดหรือผิดกิน ต่อ1การจั่วของใครก็ได้',
-  },
-  { name: 'Qspades', image: spades_Q, title: 'เพื่อนห้ามตอบคนที่จับได้ไพ่ใบนี้ ใครตอบมีเสียงกิน' },
-  { name: 'Kspades', image: spades_K, title: 'สั่งใครกินก็ได้ ตามจำนวน ไพ่ K ที่ออกไปแล้ว' },
+  { name: 'A', type: 'spades', image: spades_A },
+  { name: '2', type: 'spades', image: spades_2 },
+  { name: '3', type: 'spades', image: spades_3 },
+  { name: '4', type: 'spades', image: spades_4 },
+  { name: '5', type: 'spades', image: spades_5 },
+  { name: '6', type: 'spades', image: spades_6 },
+  { name: '7', type: 'spades', image: spades_7 },
+  { name: '8', type: 'spades', image: spades_8 },
+  { name: '9', type: 'spades', image: spades_9 },
+  { name: '10', type: 'spades', image: spades_10 },
+  { name: 'J', type: 'spades', image: spades_J },
+  { name: 'Q', type: 'spades', image: spades_Q },
+  { name: 'K', type: 'spades', image: spades_K },
 
-  { name: 'Adiamonds', image: diamonds_A, title: 'กินคนเดียว' },
-  { name: '2diamonds', image: diamonds_2, title: 'หาเพื่อนกินด้วย 1 คน' },
-  { name: '3diamonds', image: diamonds_3, title: 'หาเพื่อนกินด้วย 2 คน' },
-  { name: '4diamonds', image: diamonds_4, title: 'คนขวากิน' },
-  { name: '5diamonds', image: diamonds_5, title: 'กินทุกคน' },
-  { name: '6diamonds', image: diamonds_6, title: 'คนซ้ายกิน' },
-  { name: '7diamonds', image: diamonds_7, title: 'เลือก 1 คนมาดวลเกมกัน คนแพ้กิน คนจับคิดเกม' },
-  { name: '8diamonds', image: diamonds_8, title: 'พักผ่อน' },
-  { name: '9diamonds', image: diamonds_9, title: 'เล่นเกมกันทั้งวง คนจับคิดเกม' },
-  { name: '10diamonds', image: diamonds_10, title: 'ทาแป้งให้หน้าขาว' },
-  {
-    name: 'Jdiamonds',
-    image: diamonds_J,
-    title: 'จับหน้า ใครจับตามช้าสุดหรือผิดกิน ต่อ1การจั่วของใครก็ได้',
-  },
-  {
-    name: 'Qdiamonds',
-    image: diamonds_Q,
-    title: 'เพื่อนห้ามตอบคนที่จับได้ไพ่ใบนี้ ใครตอบมีเสียงกิน',
-  },
-  { name: 'Kdiamonds', image: diamonds_K, title: 'สั่งใครกินก็ได้ ตามจำนวน ไพ่ K ที่ออกไปแล้ว' },
+  { name: 'A', type: 'diamonds', image: diamonds_A },
+  { name: '2', type: 'diamonds', image: diamonds_2 },
+  { name: '3', type: 'diamonds', image: diamonds_3 },
+  { name: '4', type: 'diamonds', image: diamonds_4 },
+  { name: '5', type: 'diamonds', image: diamonds_5 },
+  { name: '6', type: 'diamonds', image: diamonds_6 },
+  { name: '7', type: 'diamonds', image: diamonds_7 },
+  { name: '8', type: 'diamonds', image: diamonds_8 },
+  { name: '9', type: 'diamonds', image: diamonds_9 },
+  { name: '10', type: 'diamonds', image: diamonds_10 },
+  { name: 'J', type: 'diamonds', image: diamonds_J },
+  { name: 'Q', type: 'diamonds', image: diamonds_Q },
+  { name: 'K', type: 'diamonds', image: diamonds_K },
 ]
+
+export type ICardTitleData = Record<INameDataType, string>
+
+export const cardTitleData: ICardTitleData = {
+  A: 'กินคนเดียว',
+  '2': 'หาเพื่อนกินด้วย 1 คน',
+  '3': 'หาเพื่อนกินด้วย 2 คน',
+  '4': 'คนขวากิน',
+  '5': 'กินทุกคน',
+  '6': 'คนซ้ายกิน',
+  '7': 'เลือก 1 คนมาดวลเกมกัน คนแพ้กิน คนจับคิดเกม',
+  '8': 'พักผ่อน',
+  '9': 'เล่นเกมกันทั้งวง คนจับคิดเกม',
+  '10': 'ทาแป้งให้หน้าขาว',
+  J: 'จับหน้า ใครจับตามช้าสุดหรือผิดกิน ต่อ1การจั่วของใครก็ได้',
+  Q: 'เพื่อนห้ามตอบคนที่จับได้ไพ่ใบนี้ ใครตอบมีเสียงกิน',
+  K: 'สั่งใครกินก็ได้ ตามจำนวน ไพ่ K ที่ออกไปแล้ว',
+}

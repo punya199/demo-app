@@ -72,7 +72,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ant-design/icons@npm:^5.6.1":
+"@ant-design/icons@npm:5.x, @ant-design/icons@npm:^5.6.1":
   version: 5.6.1
   resolution: "@ant-design/icons@npm:5.6.1"
   dependencies:
@@ -9123,6 +9123,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "test1@workspace:."
   dependencies:
+    "@ant-design/icons": "npm:5.x"
     "@braintree/sanitize-url": "npm:^7.1.1"
     "@emotion/babel-plugin": "npm:^11.13.5"
     "@emotion/react": "npm:^11.14.0"

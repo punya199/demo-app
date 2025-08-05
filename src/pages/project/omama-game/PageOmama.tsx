@@ -1,9 +1,9 @@
 import { Button } from 'antd'
-import { chunk, shuffle } from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 
-import { cardDeck, ICardData } from '../random-card/cardGame-data'
+import { cardTitleData, ICardTitleData, INameDataType } from '../random-card/cardGame-data'
 import AddPlayerOmama from './AddPlayerOmama'
+import EditCardTitle from './EditCardTitle'
 import Omama from './Omama'
 
 export interface SpecialCardOwner {
@@ -12,23 +12,11 @@ export interface SpecialCardOwner {
   J: number | null
 }
 
-const spiteCardNumber = 18
 const PageOmama = () => {
-  const [isAddingPlayer, setIsAddingPlayer] = useState(true)
-  const [cardlist, setCardlist] = useState<ICardData[][]>([])
-  const [currentCard, setCurrentCard] = useState<ICardData | null>(null)
-  const [userNameList, setUserNameList] = useState<string[]>([])
+  const [isAddingPlayer, setIsAddingPlayer] = useState(1)
   const [nameIndex, setNameIndex] = useState(0)
-  const [specialCardOwner, setSpecialCardOwner] = useState<SpecialCardOwner>({
-    K: null,
-    Q: null,
-    J: null,
-  })
-  const nextName = useCallback(() => {
-    if (userNameList.length === 0) return
-    const nextIndex = (nameIndex + 1) % userNameList.length
-    setNameIndex(nextIndex)
-  }, [nameIndex, userNameList.length])
+  const [userNameList, setUserNameList] = useState<string[]>([])
+  const [cardTitle, setCardTitle] = useState<Record<INameDataType, string>>(cardTitleData)
 
   const addUserName = useCallback(
     (name: string) => {
@@ -50,76 +38,64 @@ const PageOmama = () => {
       return newList
     })
   }
+  const onChange = (dataTitle: ICardTitleData) => {
+    setCardTitle(dataTitle)
+  }
+  const upperIndexName = (index: number) => {
+    const listName = [...userNameList]
+    const up = listName[index]
+    listName[index] = listName[index - 1]
+    listName[index - 1] = up
+    setUserNameList(listName)
+  }
 
-  const onRandom = useCallback(() => {
-    const a = shuffle(cardDeck)
-    const b = chunk(a, spiteCardNumber)
-    setCardlist(b)
-    setCurrentCard(null)
-    setSpecialCardOwner({ K: null, Q: null, J: null })
-    setNameIndex(0)
-    const randomIndex = Math.floor(Math.random() * userNameList.length)
-    setNameIndex(randomIndex)
-  }, [userNameList.length])
-
-  useEffect(() => {
-    onRandom()
-  }, [onRandom])
-
-  const onClickCard = useCallback(
-    (index: number) => {
-      const subDeck = [...cardlist[index]]
-      if (subDeck.length === 0) return
-      const card = subDeck[0]
-      const newCardList = [...cardlist]
-      newCardList[index] = subDeck.slice(1)
-      setCardlist(newCardList)
-      setCurrentCard(card)
-      nextName()
-      if (card.name.startsWith('K')) {
-        setSpecialCardOwner((prev) => ({ ...prev, K: nameIndex }))
-      }
-      if (card.name.startsWith('Q')) {
-        setSpecialCardOwner((prev) => ({ ...prev, Q: nameIndex }))
-      }
-      if (card.name.startsWith('J')) {
-        setSpecialCardOwner((prev) => ({ ...prev, J: nameIndex }))
-      }
-    },
-    [cardlist, nameIndex, nextName]
-  )
-  // const randomIndex = useCallback(() => {
-  //   const randomIndex = Math.floor(Math.random() * userNameList.length)
-  //   setNameIndex(randomIndex)
-  // }, [userNameList.length])
+  const downIndexName = (index: number) => {
+    const listName = [...userNameList]
+    const up = listName[index]
+    listName[index] = listName[index + 1]
+    listName[index + 1] = up
+    setUserNameList(listName)
+  }
 
   return (
     <div className="flex max-w-5xl flex-col gap-2 p-4">
-      {/* Input + Add Name */}
-      <div className="rounded-2xl bg-blue-400 px-4 py-2 text-2xl font-bold">Game Omama</div>
-      <div className="flex items-center justify-center gap-4 md:flex-row">
-        <Button type="primary" className="!h-9" onClick={() => setIsAddingPlayer((prev) => !prev)}>
-          {isAddingPlayer ? 'เริ่มเกม' : 'เพิ่มชื่อหรือแก้ไขชื่อผู้เล่น'}
-        </Button>
+      <div className="rounded-2xl bg-blue-400 px-4 py-2 text-center text-2xl font-bold">
+        Game Omama
       </div>
-
-      {isAddingPlayer ? (
+      <div className="flex items-center justify-between md:flex-row">
+        <Button type="primary" className="!h-9" onClick={() => setIsAddingPlayer(1)}>
+          เพิ่มชื่อหรือแก้ไขชื่อผู้เล่น
+        </Button>
+        {userNameList.length !== 0 && (
+          <Button type="primary" className="!h-9" onClick={() => setIsAddingPlayer(2)}>
+            เริ่มเกม
+          </Button>
+        )}
+        {userNameList.length !== 0 && (
+          <Button type="primary" className="!h-9" onClick={() => setIsAddingPlayer(3)}>
+            แก้ไขกฎ
+          </Button>
+        )}
+      </div>
+      {isAddingPlayer === 1 && (
         <AddPlayerOmama
           userNameList={userNameList}
           addUserName={addUserName}
           removeUserName={removeUserName}
-        />
-      ) : (
-        <Omama
-          cardlist={cardlist}
-          nameIndex={nameIndex}
-          onClickCard={onClickCard}
-          onRandom={onRandom}
-          currentCard={currentCard}
-          specialCardOwner={specialCardOwner}
-          userNameList={userNameList}
+          upperIndexName={upperIndexName}
+          downIndexName={downIndexName}
         />
       )}
+
+      {isAddingPlayer === 2 && (
+        <Omama
+          userNameList={userNameList}
+          nameIndex={nameIndex}
+          setNameIndex={setNameIndex}
+          cardTitle={cardTitle}
+        />
+      )}
+      {isAddingPlayer === 3 && <EditCardTitle value={cardTitle} onChange={onChange} />}
     </div>
   )
 }

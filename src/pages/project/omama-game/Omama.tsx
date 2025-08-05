@@ -1,36 +1,107 @@
-import { Button } from 'antd'
+import { Button, Modal } from 'antd'
+import { chunk, shuffle } from 'lodash'
+import { useCallback, useEffect, useState } from 'react'
 import {
   default as black_dark,
   default as black_light,
 } from '../../../assets/images/cards/back_dark.webp'
-import { ICardData } from '../random-card/cardGame-data'
+import { cardDeck, ICardData, ICardTitleData } from '../random-card/cardGame-data'
 import { SpecialCardOwner } from './PageOmama'
 
 interface OmamaProps {
-  cardlist: ICardData[][]
   userNameList: string[]
   nameIndex: number
-  specialCardOwner: SpecialCardOwner
-  currentCard: ICardData | null
-  onRandom: () => void
-  onClickCard: (index: number) => void
+  cardTitle: ICardTitleData
+  setNameIndex: (index: number) => void
 }
+
 const Omama = (props: OmamaProps) => {
+  const [cardlist, setCardlist] = useState<ICardData[][]>([])
+  const [isInitial, setIsInitial] = useState(false)
+  const [specialCardOwner, setSpecialCardOwner] = useState<SpecialCardOwner>({
+    K: null,
+    Q: null,
+    J: null,
+  })
+  const spiteCardNumber = 18
+
+  const onRandom = useCallback(() => {
+    const a = shuffle(cardDeck)
+    const b = chunk(a, spiteCardNumber)
+    setCardlist(b)
+    setSpecialCardOwner({ K: null, Q: null, J: null })
+    props.setNameIndex(0)
+    const randomIndex = Math.floor(Math.random() * props.userNameList.length)
+    props.setNameIndex(randomIndex)
+  }, [props])
+
+  useEffect(() => {
+    if (!isInitial) {
+      onRandom()
+      setIsInitial(true)
+    }
+  }, [isInitial, onRandom])
+
+  const nextName = useCallback(() => {
+    if (props.userNameList.length === 0) return
+    const nextIndex = (props.nameIndex + 1) % props.userNameList.length
+    props.setNameIndex(nextIndex)
+  }, [props])
+
+  const onClickCard = useCallback(
+    (index: number) => {
+      const subDeck = [...cardlist[index]]
+      if (subDeck.length === 0) return
+      const card = subDeck[0]
+      const newCardList = [...cardlist]
+      newCardList[index] = subDeck.slice(1)
+      setCardlist(newCardList)
+      nextName()
+      if (card.name.startsWith('K')) {
+        setSpecialCardOwner((prev) => ({ ...prev, K: props.nameIndex }))
+      }
+      if (card.name.startsWith('Q')) {
+        setSpecialCardOwner((prev) => ({ ...prev, Q: props.nameIndex }))
+      }
+      if (card.name.startsWith('J')) {
+        setSpecialCardOwner((prev) => ({ ...prev, J: props.nameIndex }))
+      }
+      Modal.info({
+        title: (
+          <div className="mb-5 text-center text-2xl">
+            {props.userNameList[props.nameIndex]} ได้ไพ่
+          </div>
+        ),
+
+        content: (
+          <div className="flex flex-col items-center gap-2">
+            <img src={card.image} alt={card.name} className="mx-auto w-40 drop-shadow-lg" />
+            <div className="text-xl">{props.cardTitle[card.name]}</div>
+          </div>
+        ),
+        okText: 'ok',
+        icon: null,
+        maskClosable: true,
+      })
+    },
+    [cardlist, nextName, props.cardTitle, props.nameIndex, props.userNameList]
+  )
+
   return (
     <div>
-      <div className="flex items-center justify-center gap-4">
-        <Button type="primary" onClick={props.onRandom}>
+      <div className="mb-2 flex items-center justify-center">
+        <Button type="primary" onClick={onRandom}>
           สุ่มไพ่ใหม่
         </Button>
-        <div className="flex w-80 items-center justify-center text-lg font-semibold text-gray-700">
-          ผู้เล่นที่ต้องจั่ว :{' '}
-          <span className="text-blue-700">{props.userNameList[props.nameIndex]}</span>
+        <div className="flex w-80 items-center justify-center gap-4 text-lg font-semibold text-gray-700">
+          <div>ผู้เล่นที่ต้องจั่ว</div>
+          <div className="text-blue-700">{props.userNameList[props.nameIndex]}</div>
         </div>
       </div>
 
       {/* Card Stack */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        {props.cardlist.map((e, index) => (
+        {cardlist.map((e, index) => (
           <div
             key={index}
             className={`flex flex-col items-center rounded-xl bg-white p-4 shadow-md transition hover:shadow-xl ${
@@ -38,7 +109,7 @@ const Omama = (props: OmamaProps) => {
             }`}
             onClick={() => {
               if (props.userNameList.length === 0) return
-              props.onClickCard(index)
+              onClickCard(index)
             }}
           >
             <img
@@ -52,25 +123,13 @@ const Omama = (props: OmamaProps) => {
         <div className="rounded-xl bg-white p-4 shadow-md transition hover:shadow-xl">
           <div className="mb-2 text-lg font-semibold">คนที่ได้ไพ่พิเศษ </div>
           <ul className="list-inside space-y-1 text-gray-700">
-            {Object.entries(props.specialCardOwner).map(([cardType, ownerIndex]) => (
+            {Object.entries(specialCardOwner).map(([cardType, ownerIndex]) => (
               <li key={cardType}>
                 {cardType} : {props.userNameList[ownerIndex] || 'ยังไม่มีคนได้'}
               </li>
             ))}
           </ul>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-xl bg-white p-6 text-center shadow">
-            <div className="mb-4 text-xl font-semibold text-gray-800">ไพ่ที่ได้</div>
-            <img
-              src={props.currentCard ? props.currentCard.image : black_light}
-              alt={props.currentCard?.name || 'back'}
-              className="mx-auto w-40 drop-shadow-lg"
-            />
-            <div className="mt-4 text-sm text-gray-600">
-              เหลือ {props.cardlist.flat().length} ใบ
-            </div>
-          </div>
+          <div className="mt-4 text-sm text-gray-600">เหลือ {cardlist.flat().length} ใบ</div>
         </div>
       </div>
     </div>

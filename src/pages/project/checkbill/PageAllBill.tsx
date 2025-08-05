@@ -63,11 +63,6 @@ const PageAllBill = () => {
         okText: 'ok',
 
         icon: null,
-        // onOk: () => {
-        //   navigate(appPath.login(), {
-        //     state: { redirect: location.pathname },
-        //   })
-        // },
       })
     }
   }
@@ -92,11 +87,6 @@ const PageAllBill = () => {
         okText: 'ok',
 
         icon: null,
-        // onOk: () => {
-        //   navigate(appPath.login(), {
-        //     state: { redirect: location.pathname },
-        //   })
-        // },
       })
     }
   }

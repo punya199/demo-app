@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, Form, Input } from 'antd'
 import { useCallback, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { TypingAnimation } from '../components/magicui/typing-animation'
 import { appPath } from '../config/app-paths'
 import { useGetMe } from '../service'
 import { apiClient } from '../utils/api-client'
@@ -56,10 +57,18 @@ const Login = () => {
   return (
     <div className="login-container flex min-h-screen items-center justify-center bg-gradient-to-r from-cyan-500 to-blue-500">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
-        <h2 className="mb-6 text-center text-3xl font-bold text-gray-800">Welcome Back!</h2>
+        <h2 className="mb-6 text-center text-3xl font-bold text-gray-800">
+          <TypingAnimation className="text-3xl">Welcome Back!</TypingAnimation>
+        </h2>
         <Form name="login" onFinish={onFinish} layout="vertical">
           <Form.Item
-            label={<span className="text-lg font-semibold text-gray-700">Username</span>}
+            label={
+              <span className="text-lg font-semibold text-gray-700">
+                <TypingAnimation className="text-lg" delay={200}>
+                  Username
+                </TypingAnimation>
+              </span>
+            }
             name="username"
             rules={[{ required: true, message: 'Please input your username!' }]}
           >
@@ -67,7 +76,13 @@ const Login = () => {
           </Form.Item>
 
           <Form.Item
-            label={<span className="text-lg font-semibold text-gray-700">Password</span>}
+            label={
+              <span className="text-lg font-semibold text-gray-700">
+                <TypingAnimation className="text-lg" delay={400}>
+                  Password
+                </TypingAnimation>
+              </span>
+            }
             name="password"
             rules={[{ required: true, message: 'Please input your password!' }]}
           >
@@ -81,7 +96,9 @@ const Login = () => {
               loading={isPending}
               className="w-full rounded-md bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600"
             >
-              Login
+              <TypingAnimation className="text-base" delay={600}>
+                Login
+              </TypingAnimation>
             </Button>
           </Form.Item>
         </Form>
@@ -89,7 +106,9 @@ const Login = () => {
           onClick={() => navigate(appPath.register())}
           className="w-full rounded-md bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600"
         >
-          Register
+          <TypingAnimation className="text-base" delay={1000}>
+            Register
+          </TypingAnimation>
         </Button>
       </div>
     </div>

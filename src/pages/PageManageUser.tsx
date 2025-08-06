@@ -64,16 +64,21 @@ const PageManageUser = () => {
       title: 'Username',
       dataIndex: 'username',
       key: 'username',
+      ellipsis: false,
     },
     {
-      title: 'role',
+      title: 'Role',
       dataIndex: 'role',
       key: 'role',
+      width: 140,
+      ellipsis: true,
     },
     {
       title: 'Action',
       dataIndex: 'action',
       key: 'action',
+      width: 100,
+      ellipsis: true,
       render: (_, record) => (
         <Button onClick={() => handleEditRole(record.id, record.role)}>Edit</Button>
       ),
@@ -81,7 +86,7 @@ const PageManageUser = () => {
   ]
   return (
     <div>
-      <Table dataSource={data?.users} columns={columns} />
+      <Table rowKey={(e: User) => e.id} dataSource={data?.users} columns={columns} />
     </div>
   )
 }

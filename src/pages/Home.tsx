@@ -1,12 +1,6 @@
-import { Button } from 'antd'
+import { FlickeringGrid } from '../components/magicui/flickering-grid'
 const Home = () => {
-  return (
-    <div className="flex h-screen flex-col items-center justify-center bg-gray-100">
-      <Button type="primary" className="!border-cyan-500 !bg-cyan-500 hover:!bg-cyan-600">
-        Hello
-      </Button>
-    </div>
-  )
+  return <FlickeringGrid />
 }
 
 export default Home

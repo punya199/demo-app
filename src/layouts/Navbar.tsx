@@ -1,41 +1,42 @@
 import { MenuOutlined } from '@ant-design/icons'
 import { useQueryClient } from '@tanstack/react-query'
-import { Button, Drawer, Dropdown, Menu, Space, Typography } from 'antd'
+import { Button, Drawer, Menu, MenuProps, Space } from 'antd'
 import { motion } from 'framer-motion'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { TypingAnimation } from '../components/magicui/typing-animation'
 import { appPath } from '../config/app-paths'
 import { useGetMe, UserRole } from '../service'
 import { checkRole } from '../utils/helper'
-const { Title } = Typography
 
-interface IMenuItemData {
-  name: string
-  path: string
-}
+// // interface IMenuItemData {
+// //   name: string
+// //   path: string
+// }
+type MenuItem = Required<MenuProps>['items'][number]
 
-const menuItemsMap: Record<string, IMenuItemData> = {
-  randomCard: {
-    name: 'RandomCard',
-    path: appPath.randomCard(),
-  },
-  omamaGame: {
-    name: 'Game Omama',
-    path: appPath.omamaGame(),
-  },
-  checkBill: {
-    name: 'Check Bill',
-    path: appPath.checkBillPage(),
-  },
-  houseRent: {
-    name: 'House Rent',
-    path: appPath.houseRent(),
-  },
-  manageUser: {
-    name: 'Manage User',
-    path: appPath.manageUser(),
-  },
-}
+// const menuItemsMap: Record<string, IMenuItemData> = {
+//   randomCard: {
+//     name: 'RandomCard',
+//     path: appPath.randomCard(),
+//   },
+//   omamaGame: {
+//     name: 'Game Omama',
+//     path: appPath.omamaGame(),
+//   },
+//   checkBill: {
+//     name: 'Check Bill',
+//     path: appPath.checkBillPage(),
+//   },
+//   houseRent: {
+//     name: 'House Rent',
+//     path: appPath.houseRent(),
+//   },
+//   manageUser: {
+//     name: 'Manage User',
+//     path: appPath.manageUser(),
+//   },
+// }
 
 const Navbar = () => {
   const navigate = useNavigate()
@@ -51,62 +52,66 @@ const Navbar = () => {
     queryClient.resetQueries()
   }
 
-  // const menuItemsDesktop = useMemo((): IMenuItemData[] => {
-  //   const defaultItems = [menuItemsMap.randomCard, menuItemsMap.omamaGame, menuItemsMap.checkBill]
-
-  //   if (user?.user.role === UserRole.ADMIN) {
-  //     defaultItems.push(menuItemsMap.houseRent)
-  //     defaultItems.push(menuItemsMap.manageUser)
-  //   }
-
-  //   return defaultItems
-  // }, [user?.user.role])
-
-  const menuItemsMobile: IMenuItemData[] = useMemo((): IMenuItemData[] => {
-    const defaultItems = [menuItemsMap.randomCard, menuItemsMap.omamaGame, menuItemsMap.checkBill]
-
-    if (checkRole(UserRole.ADMIN, user?.user.role)) {
-      defaultItems.push(menuItemsMap.houseRent)
-      defaultItems.push(menuItemsMap.manageUser)
-    }
-
-    return defaultItems
-  }, [user?.user.role])
+  const items: MenuItem[] = [
+    {
+      key: 'sub1',
+      label: 'Game',
+      children: [
+        {
+          key: 'g1',
+          label: 'random Card',
+          onClick: () => {
+            navigate(appPath.randomCard())
+            onClose()
+          },
+        },
+        {
+          key: 'g2',
+          label: 'Omama',
+          onClick: () => {
+            navigate(appPath.omamaGame())
+            onClose()
+          },
+        },
+      ],
+    },
+    {
+      key: 'sub2',
+      label: 'Check Bill',
+      onClick: () => {
+        navigate(appPath.checkBillPage())
+        onClose()
+      },
+    },
+    ...(checkRole(UserRole.SUPER_ADMIN, user?.user.role)
+      ? [
+          {
+            key: 'sub3',
+            label: 'House Rent',
+            onClick: () => {
+              navigate(appPath.houseRent())
+              onClose()
+            },
+          },
+          {
+            key: 'sub4',
+            label: 'Manage User',
+            onClick: () => {
+              navigate(appPath.manageUser())
+              onClose()
+            },
+          },
+        ]
+      : []),
+  ]
 
   return (
-    <nav className="bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 shadow-lg">
-      <div className="grid grid-cols-2 md:grid-cols-3">
+    <nav className="bg-gradient-to-r from-cyan-500 to-blue-500 px-5 py-2 shadow-lg">
+      <div className="grid grid-cols-2">
         {/* Left: Logo */}
         <Link to={appPath.home()}>
-          <motion.div whileHover={{ scale: 1.1 }}>
-            <Title level={3} className="!m-0 !text-white">
-              YAYA
-            </Title>
-          </motion.div>
+          <TypingAnimation className="text-xl text-amber-50">YaYa</TypingAnimation>
         </Link>
-        <div className="hidden items-center justify-center md:flex">
-          <Dropdown
-            menu={{
-              items: [
-                {
-                  label: 'RandomCard',
-                  key: 'randomCard',
-                  onClick: () => navigate(appPath.randomCard()),
-                },
-                {
-                  label: 'Game Omama',
-                  key: 'omamaGame',
-                  onClick: () => navigate(appPath.omamaGame()),
-                },
-              ],
-            }}
-          >
-            <a onClick={(e) => e.preventDefault()}>
-              <Button className="text-blue-500 hover:text-blue-700">Game</Button>
-            </a>
-          </Dropdown>
-          <Button onClick={() => navigate(appPath.checkBillPage())}>Check Bill</Button>
-        </div>
 
         <div className="flex items-center justify-end gap-4">
           {isLoggedIn && user.user.username}
@@ -136,7 +141,7 @@ const Navbar = () => {
           </div>
 
           <motion.div whileTap={{ scale: 0.9 }}>
-            <div className="lg:hidden">
+            <div>
               <Button
                 type="text"
                 icon={<MenuOutlined className="text-xl text-white" />}
@@ -147,22 +152,8 @@ const Navbar = () => {
         </div>
       </div>
 
-      <Drawer
-        title="Menu"
-        placement="right"
-        onClose={onClose}
-        open={open}
-        width={300} // Reduced width for the Drawer
-
-        // className="!hidden md:block" // Hide on md screens
-      >
-        <Menu mode="vertical" selectable={false}>
-          {menuItemsMobile.map((item) => (
-            <Menu.Item key={item.name} onClick={onClose}>
-              <Link to={item.path}>{item.name}</Link>
-            </Menu.Item>
-          ))}
-        </Menu>
+      <Drawer title="Menu" placement="right" onClose={onClose} open={open} width={300}>
+        <Menu mode="inline" items={items} selectable={false}></Menu>
 
         <div className="p-3">
           <Space direction="vertical" size="middle" className="w-full">

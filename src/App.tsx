@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ConfigProvider } from 'antd'
+import { App as AntdApp, ConfigProvider } from 'antd'
 import { lazy } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import './App.css'
@@ -127,7 +127,9 @@ const App = () => {
           },
         }}
       >
-        <RouterProvider router={router} />
+        <AntdApp>
+          <RouterProvider router={router} />
+        </AntdApp>
       </ConfigProvider>
     </QueryClientProvider>
   )

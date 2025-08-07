@@ -1,3 +1,11 @@
+## [1.2.6](https://github.com/punya199/test1/compare/v1.2.5...v1.2.6) (2025-08-07)
+
+
+### Fix
+
+* Add new components for enhanced UI effects, including FlickeringGrid and TypingAnimation. Introduce components.json for configuration, update App.css for theming, and enhance Navbar and Login/Register pages with animations. Update package.json with new dependencies for improved styling and animations. ([ebca109](https://github.com/punya199/test1/commit/ebca109b0327255b661f9591aa4afb083f3715ab))
+* Enhance Omama game UI by integrating Ant Design's App component in App.tsx and adding a new list to track recently drawn cards. Update card display and layout for improved user experience, including better styling and organization of game elements. ([c369207](https://github.com/punya199/test1/commit/c3692072f3ed3ff88bd0211cbb4cd100add0bc1c))
+
 ## [1.2.5](https://github.com/punya199/test1/compare/v1.2.4...v1.2.5) (2025-08-05)
 
 

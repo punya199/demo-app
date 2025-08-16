@@ -1,3 +1,10 @@
+## [1.2.7](https://github.com/punya199/demo-app/compare/v1.2.6...v1.2.7) (2025-08-16)
+
+
+### Fix
+
+* edit house rent view mode ([c1a9e00](https://github.com/punya199/demo-app/commit/c1a9e006a58284da8551cf2e880b694754990034))
+
 ## [1.2.6](https://github.com/punya199/test1/compare/v1.2.5...v1.2.6) (2025-08-07)
 
 

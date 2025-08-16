@@ -1,3 +1,14 @@
+# [1.3.0](https://github.com/punya199/demo-app/compare/v1.2.8...v1.3.0) (2025-08-16)
+
+
+### Fix
+
+* Update user role checks in multiple components to ensure safe access to user properties, preventing potential runtime errors. ([de5d719](https://github.com/punya199/demo-app/commit/de5d719e39d3c40700d83d9a3706a13a76dcdc0a))
+
+### Update
+
+* Implement role-based access control in house rent components by introducing the Authorize component. Update service to manage feature permissions and improve loading states with a new LoadingSpin component. Refactor house rent forms to support view modes based on user permissions. ([d3151a1](https://github.com/punya199/demo-app/commit/d3151a11abfbab0c1173c3c34ff07bd6d7c99b9d))
+
 ## [1.2.8](https://github.com/punya199/demo-app/compare/v1.2.7...v1.2.8) (2025-08-16)
 
 

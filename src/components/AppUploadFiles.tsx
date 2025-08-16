@@ -6,6 +6,7 @@ import { get } from 'lodash'
 import { useCallback, useMemo, useState } from 'react'
 import { appConfig } from '../config/app-config'
 import { IHouseRentFormValues } from '../pages/house-rent/house-rent-interface'
+import { useAuthStore } from '../utils/store'
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
 
@@ -27,6 +28,8 @@ export const AppUploadFiles = (props: IAppUploadFilesProps) => {
   const { value, onChange, disabled } = props
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
+
+  const { accessToken } = useAuthStore()
 
   const fileList = useMemo((): UploadFile[] => {
     return [...(value || [])]
@@ -68,14 +71,13 @@ export const AppUploadFiles = (props: IAppUploadFilesProps) => {
   )
 
   const headers = useMemo((): HttpRequestHeader => {
-    const accessToken = localStorage.getItem('accessToken')
     if (accessToken) {
       return {
         authorization: 'Bearer ' + accessToken,
       }
     }
     return {}
-  }, [])
+  }, [accessToken])
 
   return (
     <>

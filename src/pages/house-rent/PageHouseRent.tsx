@@ -4,7 +4,7 @@ import { Button, Flex, Modal, Table, TableColumnType, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { keyBy, sumBy } from 'lodash'
 import { useMemo } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
 import { EnumFeatureName, useGetFeaturePermissionAction } from '../../service'
 import { formatCurrency } from '../../utils/format-currency'
@@ -20,7 +20,6 @@ export const PageHouseRent = () => {
   const { data: houseRentListData, isLoading } = useGetHouseRentList()
   const { data: permissionAction } = useGetFeaturePermissionAction(EnumFeatureName.HOUSE_RENT)
 
-  const navigate = useNavigate()
   const { mutate: deleteHouseRent } = useDeleteHouseRent()
   const { data: userOptions } = useGetUserOptions()
 
@@ -149,16 +148,17 @@ export const PageHouseRent = () => {
           <Flex justify="space-between" align="center" gap={16}>
             <Typography.Title level={4}>รายการค่าเช่าบ้าน</Typography.Title>
             {permissionAction?.canCreate && (
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => navigate(appPath.houseRentCreate())}
-                onMouseEnter={() => {
-                  import('./PageHouseRentCreate')
-                }}
-              >
-                เพิ่มรายการ
-              </Button>
+              <Link to={appPath.houseRentCreate()}>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onMouseEnter={() => {
+                    import('./PageHouseRentCreate')
+                  }}
+                >
+                  เพิ่มรายการ
+                </Button>
+              </Link>
             )}
           </Flex>
         )}

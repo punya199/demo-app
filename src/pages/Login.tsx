@@ -7,6 +7,7 @@ import { appPath } from '../config/app-paths'
 import { useGetMe } from '../service'
 import { apiClient } from '../utils/api-client'
 import { sleep } from '../utils/helper'
+import { useAuthStore } from '../utils/store'
 type Data = {
   accessToken: string
   user: { id: number; username: string; password: string }
@@ -17,7 +18,7 @@ const Login = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryClient = useQueryClient()
-
+  const { setAccessToken } = useAuthStore()
   const { mutate: login, isPending } = useMutation({
     mutationFn: async (values: { username: string; password: string }) => {
       const [{ data }] = await Promise.all([
@@ -30,7 +31,7 @@ const Login = () => {
       return data
     },
     onSuccess: (data) => {
-      localStorage.setItem('accessToken', data.accessToken)
+      setAccessToken(data.accessToken)
       queryClient.refetchQueries()
       const redirect = location.state?.redirect
       if (redirect) {

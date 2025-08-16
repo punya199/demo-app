@@ -3,12 +3,13 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Button, Drawer, Menu, MenuProps, Space } from 'antd'
 import { motion } from 'framer-motion'
 import { compact } from 'lodash'
-import { useMemo, useState } from 'react'
+import { startTransition, useCallback, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { TypingAnimation } from '../components/magicui/typing-animation'
 import { appPath } from '../config/app-paths'
 import { EnumFeatureName, useGetMe, usePermissionRouteAllow, UserRole } from '../service'
 import { checkRole } from '../utils/helper'
+import { useAuthStore } from '../utils/store'
 
 // // interface IMenuItemData {
 // //   name: string
@@ -47,14 +48,23 @@ const Navbar = () => {
   const queryClient = useQueryClient()
   const showDrawer = () => setOpen(true)
   const onClose = () => setOpen(false)
-
+  const { clearAccessToken } = useAuthStore()
   const menuHouseRentAllowed = usePermissionRouteAllow(EnumFeatureName.HOUSE_RENT, {
     requiredRead: true,
   })
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken')
-    queryClient.resetQueries()
-  }
+  const handleLogout = useCallback(() => {
+    startTransition(() => {
+      navigate(appPath.login(), {
+        replace: true,
+      })
+      clearAccessToken()
+      queryClient.resetQueries({
+        predicate(query) {
+          return !query.queryHash.includes('permissions')
+        },
+      })
+    })
+  }, [navigate, clearAccessToken, queryClient])
 
   const items = useMemo(
     (): MenuItem[] =>
@@ -88,6 +98,9 @@ const Navbar = () => {
             navigate(appPath.checkBillPage())
             onClose()
           },
+          onMouseEnter: () => {
+            import('../pages/project/checkbill/PageAllBill')
+          },
         },
         ...(checkRole(UserRole.SUPER_ADMIN, user?.user?.role)
           ? [
@@ -98,6 +111,9 @@ const Navbar = () => {
                   navigate(appPath.houseRent())
                   onClose()
                 },
+                onMouseEnter: () => {
+                  import('../pages/house-rent/PageHouseRent')
+                },
               },
               {
                 key: 'sub4',
@@ -105,6 +121,9 @@ const Navbar = () => {
                 onClick: () => {
                   navigate(appPath.manageUser())
                   onClose()
+                },
+                onMouseEnter: () => {
+                  import('../pages/PageManageUser')
                 },
               },
             ]

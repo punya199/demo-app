@@ -3,6 +3,7 @@ import { some } from 'lodash'
 import { useMemo } from 'react'
 import { apiClient } from './utils/api-client'
 import { sleep } from './utils/helper'
+import { useAuthStore } from './utils/store'
 
 export enum UserRole {
   USER = 'user',
@@ -47,8 +48,9 @@ interface IGetMeResponse {
 }
 export const useGetMe = () => {
   const queryClient = useQueryClient()
+  const { accessToken } = useAuthStore()
   return useQuery<IGetMeResponse>({
-    queryKey: ['getme'],
+    queryKey: ['getme', accessToken],
     queryFn: async () => {
       const { data } = await apiClient.get<IGetMeResponse>(`/users/me`)
       return data
@@ -64,16 +66,17 @@ export const useGetMe = () => {
 
       return data
     },
-    enabled: !!localStorage.getItem('accessToken'),
+    enabled: !!accessToken,
   })
 }
 
 export const useGetMeSuspense = () => {
   const queryClient = useQueryClient()
+  const { accessToken } = useAuthStore()
   return useSuspenseQuery<IGetMeResponse | null>({
-    queryKey: ['getme'],
+    queryKey: ['getme', accessToken],
     queryFn: async () => {
-      if (!localStorage.getItem('accessToken')) {
+      if (!accessToken) {
         return null
       }
       const [{ data }] = await Promise.all([apiClient.get<IGetMeResponse>(`/users/me`), sleep(500)])
@@ -99,15 +102,16 @@ export const useGetMeSuspense = () => {
 
 export const useGetFeaturePermissionAction = (featureName: EnumFeatureName) => {
   const { data: getMeResponse } = useGetMe()
+  const userId = getMeResponse?.user?.id
   return useQuery<IPermissionAction>({
-    queryKey: ['permissions', featureName],
+    queryKey: ['permissions', featureName, userId],
     queryFn: async () => {
       return (
         getMeResponse?.user.permissions.find((permission) => permission.featureName === featureName)
           ?.action || defaultPermissionAction
       )
     },
-    enabled: !!featureName,
+    enabled: !!featureName && !!userId,
   })
 }
 

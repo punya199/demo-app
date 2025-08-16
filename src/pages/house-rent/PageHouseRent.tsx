@@ -148,13 +148,18 @@ export const PageHouseRent = () => {
         title={() => (
           <Flex justify="space-between" align="center" gap={16}>
             <Typography.Title level={4}>รายการค่าเช่าบ้าน</Typography.Title>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => navigate(appPath.houseRentCreate())}
-            >
-              เพิ่มรายการ
-            </Button>
+            {permissionAction?.canCreate && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => navigate(appPath.houseRentCreate())}
+                onMouseEnter={() => {
+                  import('./PageHouseRentCreate')
+                }}
+              >
+                เพิ่มรายการ
+              </Button>
+            )}
           </Flex>
         )}
         rowKey="id"

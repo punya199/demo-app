@@ -1,3 +1,4 @@
+import { css } from '@emotion/react'
 import { PropsWithChildren } from 'react'
 import { Navigate } from 'react-router-dom'
 import { appPath } from '../config/app-paths'
@@ -31,5 +32,13 @@ export const Authorize = (props: PropsWithChildren<IAuthorizeProps>) => {
     return <Navigate to={appPath.home()} state={{ message: 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้' }} />
   }
 
-  return props.children
+  return (
+    <div
+      css={css`
+        display: ${isLoggedIn && actionAllowed ? 'block' : 'none'};
+      `}
+    >
+      {props.children}
+    </div>
+  )
 }

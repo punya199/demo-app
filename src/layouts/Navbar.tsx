@@ -127,7 +127,7 @@ const Navbar = () => {
                 </Button>
               </motion.div>
             ) : (
-              <Link to={appPath.login()}>
+              <Link to={appPath.login()} state={{ redirect: location.pathname }}>
                 <motion.div whileHover={{ scale: 1.1 }}>
                   <Button type="link" className="!text-white hover:!text-cyan-300">
                     Login
@@ -169,7 +169,7 @@ const Navbar = () => {
                 Logout
               </Button>
             ) : (
-              <Link to={appPath.login()}>
+              <Link to={appPath.login()} state={{ redirect: location.pathname }}>
                 <Button type="link" block onClick={onClose}>
                   Login
                 </Button>

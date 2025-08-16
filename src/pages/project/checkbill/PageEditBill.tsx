@@ -14,8 +14,8 @@ type GetBillResponse = {
 const PageEditBill = () => {
   const { data: user } = useGetMe()
   const isLoggedIn = useMemo(() => {
-    return !!user?.user.id
-  }, [user?.user.id])
+    return !!user?.user?.id
+  }, [user?.user?.id])
   const navigate = useNavigate()
   useEffect(() => {
     if (!isLoggedIn) {

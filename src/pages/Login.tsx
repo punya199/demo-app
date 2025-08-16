@@ -42,10 +42,10 @@ const Login = () => {
   })
 
   useEffect(() => {
-    if (user?.user.id) {
+    if (user?.user?.id) {
       navigate(appPath.home())
     }
-  }, [navigate, user?.user.id])
+  }, [navigate, user?.user?.id])
 
   const onFinish = useCallback(
     async (values: { username: string; password: string }) => {

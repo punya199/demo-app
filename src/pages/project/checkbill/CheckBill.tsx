@@ -58,8 +58,8 @@ const CheckBill = (props: CheckBillPorps) => {
 
   const { data: user } = useGetMe()
   const isLoggedIn = useMemo(() => {
-    return !!user?.user.id
-  }, [user?.user.id])
+    return !!user?.user?.id
+  }, [user?.user?.id])
 
   const handleAddItem = useCallback(
     (item: Item) => {

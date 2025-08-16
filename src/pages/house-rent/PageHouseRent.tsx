@@ -102,7 +102,7 @@ export const PageHouseRent = () => {
             >
               <Button type="link" icon={<EyeOutlined />} title="ดูรายละเอียด" />
             </Link>
-            {checkRole(UserRole.SUPER_ADMIN, getMeData?.user.role) && (
+            {checkRole(UserRole.SUPER_ADMIN, getMeData?.user?.role) && (
               <Link
                 to={appPath.houseRentDetailClone({ param: { houseRentId: value } })}
                 onMouseOver={() => {
@@ -112,7 +112,7 @@ export const PageHouseRent = () => {
                 <Button type="link" icon={<CopyOutlined />} title="คัดลอก" />
               </Link>
             )}
-            {checkRole(UserRole.SUPER_ADMIN, getMeData?.user.role) && (
+            {checkRole(UserRole.SUPER_ADMIN, getMeData?.user?.role) && (
               <Button
                 type="link"
                 icon={<DeleteOutlined />}
@@ -131,7 +131,7 @@ export const PageHouseRent = () => {
         ),
       },
     ],
-    [userOptionsHash, getMeData?.user.role, deleteHouseRent]
+    [userOptionsHash, getMeData?.user?.role, deleteHouseRent]
   )
 
   return (

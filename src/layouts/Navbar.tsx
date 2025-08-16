@@ -42,7 +42,7 @@ const Navbar = () => {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const { data: user } = useGetMe()
-  const isLoggedIn = !!user?.user.id
+  const isLoggedIn = !!user?.user?.id
   const queryClient = useQueryClient()
   const showDrawer = () => setOpen(true)
   const onClose = () => setOpen(false)
@@ -83,7 +83,7 @@ const Navbar = () => {
         onClose()
       },
     },
-    ...(checkRole(UserRole.SUPER_ADMIN, user?.user.role)
+    ...(checkRole(UserRole.SUPER_ADMIN, user?.user?.role)
       ? [
           {
             key: 'sub3',

@@ -53,7 +53,7 @@ const PageAllBill = () => {
     navigate(appPath.checkBillPageSave({ param: { billId } }))
   }
   const handleEditClick = (billId: number) => {
-    if (checkRole(UserRole.ADMIN, user?.user.role)) {
+    if (checkRole(UserRole.ADMIN, user?.user?.role)) {
       navigate(appPath.checkBillPageEdit({ param: { billId } }))
     } else {
       Modal.confirm({
@@ -68,7 +68,7 @@ const PageAllBill = () => {
   }
 
   const handleDeleteClick = (billId: number) => {
-    if (checkRole(UserRole.SUPER_ADMIN, user?.user.role)) {
+    if (checkRole(UserRole.SUPER_ADMIN, user?.user?.role)) {
       Modal.confirm({
         title: 'คุณต้องการจะลบใช่หรือไม่ ?',
         okText: 'ลบ',

@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/punya199/demo-app/compare/v1.4.2...v1.4.3) (2025-08-16)
+
+
+### Fix
+
+* API client: Add response interceptor to handle 401 errors by clearing local storage and redirecting to login, improving authentication flow and user experience. ([90024e8](https://github.com/punya199/demo-app/commit/90024e83e611402755d6ba6d5db051b29742b3c7))
+
 ## [1.4.2](https://github.com/punya199/demo-app/compare/v1.4.1...v1.4.2) (2025-08-16)
 
 

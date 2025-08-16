@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
 import { useGetMe, UserRole } from '../../service'
 import { formatCurrency } from '../../utils/format-currency'
+import { checkRole } from '../../utils/helper'
 import { IHouseRentDetailData, IHouseRentMemberData } from './house-rent-interface'
 import {
   IHouseRentDataResponse,
@@ -101,15 +102,17 @@ export const PageHouseRent = () => {
             >
               <Button type="link" icon={<EyeOutlined />} title="ดูรายละเอียด" />
             </Link>
-            <Link
-              to={appPath.houseRentDetailClone({ param: { houseRentId: value } })}
-              onMouseOver={() => {
-                import('./PageHouseRentDetailClone')
-              }}
-            >
-              <Button type="link" icon={<CopyOutlined />} title="คัดลอก" />
-            </Link>
-            {getMeData?.user.role === UserRole.ADMIN && (
+            {checkRole(UserRole.SUPER_ADMIN, getMeData?.user.role) && (
+              <Link
+                to={appPath.houseRentDetailClone({ param: { houseRentId: value } })}
+                onMouseOver={() => {
+                  import('./PageHouseRentDetailClone')
+                }}
+              >
+                <Button type="link" icon={<CopyOutlined />} title="คัดลอก" />
+              </Link>
+            )}
+            {checkRole(UserRole.SUPER_ADMIN, getMeData?.user.role) && (
               <Button
                 type="link"
                 icon={<DeleteOutlined />}

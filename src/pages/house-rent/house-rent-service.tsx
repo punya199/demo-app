@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useGetMe } from '../../service'
 import { apiClient } from '../../utils/api-client'
 import {
   IGetUserOptionsParams,
@@ -91,16 +90,12 @@ export const useUpdateHouseRent = () => {
 }
 
 export const useGetHouseRentList = () => {
-  const { data: getMeData } = useGetMe()
-  const isLoggedIn = !!getMeData?.user?.id
-
   return useQuery({
     queryKey: ['house-rents'],
     queryFn: async () => {
       const { data } = await apiClient.get<IGetHouseRentListResponse>(`/house-rents`)
       return data
     },
-    enabled: !!isLoggedIn,
   })
 }
 

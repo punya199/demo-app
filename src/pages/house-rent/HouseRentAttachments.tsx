@@ -1,11 +1,13 @@
 import { Card, Form, Input, Typography } from 'antd'
 
 import { AppUploadFiles } from '../../components/AppUploadFiles'
-import { useGetMe } from '../../service'
 
-export const HouseRentAttachments = () => {
-  const { data: meData } = useGetMe()
-  const isLoggedIn = !!meData?.user?.id
+interface IHouseRentAttachmentsProps {
+  viewMode?: boolean
+}
+
+export const HouseRentAttachments = (props: IHouseRentAttachmentsProps) => {
+  const { viewMode } = props
 
   return (
     <Card>
@@ -14,7 +16,7 @@ export const HouseRentAttachments = () => {
         <Input />
       </Form.Item>
       <Form.Item name="attachments">
-        <AppUploadFiles disabled={!isLoggedIn} />
+        <AppUploadFiles disabled={viewMode} />
       </Form.Item>
     </Card>
   )

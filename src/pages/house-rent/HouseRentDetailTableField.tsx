@@ -3,7 +3,7 @@ import { css } from '@emotion/react'
 import { Button, Flex, Form, Grid, Table, Typography } from 'antd'
 import { ColumnType } from 'antd/es/table'
 import dayjs, { Dayjs } from 'dayjs'
-import { set, sumBy } from 'lodash'
+import { compact, set, sumBy } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { v4 } from 'uuid'
 import { CustomCell, ICustomCellInputType } from './CustomCell'
@@ -12,10 +12,11 @@ import { IHouseRentDetailData, IHouseRentFormValues } from './house-rent-interfa
 interface IHouseRentDetailTableFieldProps {
   value?: IHouseRentDetailData[]
   onChange?: (value: IHouseRentDetailData[]) => void
+  viewMode?: boolean
 }
 
 export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps) => {
-  const { value, onChange } = props
+  const { value, onChange, viewMode } = props
   const [isInit, setIsInit] = useState(false)
   const { md } = Grid.useBreakpoint()
 
@@ -92,7 +93,7 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
   )
 
   const columns = useMemo((): ColumnType<IHouseRentDetailData>[] => {
-    return [
+    return compact([
       {
         title: 'เดือน',
         dataIndex: 'month',
@@ -136,11 +137,11 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
           align: 'right',
         }),
       },
-      {
+      !viewMode && {
         title: 'จัดการ',
         dataIndex: 'action',
         align: 'center',
-        render: (_, _record: IHouseRentDetailData, recordIndex: number) => (
+        render: (_: unknown, _record: IHouseRentDetailData, recordIndex: number) => (
           <Flex gap={6} justify="center">
             <Button danger size="small" onClick={() => onDelete(recordIndex)}>
               ลบ
@@ -148,8 +149,8 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
           </Flex>
         ),
       },
-    ]
-  }, [renderCell, onDelete])
+    ])
+  }, [renderCell, viewMode, onDelete])
 
   return (
     <Table
@@ -157,9 +158,13 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
       title={() => (
         <Flex justify="space-between">
           <Typography.Title level={4}>ค่าเช่าบ้าน</Typography.Title>
-          <Button type="primary" icon={<PlusOutlined />} onClick={onAdd}>
-            เพิ่ม
-          </Button>
+          <div>
+            {!viewMode && (
+              <Button type="primary" icon={<PlusOutlined />} onClick={onAdd}>
+                เพิ่ม
+              </Button>
+            )}
+          </div>
         </Flex>
       )}
       rowKey="id"

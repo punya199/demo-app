@@ -2,7 +2,7 @@ import { SaveOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
 import { Button, Col, Divider, Flex, Form, Grid, Row } from 'antd'
 import { keyBy } from 'lodash'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -135,6 +135,10 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
     }
   }, [data, form, onSubmit, isLoggedIn])
 
+  const viewMode = useMemo(() => {
+    return !isLoggedIn
+  }, [isLoggedIn])
+
   return (
     <div
       className="space-y-4 py-6 md:p-4"
@@ -149,6 +153,7 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
         onFinish={handleSubmit}
         size={md ? 'large' : 'small'}
         layout="vertical"
+        disabled={viewMode}
         scrollToFirstError
       >
         <Row gutter={[16, 16]}>
@@ -157,17 +162,17 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
           </Col>
           <Col xs={24} md={16}>
             <Form.Item name="rents" noStyle>
-              <HouseRentDetailTableField />
+              <HouseRentDetailTableField viewMode={viewMode} />
             </Form.Item>
           </Col>
           <Col xs={24} md={24}>
             <Form.Item name="members" noStyle>
-              <HouseRentMemberTableField summary={data.electricitySummary} />
+              <HouseRentMemberTableField summary={data.electricitySummary} viewMode={viewMode} />
             </Form.Item>
           </Col>
 
           <Col xs={24} md={24}>
-            <HouseRentAttachments />
+            <HouseRentAttachments viewMode={viewMode} />
           </Col>
 
           <Divider />
@@ -184,7 +189,12 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
                 border-radius: 8px;
               `}
             >
-              <Button type="default" htmlType="button" onClick={() => navigate(-1)}>
+              <Button
+                type="default"
+                htmlType="button"
+                onClick={() => navigate(-1)}
+                disabled={false}
+              >
                 {defaultValues?.id ? 'ย้อนกลับ' : 'ยกเลิก'}
               </Button>
               <div>

@@ -4,7 +4,7 @@ import { Button, Flex, Form, Grid, Select, Table, Typography } from 'antd'
 import { DefaultOptionType } from 'antd/es/select'
 import { ColumnType } from 'antd/es/table'
 import dayjs, { Dayjs } from 'dayjs'
-import { chain, round, set, sumBy } from 'lodash'
+import { chain, compact, round, set, sumBy } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CustomCell, ICustomCellInputType } from './CustomCell'
 import {
@@ -17,10 +17,11 @@ interface IHouseRentMemberTableFieldProps {
   value?: IHouseRentMemberData[]
   onChange?: (value: IHouseRentMemberData[]) => void
   summary?: IElectricitySummaryData
+  viewMode?: boolean
 }
 
 export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps) => {
-  const { value, onChange, summary } = props
+  const { value, onChange, summary, viewMode } = props
   const [isInit, setIsInit] = useState(false)
   const { md } = Grid.useBreakpoint()
 
@@ -128,7 +129,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
   }, [rents])
 
   const columns = useMemo((): ColumnType<IHouseRentMemberData>[] => {
-    return [
+    return compact([
       {
         title: 'ชื่อ',
         dataIndex: 'userId',
@@ -259,7 +260,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
           )
         },
       },
-      {
+      !viewMode && {
         title: 'จัดการ',
         dataIndex: 'action',
         align: 'center',
@@ -271,7 +272,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
           </Flex>
         ),
       },
-    ]
+    ])
   }, [
     renderCell,
     userOptions?.options,
@@ -279,6 +280,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
     summary?.pricePerUnit,
     internetOptions,
     onDelete,
+    viewMode,
   ])
 
   return (
@@ -287,9 +289,13 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
       title={() => (
         <Flex justify="space-between" align="center" gap={16}>
           <Typography.Title level={4}>ข้อมูลผู้เช่า</Typography.Title>
-          <Button type="primary" icon={<PlusOutlined />} onClick={onAdd}>
-            เพิ่ม
-          </Button>
+          <div>
+            {!viewMode && (
+              <Button type="primary" icon={<PlusOutlined />} onClick={onAdd}>
+                เพิ่ม
+              </Button>
+            )}
+          </div>
         </Flex>
       )}
       rowKey={(record, index) => `${record.userId}-${index}`}

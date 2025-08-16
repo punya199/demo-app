@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/punya199/demo-app/compare/v1.4.0...v1.4.1) (2025-08-16)
+
+
+### Fix
+
+* Replace navigate with Link component for house rent creation button, enhancing navigation consistency and improving code readability. ([dcff40a](https://github.com/punya199/demo-app/commit/dcff40a9aa1c73df6e2659272d167b0cce5f91ce))
+
 # [1.4.0](https://github.com/punya199/demo-app/compare/v1.3.1...v1.4.0) (2025-08-16)
 
 

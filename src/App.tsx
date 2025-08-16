@@ -9,7 +9,9 @@ import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
 import PageManageUser from './pages/PageManageUser'
 import PageRegister from './pages/PageRegister'
 
+import { Authorize } from './components/Authorize'
 import CardGame from './pages/project/random-card/CardGame'
+import { EnumFeatureName } from './service'
 
 const Pnotfound = lazy(() => import('./layouts/Pnotfound'))
 const RootLayout = lazy(() => import('./layouts/RootLayout'))
@@ -83,19 +85,35 @@ const router = createBrowserRouter([
       },
       {
         path: appPath.houseRentCreate(),
-        element: <PageHouseRentCreate />,
+        element: (
+          <Authorize featureName={EnumFeatureName.HOUSE_RENT} requiredCreate>
+            <PageHouseRentCreate />
+          </Authorize>
+        ),
       },
       {
         path: appPath.houseRentDetailClone(),
-        element: <PageHouseRentDetailClone />,
+        element: (
+          <Authorize featureName={EnumFeatureName.HOUSE_RENT} requiredCreate>
+            <PageHouseRentDetailClone />
+          </Authorize>
+        ),
       },
       {
         path: appPath.houseRentDetail(),
-        element: <PageHouseRentDetail />,
+        element: (
+          <Authorize featureName={EnumFeatureName.HOUSE_RENT} requiredUpdate>
+            <PageHouseRentDetail />
+          </Authorize>
+        ),
       },
       {
         path: appPath.houseRent(),
-        element: <PageHouseRent />,
+        element: (
+          <Authorize featureName={EnumFeatureName.HOUSE_RENT} requiredRead>
+            <PageHouseRent />
+          </Authorize>
+        ),
       },
       {
         path: appPath.manageUser(),

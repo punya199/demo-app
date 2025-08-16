@@ -1,4 +1,6 @@
+import { Suspense } from 'react'
 import { Outlet } from 'react-router-dom'
+import { LoadingSpin } from './LoadingSpin'
 import Navbar from './Navbar'
 
 const RootLayout = () => {
@@ -10,7 +12,9 @@ const RootLayout = () => {
           flex: 1,
         }}
       >
-        <Outlet />
+        <Suspense fallback={<LoadingSpin />}>
+          <Outlet />
+        </Suspense>
       </div>
     </div>
   )

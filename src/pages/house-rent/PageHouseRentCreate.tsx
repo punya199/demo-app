@@ -3,6 +3,7 @@ import { chain } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
+import { EnumFeatureName, useGetFeaturePermissionAction } from '../../service'
 import { IHouseRentFormValues } from './house-rent-interface'
 import { useCreateHouseRent } from './house-rent-service'
 import { HouseRentForm } from './HouseRentForm'
@@ -10,6 +11,7 @@ import { HouseRentForm } from './HouseRentForm'
 export const PageHouseRentCreate = () => {
   const { mutate: saveHouseRent, isPending } = useCreateHouseRent()
   const navigate = useNavigate()
+  const { data: permissionAction } = useGetFeaturePermissionAction(EnumFeatureName.HOUSE_RENT)
 
   const handleSubmit = useCallback(
     (data: IHouseRentFormValues) => {
@@ -66,6 +68,11 @@ export const PageHouseRentCreate = () => {
     }
   }, [])
   return (
-    <HouseRentForm defaultValues={defaultValues} onSubmit={handleSubmit} isSubmitting={isPending} />
+    <HouseRentForm
+      defaultValues={defaultValues}
+      onSubmit={handleSubmit}
+      isSubmitting={isPending}
+      viewMode={!permissionAction?.canCreate}
+    />
   )
 }

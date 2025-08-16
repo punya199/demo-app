@@ -2,11 +2,10 @@ import { SaveOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
 import { Button, Col, Divider, Flex, Form, Grid, Row } from 'antd'
 import { keyBy } from 'lodash'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { useGetMe } from '../../service'
 import { calculateElectricitySummary } from './house-rent-helper'
 import {
   IHouseRentDetailData,
@@ -83,12 +82,12 @@ interface IHouseRentFormProps {
   defaultValues?: IHouseRentFormValues
   onSubmit: (data: IHouseRentFormValues) => void
   isSubmitting?: boolean
+  viewMode?: boolean
 }
 export const HouseRentForm = (props: IHouseRentFormProps) => {
-  const { defaultValues, onSubmit, isSubmitting } = props
+  const { defaultValues, onSubmit, isSubmitting, viewMode } = props
   const navigate = useNavigate()
-  const { data: getMeData } = useGetMe()
-  const isLoggedIn = !!getMeData?.user?.id
+
   const { data, setData, setElectricitySummary } = useHouseRentStore()
   const { md } = Grid.useBreakpoint()
   const [form] = Form.useForm()
@@ -130,14 +129,10 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
 
   const handleSubmit = useCallback(async () => {
     await form.validateFields()
-    if (isLoggedIn) {
+    if (!viewMode) {
       onSubmit?.(data)
     }
-  }, [data, form, onSubmit, isLoggedIn])
-
-  const viewMode = useMemo(() => {
-    return !isLoggedIn
-  }, [isLoggedIn])
+  }, [data, form, onSubmit, viewMode])
 
   return (
     <div
@@ -198,7 +193,7 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
                 {defaultValues?.id ? 'ย้อนกลับ' : 'ยกเลิก'}
               </Button>
               <div>
-                {isLoggedIn && (
+                {!viewMode && (
                   <Button
                     variant="solid"
                     color="green"

@@ -1,7 +1,9 @@
-import { Empty, message, Spin } from 'antd'
+import { Empty, message } from 'antd'
 import { chain } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
+import { LoadingSpin } from '../../layouts/LoadingSpin'
+import { EnumFeatureName, useGetFeaturePermissionAction } from '../../service'
 import { calculateElectricitySummary } from './house-rent-helper'
 import { IHouseRentFormValues } from './house-rent-interface'
 import { useCreateHouseRent, useGetHouseRent } from './house-rent-service'
@@ -12,6 +14,7 @@ export const PageHouseRentDetailClone = () => {
   const { data: houseRentData, isLoading } = useGetHouseRent(houseRentId)
 
   const { mutate: saveHouseRent, isPending } = useCreateHouseRent()
+  const { data: permissionAction } = useGetFeaturePermissionAction(EnumFeatureName.HOUSE_RENT)
 
   const handleSubmit = useCallback(
     (data: IHouseRentFormValues) => {
@@ -51,13 +54,18 @@ export const PageHouseRentDetailClone = () => {
   }, [houseRentData])
 
   if (isLoading) {
-    return <Spin />
+    return <LoadingSpin />
   }
   if (!defaultValues) {
     return <Empty description="ไม่พบข้อมูล" />
   }
 
   return (
-    <HouseRentForm defaultValues={defaultValues} onSubmit={handleSubmit} isSubmitting={isPending} />
+    <HouseRentForm
+      defaultValues={defaultValues}
+      onSubmit={handleSubmit}
+      isSubmitting={isPending}
+      viewMode={!permissionAction?.canCreate}
+    />
   )
 }

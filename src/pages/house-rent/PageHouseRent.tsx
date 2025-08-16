@@ -6,9 +6,8 @@ import { keyBy, sumBy } from 'lodash'
 import { useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
-import { useGetMe, UserRole } from '../../service'
+import { EnumFeatureName, useGetFeaturePermissionAction } from '../../service'
 import { formatCurrency } from '../../utils/format-currency'
-import { checkRole } from '../../utils/helper'
 import { IHouseRentDetailData, IHouseRentMemberData } from './house-rent-interface'
 import {
   IHouseRentDataResponse,
@@ -18,8 +17,9 @@ import {
 } from './house-rent-service'
 
 export const PageHouseRent = () => {
-  const { data: getMeData } = useGetMe()
   const { data: houseRentListData, isLoading } = useGetHouseRentList()
+  const { data: permissionAction } = useGetFeaturePermissionAction(EnumFeatureName.HOUSE_RENT)
+
   const navigate = useNavigate()
   const { mutate: deleteHouseRent } = useDeleteHouseRent()
   const { data: userOptions } = useGetUserOptions()
@@ -94,15 +94,17 @@ export const PageHouseRent = () => {
         align: 'center',
         render: (value) => (
           <Flex gap={4} justify="center">
-            <Link
-              to={appPath.houseRentDetail({ param: { houseRentId: value } })}
-              onMouseOver={() => {
-                import('./PageHouseRentDetail')
-              }}
-            >
-              <Button type="link" icon={<EyeOutlined />} title="ดูรายละเอียด" />
-            </Link>
-            {checkRole(UserRole.SUPER_ADMIN, getMeData?.user?.role) && (
+            {permissionAction?.canRead && (
+              <Link
+                to={appPath.houseRentDetail({ param: { houseRentId: value } })}
+                onMouseOver={() => {
+                  import('./PageHouseRentDetail')
+                }}
+              >
+                <Button type="link" icon={<EyeOutlined />} title="ดูรายละเอียด" />
+              </Link>
+            )}
+            {permissionAction?.canCreate && (
               <Link
                 to={appPath.houseRentDetailClone({ param: { houseRentId: value } })}
                 onMouseOver={() => {
@@ -112,7 +114,7 @@ export const PageHouseRent = () => {
                 <Button type="link" icon={<CopyOutlined />} title="คัดลอก" />
               </Link>
             )}
-            {checkRole(UserRole.SUPER_ADMIN, getMeData?.user?.role) && (
+            {permissionAction?.canDelete && (
               <Button
                 type="link"
                 icon={<DeleteOutlined />}
@@ -131,7 +133,7 @@ export const PageHouseRent = () => {
         ),
       },
     ],
-    [userOptionsHash, getMeData?.user?.role, deleteHouseRent]
+    [userOptionsHash, permissionAction, deleteHouseRent]
   )
 
   return (

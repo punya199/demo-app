@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/punya199/demo-app/compare/v1.4.3...v1.4.4) (2025-08-16)
+
+
+### Fix
+
+* user management: Add EnumUserStatus for user status representation, update IUser interface for better type safety, and improve user table with status display using tags. Also, include change-case library for string formatting. ([9592627](https://github.com/punya199/demo-app/commit/959262798400f66bfe9e9cb94c609cd28f693ba9))
+
 ## [1.4.3](https://github.com/punya199/demo-app/compare/v1.4.2...v1.4.3) (2025-08-16)
 
 

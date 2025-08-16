@@ -2,11 +2,12 @@ import { MenuOutlined } from '@ant-design/icons'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button, Drawer, Menu, MenuProps, Space } from 'antd'
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { compact } from 'lodash'
+import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { TypingAnimation } from '../components/magicui/typing-animation'
 import { appPath } from '../config/app-paths'
-import { useGetMe, UserRole } from '../service'
+import { EnumFeatureName, useGetMe, usePermissionRouteAllow, UserRole } from '../service'
 import { checkRole } from '../utils/helper'
 
 // // interface IMenuItemData {
@@ -47,63 +48,70 @@ const Navbar = () => {
   const showDrawer = () => setOpen(true)
   const onClose = () => setOpen(false)
 
+  const menuHouseRentAllowed = usePermissionRouteAllow(EnumFeatureName.HOUSE_RENT, {
+    requiredRead: true,
+  })
   const handleLogout = () => {
     localStorage.removeItem('accessToken')
     queryClient.resetQueries()
   }
 
-  const items: MenuItem[] = [
-    {
-      key: 'sub1',
-      label: 'Game',
-      children: [
+  const items = useMemo(
+    (): MenuItem[] =>
+      compact([
         {
-          key: 'g1',
-          label: 'random Card',
+          key: 'sub1',
+          label: 'Game',
+          children: [
+            {
+              key: 'g1',
+              label: 'random Card',
+              onClick: () => {
+                navigate(appPath.randomCard())
+                onClose()
+              },
+            },
+            {
+              key: 'g2',
+              label: 'Omama',
+              onClick: () => {
+                navigate(appPath.omamaGame())
+                onClose()
+              },
+            },
+          ],
+        },
+        {
+          key: 'sub2',
+          label: 'Check Bill',
           onClick: () => {
-            navigate(appPath.randomCard())
+            navigate(appPath.checkBillPage())
             onClose()
           },
         },
-        {
-          key: 'g2',
-          label: 'Omama',
-          onClick: () => {
-            navigate(appPath.omamaGame())
-            onClose()
-          },
-        },
-      ],
-    },
-    {
-      key: 'sub2',
-      label: 'Check Bill',
-      onClick: () => {
-        navigate(appPath.checkBillPage())
-        onClose()
-      },
-    },
-    ...(checkRole(UserRole.SUPER_ADMIN, user?.user?.role)
-      ? [
-          {
-            key: 'sub3',
-            label: 'House Rent',
-            onClick: () => {
-              navigate(appPath.houseRent())
-              onClose()
-            },
-          },
-          {
-            key: 'sub4',
-            label: 'Manage User',
-            onClick: () => {
-              navigate(appPath.manageUser())
-              onClose()
-            },
-          },
-        ]
-      : []),
-  ]
+        ...(checkRole(UserRole.SUPER_ADMIN, user?.user?.role)
+          ? [
+              menuHouseRentAllowed && {
+                key: 'sub3',
+                label: 'House Rent',
+                onClick: () => {
+                  navigate(appPath.houseRent())
+                  onClose()
+                },
+              },
+              {
+                key: 'sub4',
+                label: 'Manage User',
+                onClick: () => {
+                  navigate(appPath.manageUser())
+                  onClose()
+                },
+              },
+            ]
+          : []),
+      ]),
+    [menuHouseRentAllowed, navigate, user?.user?.role]
+  )
 
   return (
     <nav className="bg-gradient-to-r from-cyan-500 to-blue-500 px-5 py-2 shadow-lg">

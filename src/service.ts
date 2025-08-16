@@ -1,4 +1,6 @@
 import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { some } from 'lodash'
+import { useMemo } from 'react'
 import { apiClient } from './utils/api-client'
 import { sleep } from './utils/helper'
 
@@ -103,4 +105,34 @@ export const useGetFeaturePermissionAction = (featureName: EnumFeatureName) => {
     },
     enabled: !!featureName,
   })
+}
+
+export const usePermissionRouteAllow = (
+  featureName: EnumFeatureName,
+  options: {
+    requiredRead?: boolean
+    requiredCreate?: boolean
+    requiredUpdate?: boolean
+    requiredDelete?: boolean
+  }
+) => {
+  const { requiredRead, requiredCreate, requiredUpdate, requiredDelete } = options
+  const { data: permissionAction } = useGetFeaturePermissionAction(featureName)
+
+  const actionAllowed = useMemo(() => {
+    const _requiredRead = requiredRead || requiredCreate || requiredUpdate || requiredDelete
+    if (_requiredRead) {
+      const d = some([
+        _requiredRead && permissionAction?.canRead,
+        requiredCreate && permissionAction?.canCreate,
+        requiredUpdate && permissionAction?.canUpdate,
+        requiredDelete && permissionAction?.canDelete,
+      ])
+
+      return d
+    }
+
+    return true
+  }, [permissionAction, requiredRead, requiredCreate, requiredUpdate, requiredDelete])
+  return actionAllowed
 }

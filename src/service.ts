@@ -70,16 +70,20 @@ export const useGetMe = () => {
 
 export const useGetMeSuspense = () => {
   const queryClient = useQueryClient()
-  return useSuspenseQuery<IGetMeResponse>({
+  return useSuspenseQuery<IGetMeResponse | null>({
     queryKey: ['getme'],
     queryFn: async () => {
       if (!localStorage.getItem('accessToken')) {
-        throw new Error('Unauthorized')
+        return null
       }
       const [{ data }] = await Promise.all([apiClient.get<IGetMeResponse>(`/users/me`), sleep(500)])
       return data
     },
     select: (data) => {
+      if (!data) {
+        return null
+      }
+
       for (const featureName of Object.values(EnumFeatureName)) {
         queryClient.setQueryData(
           ['permissions', featureName],

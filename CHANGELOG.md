@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/punya199/demo-app/compare/v1.4.1...v1.4.2) (2025-08-16)
+
+
+### Fix
+
+* type safety: Update fileList useMemo in AppUploadFiles component to specify UploadFile[] type, and add thumbnail URL to attachments in PageHouseRentDetail for improved image handling. ([67461ef](https://github.com/punya199/demo-app/commit/67461efd761c6265feba39bafc93bb5d3c2e871f))
+
 ## [1.4.1](https://github.com/punya199/demo-app/compare/v1.4.0...v1.4.1) (2025-08-16)
 
 

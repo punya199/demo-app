@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/punya199/demo-app/compare/v1.4.4...v1.4.5) (2025-08-16)
+
+
+### Fix
+
+* AppUploadFiles component: Refactor access token retrieval to use useAuthStore for improved state management and dependency handling in headers, enhancing authentication flow. ([4a29eb2](https://github.com/punya199/demo-app/commit/4a29eb2c6b2e232f52a81bf847caadc15ceba7c4))
+
 ## [1.4.4](https://github.com/punya199/demo-app/compare/v1.4.3...v1.4.4) (2025-08-16)
 
 

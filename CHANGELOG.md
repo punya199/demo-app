@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/punya199/demo-app/compare/v1.3.0...v1.3.1) (2025-08-16)
+
+
+### Fix
+
+* Update HouseRentDetailTableField and HouseRentMemberTableField components to use Typography.Title for summary displays and enhance form validation for unique member entries, improving UI consistency and data integrity. ([07de8f5](https://github.com/punya199/demo-app/commit/07de8f5e14f342e548fb8ca2027066169caa6b70))
+
 # [1.3.0](https://github.com/punya199/demo-app/compare/v1.2.8...v1.3.0) (2025-08-16)
 
 

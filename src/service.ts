@@ -18,6 +18,12 @@ export enum EnumFeatureName {
   USER = 'user',
 }
 
+export enum EnumUserStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  BLOCKED = 'blocked',
+}
+
 interface IPermissionAction {
   canRead: boolean
   canCreate: boolean
@@ -38,11 +44,22 @@ export interface IPermission {
   action: IPermissionAction
 }
 
+export interface IUser {
+  id: number
+  username: string
+  role: UserRole
+  status: EnumUserStatus
+  createdAt: string
+  updatedAt: string
+  deletedAt: string
+}
+
+export interface IGetUsersResponse {
+  users: IUser[]
+}
+
 interface IGetMeResponse {
-  user: {
-    id: number
-    username: string
-    role: UserRole
+  user: Pick<IUser, 'id' | 'username' | 'role'> & {
     permissions: IPermission[]
   }
 }

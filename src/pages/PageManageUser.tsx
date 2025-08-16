@@ -1,34 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Button, Modal, Select, Table } from 'antd'
+import { Button, Modal, Select, Table, Tag } from 'antd'
 import { ColumnsType } from 'antd/es/table'
-import { UserRole } from '../service'
+import { pascalCase } from 'change-case'
+import { EnumUserStatus, IGetUsersResponse, IUser, UserRole } from '../service'
 import { apiClient } from '../utils/api-client'
-
-type GetUsersResponse = {
-  users: User[]
-}
-
-type User = {
-  id: number
-  username: string
-  role: UserRole
-  createdAt: string
-  updatedAt: string
-  deletedAt: string
-}
-
 const PageManageUser = () => {
   const queryClient = useQueryClient()
   const { data } = useQuery({
     queryKey: ['UserList'],
     queryFn: async () => {
-      const { data } = await apiClient.get<GetUsersResponse>(`/users`)
+      const { data } = await apiClient.get<IGetUsersResponse>(`/users`)
       return data
     },
   })
   const { mutate: editUser } = useMutation({
     mutationFn: async (param: { userId: number; role: UserRole }) => {
-      await apiClient.put<User>(`/users/${param.userId}`, { role: param.role })
+      await apiClient.put<IUser>(`/users/${param.userId}`, { role: param.role })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['UserList'] })
@@ -59,7 +46,7 @@ const PageManageUser = () => {
     })
   }
 
-  const columns: ColumnsType<User> = [
+  const columns: ColumnsType<IUser> = [
     {
       title: 'Username',
       dataIndex: 'username',
@@ -72,6 +59,31 @@ const PageManageUser = () => {
       key: 'role',
       width: 140,
       ellipsis: true,
+      render: (role: UserRole) => {
+        return pascalCase(role)
+      },
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: 140,
+      ellipsis: true,
+      render: (status: EnumUserStatus) => {
+        return (
+          <Tag
+            color={
+              status === EnumUserStatus.ACTIVE
+                ? 'green'
+                : status === EnumUserStatus.INACTIVE
+                  ? 'default'
+                  : 'error'
+            }
+          >
+            {pascalCase(status)}
+          </Tag>
+        )
+      },
     },
     {
       title: 'Action',
@@ -86,7 +98,7 @@ const PageManageUser = () => {
   ]
   return (
     <div>
-      <Table rowKey={(e: User) => e.id} dataSource={data?.users} columns={columns} />
+      <Table rowKey={(e) => e.id} dataSource={data?.users} columns={columns} />
     </div>
   )
 }

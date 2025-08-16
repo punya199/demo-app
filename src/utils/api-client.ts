@@ -20,7 +20,7 @@ const createClient = () => {
       return response
     },
     (error) => {
-      if (error.response.status === 401) {
+      if (error?.response?.status === 401) {
         localStorageAuth.clear()
         window.location.href = appPath.login()
       }

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, Form, Input } from 'antd'
+import { get } from 'lodash'
 import { useCallback, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { TypingAnimation } from '../components/magicui/typing-animation'
@@ -19,6 +20,8 @@ const Login = () => {
   const location = useLocation()
   const queryClient = useQueryClient()
   const { setAccessToken } = useAuthStore()
+  const [form] = Form.useForm()
+
   const { mutate: login, isPending } = useMutation({
     mutationFn: async (values: { username: string; password: string }) => {
       const [{ data }] = await Promise.all([
@@ -39,6 +42,18 @@ const Login = () => {
       } else {
         navigate(appPath.home())
       }
+    },
+    onError: (error) => {
+      const errorMessage = get(error, 'response.data.message', 'เกิดข้อผิดพลาด')
+      form.setFields([
+        {
+          name: 'username',
+        },
+        {
+          name: 'password',
+          errors: [errorMessage],
+        },
+      ])
     },
   })
 
@@ -61,7 +76,7 @@ const Login = () => {
         <h2 className="mb-6 text-center text-3xl font-bold text-gray-800">
           <TypingAnimation className="text-3xl">Welcome Back!</TypingAnimation>
         </h2>
-        <Form name="login" onFinish={onFinish} layout="vertical">
+        <Form form={form} name="login" onFinish={onFinish} layout="vertical">
           <Form.Item
             label={
               <span className="text-lg font-semibold text-gray-700">

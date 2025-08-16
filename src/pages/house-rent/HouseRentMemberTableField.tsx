@@ -4,7 +4,7 @@ import { Button, Flex, Form, Grid, Select, Table, Typography } from 'antd'
 import { DefaultOptionType } from 'antd/es/select'
 import { ColumnType } from 'antd/es/table'
 import dayjs, { Dayjs } from 'dayjs'
-import { chain, compact, round, set, sumBy } from 'lodash'
+import { chain, compact, round, set, sumBy, uniq } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CustomCell, ICustomCellInputType } from './CustomCell'
 import {
@@ -328,7 +328,33 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
               background-color: #f0f0f0;
             `}
           >
-            <Table.Summary.Cell index={0} colSpan={4} align="right">
+            <Table.Summary.Cell index={0}>
+              <Form.Item
+                name="members"
+                css={css`
+                  .ant-form-item-control-input {
+                    display: none;
+                  }
+                `}
+                rules={[
+                  {
+                    validator: (_, value: IHouseRentMemberData[]) => {
+                      const userIds = chain(value ?? [])
+                        .map((item) => item.userId)
+                        .value()
+
+                      if (userIds.length && userIds.length !== uniq(userIds).length) {
+                        return Promise.reject(new Error('ชื่อผู้เช่าซ้ำกัน'))
+                      }
+                      return Promise.resolve()
+                    },
+                  },
+                ]}
+              >
+                <Form.ErrorList />
+              </Form.Item>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={1} colSpan={3} align="right">
               <Typography.Text strong>ส่วนรวม</Typography.Text>
             </Table.Summary.Cell>
             <Table.Summary.Cell index={3} align="right">
@@ -337,16 +363,74 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
             <Table.Summary.Cell index={4} align="right">
               <Typography.Text strong>{totalPrice.toLocaleString()}</Typography.Text>
             </Table.Summary.Cell>
-            <Table.Summary.Cell index={5} colSpan={3}></Table.Summary.Cell>
+            <Table.Summary.Cell index={5}>
+              <Form.Item
+                name="members"
+                css={css`
+                  .ant-form-item-control-input {
+                    display: none;
+                  }
+                `}
+                rules={[
+                  {
+                    validator: (_, value: IHouseRentMemberData[]) => {
+                      const payInternetMonthIds = chain(value ?? [])
+                        .flatMap((item) => item.payInternetMonthIds)
+                        .value()
+
+                      if (
+                        payInternetMonthIds.length &&
+                        payInternetMonthIds.length !== uniq(payInternetMonthIds).length
+                      ) {
+                        return Promise.reject(new Error('ชำระค่าอินเทอร์เน็ตซ้ำกัน'))
+                      }
+                      return Promise.resolve()
+                    },
+                  },
+                ]}
+              >
+                <Form.ErrorList />
+              </Form.Item>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={6}>
+              <Form.Item
+                name="members"
+                css={css`
+                  .ant-form-item-control-input {
+                    display: none;
+                  }
+                `}
+                rules={[
+                  {
+                    validator: (_, value: IHouseRentMemberData[]) => {
+                      const payElectricityMonthIds = chain(value ?? [])
+                        .flatMap((item) => item.payElectricityMonthIds)
+                        .value()
+
+                      if (
+                        payElectricityMonthIds.length &&
+                        payElectricityMonthIds.length !== uniq(payElectricityMonthIds).length
+                      ) {
+                        return Promise.reject(new Error('ชำระค่าไฟฟ้าซ้ำกัน'))
+                      }
+                      return Promise.resolve()
+                    },
+                  },
+                ]}
+              >
+                <Form.ErrorList />
+              </Form.Item>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={7}></Table.Summary.Cell>
           </Table.Summary.Row>
         )
       }}
       footer={() => {
         return (
           <Flex justify="end">
-            <Typography.Text type="danger" strong>
+            <Typography.Title level={5}>
               {`*** ค่าไฟฟ้า ${rents?.length || '-'} เดือน ${summary?.totalPrice?.toLocaleString()} บาท / ${summary?.totalUnit?.toLocaleString()} หน่วย = ${summary?.pricePerUnit?.toLocaleString()} บาท/หน่วย`}
-            </Typography.Text>
+            </Typography.Title>
           </Flex>
         )
       }}

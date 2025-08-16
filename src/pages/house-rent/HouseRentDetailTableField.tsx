@@ -228,9 +228,9 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
         const total = totalHouseRent + totalElectricity + totalInternet
         return (
           <Flex gap={12} justify="end">
-            <Typography.Text type="danger" strong>
+            <Typography.Title level={5}>
               {`*** สรุปยอด ค่าเช่าบ้าน ${totalHouseRent.toLocaleString()} บาท + ค่าไฟ ${totalElectricity.toLocaleString()} บาท + ค่าอินเทอร์เน็ต ${totalInternet.toLocaleString()} บาท = ${total.toLocaleString()} บาท`}
-            </Typography.Text>
+            </Typography.Title>
           </Flex>
         )
       }}

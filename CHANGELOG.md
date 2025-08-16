@@ -1,3 +1,11 @@
+## [1.2.8](https://github.com/punya199/demo-app/compare/v1.2.7...v1.2.8) (2025-08-16)
+
+
+### Fix
+
+* Remove dependency on useGetMe for house rent list query and implement role-based access control for copy link functionality in PageHouseRent component. ([9d23e4d](https://github.com/punya199/demo-app/commit/9d23e4db8ed27a9886d058c901ac958880c6c148))
+* Update Navbar component to include redirect state in login links for improved user experience. ([f07d671](https://github.com/punya199/demo-app/commit/f07d671c311f26339a99ddebf601b6d9ec091f53))
+
 ## [1.2.7](https://github.com/punya199/demo-app/compare/v1.2.6...v1.2.7) (2025-08-16)
 
 

@@ -55,6 +55,7 @@ export const PageHouseRentDetail = () => {
           uid: attachment.id,
           name: attachment.fileName,
           url: `${appConfig().VITE_API_DOMAIN}/attachments/${attachment.id}/file`,
+          thumbUrl: `${appConfig().VITE_API_DOMAIN}/attachments/${attachment.id}/file?thumbnail=true`,
         }
       }),
     }

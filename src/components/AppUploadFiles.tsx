@@ -28,7 +28,7 @@ export const AppUploadFiles = (props: IAppUploadFilesProps) => {
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
 
-  const fileList = useMemo(() => {
+  const fileList = useMemo((): UploadFile[] => {
     return [...(value || [])]
   }, [value])
 

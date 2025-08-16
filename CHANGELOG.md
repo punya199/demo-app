@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/punya199/demo-app/compare/v1.3.1...v1.4.0) (2025-08-16)
+
+
+### Update
+
+* authentication management: Introduce useAuthStore for centralized access token handling, refactor components to utilize the new store for authentication state, and improve permission checks in various components, streamlining user access control and enhancing overall code maintainability. ([ec6bd4a](https://github.com/punya199/demo-app/commit/ec6bd4a88d69bb8df8199f2aa979d0cca3590b3b))
+
 ## [1.3.1](https://github.com/punya199/demo-app/compare/v1.3.0...v1.3.1) (2025-08-16)
 
 

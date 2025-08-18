@@ -3,7 +3,7 @@ import { Button } from 'antd'
 import { toPng } from 'html-to-image'
 import { keyBy, round } from 'lodash'
 import { useMemo, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { apiClient } from '../../../utils/api-client'
 type Bill = {
   id: number
@@ -34,6 +34,7 @@ type GetBillResponse = {
 
 const PageSaveBillToImage = () => {
   const params = useParams()
+  const navigate = useNavigate()
   const billId = params.billId
   const { data } = useQuery({
     queryKey: ['BillList', billId],
@@ -276,7 +277,16 @@ const PageSaveBillToImage = () => {
       </div>
 
       {/* Save Button */}
-      <div className="mt-5 text-center">
+      <div className="mt-5 flex justify-center gap-2 text-center">
+        <Button
+          type="primary"
+          size="large"
+          onClick={() => {
+            navigate(-1)
+          }}
+        >
+          กลับ
+        </Button>
         <Button type="primary" size="large" onClick={handleDownloadAll}>
           💾 บันทึกเป็นรูปภาพ
         </Button>

@@ -58,44 +58,58 @@ const PageOmama = () => {
   }
 
   return (
-    <div className="flex max-w-5xl flex-col gap-2 p-4">
-      <div className="rounded-2xl bg-blue-400 px-4 py-2 text-center text-2xl font-bold">
-        Game Omama
-      </div>
-      <div className="flex items-center justify-between md:flex-row">
-        <Button type="primary" className="!h-9" onClick={() => setIsAddingPlayer(1)}>
-          เพิ่มชื่อหรือแก้ไขชื่อผู้เล่น
-        </Button>
-        {userNameList.length !== 0 && (
-          <Button type="primary" className="!h-9" onClick={() => setIsAddingPlayer(2)}>
-            เริ่มเกม
+    <div className="flex w-full justify-center">
+      <div className="flex w-5xl flex-col gap-3 p-4">
+        <div className="rounded-2xl bg-blue-400 px-4 py-2 text-center text-2xl font-bold">
+          Game Omama
+        </div>
+        <div className="flex items-center gap-1 sm:grid sm:grid-cols-3 sm:justify-between sm:gap-4">
+          <Button
+            type="primary"
+            className="!h-9 w-3/5 sm:w-full"
+            onClick={() => setIsAddingPlayer(1)}
+          >
+            เพิ่มชื่อหรือแก้ไขชื่อผู้เล่น
           </Button>
+          {userNameList.length > 1 && (
+            <Button
+              type="primary"
+              className="!h-9 w-1/5 sm:w-full"
+              onClick={() => setIsAddingPlayer(2)}
+            >
+              เริ่มเกม
+            </Button>
+          )}
+          {userNameList.length > 1 && (
+            <Button
+              type="primary"
+              className="!h-9 w-1/5 sm:w-full"
+              onClick={() => setIsAddingPlayer(3)}
+            >
+              แก้ไขกฎ
+            </Button>
+          )}
+        </div>
+        {isAddingPlayer === 1 && (
+          <AddPlayerOmama
+            userNameList={userNameList}
+            addUserName={addUserName}
+            removeUserName={removeUserName}
+            upperIndexName={upperIndexName}
+            downIndexName={downIndexName}
+          />
         )}
-        {userNameList.length !== 0 && (
-          <Button type="primary" className="!h-9" onClick={() => setIsAddingPlayer(3)}>
-            แก้ไขกฎ
-          </Button>
-        )}
-      </div>
-      {isAddingPlayer === 1 && (
-        <AddPlayerOmama
-          userNameList={userNameList}
-          addUserName={addUserName}
-          removeUserName={removeUserName}
-          upperIndexName={upperIndexName}
-          downIndexName={downIndexName}
-        />
-      )}
 
-      {isAddingPlayer === 2 && (
-        <Omama
-          userNameList={userNameList}
-          nameIndex={nameIndex}
-          setNameIndex={setNameIndex}
-          cardTitle={cardTitle}
-        />
-      )}
-      {isAddingPlayer === 3 && <EditCardTitle value={cardTitle} onChange={onChange} />}
+        {isAddingPlayer === 2 && (
+          <Omama
+            userNameList={userNameList}
+            nameIndex={nameIndex}
+            setNameIndex={setNameIndex}
+            cardTitle={cardTitle}
+          />
+        )}
+        {isAddingPlayer === 3 && <EditCardTitle value={cardTitle} onChange={onChange} />}
+      </div>
     </div>
   )
 }

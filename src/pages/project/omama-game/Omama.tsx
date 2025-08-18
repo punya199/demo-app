@@ -113,13 +113,13 @@ const Omama = (props: OmamaProps) => {
   )
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6">
       {/* ส่วนบน */}
-      <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-        <Button onClick={onRandom} className="w-full sm:w-auto">
+      <div className="flex flex-col items-center gap-4 sm:grid sm:grid-cols-3 sm:justify-between">
+        <Button onClick={onRandom} className="w-full">
           สุ่มไพ่ใหม่
         </Button>
-        <div className="flex items-center gap-4 text-lg font-semibold text-gray-700 sm:flex-row sm:gap-2">
+        <div className="flex items-center justify-center gap-4 text-lg font-semibold text-gray-700 sm:flex-row sm:gap-2">
           <span>ผู้เล่นที่ต้องจั่ว</span>
           <span className="text-blue-700">{props.userNameList[props.nameIndex]}</span>
         </div>
@@ -171,11 +171,13 @@ const Omama = (props: OmamaProps) => {
           .map((item, index) => (
             <div
               key={index}
-              className="flex items-center justify-between rounded-md border p-2 text-sm sm:text-base"
+              className="grid grid-cols-3 items-center rounded-md border text-sm sm:text-base"
             >
-              <span className="font-semibold">{item.name}</span>
-              <span>ได้ไพ่ {item.card}</span>
-              <img src={item.image} alt={item.name} className="h-16 w-12 object-contain" />
+              <span className="flex justify-center font-semibold">{item.name}</span>
+              <span className="flex justify-center font-semibold">ได้ไพ่ {item.card}</span>
+              <div className="flex justify-center">
+                <img src={item.image} alt={item.name} className="m-2 h-16 w-12 sm:h-24 sm:w-18" />
+              </div>
             </div>
           ))}
       </div>

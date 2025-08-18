@@ -141,7 +141,8 @@ const App = () => {
       <ConfigProvider
         theme={{
           token: {
-            colorPrimary: '#2563EB',
+            colorPrimary: '#2563EB', // สีใหม่ของ primary
+            borderRadius: 12, // มุมโค้ง
           },
         }}
       >

@@ -1,3 +1,10 @@
+## [1.4.6](https://github.com/punya199/demo-app/compare/v1.4.5...v1.4.6) (2025-08-18)
+
+
+### Fix
+
+* Clean up App.css by removing unused CSS variables and styles. Update App.tsx to include new border radius for primary color. Enhance PageSaveBillToImage with navigation functionality and improve layout in Omama game components for better user experience. ([1f8a6c7](https://github.com/punya199/demo-app/commit/1f8a6c73b4fe20391b70257c1f99871717ccbe3f))
+
 ## [1.4.5](https://github.com/punya199/demo-app/compare/v1.4.4...v1.4.5) (2025-08-16)
 
 

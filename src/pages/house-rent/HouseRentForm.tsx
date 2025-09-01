@@ -1,11 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { SaveOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
-import { Button, Col, Divider, Flex, Form, Grid, Row } from 'antd'
+import { Button, Col, Divider, Flex, Form, Grid, Input, Row } from 'antd'
 import { keyBy } from 'lodash'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import { calculateElectricitySummary } from './house-rent-helper'
 import {
   IHouseRentDetailData,
@@ -31,52 +30,52 @@ type IHouseRentStoreActions = {
 
 export type IHouseRentStore = IHouseRentStoreState & IHouseRentStoreActions
 
-const useHouseRentStore = create<IHouseRentStore>()(
-  persist(
-    (set) => ({
-      data: {
-        name: '',
-        rents: [],
-        members: [],
-        baseHouseRent: 0,
-        paymentFee: 0,
-        electricitySummary: {
-          totalUnit: 0,
-          totalPrice: 0,
-          pricePerUnit: 0,
-          shareUnit: 0,
-        },
-        internet: {
-          pricePerMonth: 0,
-        },
-        airCondition: {
-          pricePerUnit: 0,
-          unit: 0,
-        },
-        attachments: [],
-      },
-      setData: (data) => set((state) => ({ ...state, data: { ...state.data, ...data } })),
-      setRents: (rents) =>
-        set((state) => ({
-          ...state,
-          data: { ...state.data, rents },
-        })),
-      setMembers: (members) =>
-        set((state) => ({
-          ...state,
-          data: { ...state.data, members },
-        })),
-      setElectricitySummary: (electricitySummary) =>
-        set((state) => ({
-          ...state,
-          data: { ...state.data, electricitySummary },
-        })),
-    }),
-    {
-      name: 'house-rent-storage',
-    }
-  )
-)
+// const useHouseRentStore = create<IHouseRentStore>()(
+//   persist(
+//     (set) => ({
+//       data: {
+//         name: '',
+//         rents: [],
+//         members: [],
+//         baseHouseRent: 0,
+//         paymentFee: 0,
+//         electricitySummary: {
+//           totalUnit: 0,
+//           totalPrice: 0,
+//           pricePerUnit: 0,
+//           shareUnit: 0,
+//         },
+//         internet: {
+//           pricePerMonth: 0,
+//         },
+//         airCondition: {
+//           pricePerUnit: 0,
+//           unit: 0,
+//         },
+//         attachments: [],
+//       },
+//       setData: (data) => set((state) => ({ ...state, data: { ...state.data, ...data } })),
+//       setRents: (rents) =>
+//         set((state) => ({
+//           ...state,
+//           data: { ...state.data, rents },
+//         })),
+//       setMembers: (members) =>
+//         set((state) => ({
+//           ...state,
+//           data: { ...state.data, members },
+//         })),
+//       setElectricitySummary: (electricitySummary) =>
+//         set((state) => ({
+//           ...state,
+//           data: { ...state.data, electricitySummary },
+//         })),
+//     }),
+//     {
+//       name: 'house-rent-storage',
+//     }
+//   )
+// )
 
 interface IHouseRentFormProps {
   defaultValues?: IHouseRentFormValues
@@ -85,54 +84,63 @@ interface IHouseRentFormProps {
   viewMode?: boolean
 }
 export const HouseRentForm = (props: IHouseRentFormProps) => {
-  const { defaultValues, onSubmit, isSubmitting, viewMode } = props
+  const { defaultValues: rawDefaultValues, onSubmit, isSubmitting, viewMode } = props
   const navigate = useNavigate()
 
-  const { data, setData, setElectricitySummary } = useHouseRentStore()
+  // const { data, setData, setElectricitySummary } = useHouseRentStore()
   const { md } = Grid.useBreakpoint()
   const [form] = Form.useForm()
+  const electricitySummary = Form.useWatch('electricitySummary', form)
 
-  useEffect(() => {
-    if (defaultValues) {
-      setData(defaultValues)
+  const defaultValues = useMemo(() => {
+    const electricitySummary = calculateElectricitySummary(
+      rawDefaultValues?.rents || [],
+      rawDefaultValues?.members || []
+    )
+    return {
+      ...rawDefaultValues,
+      electricitySummary,
+      baseHouseRent: +(rawDefaultValues?.baseHouseRent || 0),
+      paymentFee: +(rawDefaultValues?.paymentFee || 0),
+      internet: {
+        ...rawDefaultValues?.internet,
+        pricePerMonth: +(rawDefaultValues?.internet?.pricePerMonth || 0),
+      },
+      airCondition: {
+        ...rawDefaultValues?.airCondition,
+        pricePerUnit: +(rawDefaultValues?.airCondition?.pricePerUnit || 0),
+        unit: +(rawDefaultValues?.airCondition?.unit || 0),
+      },
     }
-  }, [defaultValues, setData])
-
-  useEffect(() => {
-    if (data) {
-      form.setFieldsValue(data)
-    }
-  }, [data, form])
-
-  useEffect(() => {
-    const electricitySummary = calculateElectricitySummary(data.rents, data.members)
-    setElectricitySummary(electricitySummary)
-  }, [data.rents, data.members, setElectricitySummary])
+  }, [])
 
   const onValuesChange = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (_: any, data: IHouseRentFormValues) => {
       const rentsHash = keyBy(data.rents, 'id')
-      setData({
-        ...data,
-        members: (data.members || []).map((member) => ({
-          ...member,
-          payInternetMonthIds: (member.payInternetMonthIds || []).filter((id) => !!rentsHash[id]),
-          payElectricityMonthIds: (member.payElectricityMonthIds || []).filter(
-            (id) => !!rentsHash[id]
-          ),
-        })),
-      })
+      const electricitySummary = calculateElectricitySummary(data?.rents || [], data?.members || [])
+      form.setFieldValue('electricitySummary', electricitySummary)
+      const newMembers = (data.members || []).map((member) => ({
+        ...member,
+        payInternetMonthIds: (member.payInternetMonthIds || []).filter((id) => !!rentsHash[id]),
+        payElectricityMonthIds: (member.payElectricityMonthIds || []).filter(
+          (id) => !!rentsHash[id]
+        ),
+      }))
+      form.setFieldValue('members', newMembers)
     },
-    [setData]
+    []
   )
 
-  const handleSubmit = useCallback(async () => {
-    await form.validateFields()
-    if (!viewMode) {
-      onSubmit?.(data)
-    }
-  }, [data, form, onSubmit, viewMode])
+  const handleSubmit = useCallback(
+    async (values: IHouseRentFormValues) => {
+      await form.validateFields()
+      if (!viewMode) {
+        onSubmit?.(values)
+      }
+    },
+    [form, onSubmit, viewMode]
+  )
 
   return (
     <div
@@ -146,12 +154,18 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
         form={form}
         onValuesChange={onValuesChange}
         onFinish={handleSubmit}
+        initialValues={defaultValues}
         size={md ? 'large' : 'small'}
         layout="vertical"
         disabled={viewMode}
         scrollToFirstError
       >
         <Row gutter={[16, 16]}>
+          {/* keep value */}
+          <Form.Item name="electricitySummary" noStyle hidden>
+            <Input />
+          </Form.Item>
+
           <Col xs={24} md={8}>
             <HouseRentMasterDataField />
           </Col>
@@ -162,7 +176,7 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
           </Col>
           <Col xs={24} md={24}>
             <Form.Item name="members" noStyle>
-              <HouseRentMemberTableField summary={data.electricitySummary} viewMode={viewMode} />
+              <HouseRentMemberTableField summary={electricitySummary} viewMode={viewMode} />
             </Form.Item>
           </Col>
 
@@ -172,7 +186,7 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
 
           <Divider />
           <Col xs={24} md={24}>
-            <HouseRentReportSummary data={data} />
+            <HouseRentReportSummary />
           </Col>
           <Col span={24}>
             <Flex

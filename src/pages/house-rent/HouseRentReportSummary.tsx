@@ -1,5 +1,5 @@
 import { css } from '@emotion/react'
-import { Flex, Grid, Typography } from 'antd'
+import { Flex, Form, Grid, Typography } from 'antd'
 import Table, { ColumnType } from 'antd/es/table'
 import { chain, filter, keyBy, round, sumBy } from 'lodash'
 import { useMemo } from 'react'
@@ -30,11 +30,16 @@ interface IHouseRentReportSummaryData {
   finalPayment: number
 }
 
-interface IHouseRentReportSummaryProps {
-  data: IHouseRentFormValues
-}
-export const HouseRentReportSummary = (props: IHouseRentReportSummaryProps) => {
-  const { data } = props
+export const HouseRentReportSummary = () => {
+  const form = Form.useFormInstance<IHouseRentFormValues>()
+  const members = Form.useWatch('members', form)
+  const rents = Form.useWatch('rents', form)
+  const electricitySummary = Form.useWatch('electricitySummary', form)
+  const baseHouseRent = Form.useWatch('baseHouseRent', form)
+  const internetData = Form.useWatch('internet', form)
+  const airConditionData = Form.useWatch('airCondition', form)
+  const paymentFeeData = Form.useWatch('paymentFee', form)
+
   const { md } = Grid.useBreakpoint()
 
   const { data: userOptions } = useGetUserOptions()
@@ -147,42 +152,43 @@ export const HouseRentReportSummary = (props: IHouseRentReportSummaryProps) => {
   }, [])
 
   const dataSource = useMemo(() => {
-    const totalMonth = data.rents?.length || 0
-    const totalMember = data.members?.length || 0
+    const totalMonth = rents?.length || 0
+    const totalMember = members?.length || 0
 
     // house rent
-    const houseRent = round((data.baseHouseRent * totalMonth) / totalMember, 0)
+    const houseRent = round((baseHouseRent * totalMonth) / totalMember, 0)
 
     // internet
-    const totalInternetPrice = round(data.internet.pricePerMonth * totalMonth, 0)
+    const totalInternetPrice = round((internetData?.pricePerMonth || 0) * totalMonth, 0)
     const internet = round(totalInternetPrice / totalMember, 0)
 
     // water
-    const totalWaterPrice = sumBy(data.rents, 'waterPrice')
+    const totalWaterPrice = sumBy(rents, 'waterPrice')
     const water = round(totalWaterPrice / totalMember, 0)
 
     // electricity share
-    const electricityShare = round(
-      (data.electricitySummary.shareUnit * data.electricitySummary.pricePerUnit) / totalMember,
+    const electricityShareTotalPrice = round(
+      (electricitySummary?.shareUnit || 0) * (electricitySummary?.pricePerUnit || 0),
       0
     )
+    const electricityShare = round(electricityShareTotalPrice / totalMember, 0)
 
     // payment fee
-    const paymentFee = round((data.paymentFee * totalMonth) / totalMember, 0)
+    const paymentFee = round((paymentFeeData * totalMonth) / totalMember, 0)
 
-    const rentsHash = keyBy(data.rents, 'id')
+    const rentsHash = keyBy(rents, 'id')
 
-    return chain(data.members || [])
+    return chain(members || [])
       .reduce((acc: IHouseRentReportSummaryData[], member) => {
         // air condition
         const airCondition = round(
-          data.airCondition.pricePerUnit * member.airConditionUnit * totalMonth,
+          (airConditionData?.pricePerUnit || 0) * member.airConditionUnit * totalMonth,
           0
         )
 
         // electricity
         const electricity = round(
-          member.electricityUnit.diff * data.electricitySummary.pricePerUnit,
+          member.electricityUnit.diff * electricitySummary?.pricePerUnit || 0,
           0
         )
 
@@ -191,7 +197,7 @@ export const HouseRentReportSummary = (props: IHouseRentReportSummaryProps) => {
           filter(
             member.payInternetMonthIds,
             (payInternetMonthId) => !!rentsHash[payInternetMonthId]
-          ).length * data.internet.pricePerMonth
+          ).length * internetData?.pricePerMonth
 
         const deductElectricity = chain(member.payElectricityMonthIds)
           .sumBy((id) => {
@@ -234,14 +240,14 @@ export const HouseRentReportSummary = (props: IHouseRentReportSummaryProps) => {
       }, [])
       .value()
   }, [
-    data.rents,
-    data.members,
-    data.baseHouseRent,
-    data.internet.pricePerMonth,
-    data.electricitySummary.shareUnit,
-    data.electricitySummary.pricePerUnit,
-    data.paymentFee,
-    data.airCondition.pricePerUnit,
+    rents,
+    members,
+    baseHouseRent,
+    internetData?.pricePerMonth,
+    electricitySummary?.shareUnit,
+    electricitySummary?.pricePerUnit,
+    paymentFeeData,
+    airConditionData?.pricePerUnit,
     userOptionsHash,
   ])
 

@@ -320,8 +320,10 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
       summary={(d) => {
         if (!d?.length) return null
 
-        const totalUnit = sumBy(d, 'electricityUnit.diff')
-        const totalPrice = round(totalUnit * (summary?.pricePerUnit || 0), 0)
+        const totalMemberUnit = sumBy(d, 'electricityUnit.diff')
+        const totalUnit = summary?.totalUnit || 0
+        const shareUnit = summary?.shareUnit || 0
+        const totalPrice = round(shareUnit * (summary?.pricePerUnit || 0), 0)
         return (
           <Table.Summary.Row
             css={css`
@@ -355,10 +357,12 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
               </Form.Item>
             </Table.Summary.Cell>
             <Table.Summary.Cell index={1} colSpan={3} align="right">
-              <Typography.Text strong>ส่วนรวม</Typography.Text>
+              <Typography.Text strong>
+                ส่วนรวม {`(${totalUnit.toLocaleString()} - ${totalMemberUnit.toLocaleString()})`}
+              </Typography.Text>
             </Table.Summary.Cell>
             <Table.Summary.Cell index={3} align="right">
-              <Typography.Text strong>{totalUnit.toLocaleString()}</Typography.Text>
+              <Typography.Text strong>{shareUnit.toLocaleString()}</Typography.Text>
             </Table.Summary.Cell>
             <Table.Summary.Cell index={4} align="right">
               <Typography.Text strong>{totalPrice.toLocaleString()}</Typography.Text>

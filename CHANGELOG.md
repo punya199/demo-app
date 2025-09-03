@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/punya199/demo-app/compare/v1.5.1...v1.5.2) (2025-09-03)
+
+
+### Fix
+
+* Removes authorization check for house rent summary ([d805076](https://github.com/punya199/demo-app/commit/d805076583a3ec747f4ad427c01a45d723c4a41a))
+
 ## [1.5.1](https://github.com/punya199/demo-app/compare/v1.5.0...v1.5.1) (2025-09-03)
 
 

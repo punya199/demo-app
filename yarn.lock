@@ -8067,6 +8067,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-to-print@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "react-to-print@npm:3.1.1"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ~19
+  checksum: 10c0/07ce955f35bb9cef1c856d94eda3b5a9f82759367c76e5c6b4139c76012fb3c66ad866dd37bbc2eb714a98c096ef7077a553317722ddb72ebbfb95449337110e
+  languageName: node
+  linkType: hard
+
 "react-transition-group@npm:^4.3.0":
   version: 4.4.5
   resolution: "react-transition-group@npm:4.4.5"
@@ -9265,6 +9274,7 @@ __metadata:
     react-responsive: "npm:^10.0.1"
     react-router-dom: "npm:^7.5.0"
     react-select: "npm:^5.10.2"
+    react-to-print: "npm:^3.1.1"
     semantic-release: "npm:^24.2.5"
     tailwind-merge: "npm:^3.3.1"
     tailwindcss: "npm:^4.1.4"

@@ -1,4 +1,4 @@
-import { CopyOutlined, DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
+import { CopyOutlined, DeleteOutlined, EyeOutlined, PlusOutlined, ProjectOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
 import { Button, Flex, Modal, Table, TableColumnType, Typography } from 'antd'
 import dayjs from 'dayjs'
@@ -93,6 +93,14 @@ export const PageHouseRent = () => {
         align: 'center',
         render: (value) => (
           <Flex gap={4} justify="center">
+            <Link
+              to={appPath.houseRentSummary({ param: { houseRentId: value } })}
+              onMouseOver={() => {
+                import('./PageHouseRentSummary')
+              }}
+            >
+              <Button type="link" icon={<ProjectOutlined />} title="รายงาน" />
+            </Link>
             {permissionAction?.canRead && (
               <Link
                 to={appPath.houseRentDetail({ param: { houseRentId: value } })}

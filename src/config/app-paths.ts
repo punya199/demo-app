@@ -16,5 +16,8 @@ export const appPath = {
   houseRentDetailClone: generatePath<{ param: { houseRentId: string } }>(
     '/house-rent/:houseRentId/clone'
   ),
+  houseRentSummary: generatePath<{ param: { houseRentId: string } }>(
+    '/house-rent/:houseRentId/summary'
+  ),
   manageUser: generatePath('/manage-user'),
 }

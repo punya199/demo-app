@@ -43,6 +43,11 @@ const PageHouseRentDetailClone = lazy(() =>
     default: module.PageHouseRentDetailClone,
   }))
 )
+const PageHouseRentSummary = lazy(() =>
+  import('./pages/house-rent/PageHouseRentSummary').then((module) => ({
+    default: module.PageHouseRentSummary,
+  }))
+)
 
 const router = createBrowserRouter([
   {
@@ -88,6 +93,14 @@ const router = createBrowserRouter([
         element: (
           <Authorize featureName={EnumFeatureName.HOUSE_RENT} requiredCreate>
             <PageHouseRentCreate />
+          </Authorize>
+        ),
+      },
+      {
+        path: appPath.houseRentSummary(),
+        element: (
+          <Authorize featureName={EnumFeatureName.HOUSE_RENT} requiredRead>
+            <PageHouseRentSummary />
           </Authorize>
         ),
       },

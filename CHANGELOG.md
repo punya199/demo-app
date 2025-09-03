@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/punya199/demo-app/compare/v1.5.2...v1.5.3) (2025-09-03)
+
+
+### Fix
+
+* Configures Dayjs for timezone support ([ca5c591](https://github.com/punya199/demo-app/commit/ca5c5916d5a1b69027385f9778235298e5e32451))
+
 ## [1.5.2](https://github.com/punya199/demo-app/compare/v1.5.1...v1.5.2) (2025-09-03)
 
 

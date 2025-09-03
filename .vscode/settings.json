@@ -16,5 +16,6 @@
   },
   "[sql]": {
     "editor.defaultFormatter": "adpyke.vscode-sql-formatter"
-  }
+  },
+  "kiroAgent.configureMCP": "Disabled"
 }

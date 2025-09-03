@@ -99,9 +99,7 @@ const router = createBrowserRouter([
       {
         path: appPath.houseRentSummary(),
         element: (
-          <Authorize featureName={EnumFeatureName.HOUSE_RENT} requiredRead>
-            <PageHouseRentSummary />
-          </Authorize>
+          <PageHouseRentSummary />
         ),
       },
       {

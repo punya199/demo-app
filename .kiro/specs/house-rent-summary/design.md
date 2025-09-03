@@ -6,33 +6,39 @@ The House Rent Summary page will be implemented as a new route within the existi
 
 ## Architecture
 
-### Component Structure
+### Component Structure (Actual Implementation)
 
 ```
 PageHouseRentSummary
+├── Global (Emotion CSS for print styles)
 ├── HouseRentSummaryHeader
-│   ├── HouseRentTitle
-│   ├── DateRangeDisplay
-│   └── PrintButton
-├── HouseRentSummaryContent
-│   ├── BasicInfoSection
-│   ├── RentalDetailsSection
-│   │   └── RentalDetailsTable
-│   ├── MemberDetailsSection
-│   │   └── MemberDetailsTable
-│   ├── ElectricitySummarySection
-│   └── FinancialSummarySection
-└── HouseRentSummaryFooter
-    └── NavigationButtons
+│   ├── House name and date range display
+│   └── Print button with react-to-print integration
+└── HouseRentSummaryContent (printable content)
+    ├── SummarySection (Basic Information)
+    │   └── BasicInfoSection
+    ├── SummarySection (Electricity Summary - Inline)
+    │   └── Inline electricity summary grid
+    ├── SummarySection (Monthly Rental Details)
+    │   └── RentalDetailsSection
+    │       ├── Desktop responsive table
+    │       └── Mobile card layout
+    └── SummarySection (Member Summary)
+        └── MemberDetailsSection
+            ├── Complex calculation engine
+            ├── Desktop comprehensive table
+            └── Mobile detailed cards
 ```
 
-### Data Flow
+### Data Flow (Actual Implementation)
 
-The summary page will:
-1. Use the same `useGetHouseRent` hook as the detail page
-2. Transform the data for display-optimized presentation
-3. Apply responsive and print-specific styling
-4. Provide print functionality through browser APIs
+The summary page:
+1. Uses `useGetHouseRent` hook for data fetching with loading and error states
+2. Transforms API data using `calculateElectricitySummary` helper function
+3. Converts attachment data to proper UploadFile format with secure URLs
+4. Implements react-to-print with custom page styling and document titles
+5. Uses `useMemo` for performance optimization of data transformations
+6. Provides comprehensive error handling with NotFound component fallback
 
 ## Components and Interfaces
 
@@ -105,21 +111,25 @@ interface ISummaryTableColumn {
 - Print-optimized column widths
 - Configured with page breaks before and after for dedicated print pages
 
-#### MemberDetailsSection
-- Member information table
-- Electricity usage, AC units, payments
-- Calculated costs per member
-- Expandable on mobile, full table on desktop
+#### MemberDetailsSection (Comprehensive Implementation)
+- Complex financial calculation engine with 13 different cost components
+- Individual member cost breakdown including house rent, air conditioning, utilities
+- Payment deduction tracking for internet and electricity direct payments
+- Responsive design with detailed desktop table (13 columns) and mobile cards
+- Real-time calculation of final payments and monthly averages
+- Summary totals row with grand total calculations
 
-#### ElectricitySummarySection
-- Total units, price, and calculations
-- Visual emphasis on key numbers
-- Clear formatting for financial data
+#### ElectricitySummarySection (Integrated Implementation)
+- Integrated directly into PageHouseRentSummary as inline grid section
+- Displays total units, total price, price per unit, and shared units
+- Responsive 2-column grid layout with proper formatting
+- Uses existing electricity summary calculations from helper functions
 
-#### FinancialSummarySection
-- Overall totals and breakdowns
-- Cost per person calculations
-- Payment summary information
+#### FinancialSummarySection (Integrated into MemberDetailsSection)
+- Financial summaries integrated into comprehensive MemberDetailsSection
+- All cost calculations, deductions, and final payments handled in single component
+- Mobile summary cards show grand totals for all members
+- Desktop table includes summary row with complete financial breakdown
 
 ## Responsive Design Strategy
 
@@ -257,12 +267,14 @@ interface ISummaryTableColumn {
 - Print dialog error handling
 - Fallback for unsupported browsers
 
-### React-to-Print Integration
-- Enhanced print functionality using react-to-print library
-- Better control over print content and styling
-- Improved page break handling and content flow
-- Custom print document titles and page styling
-- Separation of print content from screen UI elements
+### React-to-Print Integration (Implemented)
+- Enhanced print functionality using react-to-print library v3.1.1
+- Custom `useReactToPrint` hook with `contentRef` for precise print content control
+- Dynamic document titles based on house rent name
+- Comprehensive page styling with A4 format, margins, and typography
+- Page break controls for RentalDetailsSection with dedicated page allocation
+- Separation of print content from screen UI elements using ref-based targeting
+- Fallback to `window.print()` for backward compatibility
 
 ## Performance Considerations
 

@@ -84,7 +84,7 @@ export const RentalDetailsSection = ({ rents }: IRentalDetailsSectionProps) => {
   )
 
   return (
-    <div className="space-y-4 rental-details-section">
+    <div className="space-y-4 ">
       {/* Desktop Table */}
       <div className="hidden md:block">
         <Table

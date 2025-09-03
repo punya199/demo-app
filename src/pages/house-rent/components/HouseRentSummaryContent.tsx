@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { ReactNode } from 'react'
 
 interface IHouseRentSummaryContentProps {
@@ -11,7 +12,7 @@ export const HouseRentSummaryContent = ({ children }: IHouseRentSummaryContentPr
       <div className="hidden print:block text-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">House Rent Summary</h1>
         <p className="text-sm text-gray-600 mt-1">
-          Generated on {new Date().toLocaleDateString('th-TH')}
+          Generated on {dayjs().tz().format('DD/MM/YYYY HH:mm')}
         </p>
       </div>
 

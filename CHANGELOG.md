@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/punya199/demo-app/compare/v1.5.0...v1.5.1) (2025-09-03)
+
+
+### Fix
+
+* Removes redundant class from container. ([89c5577](https://github.com/punya199/demo-app/commit/89c5577445464ecc2e2e892f6d7b0d8e50bdd55d))
+
 # [1.5.0](https://github.com/punya199/demo-app/compare/v1.4.7...v1.5.0) (2025-09-03)
 
 

@@ -1,3 +1,14 @@
+# [1.5.0](https://github.com/punya199/demo-app/compare/v1.4.7...v1.5.0) (2025-09-03)
+
+
+### Fix
+
+* Adds house rent summary page ([412f9b1](https://github.com/punya199/demo-app/commit/412f9b1e6baffc878534c829fc461eb4b8d453ea))
+
+### Update
+
+* setup kiro ([6a187b4](https://github.com/punya199/demo-app/commit/6a187b455174535129e015303b03a657c7cc2b60))
+
 ## [1.4.7](https://github.com/punya199/demo-app/compare/v1.4.6...v1.4.7) (2025-09-01)
 
 

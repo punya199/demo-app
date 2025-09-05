@@ -1,3 +1,10 @@
+## [1.5.4](https://github.com/punya199/demo-app/compare/v1.5.3...v1.5.4) (2025-09-05)
+
+
+### Fix
+
+* house rent update functionality ([9814a63](https://github.com/punya199/demo-app/commit/9814a63134db41c939405dcf81492e8e98b6fca5))
+
 ## [1.5.3](https://github.com/punya199/demo-app/compare/v1.5.2...v1.5.3) (2025-09-03)
 
 

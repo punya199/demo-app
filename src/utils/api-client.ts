@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { set } from 'lodash'
 import { appConfig } from '../config/app-config'
 import { appPath } from '../config/app-paths'
 import { localStorageAuth } from './store'
@@ -7,12 +6,9 @@ import { localStorageAuth } from './store'
 const createClient = () => {
   const ax = axios.create({
     baseURL: appConfig().VITE_API_DOMAIN,
+    withCredentials: true,
   })
   ax.interceptors.request.use((config) => {
-    const accessToken = localStorage.getItem('accessToken')
-    if (accessToken) {
-      set(config, ['headers', 'authorization'], 'Bearer ' + accessToken)
-    }
     return config
   })
   ax.interceptors.response.use(

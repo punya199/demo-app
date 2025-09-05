@@ -25,7 +25,7 @@ const Login = () => {
   const { mutate: login, isPending } = useMutation({
     mutationFn: async (values: { username: string; password: string }) => {
       const [{ data }] = await Promise.all([
-        apiClient.post<Data>(`/users/login`, {
+        apiClient.post<Data>(`/auth/login`, {
           username: values.username,
           password: values.password,
         }),

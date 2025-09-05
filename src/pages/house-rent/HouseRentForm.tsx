@@ -162,9 +162,17 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
       >
         <Row gutter={[16, 16]}>
           {/* keep value */}
+          <Form.Item name="id" noStyle hidden>
+            <Input />
+          </Form.Item>
           <Form.Item name="electricitySummary" noStyle hidden>
             <Input />
           </Form.Item>
+          <Form.Item name="attachments" noStyle hidden>
+            <Input />
+          </Form.Item>
+
+          {/* keep value */}
 
           <Col xs={24} md={8}>
             <HouseRentMasterDataField />

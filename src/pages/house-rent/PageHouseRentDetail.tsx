@@ -15,7 +15,7 @@ export const PageHouseRentDetail = () => {
   const { houseRentId } = useParams<{ houseRentId: string }>()
   const { data: houseRentData, isLoading } = useGetHouseRent(houseRentId)
 
-  const { mutate: saveHouseRent, isPending } = useUpdateHouseRent()
+  const { mutate: saveHouseRent, isPending } = useUpdateHouseRent(houseRentId)
   const { data: permissionAction } = useGetFeaturePermissionAction(EnumFeatureName.HOUSE_RENT)
 
   const handleSubmit = useCallback(

@@ -73,12 +73,13 @@ export const useCreateHouseRent = () => {
   })
 }
 
-export const useUpdateHouseRent = () => {
+export const useUpdateHouseRent = (houseRentId?: string) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (params: ISaveHouseRentParams) => {
+      if (!houseRentId) throw new Error('houseRentId is required')
       const { data } = await apiClient.put<IGetHouseRentResponse>(
-        `/house-rents/${params.id}`,
+        `/house-rents/${houseRentId}`,
         params
       )
       return data

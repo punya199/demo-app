@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/punya199/demo-app/compare/v1.5.4...v1.6.0) (2025-09-08)
+
+
+### Update
+
+* login endpoint for authentication ([9feef24](https://github.com/punya199/demo-app/commit/9feef24bea802b3385f4ae4c698b380002d1fbcb))
+
 ## [1.5.4](https://github.com/punya199/demo-app/compare/v1.5.3...v1.5.4) (2025-09-05)
 
 

@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/punya199/demo-app/compare/v1.6.0...v1.6.1) (2025-09-17)
+
+
+### Fix
+
+* Improves authentication and authorization flow ([2042b12](https://github.com/punya199/demo-app/commit/2042b120705a2c8e0c8b0e23ea6d2d0a29827207))
+
 # [1.6.0](https://github.com/punya199/demo-app/compare/v1.5.4...v1.6.0) (2025-09-08)
 
 

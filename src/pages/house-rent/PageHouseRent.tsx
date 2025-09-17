@@ -1,4 +1,10 @@
-import { CopyOutlined, DeleteOutlined, EyeOutlined, PlusOutlined, ProjectOutlined } from '@ant-design/icons'
+import {
+  CopyOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  ProjectOutlined,
+} from '@ant-design/icons'
 import { css } from '@emotion/react'
 import { Button, Flex, Modal, Table, TableColumnType, Typography } from 'antd'
 import dayjs from 'dayjs'
@@ -6,7 +12,8 @@ import { keyBy, sumBy } from 'lodash'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
-import { EnumFeatureName, useGetFeaturePermissionAction } from '../../service'
+import { useGetFeaturePermissionAction } from '../../service'
+import { EnumPermissionFeatureName } from '../../services/permission/permission.params'
 import { formatCurrency } from '../../utils/format-currency'
 import { IHouseRentDetailData, IHouseRentMemberData } from './house-rent-interface'
 import {
@@ -18,7 +25,9 @@ import {
 
 export const PageHouseRent = () => {
   const { data: houseRentListData, isLoading } = useGetHouseRentList()
-  const { data: permissionAction } = useGetFeaturePermissionAction(EnumFeatureName.HOUSE_RENT)
+  const { data: permissionAction } = useGetFeaturePermissionAction(
+    EnumPermissionFeatureName.HOUSE_RENT
+  )
 
   const { mutate: deleteHouseRent } = useDeleteHouseRent()
   const { data: userOptions } = useGetUserOptions()

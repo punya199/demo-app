@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { some } from 'lodash'
 import { useMemo } from 'react'
+import { EnumPermissionFeatureName } from './services/permission/permission.params'
 import { apiClient } from './utils/api-client'
 import { sleep } from './utils/helper'
 
@@ -10,12 +11,6 @@ export enum UserRole {
   SUPER_ADMIN = 'super_admin',
 }
 export const roleLevels: UserRole[] = [UserRole.USER, UserRole.ADMIN, UserRole.SUPER_ADMIN]
-
-export enum EnumFeatureName {
-  HOUSE_RENT = 'house_rent',
-  BILL = 'bill',
-  USER = 'user',
-}
 
 export enum EnumUserStatus {
   ACTIVE = 'active',
@@ -39,7 +34,7 @@ const defaultPermissionAction: IPermissionAction = {
 
 export interface IPermission {
   id: string
-  featureName: EnumFeatureName
+  featureName: EnumPermissionFeatureName
   action: IPermissionAction
 }
 
@@ -75,7 +70,7 @@ export const useGetMe = () => {
       return data
     },
     select: (data) => {
-      for (const featureName of Object.values(EnumFeatureName)) {
+      for (const featureName of Object.values(EnumPermissionFeatureName)) {
         queryClient.setQueryData(
           ['permissions', featureName],
           data.user.permissions.find((permission) => permission.featureName === featureName)
@@ -101,7 +96,7 @@ export const useGetMeSuspense = () => {
         return null
       }
 
-      for (const featureName of Object.values(EnumFeatureName)) {
+      for (const featureName of Object.values(EnumPermissionFeatureName)) {
         queryClient.setQueryData(
           ['permissions', featureName],
           data.user.permissions.find((permission) => permission.featureName === featureName)
@@ -114,7 +109,7 @@ export const useGetMeSuspense = () => {
   })
 }
 
-export const useGetFeaturePermissionAction = (featureName: EnumFeatureName) => {
+export const useGetFeaturePermissionAction = (featureName: EnumPermissionFeatureName) => {
   const { data: getMeResponse } = useGetMe()
   const userId = getMeResponse?.user?.id
   return useQuery<IPermissionAction>({
@@ -130,7 +125,7 @@ export const useGetFeaturePermissionAction = (featureName: EnumFeatureName) => {
 }
 
 export const usePermissionRouteAllow = (
-  featureName: EnumFeatureName,
+  featureName: EnumPermissionFeatureName,
   options: {
     requiredRead?: boolean
     requiredCreate?: boolean

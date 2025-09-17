@@ -7,7 +7,8 @@ import { startTransition, useCallback, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { TypingAnimation } from '../components/magicui/typing-animation'
 import { appPath } from '../config/app-paths'
-import { EnumFeatureName, useGetMe, usePermissionRouteAllow, UserRole } from '../service'
+import { useGetMe, usePermissionRouteAllow, UserRole } from '../service'
+import { EnumPermissionFeatureName } from '../services/permission/permission.params'
 import { apiClient } from '../utils/api-client'
 import { checkRole, sleep } from '../utils/helper'
 
@@ -48,16 +49,13 @@ const Navbar = () => {
   const queryClient = useQueryClient()
   const showDrawer = () => setOpen(true)
   const onClose = () => setOpen(false)
-  const menuHouseRentAllowed = usePermissionRouteAllow(EnumFeatureName.HOUSE_RENT, {
+  const menuHouseRentAllowed = usePermissionRouteAllow(EnumPermissionFeatureName.HOUSE_RENT, {
     requiredRead: true,
   })
 
   const { mutate: logout } = useMutation({
     mutationFn: async () => {
-      const [{ data }] = await Promise.all([
-        apiClient.post(`/auth/logout`),
-        sleep(350),
-      ])
+      const [{ data }] = await Promise.all([apiClient.post(`/auth/logout`), sleep(350)])
       return data
     },
     onSettled: () => {
@@ -116,29 +114,29 @@ const Navbar = () => {
         },
         ...(checkRole(UserRole.SUPER_ADMIN, user?.user?.role)
           ? [
-            menuHouseRentAllowed && {
-              key: 'sub3',
-              label: 'House Rent',
-              onClick: () => {
-                navigate(appPath.houseRent())
-                onClose()
+              menuHouseRentAllowed && {
+                key: 'sub3',
+                label: 'House Rent',
+                onClick: () => {
+                  navigate(appPath.houseRent())
+                  onClose()
+                },
+                onMouseEnter: () => {
+                  import('../pages/house-rent/PageHouseRent')
+                },
               },
-              onMouseEnter: () => {
-                import('../pages/house-rent/PageHouseRent')
+              {
+                key: 'sub4',
+                label: 'Manage User',
+                onClick: () => {
+                  navigate(appPath.manageUser())
+                  onClose()
+                },
+                onMouseEnter: () => {
+                  import('../pages/PageManageUser')
+                },
               },
-            },
-            {
-              key: 'sub4',
-              label: 'Manage User',
-              onClick: () => {
-                navigate(appPath.manageUser())
-                onClose()
-              },
-              onMouseEnter: () => {
-                import('../pages/PageManageUser')
-              },
-            },
-          ]
+            ]
           : []),
       ]),
     [menuHouseRentAllowed, navigate, user?.user?.role]

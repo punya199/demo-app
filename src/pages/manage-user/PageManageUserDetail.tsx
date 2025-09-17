@@ -5,7 +5,8 @@ import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { NotFound } from '../../components/NotFound'
 import { LoadingSpin } from '../../layouts/LoadingSpin'
-import { EnumUserStatus } from '../../service'
+import { EnumUserStatus, useGetFeaturePermissionAction } from '../../service'
+import { EnumPermissionFeatureName } from '../../services/permission/permission.params'
 import { useGetPermissionOptions } from '../../services/permission/permission.query'
 import { useGetUser, useGetUserPermissions } from '../../services/user/user.query'
 import { IUserPermissionFormValues, UserPermissionForm } from './UserPermissionForm'
@@ -46,6 +47,10 @@ const PageManageUserDetail = () => {
     return data
   }, [userPermissionsResponse, permissionOptionsResponse])
 
+  const { data: userPermissionAction } = useGetFeaturePermissionAction(
+    EnumPermissionFeatureName.USER_PERMISSIONS
+  )
+
   if (userLoading || permissionOptionsLoading || userPermissionsLoading) {
     return <LoadingSpin />
   }
@@ -67,7 +72,6 @@ const PageManageUserDetail = () => {
         </div>
         <div>
           <Typography.Title level={4}>
-            {' '}
             <Tag
               color={
                 user.status === EnumUserStatus.ACTIVE
@@ -83,10 +87,16 @@ const PageManageUserDetail = () => {
         </div>
       </Flex>
       <Divider />
-      <Flex vertical>
-        <Typography.Title level={4}>Permissions</Typography.Title>
-        <UserPermissionForm initialValues={initialPermissionsValues} userId={userId} />
-      </Flex>
+      {(userPermissionAction?.canRead || userPermissionAction?.canUpdate) && (
+        <Flex vertical>
+          <Typography.Title level={4}>Permissions</Typography.Title>
+          <UserPermissionForm
+            initialValues={initialPermissionsValues}
+            userId={userId}
+            disabled={!userPermissionAction?.canUpdate}
+          />
+        </Flex>
+      )}
     </div>
   )
 }

@@ -9,10 +9,11 @@ export type IUserPermissionFormValues = IEditUserPermissionsParams
 interface IUserPermissionFormProps {
   userId: string
   initialValues: IUserPermissionFormValues
+  disabled?: boolean
 }
 
 export const UserPermissionForm = (props: IUserPermissionFormProps) => {
-  const { userId, initialValues } = props
+  const { userId, initialValues, disabled } = props
   const { mutate: editUserPermissions, isPending } = useEditUserPermissions(userId)
 
   const onFinish = useCallback(
@@ -26,7 +27,7 @@ export const UserPermissionForm = (props: IUserPermissionFormProps) => {
     [editUserPermissions]
   )
   return (
-    <Form initialValues={initialValues} layout="vertical" onFinish={onFinish}>
+    <Form initialValues={initialValues} layout="vertical" onFinish={onFinish} disabled={disabled}>
       <div
         css={css`
           display: grid;

@@ -8,7 +8,7 @@ import { appPath } from './config/app-paths'
 import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
 
 import { Authorize } from './components/Authorize'
-import { EnumFeatureName } from './service'
+import { EnumPermissionFeatureName } from './services/permission/permission.params'
 
 const Pnotfound = lazy(() => import('./layouts/Pnotfound'))
 const RootLayout = lazy(() => import('./layouts/RootLayout'))
@@ -90,7 +90,7 @@ const router = createBrowserRouter([
       {
         path: appPath.houseRentCreate(),
         element: (
-          <Authorize featureName={EnumFeatureName.HOUSE_RENT} requiredCreate>
+          <Authorize featureName={EnumPermissionFeatureName.HOUSE_RENT} requiredCreate>
             <PageHouseRentCreate />
           </Authorize>
         ),
@@ -102,7 +102,7 @@ const router = createBrowserRouter([
       {
         path: appPath.houseRentDetailClone(),
         element: (
-          <Authorize featureName={EnumFeatureName.HOUSE_RENT} requiredCreate>
+          <Authorize featureName={EnumPermissionFeatureName.HOUSE_RENT} requiredCreate>
             <PageHouseRentDetailClone />
           </Authorize>
         ),
@@ -110,7 +110,7 @@ const router = createBrowserRouter([
       {
         path: appPath.houseRentDetail(),
         element: (
-          <Authorize featureName={EnumFeatureName.HOUSE_RENT} requiredUpdate>
+          <Authorize featureName={EnumPermissionFeatureName.HOUSE_RENT} requiredUpdate>
             <PageHouseRentDetail />
           </Authorize>
         ),
@@ -118,7 +118,7 @@ const router = createBrowserRouter([
       {
         path: appPath.houseRent(),
         element: (
-          <Authorize featureName={EnumFeatureName.HOUSE_RENT} requiredRead>
+          <Authorize featureName={EnumPermissionFeatureName.HOUSE_RENT} requiredRead>
             <PageHouseRent />
           </Authorize>
         ),

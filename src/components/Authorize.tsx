@@ -2,10 +2,11 @@ import { css } from '@emotion/react'
 import { PropsWithChildren } from 'react'
 import { Navigate } from 'react-router-dom'
 import { appPath } from '../config/app-paths'
-import { EnumFeatureName, useGetMeSuspense, usePermissionRouteAllow } from '../service'
+import { useGetMeSuspense, usePermissionRouteAllow } from '../service'
+import { EnumPermissionFeatureName } from '../services/permission/permission.params'
 
 interface IAuthorizeProps {
-  featureName: EnumFeatureName
+  featureName: EnumPermissionFeatureName
   requiredRead?: boolean
   requiredCreate?: boolean
   requiredUpdate?: boolean

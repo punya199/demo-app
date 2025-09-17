@@ -1,3 +1,10 @@
+## [1.6.3](https://github.com/punya199/demo-app/compare/v1.6.2...v1.6.3) (2025-09-17)
+
+
+### Fix
+
+* Enables user permission management ([f074fff](https://github.com/punya199/demo-app/commit/f074fffa03f152cf58794ee89e5bc0d946703cf4))
+
 ## [1.6.2](https://github.com/punya199/demo-app/compare/v1.6.1...v1.6.2) (2025-09-17)
 
 

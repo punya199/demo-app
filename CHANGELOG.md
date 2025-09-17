@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/punya199/demo-app/compare/v1.6.1...v1.6.2) (2025-09-17)
+
+
+### Fix
+
+* husky ([7482287](https://github.com/punya199/demo-app/commit/74822874b0b7f1ebae9fb0b09ca96733b5159a6d))
+
 ## [1.6.1](https://github.com/punya199/demo-app/compare/v1.6.0...v1.6.1) (2025-09-17)
 
 

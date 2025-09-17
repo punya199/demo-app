@@ -1,3 +1,10 @@
+## [1.6.4](https://github.com/punya199/demo-app/compare/v1.6.3...v1.6.4) (2025-09-17)
+
+
+### Fix
+
+* Refactors permission feature name enum ([666db4f](https://github.com/punya199/demo-app/commit/666db4fa885519ae42d51779b1fc34ce3b16af53))
+
 ## [1.6.3](https://github.com/punya199/demo-app/compare/v1.6.2...v1.6.3) (2025-09-17)
 
 

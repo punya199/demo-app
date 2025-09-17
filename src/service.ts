@@ -64,7 +64,7 @@ interface IGetMeResponse {
 export const useGetMe = () => {
   const queryClient = useQueryClient()
   return useQuery<IGetMeResponse>({
-    queryKey: ['getme'],
+    queryKey: ['users', 'me'],
     queryFn: async () => {
       const { data } = await apiClient.get<IGetMeResponse>(`/users/me`)
       return data
@@ -72,7 +72,7 @@ export const useGetMe = () => {
     select: (data) => {
       for (const featureName of Object.values(EnumPermissionFeatureName)) {
         queryClient.setQueryData(
-          ['permissions', featureName],
+          ['users', data.user.id, 'permissions', featureName],
           data.user.permissions.find((permission) => permission.featureName === featureName)
             ?.action || defaultPermissionAction
         )
@@ -86,7 +86,7 @@ export const useGetMe = () => {
 export const useGetMeSuspense = () => {
   const queryClient = useQueryClient()
   return useSuspenseQuery<IGetMeResponse | null>({
-    queryKey: ['getme'],
+    queryKey: ['users', 'me'],
     queryFn: async () => {
       const [{ data }] = await Promise.all([apiClient.get<IGetMeResponse>(`/users/me`), sleep(500)])
       return data
@@ -98,7 +98,7 @@ export const useGetMeSuspense = () => {
 
       for (const featureName of Object.values(EnumPermissionFeatureName)) {
         queryClient.setQueryData(
-          ['permissions', featureName],
+          ['users', data.user.id, 'permissions', featureName],
           data.user.permissions.find((permission) => permission.featureName === featureName)
             ?.action || defaultPermissionAction
         )
@@ -112,13 +112,14 @@ export const useGetMeSuspense = () => {
 export const useGetFeaturePermissionAction = (featureName: EnumPermissionFeatureName) => {
   const { data: getMeResponse } = useGetMe()
   const userId = getMeResponse?.user?.id
+  const featurePermissionAction =
+    getMeResponse?.user.permissions.find((permission) => permission.featureName === featureName)
+      ?.action || defaultPermissionAction
+  const key = ['users', userId, 'permissions', featureName, featurePermissionAction]
   return useQuery<IPermissionAction>({
-    queryKey: ['permissions', featureName, userId],
+    queryKey: key,
     queryFn: async () => {
-      return (
-        getMeResponse?.user.permissions.find((permission) => permission.featureName === featureName)
-          ?.action || defaultPermissionAction
-      )
+      return featurePermissionAction
     },
     enabled: !!featureName && !!userId,
   })

@@ -49,7 +49,7 @@ export const useEditUserPermissions = (userId: string) => {
       return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users', userId] })
+      queryClient.invalidateQueries({ queryKey: ['users'] })
     },
   })
 }

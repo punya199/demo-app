@@ -7,6 +7,7 @@ import { appConfig } from './config/app-config'
 import { appPath } from './config/app-paths'
 import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
 
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Authorize } from './components/Authorize'
 import { EnumPermissionFeatureName } from './services/permission/permission.params'
 
@@ -150,6 +151,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       {appConfig().VITE_IS_DEVELOPMENT && <ScreenSizeIndicator />}
+      {appConfig().VITE_IS_DEVELOPMENT && <ReactQueryDevtools />}
       <ConfigProvider
         theme={{
           token: {

@@ -1,3 +1,10 @@
+## [1.6.6](https://github.com/punya199/demo-app/compare/v1.6.5...v1.6.6) (2025-09-17)
+
+
+### Fix
+
+* Adds React Query Devtools for debugging ([224ad58](https://github.com/punya199/demo-app/commit/224ad58871944dd0a3f397b4b74e1a99bc55132e))
+
 ## [1.6.5](https://github.com/punya199/demo-app/compare/v1.6.4...v1.6.5) (2025-09-17)
 
 

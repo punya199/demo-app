@@ -8,8 +8,9 @@ import { appPath } from '../config/app-paths'
 import { useGetMe } from '../service'
 import { apiClient } from '../utils/api-client'
 import { sleep } from '../utils/helper'
+import { localStorageHelper } from '../utils/local-storage-helper'
 type Data = {
-  accessToken: string
+  refreshToken: string
   user: { id: number; username: string; password: string }
 }
 
@@ -31,7 +32,10 @@ const Login = () => {
       ])
       return data
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      localStorageHelper.set({
+        refreshToken: data.refreshToken,
+      })
       queryClient.refetchQueries()
       queryClient.resetQueries()
       const redirect = location.state?.redirect

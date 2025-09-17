@@ -67,16 +67,7 @@ export const UserPermissionForm = (props: IUserPermissionFormProps) => {
                   </Form.Item>
                 </div>
                 <Flex justify="center">
-                  <Form.Item
-                    dependencies={[
-                      [field.name, 'action', 'canRead'],
-                      [field.name, 'action', 'canCreate'],
-                      [field.name, 'action', 'canUpdate'],
-                      [field.name, 'action', 'canDelete'],
-                    ]}
-                    shouldUpdate
-                    noStyle
-                  >
+                  <Form.Item shouldUpdate noStyle>
                     {({ getFieldValue, setFieldValue }) => {
                       const action = getFieldValue(['permissions', field.name, 'action'])
                       const canAll = Object.values(action || {}).every((value) => value)

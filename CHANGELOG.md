@@ -1,3 +1,10 @@
+## [1.6.5](https://github.com/punya199/demo-app/compare/v1.6.4...v1.6.5) (2025-09-17)
+
+
+### Fix
+
+* Implements refresh token functionality ([2a803bc](https://github.com/punya199/demo-app/commit/2a803bc8205e1ebd9db648d8b5574f662d6248c9))
+
 ## [1.6.4](https://github.com/punya199/demo-app/compare/v1.6.3...v1.6.4) (2025-09-17)
 
 

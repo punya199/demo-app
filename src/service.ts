@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { EnumPermissionFeatureName } from './services/permission/permission.params'
 import { apiClient } from './utils/api-client'
 import { sleep } from './utils/helper'
+import { localStorageHelper } from './utils/local-storage-helper'
 
 export enum UserRole {
   USER = 'user',
@@ -70,6 +71,9 @@ export const useGetMe = () => {
       return data
     },
     select: (data) => {
+      localStorageHelper.set({
+        uid: data.user.id,
+      })
       for (const featureName of Object.values(EnumPermissionFeatureName)) {
         queryClient.setQueryData(
           ['users', data.user.id, 'permissions', featureName],

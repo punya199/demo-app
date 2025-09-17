@@ -3,7 +3,6 @@ import { some } from 'lodash'
 import { useMemo } from 'react'
 import { apiClient } from './utils/api-client'
 import { sleep } from './utils/helper'
-import { useAuthStore } from './utils/store'
 
 export enum UserRole {
   USER = 'user',
@@ -65,9 +64,8 @@ interface IGetMeResponse {
 }
 export const useGetMe = () => {
   const queryClient = useQueryClient()
-  const { accessToken } = useAuthStore()
   return useQuery<IGetMeResponse>({
-    queryKey: ['getme', accessToken],
+    queryKey: ['getme'],
     queryFn: async () => {
       const { data } = await apiClient.get<IGetMeResponse>(`/users/me`)
       return data
@@ -83,19 +81,14 @@ export const useGetMe = () => {
 
       return data
     },
-    enabled: !!accessToken,
   })
 }
 
 export const useGetMeSuspense = () => {
   const queryClient = useQueryClient()
-  const { accessToken } = useAuthStore()
   return useSuspenseQuery<IGetMeResponse | null>({
-    queryKey: ['getme', accessToken],
+    queryKey: ['getme'],
     queryFn: async () => {
-      if (!accessToken) {
-        return null
-      }
       const [{ data }] = await Promise.all([apiClient.get<IGetMeResponse>(`/users/me`), sleep(500)])
       return data
     },

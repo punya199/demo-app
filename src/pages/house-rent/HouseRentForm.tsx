@@ -143,95 +143,108 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
   )
 
   return (
-    <div
-      className="space-y-4 py-6 md:p-4"
-      css={css`
+    <div css={css`
+      position: relative;
+    `}>
+
+      <div
+        className="space-y-4 py-6 md:p-4"
+        css={css`
         background-color: #585858;
         height: 100%;
       `}
-    >
-      <Form
-        form={form}
-        onValuesChange={onValuesChange}
-        onFinish={handleSubmit}
-        initialValues={defaultValues}
-        size={md ? 'large' : 'small'}
-        layout="vertical"
-        disabled={viewMode}
-        scrollToFirstError
       >
-        <Row gutter={[16, 16]}>
-          {/* keep value */}
-          <Form.Item name="id" noStyle hidden>
-            <Input />
-          </Form.Item>
-          <Form.Item name="electricitySummary" noStyle hidden>
-            <Input />
-          </Form.Item>
-          <Form.Item name="attachments" noStyle hidden>
-            <Input />
-          </Form.Item>
-
-          {/* keep value */}
-
-          <Col xs={24} md={8}>
-            <HouseRentMasterDataField />
-          </Col>
-          <Col xs={24} md={16}>
-            <Form.Item name="rents" noStyle>
-              <HouseRentDetailTableField viewMode={viewMode} />
+        <Form
+          form={form}
+          onValuesChange={onValuesChange}
+          onFinish={handleSubmit}
+          initialValues={defaultValues}
+          size={md ? 'large' : 'small'}
+          layout="vertical"
+          disabled={viewMode}
+          scrollToFirstError
+        >
+          <Row gutter={[16, 16]}>
+            {/* keep value */}
+            <Form.Item name="id" noStyle hidden>
+              <Input />
             </Form.Item>
-          </Col>
-          <Col xs={24} md={24}>
-            <Form.Item name="members" noStyle>
-              <HouseRentMemberTableField summary={electricitySummary} viewMode={viewMode} />
+            <Form.Item name="electricitySummary" noStyle hidden>
+              <Input />
             </Form.Item>
-          </Col>
+            <Form.Item name="attachments" noStyle hidden>
+              <Input />
+            </Form.Item>
 
-          <Col xs={24} md={24}>
-            <HouseRentAttachments viewMode={viewMode} />
-          </Col>
+            {/* keep value */}
 
-          <Divider />
-          <Col xs={24} md={24}>
-            <HouseRentReportSummary />
-          </Col>
-          <Col span={24}>
-            <Flex
-              justify="space-between"
-              gap={8}
-              css={css`
+            <Col xs={24} md={8}>
+              <HouseRentMasterDataField />
+            </Col>
+            <Col xs={24} md={16}>
+              <Form.Item name="rents" noStyle>
+                <HouseRentDetailTableField viewMode={viewMode} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={24}>
+              <Form.Item name="members" noStyle>
+                <HouseRentMemberTableField summary={electricitySummary} viewMode={viewMode} />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={24}>
+              <HouseRentAttachments viewMode={viewMode} />
+            </Col>
+
+            <Divider />
+            <Col xs={24} md={24}>
+              <HouseRentReportSummary />
+            </Col>
+
+          </Row>
+        </Form>
+      </div>
+      <div css={css`
+              position: sticky;
+              bottom: 0;
+              left: 0;
+              width: 100%;
+              z-index: 1000;
+              background-color: #fff;
+            `}>
+        <Flex
+          justify="space-between"
+          gap={8}
+          css={css`
                 background-color: #fff;
                 padding: 16px;
                 border-radius: 8px;
               `}
-            >
+        >
+          <Button
+            type="default"
+            htmlType="button"
+            onClick={() => navigate(-1)}
+            disabled={false}
+          >
+            {defaultValues?.id ? 'ย้อนกลับ' : 'ยกเลิก'}
+          </Button>
+          <div>
+            {!viewMode && (
               <Button
-                type="default"
-                htmlType="button"
-                onClick={() => navigate(-1)}
-                disabled={false}
+                variant="solid"
+                color="green"
+                htmlType="submit"
+                loading={isSubmitting}
+                disabled={isSubmitting}
+                icon={<SaveOutlined />}
               >
-                {defaultValues?.id ? 'ย้อนกลับ' : 'ยกเลิก'}
+                บันทึก
               </Button>
-              <div>
-                {!viewMode && (
-                  <Button
-                    variant="solid"
-                    color="green"
-                    htmlType="submit"
-                    loading={isSubmitting}
-                    disabled={isSubmitting}
-                    icon={<SaveOutlined />}
-                  >
-                    บันทึก
-                  </Button>
-                )}
-              </div>
-            </Flex>
-          </Col>
-        </Row>
-      </Form>
+            )}
+          </div>
+        </Flex>
+      </div>
     </div>
   )
 }

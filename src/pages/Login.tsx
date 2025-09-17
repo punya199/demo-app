@@ -8,7 +8,6 @@ import { appPath } from '../config/app-paths'
 import { useGetMe } from '../service'
 import { apiClient } from '../utils/api-client'
 import { sleep } from '../utils/helper'
-import { useAuthStore } from '../utils/store'
 type Data = {
   accessToken: string
   user: { id: number; username: string; password: string }
@@ -19,7 +18,6 @@ const Login = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryClient = useQueryClient()
-  const { setAccessToken } = useAuthStore()
   const [form] = Form.useForm()
 
   const { mutate: login, isPending } = useMutation({
@@ -33,9 +31,9 @@ const Login = () => {
       ])
       return data
     },
-    onSuccess: (data) => {
-      setAccessToken(data.accessToken)
+    onSuccess: () => {
       queryClient.refetchQueries()
+      queryClient.resetQueries()
       const redirect = location.state?.redirect
       if (redirect) {
         navigate(redirect)

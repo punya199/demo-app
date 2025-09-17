@@ -24,6 +24,9 @@ export const localStorageAuth = {
   },
 }
 
+/**
+ * @deprecated not use this store
+ */
 export const useAuthStore = create<AuthStore>((set) => {
   const { accessToken } = localStorageAuth.get()
   return {

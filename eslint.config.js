@@ -29,6 +29,10 @@ export default tseslint.config(
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: {
       'react-hooks': reactHooks,
@@ -52,6 +56,7 @@ export default tseslint.config(
       ],
       'react/no-unused-prop-types': 'warn',
       'no-console': 'warn',
+      '@typescript-eslint/no-deprecated': 'error',
     },
   }
 )

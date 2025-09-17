@@ -1,5 +1,5 @@
 import { MenuOutlined } from '@ant-design/icons'
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, Drawer, Menu, MenuProps, Space } from 'antd'
 import { motion } from 'framer-motion'
 import { compact } from 'lodash'
@@ -8,8 +8,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { TypingAnimation } from '../components/magicui/typing-animation'
 import { appPath } from '../config/app-paths'
 import { EnumFeatureName, useGetMe, usePermissionRouteAllow, UserRole } from '../service'
-import { checkRole } from '../utils/helper'
-import { useAuthStore } from '../utils/store'
+import { apiClient } from '../utils/api-client'
+import { checkRole, sleep } from '../utils/helper'
 
 // // interface IMenuItemData {
 // //   name: string
@@ -48,23 +48,35 @@ const Navbar = () => {
   const queryClient = useQueryClient()
   const showDrawer = () => setOpen(true)
   const onClose = () => setOpen(false)
-  const { clearAccessToken } = useAuthStore()
   const menuHouseRentAllowed = usePermissionRouteAllow(EnumFeatureName.HOUSE_RENT, {
     requiredRead: true,
   })
+
+  const { mutate: logout } = useMutation({
+    mutationFn: async () => {
+      const [{ data }] = await Promise.all([
+        apiClient.post(`/auth/logout`),
+        sleep(350),
+      ])
+      return data
+    },
+    onSettled: () => {
+      startTransition(() => {
+        navigate(appPath.login(), {
+          replace: true,
+        })
+        queryClient.resetQueries({
+          predicate(query) {
+            return !query.queryHash.includes('permissions')
+          },
+        })
+      })
+    },
+  })
+
   const handleLogout = useCallback(() => {
-    startTransition(() => {
-      navigate(appPath.login(), {
-        replace: true,
-      })
-      clearAccessToken()
-      queryClient.resetQueries({
-        predicate(query) {
-          return !query.queryHash.includes('permissions')
-        },
-      })
-    })
-  }, [navigate, clearAccessToken, queryClient])
+    logout()
+  }, [logout])
 
   const items = useMemo(
     (): MenuItem[] =>
@@ -104,29 +116,29 @@ const Navbar = () => {
         },
         ...(checkRole(UserRole.SUPER_ADMIN, user?.user?.role)
           ? [
-              menuHouseRentAllowed && {
-                key: 'sub3',
-                label: 'House Rent',
-                onClick: () => {
-                  navigate(appPath.houseRent())
-                  onClose()
-                },
-                onMouseEnter: () => {
-                  import('../pages/house-rent/PageHouseRent')
-                },
+            menuHouseRentAllowed && {
+              key: 'sub3',
+              label: 'House Rent',
+              onClick: () => {
+                navigate(appPath.houseRent())
+                onClose()
               },
-              {
-                key: 'sub4',
-                label: 'Manage User',
-                onClick: () => {
-                  navigate(appPath.manageUser())
-                  onClose()
-                },
-                onMouseEnter: () => {
-                  import('../pages/PageManageUser')
-                },
+              onMouseEnter: () => {
+                import('../pages/house-rent/PageHouseRent')
               },
-            ]
+            },
+            {
+              key: 'sub4',
+              label: 'Manage User',
+              onClick: () => {
+                navigate(appPath.manageUser())
+                onClose()
+              },
+              onMouseEnter: () => {
+                import('../pages/PageManageUser')
+              },
+            },
+          ]
           : []),
       ]),
     [menuHouseRentAllowed, navigate, user?.user?.role]

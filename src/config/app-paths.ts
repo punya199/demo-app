@@ -20,4 +20,5 @@ export const appPath = {
     '/house-rent/:houseRentId/summary'
   ),
   manageUser: generatePath('/manage-user'),
+  manageUserDetail: generatePath<{ param: { userId: string } }>('/manage-user/:userId'),
 }

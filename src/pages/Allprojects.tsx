@@ -4,6 +4,7 @@ interface ProjectList {
   link: string
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const projectList: ProjectList[] = [
   {
     name: 'MeowList',

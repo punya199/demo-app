@@ -6,19 +6,18 @@ import './App.css'
 import { appConfig } from './config/app-config'
 import { appPath } from './config/app-paths'
 import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
-import PageManageUser from './pages/PageManageUser'
-import PageRegister from './pages/PageRegister'
 
 import { Authorize } from './components/Authorize'
-import CardGame from './pages/project/random-card/CardGame'
 import { EnumFeatureName } from './service'
 
 const Pnotfound = lazy(() => import('./layouts/Pnotfound'))
 const RootLayout = lazy(() => import('./layouts/RootLayout'))
-
 const Home = lazy(() => import('./pages/Home'))
 const Login = lazy(() => import('./pages/Login'))
-
+const PageManageUserDetail = lazy(() => import('./pages/manage-user/PageManageUserDetail'))
+const PageManageUser = lazy(() => import('./pages/PageManageUser'))
+const PageRegister = lazy(() => import('./pages/PageRegister'))
+const CardGame = lazy(() => import('./pages/project/random-card/CardGame'))
 const PageOmama = lazy(() => import('./pages/project/omama-game/PageOmama'))
 const PageAllBill = lazy(() => import('./pages/project/checkbill/PageAllBill'))
 const PageCreateBill = lazy(() => import('./pages/project/checkbill/PageCreateBill'))
@@ -98,9 +97,7 @@ const router = createBrowserRouter([
       },
       {
         path: appPath.houseRentSummary(),
-        element: (
-          <PageHouseRentSummary />
-        ),
+        element: <PageHouseRentSummary />,
       },
       {
         path: appPath.houseRentDetailClone(),
@@ -125,6 +122,10 @@ const router = createBrowserRouter([
             <PageHouseRent />
           </Authorize>
         ),
+      },
+      {
+        path: appPath.manageUserDetail(),
+        element: <PageManageUserDetail />,
       },
       {
         path: appPath.manageUser(),

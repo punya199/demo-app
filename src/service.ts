@@ -44,7 +44,7 @@ export interface IPermission {
 }
 
 export interface IUser {
-  id: number
+  id: string
   username: string
   role: UserRole
   status: EnumUserStatus
@@ -55,6 +55,10 @@ export interface IUser {
 
 export interface IGetUsersResponse {
   users: IUser[]
+}
+
+export interface IGetUserResponse {
+  user: IUser
 }
 
 interface IGetMeResponse {

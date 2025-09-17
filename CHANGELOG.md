@@ -1,3 +1,10 @@
+## [1.6.7](https://github.com/punya199/demo-app/compare/v1.6.6...v1.6.7) (2025-09-17)
+
+
+### Fix
+
+* Stores user ID in local storage upon login ([8ec42e9](https://github.com/punya199/demo-app/commit/8ec42e933b7861cfb46264b699d9a5a4ff7ef6aa))
+
 ## [1.6.6](https://github.com/punya199/demo-app/compare/v1.6.5...v1.6.6) (2025-09-17)
 
 

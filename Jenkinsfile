@@ -92,7 +92,6 @@ pipeline {
 
                     def dockerImageName = "${DOCKER_IMAGE}:demo-app"
 
-                    sh 'yarn bo-web:build'
                     docker.withRegistry("https://${DOCKER_REGISTRY}", REGISTRY_CREDENTIALS) {
                         dockerImage = docker.build(dockerImageName, "-f Dockerfile --build-arg VITE_APP_VERSION=${env.VITE_APP_VERSION} --build-arg VITE_APP_BUILD_VERSION=${env.GIT_COMMIT_VERSION} .")
                         dockerImage.push()

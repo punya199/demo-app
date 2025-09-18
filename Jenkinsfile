@@ -45,10 +45,7 @@ pipeline {
                 ]) {
                   // Add network timeout and retry options
                   sh '''
-                    yarn install --immutable \
-                      --network-timeout 300000 \
-                      --network-concurrency 1 \
-                      --cache-folder ${YARN_CACHE_FOLDER}
+                    yarn install --immutable 
                   '''
                 }
             }

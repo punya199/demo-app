@@ -2,8 +2,8 @@ name: Release and Build Docker Image
 
 on:
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
     tags:
       - 'v*'
       - 'latest'

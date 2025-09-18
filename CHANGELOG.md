@@ -1,3 +1,10 @@
+## [1.6.13](https://github.com/punya199/demo-app/compare/v1.6.12...v1.6.13) (2025-09-18)
+
+
+### Fix
+
+* Disables push trigger on main branch ([579da37](https://github.com/punya199/demo-app/commit/579da37171c565fb157555be913b5683cabc347d))
+
 ## [1.6.12](https://github.com/punya199/demo-app/compare/v1.6.11...v1.6.12) (2025-09-18)
 
 

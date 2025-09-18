@@ -1,3 +1,10 @@
+## [1.6.9](https://github.com/punya199/demo-app/compare/v1.6.8...v1.6.9) (2025-09-18)
+
+
+### Fix
+
+* Updates Node.js version in Jenkinsfile ([0c90466](https://github.com/punya199/demo-app/commit/0c9046642e950e2de661ff438ca4d0c01d5ce74e))
+
 ## [1.6.8](https://github.com/punya199/demo-app/compare/v1.6.7...v1.6.8) (2025-09-18)
 
 

@@ -5,6 +5,13 @@
 
 * Defines Docker registry as a variable ([14285b0](https://github.com/punya199/demo-app/commit/14285b0dd15bec92fee79b196386a093fb97c4b9))
 
+## [1.6.16](https://github.com/punya199/demo-app/compare/v1.6.15...v1.6.16) (2025-09-18)
+
+
+### Fix
+
+* Defines Docker registry as a variable ([14285b0](https://github.com/punya199/demo-app/commit/14285b0dd15bec92fee79b196386a093fb97c4b9))
+
 ## [1.6.15](https://github.com/punya199/demo-app/compare/v1.6.14...v1.6.15) (2025-09-18)
 
 

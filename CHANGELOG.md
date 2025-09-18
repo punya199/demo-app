@@ -1,3 +1,10 @@
+## [1.6.8](https://github.com/punya199/demo-app/compare/v1.6.7...v1.6.8) (2025-09-18)
+
+
+### Fix
+
+* Adds CI/CD pipeline to build and release ([140e20f](https://github.com/punya199/demo-app/commit/140e20f6fd066356fec9cbecffa6553731687526))
+
 ## [1.6.7](https://github.com/punya199/demo-app/compare/v1.6.6...v1.6.7) (2025-09-17)
 
 

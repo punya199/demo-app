@@ -1,3 +1,10 @@
+## [1.6.11](https://github.com/punya199/demo-app/compare/v1.6.10...v1.6.11) (2025-09-18)
+
+
+### Fix
+
+* Optimizes Node.js and Yarn for CI ([5a1fda5](https://github.com/punya199/demo-app/commit/5a1fda5753dc21020ac3e2b7ac56eacfa97c02b3))
+
 ## [1.6.10](https://github.com/punya199/demo-app/compare/v1.6.9...v1.6.10) (2025-09-18)
 
 

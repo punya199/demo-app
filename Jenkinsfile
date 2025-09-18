@@ -2,7 +2,7 @@ pipeline {
     agent { label 'slave' }
 
     tools {
-        nodejs 'node-22.17.0'
+        nodejs 'node-20.18.1'
     }
 
     environment {

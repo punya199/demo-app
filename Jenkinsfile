@@ -24,10 +24,20 @@ pipeline {
             }
             steps {
                 scmSkip(deleteBuild: false)
-                script {
-                    sh '''
-                    yarn install
-                    '''
+                 // restore cache, install, then update cache
+                cache(maxCacheSize: 1000, defaultBranch: 'main', caches: [
+                  arbitraryFileCache(
+                    path: '.yarn/cache', 
+                    cacheName: 'yarn-berry-cache', 
+                    cacheValidityDecidingFile: 'yarn.lock'  // ถ้า lock file เปลี่ยน จะรีโหลด cache ใหม่
+                  ),
+                  arbitraryFileCache(
+                      path: 'node_modules',
+                      cacheName: 'node-modules-cache',
+                      cacheValidityDecidingFile: 'yarn.lock'
+                  )
+                ]) {
+                  sh 'yarn install --immutable'
                 }
             }
         }
@@ -84,7 +94,6 @@ pipeline {
     }
     post {
         always {
-            cache(path: '.yarn/cache', key: "yarn-cache-${env.BRANCH_NAME}")
             deleteDir()
         }
     }

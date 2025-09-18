@@ -17,6 +17,7 @@ pipeline {
         // Optimize Yarn for CI
         YARN_CACHE_FOLDER = "${WORKSPACE}/.yarn/cache"
         YARN_ENABLE_GLOBAL_CACHE = "false"
+        DOCKER_BUILDKIT = 1
     }
 
     stages {

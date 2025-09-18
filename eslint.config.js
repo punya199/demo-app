@@ -8,6 +8,13 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+  },
+  {
     ignores: [
       'dist',
       'build',

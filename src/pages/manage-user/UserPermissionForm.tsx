@@ -22,6 +22,9 @@ export const UserPermissionForm = (props: IUserPermissionFormProps) => {
         onSuccess: () => {
           message.success('User permissions updated successfully')
         },
+        onError: () => {
+          message.error('User permissions updated failed')
+        },
       })
     },
     [editUserPermissions]

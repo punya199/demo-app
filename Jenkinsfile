@@ -84,6 +84,7 @@ pipeline {
     }
     post {
         always {
+            cache(path: '.yarn/cache', key: "yarn-cache-${env.BRANCH_NAME}")
             deleteDir()
         }
     }

@@ -7,7 +7,8 @@ pipeline {
 
     environment {
         REGISTRY_CREDENTIALS = 'dockerhub-ton'
-        DOCKER_IMAGE = "docker.io/acelectic/yaya-developer"
+        DOCKER_REGISTRY = "docker.io"
+        DOCKER_IMAGE = "${DOCKER_REGISTRY}/acelectic/yaya-developer"
         GIT_COMMIT_VERSION = "${env.GIT_COMMIT}"
         GITHUB_TOKEN = credentials('github-ya')
         BRANCH_NAME = "${env.BRANCH_NAME}"

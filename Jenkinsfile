@@ -11,6 +11,11 @@ pipeline {
         GIT_COMMIT_VERSION = "${env.GIT_COMMIT}"
         GITHUB_TOKEN = credentials('github-ya')
         BRANCH_NAME = "${env.BRANCH_NAME}"
+        // Add Node.js memory optimization
+        NODE_OPTIONS = "--max-old-space-size=2048"
+        // Optimize Yarn for CI
+        YARN_CACHE_FOLDER = "${WORKSPACE}/.yarn/cache"
+        YARN_ENABLE_GLOBAL_CACHE = "false"
     }
 
     stages {
@@ -18,18 +23,19 @@ pipeline {
             when {
                 anyOf {
                     branch 'main'
-
                     changeRequest target: 'main', comparator: 'GLOB'
                 }
             }
             steps {
                 scmSkip(deleteBuild: false)
-                 // restore cache, install, then update cache
+                // Clear any existing node_modules to prevent conflicts
+                sh 'rm -rf node_modules || true'
+                
                 cache(maxCacheSize: 1000, defaultBranch: 'main', caches: [
                   arbitraryFileCache(
                     path: '.yarn/cache', 
                     cacheName: 'yarn-berry-cache', 
-                    cacheValidityDecidingFile: 'yarn.lock'  // ถ้า lock file เปลี่ยน จะรีโหลด cache ใหม่
+                    cacheValidityDecidingFile: 'yarn.lock'
                   ),
                   arbitraryFileCache(
                       path: 'node_modules',
@@ -37,7 +43,13 @@ pipeline {
                       cacheValidityDecidingFile: 'yarn.lock'
                   )
                 ]) {
-                  sh 'yarn install --immutable'
+                  // Add network timeout and retry options
+                  sh '''
+                    yarn install --immutable \
+                      --network-timeout 300000 \
+                      --network-concurrency 1 \
+                      --cache-folder ${YARN_CACHE_FOLDER}
+                  '''
                 }
             }
         }
@@ -94,7 +106,14 @@ pipeline {
     }
     post {
         always {
+            // Clean up yarn cache to free memory
+            sh 'yarn cache clean --all || true'
             deleteDir()
+        }
+        failure {
+            // Additional cleanup on failure
+            sh 'pkill -f node || true'
+            sh 'pkill -f yarn || true'
         }
     }
 }

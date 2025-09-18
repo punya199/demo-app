@@ -1,3 +1,10 @@
+## [1.6.14](https://github.com/punya199/demo-app/compare/v1.6.13...v1.6.14) (2025-09-18)
+
+
+### Fix
+
+* Adds build version to Docker image ([be3b4cf](https://github.com/punya199/demo-app/commit/be3b4cf0f15ffcb7a62efaa1c614a82b73f77d25))
+
 ## [1.6.13](https://github.com/punya199/demo-app/compare/v1.6.12...v1.6.13) (2025-09-18)
 
 

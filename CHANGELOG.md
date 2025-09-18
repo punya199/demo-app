@@ -1,3 +1,10 @@
+## [1.6.12](https://github.com/punya199/demo-app/compare/v1.6.11...v1.6.12) (2025-09-18)
+
+
+### Fix
+
+* Removes yarn install options ([fcb471c](https://github.com/punya199/demo-app/commit/fcb471c739f3933ddf3e0a3c6a4e08417e8fcde7))
+
 ## [1.6.11](https://github.com/punya199/demo-app/compare/v1.6.10...v1.6.11) (2025-09-18)
 
 

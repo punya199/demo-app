@@ -1,3 +1,11 @@
+## [1.6.15](https://github.com/punya199/demo-app/compare/v1.6.14...v1.6.15) (2025-09-18)
+
+
+### Fix
+
+* Adds ci skip to release commit message ([25a67b5](https://github.com/punya199/demo-app/commit/25a67b589ef066d5d4a22daf7608824d176af148))
+* Improves user permission update feedback ([2b4ddad](https://github.com/punya199/demo-app/commit/2b4ddadf333803e8b614e9e76305564968cdebb5))
+
 ## [1.6.14](https://github.com/punya199/demo-app/compare/v1.6.13...v1.6.14) (2025-09-18)
 
 

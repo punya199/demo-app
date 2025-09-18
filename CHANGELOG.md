@@ -1,3 +1,10 @@
+## [1.6.10](https://github.com/punya199/demo-app/compare/v1.6.9...v1.6.10) (2025-09-18)
+
+
+### Fix
+
+* Adds yarn cache to pipeline ([b583cb5](https://github.com/punya199/demo-app/commit/b583cb548578e4a46fd0d3de32cc8b267ffa9191))
+
 ## [1.6.9](https://github.com/punya199/demo-app/compare/v1.6.8...v1.6.9) (2025-09-18)
 
 

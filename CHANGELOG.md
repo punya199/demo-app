@@ -1,3 +1,10 @@
+## [1.6.17](https://github.com/punya199/demo-app/compare/v1.6.16...v1.6.17) (2025-09-18)
+
+
+### Fix
+
+* Enables Docker BuildKit ([b3e226c](https://github.com/punya199/demo-app/commit/b3e226c467feb520174c9cdc96c6f49098fba376))
+
 ## [1.6.16](https://github.com/punya199/demo-app/compare/v1.6.15...v1.6.16) (2025-09-18)
 
 

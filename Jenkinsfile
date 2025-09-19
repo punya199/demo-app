@@ -30,9 +30,6 @@ pipeline {
             }
             steps {
                 scmSkip(deleteBuild: false)
-                // Clear any existing node_modules to prevent conflicts
-                sh 'rm -rf node_modules || true'
-                
                 cache(maxCacheSize: 1000, defaultBranch: 'main', caches: [
                   arbitraryFileCache(
                     path: '.yarn/cache', 
@@ -104,14 +101,7 @@ pipeline {
     }
     post {
         always {
-            // Clean up yarn cache to free memory
-            sh 'yarn cache clean --all || true'
             deleteDir()
-        }
-        failure {
-            // Additional cleanup on failure
-            sh 'pkill -f node || true'
-            sh 'pkill -f yarn || true'
         }
     }
 }

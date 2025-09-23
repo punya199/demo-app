@@ -4,6 +4,14 @@
 ### Fix
 
 * Configures React Query cache times ([aa62361](https://github.com/punya199/demo-app/commit/aa623618879465cf829d9ee04ecc576b0fecf939))
+* Removes Docker BuildKit configuration ([2211ce5](https://github.com/punya199/demo-app/commit/2211ce546a002eac172680d04643265072ff4fcf))
+
+## [1.6.19](https://github.com/punya199/demo-app/compare/v1.6.18...v1.6.19) (2025-09-23)
+
+
+### Fix
+
+* Configures React Query cache times ([aa62361](https://github.com/punya199/demo-app/commit/aa623618879465cf829d9ee04ecc576b0fecf939))
 
 ## [1.6.18](https://github.com/punya199/demo-app/compare/v1.6.17...v1.6.18) (2025-09-19)
 

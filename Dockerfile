@@ -12,15 +12,14 @@ WORKDIR /usr/src/app
 
 RUN corepack enable \
   && yarn set version berry \
-  && yarn config set nodeLinker node-modules \
-  && yarn
+  && yarn config set nodeLinker node-modules 
 
 COPY package.json .
 COPY yarn.lock .
 COPY .yarnrc.yml ./
 COPY .yarn/ ./.yarn/
 
-RUN yarn install
+RUN yarn install --immutable
 
 COPY . .
 

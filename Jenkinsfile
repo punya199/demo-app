@@ -88,10 +88,10 @@ pipeline {
                     env.VITE_APP_BUILD_VERSION = env.GIT_COMMIT_VERSION
                     sh "echo env.VITE_APP_BUILD_VERSION=${env.VITE_APP_BUILD_VERSION}"
 
-                    def dockerImageName = "${DOCKER_IMAGE}:demo-app"
+                    dockerImageName = "${DOCKER_IMAGE}:demo-app"
                     docker.build(dockerImageName, "-f Dockerfile --build-arg VITE_APP_VERSION=${env.VITE_APP_VERSION} --build-arg VITE_APP_BUILD_VERSION=${env.GIT_COMMIT_VERSION} .")
                     
-                    docker.withRegistry("https://${DOCKER_REGISTRY}", REGISTRY_CREDENTIALS) {
+                    docker.withRegistry('https://index.docker.io/v1/', REGISTRY_CREDENTIALS) {
                         dockerImage = docker.image(dockerImageName)
                         dockerImage.push()
                     }

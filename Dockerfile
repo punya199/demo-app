@@ -8,8 +8,6 @@ ENV VITE_APP_BUILD_VERSION=$VITE_APP_BUILD_VERSION
 RUN echo "VITE_APP_VERSION: $VITE_APP_VERSION"
 RUN echo "VITE_APP_BUILD_VERSION: $VITE_APP_BUILD_VERSION"
 
-ENV YARN_CACHE_FOLDER=/root/.yarn
-
 WORKDIR /usr/src/app
 
 RUN corepack enable \
@@ -22,7 +20,7 @@ COPY yarn.lock .
 COPY .yarnrc.yml ./
 COPY .yarn/ ./.yarn/
 
-RUN --mount=type=cache,target="$YARN_CACHE_FOLDER" YARN_CACHE_FOLDER="$YARN_CACHE_FOLDER" yarn install
+RUN yarn install
 
 COPY . .
 

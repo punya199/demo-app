@@ -1,3 +1,11 @@
+## [1.6.22](https://github.com/punya199/demo-app/compare/v1.6.21...v1.6.22) (2025-09-23)
+
+
+### Fix
+
+* Optimizes Docker image build process. ([a4ed4b8](https://github.com/punya199/demo-app/commit/a4ed4b822315a00c4e404a7636d896fb14282463))
+* Updates Docker registry for image push ([3a6a1ac](https://github.com/punya199/demo-app/commit/3a6a1ac2044bdeb141fb126b4c2adca476d3e015))
+
 ## [1.6.21](https://github.com/punya199/demo-app/compare/v1.6.20...v1.6.21) (2025-09-23)
 
 

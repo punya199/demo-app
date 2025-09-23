@@ -1,3 +1,10 @@
+## [1.6.23](https://github.com/punya199/demo-app/compare/v1.6.22...v1.6.23) (2025-09-23)
+
+
+### Fix
+
+* Refactors HouseRentForm layout and error handling. ([815ebd1](https://github.com/punya199/demo-app/commit/815ebd11b6a9b43ad7c1ce5dd63967f3b3769cbb))
+
 ## [1.6.22](https://github.com/punya199/demo-app/compare/v1.6.21...v1.6.22) (2025-09-23)
 
 

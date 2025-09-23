@@ -143,26 +143,27 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
   )
 
   return (
-    <div css={css`
-      position: relative;
-    `}>
-
+    <Form
+      form={form}
+      onValuesChange={onValuesChange}
+      onFinish={handleSubmit}
+      initialValues={defaultValues}
+      size={md ? 'large' : 'small'}
+      layout="vertical"
+      disabled={viewMode}
+      scrollToFirstError
+    >
       <div
-        className="space-y-4 py-6 md:p-4"
         css={css`
-        background-color: #585858;
-        height: 100%;
-      `}
+          position: relative;
+        `}
       >
-        <Form
-          form={form}
-          onValuesChange={onValuesChange}
-          onFinish={handleSubmit}
-          initialValues={defaultValues}
-          size={md ? 'large' : 'small'}
-          layout="vertical"
-          disabled={viewMode}
-          scrollToFirstError
+        <div
+          className="space-y-4 py-6 md:p-4"
+          css={css`
+            background-color: #585858;
+            height: 100%;
+          `}
         >
           <Row gutter={[16, 16]}>
             {/* keep value */}
@@ -200,51 +201,47 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
             <Col xs={24} md={24}>
               <HouseRentReportSummary />
             </Col>
-
           </Row>
-        </Form>
-      </div>
-      <div css={css`
-              position: sticky;
-              bottom: 0;
-              left: 0;
-              width: 100%;
-              z-index: 1000;
-              background-color: #fff;
-            `}>
-        <Flex
-          justify="space-between"
-          gap={8}
+        </div>
+        <div
           css={css`
-                background-color: #fff;
-                padding: 16px;
-                border-radius: 8px;
-              `}
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: #fff;
+          `}
         >
-          <Button
-            type="default"
-            htmlType="button"
-            onClick={() => navigate(-1)}
-            disabled={false}
+          <Flex
+            justify="space-between"
+            gap={8}
+            css={css`
+              background-color: #fff;
+              padding: 16px;
+              border-radius: 8px;
+            `}
           >
-            {defaultValues?.id ? 'ย้อนกลับ' : 'ยกเลิก'}
-          </Button>
-          <div>
-            {!viewMode && (
-              <Button
-                variant="solid"
-                color="green"
-                htmlType="submit"
-                loading={isSubmitting}
-                disabled={isSubmitting}
-                icon={<SaveOutlined />}
-              >
-                บันทึก
-              </Button>
-            )}
-          </div>
-        </Flex>
+            <Button type="default" htmlType="button" onClick={() => navigate(-1)} disabled={false}>
+              {defaultValues?.id ? 'ย้อนกลับ' : 'ยกเลิก'}
+            </Button>
+            <div>
+              {!viewMode && (
+                <Button
+                  variant="solid"
+                  color="green"
+                  htmlType="submit"
+                  loading={isSubmitting}
+                  disabled={isSubmitting}
+                  icon={<SaveOutlined />}
+                >
+                  บันทึก
+                </Button>
+              )}
+            </div>
+          </Flex>
+        </div>
       </div>
-    </div>
+    </Form>
   )
 }

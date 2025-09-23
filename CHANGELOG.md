@@ -1,3 +1,10 @@
+## [1.6.21](https://github.com/punya199/demo-app/compare/v1.6.20...v1.6.21) (2025-09-23)
+
+
+### Fix
+
+* Improves Docker build process ([a99be82](https://github.com/punya199/demo-app/commit/a99be820e95526b042e77a8655545e56a4a1148e))
+
 ## [1.6.20](https://github.com/punya199/demo-app/compare/v1.6.19...v1.6.20) (2025-09-23)
 
 

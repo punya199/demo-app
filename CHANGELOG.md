@@ -1,3 +1,10 @@
+## [1.6.20](https://github.com/punya199/demo-app/compare/v1.6.19...v1.6.20) (2025-09-23)
+
+
+### Fix
+
+* Simplifies Dockerfile build process ([2864cf0](https://github.com/punya199/demo-app/commit/2864cf04bc69a807c0284ec460aba53ab7a3bf29))
+
 ## [1.6.19](https://github.com/punya199/demo-app/compare/v1.6.18...v1.6.19) (2025-09-23)
 
 

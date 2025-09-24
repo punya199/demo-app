@@ -1,3 +1,10 @@
+## [1.6.24](https://github.com/punya199/demo-app/compare/v1.6.23...v1.6.24) (2025-09-24)
+
+
+### Fix
+
+* Updates the base Nginx image ([80094cd](https://github.com/punya199/demo-app/commit/80094cd227f133f371afe2b8420973fc294cbc50))
+
 ## [1.6.23](https://github.com/punya199/demo-app/compare/v1.6.22...v1.6.23) (2025-09-23)
 
 

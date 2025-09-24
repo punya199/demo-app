@@ -25,7 +25,7 @@ COPY . .
 
 RUN yarn build
 
-FROM nginx:stable-alpine AS runner
+FROM nginx:1.29.1-alpine-slim AS runner
 
 COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf

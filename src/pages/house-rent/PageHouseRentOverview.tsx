@@ -16,6 +16,7 @@ import {
   YAxis,
 } from 'recharts'
 import { appPath } from '../../config/app-paths'
+import { LoadingSpin } from '../../layouts/LoadingSpin'
 import { IUser } from '../../service'
 import {
   IGetHouseRentOverviewData,
@@ -160,11 +161,11 @@ const OverviewChart = (props: IOverviewChartProps) => {
       `}
     >
       <Typography.Title level={5}>{title}</Typography.Title>
-      <ResponsiveContainer width="100%" aspect={1.8}>
+      <ResponsiveContainer width="100%" minHeight="200px" minWidth="100px" aspect={1.8}>
         <ComposedChart
-          // style={{ width: '100%', maxHeight: '70vh' }}
-          height={200}
           data={chartData}
+          width="100%"
+          height="100%"
           margin={{
             top: 5,
             right: 0,
@@ -193,7 +194,7 @@ const OverviewChart = (props: IOverviewChartProps) => {
 
 export const PageHouseRentOverview = () => {
   const { data: userListData, isLoading: isUserListLoading } = useGetHouseRentUserList()
-  const { data: overviewData } = useGetHouseRentOverview()
+  const { data: overviewData, isLoading: isOverviewLoading } = useGetHouseRentOverview()
   const { md } = Grid.useBreakpoint()
   const userColumns = useMemo(
     (): TableColumnType<IUser>[] => [
@@ -208,7 +209,16 @@ export const PageHouseRentOverview = () => {
         dataIndex: 'id',
         align: 'center',
         render: (userId: string) => {
-          return <Link to={appPath.houseRentUserDetail({ param: { userId } })}>ดูสรุป</Link>
+          return (
+            <Link
+              to={appPath.houseRentUserDetail({ param: { userId } })}
+              onMouseOver={() => {
+                import('./PageHouseRentUserDetail')
+              }}
+            >
+              ดูสรุป
+            </Link>
+          )
         },
       },
     ],
@@ -235,54 +245,58 @@ export const PageHouseRentOverview = () => {
         height: 100%;
       `}
     >
-      <div
-        css={css(
-          css`
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            background-color: #fff;
-            padding: 20px;
-          `,
-          md &&
+      {isOverviewLoading ? (
+        <LoadingSpin />
+      ) : (
+        <div
+          css={css(
             css`
-              grid-template-columns: 1fr 1fr;
-              gap: 36px;
-            `
-        )}
-      >
-        <OverviewChart title="ค่าไฟฟ้า" data={data} chartMemberKey="individualElectricityPrice" />
-        <OverviewChart title="หน่วยไฟฟ้า" data={data} chartMemberKey="electricityUnit.diff" />
-        <OverviewChart title="ค่าเช่าบ้าน" data={data} chartMemberKey="totalPrice" />
-        <OverviewChart
-          title="ภาพรวมค่าไฟฟ้า"
-          data={data}
-          chartKeys={[
-            {
-              label: 'ค่าไฟฟ้า',
-              key: 'electricity.totalPrice',
-              color: '#D3C95C',
-            },
-            {
-              label: 'ค่าไฟฟ้าส่วนรวม',
-              key: 'electricity.sharePrice',
-              color: '#82ca9d',
-            },
-            {
-              label: 'หน่วยไฟฟ้า',
-              key: 'electricity.unit',
-              color: '#8884d8',
-              type: 'area',
-            },
-            {
-              label: 'หน่วยไฟฟ้าส่วนรวม',
-              key: 'electricity.shareUnit',
-              color: '#58B1B1',
-              type: 'area',
-            },
-          ]}
-        />
-      </div>
+              display: grid;
+              grid-template-columns: 1fr;
+              gap: 20px;
+              background-color: #fff;
+              padding: 20px;
+            `,
+            md &&
+              css`
+                grid-template-columns: 1fr 1fr;
+                gap: 36px;
+              `
+          )}
+        >
+          <OverviewChart title="ค่าไฟฟ้า" data={data} chartMemberKey="individualElectricityPrice" />
+          <OverviewChart title="หน่วยไฟฟ้า" data={data} chartMemberKey="electricityUnit.diff" />
+          <OverviewChart title="ค่าเช่าบ้าน" data={data} chartMemberKey="totalPrice" />
+          <OverviewChart
+            title="ภาพรวมค่าไฟฟ้า"
+            data={data}
+            chartKeys={[
+              {
+                label: 'ค่าไฟฟ้า',
+                key: 'electricity.totalPrice',
+                color: '#D3C95C',
+              },
+              {
+                label: 'ค่าไฟฟ้าส่วนรวม',
+                key: 'electricity.sharePrice',
+                color: '#82ca9d',
+              },
+              {
+                label: 'หน่วยไฟฟ้า',
+                key: 'electricity.unit',
+                color: '#8884d8',
+                type: 'area',
+              },
+              {
+                label: 'หน่วยไฟฟ้าส่วนรวม',
+                key: 'electricity.shareUnit',
+                color: '#58B1B1',
+                type: 'area',
+              },
+            ]}
+          />
+        </div>
+      )}
       <Table
         title={() => <Typography.Title level={4}>ผู้เช่า</Typography.Title>}
         rowKey={(e) => e.id}

@@ -165,7 +165,12 @@ export const PageHouseRent = () => {
           <Flex justify="space-between" align="center" gap={16}>
             <Typography.Title level={4}>รายการค่าเช่าบ้าน</Typography.Title>
             <Flex gap={8} align="center" justify="center">
-              <Link to={appPath.houseRentOverview()}>
+              <Link
+                to={appPath.houseRentOverview()}
+                onMouseOver={() => {
+                  import('./PageHouseRentOverview')
+                }}
+              >
                 <Button type="link" icon={<ProjectOutlined />} title="ดูสรุป" />
               </Link>
               {permissionAction?.canCreate && (

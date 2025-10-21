@@ -1,3 +1,10 @@
+## [1.6.27](https://github.com/punya199/demo-app/compare/v1.6.26...v1.6.27) (2025-10-21)
+
+
+### Fix
+
+* Improves page load performance with lazy loading ([244b450](https://github.com/punya199/demo-app/commit/244b450dd0558761434994f832d1b95d31fa3be6))
+
 ## [1.6.26](https://github.com/punya199/demo-app/compare/v1.6.25...v1.6.26) (2025-10-21)
 
 

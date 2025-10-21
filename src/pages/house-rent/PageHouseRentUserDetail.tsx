@@ -12,8 +12,6 @@ export const PageHouseRentUserDetail = () => {
 
   const { data: userDetailData, isLoading: isUserDetailLoading } = useGetHouseRentUserDetail(userId)
 
-  console.log(userDetailData)
-
   const data = useMemo(() => {
     return chain(userDetailData?.data ?? [])
       .map((d) => {

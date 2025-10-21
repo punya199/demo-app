@@ -54,19 +54,41 @@ interface IGetHouseRentUserListResponse {
   users: IUser[]
 }
 
-interface IGetHouseRentUserDetailData {
-  group: string
-  title: string
+export interface IGetHouseRentOverviewMemberData {
+  username: string
   airConditionPrice: number
   waterPrice: number
   electricityRate: number
   individualElectricityPrice: number
   electricityUnit: { diff: number; prev: number; current: number }
+  totalPrice: number
+}
+
+interface IGetHouseRentUserDetailData extends Omit<IGetHouseRentOverviewMemberData, 'username'> {
+  group: string
+  title: string
 }
 
 interface IGetHouseRentUserDetailResponse {
   data: IGetHouseRentUserDetailData[]
   user: IUser
+}
+
+export interface IGetHouseRentOverviewData {
+  group: string
+  title: string
+  electricity: {
+    totalPrice: number
+    unit: number
+    pricePerUnit: number
+    shareUnit: number
+    sharePrice: number
+  }
+  members: Record<string, IGetHouseRentOverviewMemberData>
+}
+
+export interface IGetHouseRentOverviewResponse {
+  data: IGetHouseRentOverviewData[]
 }
 
 export const useGetHouseRent = (houseRentId?: string) => {
@@ -143,6 +165,16 @@ export const useGetHouseRentUserDetail = (userId?: string) => {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     refetchOnReconnect: true,
+  })
+}
+
+export const useGetHouseRentOverview = () => {
+  return useQuery({
+    queryKey: ['house-rents', 'overview'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IGetHouseRentOverviewResponse>(`/house-rents/overview`)
+      return data
+    },
   })
 }
 

@@ -164,19 +164,24 @@ export const PageHouseRent = () => {
         title={() => (
           <Flex justify="space-between" align="center" gap={16}>
             <Typography.Title level={4}>รายการค่าเช่าบ้าน</Typography.Title>
-            {permissionAction?.canCreate && (
-              <Link to={appPath.houseRentCreate()}>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onMouseEnter={() => {
-                    import('./PageHouseRentCreate')
-                  }}
-                >
-                  เพิ่มรายการ
-                </Button>
+            <Flex gap={8} align="center" justify="center">
+              <Link to={appPath.houseRentOverview()}>
+                <Button type="link" icon={<ProjectOutlined />} title="ดูสรุป" />
               </Link>
-            )}
+              {permissionAction?.canCreate && (
+                <Link to={appPath.houseRentCreate()}>
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onMouseEnter={() => {
+                      import('./PageHouseRentCreate')
+                    }}
+                  >
+                    เพิ่มรายการ
+                  </Button>
+                </Link>
+              )}
+            </Flex>
           </Flex>
         )}
         rowKey="id"

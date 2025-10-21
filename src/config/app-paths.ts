@@ -12,6 +12,8 @@ export const appPath = {
   register: generatePath('/register'),
   houseRent: generatePath('/house-rent'),
   houseRentCreate: generatePath('/house-rent/create'),
+  houseRentOverview: generatePath('/house-rent/overview'),
+  houseRentUserDetail: generatePath<{ param: { userId: string } }>('/house-rent/users/:userId'),
   houseRentDetail: generatePath<{ param: { houseRentId: string } }>('/house-rent/:houseRentId'),
   houseRentDetailClone: generatePath<{ param: { houseRentId: string } }>(
     '/house-rent/:houseRentId/clone'

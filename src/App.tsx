@@ -48,6 +48,16 @@ const PageHouseRentSummary = lazy(() =>
     default: module.PageHouseRentSummary,
   }))
 )
+const PageHouseRentUserDetail = lazy(() =>
+  import('./pages/house-rent/PageHouseRentUserDetail').then((module) => ({
+    default: module.PageHouseRentUserDetail,
+  }))
+)
+const PageHouseRentOverview = lazy(() =>
+  import('./pages/house-rent/PageHouseRentOverview').then((module) => ({
+    default: module.PageHouseRentOverview,
+  }))
+)
 
 const router = createBrowserRouter([
   {
@@ -87,6 +97,14 @@ const router = createBrowserRouter([
       {
         path: appPath.checkBillPageSave(),
         element: <PageSaveBillToImage />,
+      },
+      {
+        path: appPath.houseRentUserDetail(),
+        element: <PageHouseRentUserDetail />,
+      },
+      {
+        path: appPath.houseRentOverview(),
+        element: <PageHouseRentOverview />,
       },
       {
         path: appPath.houseRentCreate(),

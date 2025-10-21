@@ -1,3 +1,10 @@
+## [1.6.26](https://github.com/punya199/demo-app/compare/v1.6.25...v1.6.26) (2025-10-21)
+
+
+### Fix
+
+* Adds house rent overview page ([17d7b02](https://github.com/punya199/demo-app/commit/17d7b0268066440d1a0752f1b6e276880bff9f15))
+
 ## [1.6.25](https://github.com/punya199/demo-app/compare/v1.6.24...v1.6.25) (2025-10-21)
 
 

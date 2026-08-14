@@ -73,15 +73,15 @@ const Login = () => {
   )
 
   return (
-    <div className="login-container flex min-h-screen items-center justify-center bg-gradient-to-r from-cyan-500 to-blue-500">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
-        <h2 className="mb-6 text-center text-3xl font-bold text-gray-800">
+    <div className="login-container flex min-h-screen items-center justify-center bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-slate-900 dark:to-slate-800">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-slate-900">
+        <h2 className="mb-6 text-center text-3xl font-bold text-gray-800 dark:text-slate-100">
           <TypingAnimation className="text-3xl">Welcome Back!</TypingAnimation>
         </h2>
         <Form form={form} name="login" onFinish={onFinish} layout="vertical">
           <Form.Item
             label={
-              <span className="text-lg font-semibold text-gray-700">
+              <span className="text-lg font-semibold text-gray-700 dark:text-slate-300">
                 <TypingAnimation className="text-lg" delay={200}>
                   Username
                 </TypingAnimation>
@@ -90,12 +90,12 @@ const Login = () => {
             name="username"
             rules={[{ required: true, message: 'Please input your username!' }]}
           >
-            <Input className="focus:ring-opacity-50 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200" />
+            <Input className="focus:ring-opacity-50 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 dark:border-slate-600" />
           </Form.Item>
 
           <Form.Item
             label={
-              <span className="text-lg font-semibold text-gray-700">
+              <span className="text-lg font-semibold text-gray-700 dark:text-slate-300">
                 <TypingAnimation className="text-lg" delay={400}>
                   Password
                 </TypingAnimation>
@@ -104,7 +104,7 @@ const Login = () => {
             name="password"
             rules={[{ required: true, message: 'Please input your password!' }]}
           >
-            <Input.Password className="focus:ring-opacity-50 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200" />
+            <Input.Password className="focus:ring-opacity-50 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 dark:border-slate-600" />
           </Form.Item>
 
           <Form.Item>
@@ -121,6 +121,7 @@ const Login = () => {
           </Form.Item>
         </Form>
         <Button
+          type="primary"
           onClick={() => navigate(appPath.register())}
           className="w-full rounded-md bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600"
         >

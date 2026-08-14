@@ -42,9 +42,9 @@ const PageRegister = () => {
     [register]
   )
   return (
-    <div className="login-container flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-300 to-purple-400">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
-        <h2 className="mb-6 text-center text-3xl font-bold text-gray-800">
+    <div className="login-container flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-300 to-purple-400 dark:from-slate-900 dark:to-slate-800">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-slate-900">
+        <h2 className="mb-6 text-center text-3xl font-bold text-gray-800 dark:text-slate-100">
           <TypingAnimation className="text-3xl" delay={200}>
             Register
           </TypingAnimation>
@@ -58,7 +58,7 @@ const PageRegister = () => {
         >
           <Form.Item
             label={
-              <span className="text-lg font-semibold text-gray-700">
+              <span className="text-lg font-semibold text-gray-700 dark:text-slate-300">
                 <TypingAnimation className="text-lg" delay={400}>
                   Username
                 </TypingAnimation>
@@ -67,12 +67,12 @@ const PageRegister = () => {
             name="username"
             rules={[{ required: true, message: 'Please input your username!' }]}
           >
-            <Input className="focus:ring-opacity-50 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200" />
+            <Input className="focus:ring-opacity-50 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 dark:border-slate-600" />
           </Form.Item>
 
           <Form.Item
             label={
-              <span className="text-lg font-semibold text-gray-700">
+              <span className="text-lg font-semibold text-gray-700 dark:text-slate-300">
                 <TypingAnimation className="text-lg" delay={600}>
                   Password
                 </TypingAnimation>
@@ -81,7 +81,7 @@ const PageRegister = () => {
             name="password"
             rules={[{ required: true, message: 'Please input your password!' }]}
           >
-            <Input.Password className="focus:ring-opacity-50 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200" />
+            <Input.Password className="focus:ring-opacity-50 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 dark:border-slate-600" />
           </Form.Item>
 
           <Form.Item>

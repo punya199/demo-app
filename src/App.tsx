@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { App as AntdApp, ConfigProvider } from 'antd'
-import { lazy } from 'react'
+import { App as AntdApp, ConfigProvider, theme } from 'antd'
+import { lazy, useEffect, useMemo } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import './App.css'
 import { appConfig } from './config/app-config'
@@ -10,6 +10,7 @@ import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Authorize } from './components/Authorize'
 import { EnumPermissionFeatureName } from './services/permission/permission.params'
+import { useThemeStore } from './utils/theme-store'
 
 const Pnotfound = lazy(() => import('./layouts/Pnotfound'))
 const RootLayout = lazy(() => import('./layouts/RootLayout'))
@@ -166,18 +167,32 @@ const queryClient = new QueryClient({
   },
 })
 const App = () => {
+  const mode = useThemeStore((state) => state.mode)
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', mode === 'dark')
+  }, [mode])
+
+  const themeConfig = useMemo(
+    () => ({
+      algorithm: mode === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
+      token: {
+        colorPrimary: '#2563EB',
+        colorInfo: '#2563EB',
+        borderRadius: 10,
+        fontFamily:
+          "'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+        controlHeight: 38,
+      },
+    }),
+    [mode]
+  )
+
   return (
     <QueryClientProvider client={queryClient}>
       {appConfig().VITE_IS_DEVELOPMENT && <ScreenSizeIndicator />}
       {appConfig().VITE_IS_DEVELOPMENT && <ReactQueryDevtools />}
-      <ConfigProvider
-        theme={{
-          token: {
-            colorPrimary: '#2563EB', // สีใหม่ของ primary
-            borderRadius: 12, // มุมโค้ง
-          },
-        }}
-      >
+      <ConfigProvider theme={themeConfig}>
         <AntdApp>
           <RouterProvider router={router} />
         </AntdApp>

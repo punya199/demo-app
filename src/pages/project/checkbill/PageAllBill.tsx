@@ -12,6 +12,7 @@ import { apiClient } from '../../../utils/api-client'
 import { checkRole } from '../../../utils/helper'
 import { Friend } from './AddFriends'
 import { Item } from './AddItem'
+import { mockBill } from './mock-bill-data'
 
 export type Bill = {
   id: number
@@ -37,6 +38,8 @@ const PageAllBill = () => {
       const { data } = await apiClient.get<GetBillsResponse>(`/bills`)
       return data
     },
+    // ข้อมูลตัวอย่างไว้ดูหน้าตอนยังไม่ได้เชื่อมต่อ backend - ลบทิ้งได้เมื่อเชื่อมต่อแล้ว
+    initialData: { bills: [mockBill] },
   })
 
   const { mutate: deleteBill } = useMutation({
@@ -53,7 +56,8 @@ const PageAllBill = () => {
     navigate(appPath.checkBillPageSave({ param: { billId } }))
   }
   const handleEditClick = (billId: number) => {
-    if (checkRole(UserRole.ADMIN, user?.user?.role)) {
+    const isMockBill = billId === mockBill.id
+    if (isMockBill || checkRole(UserRole.ADMIN, user?.user?.role)) {
       navigate(appPath.checkBillPageEdit({ param: { billId } }))
     } else {
       Modal.confirm({
@@ -157,8 +161,11 @@ const PageAllBill = () => {
 
   return (
     <div className="mt-2 flex justify-center">
-      <div className="m-2 w-full rounded-3xl bg-gradient-to-br from-blue-100 via-white to-blue-200 p-4 shadow-2xl md:max-w-2xl">
-        <Typography.Title level={3} className="!text-center text-blue-700 drop-shadow-md">
+      <div className="m-2 w-full rounded-3xl bg-gradient-to-br from-blue-100 via-white to-blue-200 p-4 shadow-2xl md:max-w-2xl dark:from-slate-800 dark:via-slate-900 dark:to-slate-950">
+        <Typography.Title
+          level={3}
+          className="!text-center !text-blue-700 drop-shadow-md dark:!text-blue-300"
+        >
           แบ่งบิลเพื่อนแบบกำหนดเอง
         </Typography.Title>
 

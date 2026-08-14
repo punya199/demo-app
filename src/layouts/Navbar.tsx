@@ -1,7 +1,7 @@
-import { MenuOutlined } from '@ant-design/icons'
+import { DownOutlined, LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button, Drawer, Menu, MenuProps, Space } from 'antd'
-import { motion } from 'framer-motion'
+import { Avatar, Button, Drawer, Dropdown, Menu, MenuProps, Space } from 'antd'
+import { motion } from 'motion/react'
 import { compact } from 'lodash'
 import { startTransition, useCallback, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -12,34 +12,9 @@ import { EnumPermissionFeatureName } from '../services/permission/permission.par
 import { apiClient } from '../utils/api-client'
 import { checkRole, sleep } from '../utils/helper'
 
-// // interface IMenuItemData {
-// //   name: string
-// //   path: string
-// }
 type MenuItem = Required<MenuProps>['items'][number]
 
-// const menuItemsMap: Record<string, IMenuItemData> = {
-//   randomCard: {
-//     name: 'RandomCard',
-//     path: appPath.randomCard(),
-//   },
-//   omamaGame: {
-//     name: 'Game Omama',
-//     path: appPath.omamaGame(),
-//   },
-//   checkBill: {
-//     name: 'Check Bill',
-//     path: appPath.checkBillPage(),
-//   },
-//   houseRent: {
-//     name: 'House Rent',
-//     path: appPath.houseRent(),
-//   },
-//   manageUser: {
-//     name: 'Manage User',
-//     path: appPath.manageUser(),
-//   },
-// }
+const appVersion = import.meta.env.VITE_APP_VERSION || 'unknown'
 
 const Navbar = () => {
   const navigate = useNavigate()
@@ -142,83 +117,109 @@ const Navbar = () => {
     [menuHouseRentAllowed, navigate, user?.user?.role]
   )
 
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'version',
+      label: `Version ${appVersion}`,
+      disabled: true,
+    },
+    { type: 'divider' },
+    {
+      key: 'logout',
+      label: 'Logout',
+      icon: <LogoutOutlined />,
+      onClick: handleLogout,
+    },
+  ]
+
   return (
-    <nav className="bg-gradient-to-r from-cyan-500 to-blue-500 px-5 py-2 shadow-lg">
-      <div className="grid grid-cols-2">
-        {/* Left: Logo */}
-        <Link to={appPath.home()}>
-          <TypingAnimation className="text-xl text-amber-50">YaYa</TypingAnimation>
+    <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 px-4 shadow-sm backdrop-blur sm:px-6 dark:border-slate-800 dark:bg-slate-900/90">
+      <div className="flex h-16 items-center justify-between gap-4">
+        <Link to={appPath.home()} className="shrink-0">
+          <TypingAnimation
+            className="text-xl font-bold text-slate-900 dark:text-white"
+            duration={80}
+          >
+            YaYa
+          </TypingAnimation>
         </Link>
 
-        <div className="flex items-center justify-end gap-4">
-          {isLoggedIn && user.user.username}
-          <div className="hidden items-center gap-2 lg:flex">
+        <Menu
+          mode="horizontal"
+          items={items}
+          selectable={false}
+          className="hidden min-w-0 flex-1 !justify-center !border-none !bg-transparent lg:flex"
+        />
+
+        <div className="flex items-center gap-2">
+          <div className="hidden items-center lg:flex">
             {isLoggedIn ? (
-              <motion.div whileHover={{ scale: 1.1 }}>
-                <Button
-                  type="link"
-                  className="!text-white hover:!text-cyan-300"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
-              </motion.div>
+              <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <Button type="text" className="flex items-center gap-2 !px-2">
+                    <Avatar size="small" icon={<UserOutlined />} />
+                    <span className="font-medium text-slate-700 dark:text-slate-200">
+                      {user.user.username}
+                    </span>
+                    <DownOutlined className="text-xs text-slate-400 dark:text-slate-500" />
+                  </Button>
+                </motion.div>
+              </Dropdown>
             ) : (
               <Link to={appPath.login()} state={{ redirect: location.pathname }}>
-                <motion.div whileHover={{ scale: 1.1 }}>
-                  <Button type="link" className="!text-white hover:!text-cyan-300">
-                    Login
-                  </Button>
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <Button type="primary">Login</Button>
                 </motion.div>
               </Link>
             )}
-            <div className="rounded bg-black px-2 py-1 text-xs text-white">
-              Version: {import.meta.env.VITE_APP_VERSION || 'unknown'}
-            </div>
           </div>
 
-          <motion.div whileTap={{ scale: 0.9 }}>
-            <div>
-              <Button
-                type="text"
-                icon={<MenuOutlined className="text-xl text-white" />}
-                onClick={showDrawer}
-              />
-            </div>
+          <motion.div whileTap={{ scale: 0.9 }} className="lg:hidden">
+            <Button
+              type="text"
+              icon={<MenuOutlined className="text-lg text-slate-700 dark:text-slate-200" />}
+              onClick={showDrawer}
+            />
           </motion.div>
         </div>
       </div>
 
       <Drawer title="Menu" placement="right" onClose={onClose} open={open} width={300}>
-        <Menu mode="inline" items={items} selectable={false}></Menu>
+        <Menu mode="inline" items={items} selectable={false} />
 
-        <div className="p-3">
+        <div className="mt-4 border-t border-slate-100 pt-4 dark:border-slate-800">
           <Space direction="vertical" size="middle" className="w-full">
             {isLoggedIn ? (
-              <Button
-                type="link"
-                block
-                onClick={() => {
-                  handleLogout()
-                  onClose()
-                }}
-              >
-                Logout
-              </Button>
+              <>
+                <div className="flex items-center gap-2 px-1 text-slate-600 dark:text-slate-300">
+                  <Avatar size="small" icon={<UserOutlined />} />
+                  <span className="font-medium">{user.user.username}</span>
+                </div>
+                <Button
+                  block
+                  icon={<LogoutOutlined />}
+                  onClick={() => {
+                    handleLogout()
+                    onClose()
+                  }}
+                >
+                  Logout
+                </Button>
+              </>
             ) : (
               <Link to={appPath.login()} state={{ redirect: location.pathname }}>
-                <Button type="link" block onClick={onClose}>
+                <Button type="primary" block onClick={onClose}>
                   Login
                 </Button>
               </Link>
             )}
-            <div className="rounded bg-black px-2 py-1 text-xs text-white">
-              Version: {import.meta.env.VITE_APP_VERSION || 'unknown'}
+            <div className="text-center text-xs text-slate-400 dark:text-slate-500">
+              Version {appVersion}
             </div>
           </Space>
         </div>
       </Drawer>
-    </nav>
+    </header>
   )
 }
 

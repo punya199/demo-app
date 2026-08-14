@@ -1,10 +1,17 @@
+import {
+  ArrowLeftOutlined,
+  DownloadOutlined,
+  TeamOutlined,
+  WalletOutlined,
+} from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
-import { Button } from 'antd'
+import { Button, Card, Divider, Tag, Typography } from 'antd'
 import { toPng } from 'html-to-image'
-import { keyBy, round } from 'lodash'
+import { keyBy } from 'lodash'
 import { useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { apiClient } from '../../../utils/api-client'
+import { mockBill } from './mock-bill-data'
 type Bill = {
   id: number
   title: string
@@ -42,6 +49,8 @@ const PageSaveBillToImage = () => {
       const { data } = await apiClient.get<GetBillResponse>(`/bills/${billId}`)
       return data
     },
+    // ข้อมูลตัวอย่างไว้ดูหน้าตอนยังไม่ได้เชื่อมต่อ backend - ลบทิ้งได้เมื่อเชื่อมต่อแล้ว
+    initialData: { bill: mockBill },
   })
   const friendHash = keyBy(data?.bill.friends || [], (e) => e.id)
   const friendBill = useMemo(() => {
@@ -52,9 +61,12 @@ const PageSaveBillToImage = () => {
       const split = item.friendIds
       if (!split || split.length === 0) return
 
-      const pricePerPerson = round(item.price / split.length)
-      split.forEach((fid) => {
-        newFriendBill[fid] += pricePerPerson
+      // แบ่งเศษที่หารไม่ลงตัวให้คนแรกๆ ทีละ 1 บาท เพื่อให้ยอดรวมตรงกับราคาสินค้าเป๊ะ
+      const baseShare = Math.floor(item.price / split.length)
+      const remainder = item.price - baseShare * split.length
+
+      split.forEach((fid, index) => {
+        newFriendBill[fid] += baseShare + (index < remainder ? 1 : 0)
       })
     })
 
@@ -118,6 +130,11 @@ const PageSaveBillToImage = () => {
     return result
   }, [data?.bill.friends, friendBill, friendPaid])
 
+  const totalSpent = useMemo(
+    () => data?.bill.items.reduce((acc, curr) => acc + curr.price, 0) ?? 0,
+    [data?.bill.items]
+  )
+
   const containerRefs = useRef<{ [friendId: string]: HTMLDivElement | null }>({})
 
   const handleDownloadAll = async () => {
@@ -135,160 +152,179 @@ const PageSaveBillToImage = () => {
   }
 
   return (
-    <div className="mx-auto max-w-2xl rounded-xl bg-white p-4 text-gray-800 shadow-md">
-      {/* Header */}
-      <div ref={(el) => (containerRefs.current['billList'] = el)} className="mb-6 bg-white">
-        <div className="mb-1 border-b pb-3 text-center">
-          <h1 className="text-2xl !font-extrabold break-words text-blue-700">{data?.bill.title}</h1>
-          <div className="mt-1 text-sm text-gray-600">
-            ยอดที่จ่ายทั้งหมด{' '}
-            <span className="font-bold text-black">
-              {data?.bill.items.reduce((acc, curr) => acc + curr.price, 0).toLocaleString()} บาท
-            </span>
+    <div className="mx-auto max-w-2xl space-y-6 p-4 md:p-6">
+      {/* Header + ผู้จ่ายเงินล่วงหน้า */}
+      <div ref={(el) => (containerRefs.current['billList'] = el)} className="space-y-6">
+        <div className="text-center">
+          <Typography.Title level={3} className="!mb-1 break-words">
+            {data?.bill.title}
+          </Typography.Title>
+          <div>
+            <Typography.Text type="secondary">ยอดที่จ่ายทั้งหมด </Typography.Text>
+            <Typography.Text strong className="text-lg">
+              {totalSpent.toLocaleString()} บาท
+            </Typography.Text>
           </div>
         </div>
-        {/* Section: ผู้จ่ายเงินล่วงหน้า */}
-        <div className="mb-8 space-y-4">
-          {data?.bill.friends.map((friend) => {
-            const paidItems = data.bill.items.filter((item) => item.payerId === friend.id)
-            if (paidItems.length === 0) return null
 
-            return (
-              <div
-                key={friend.id}
-                className="bg-green-30 rounded-xl border border-green-300 p-4 shadow-sm"
-              >
-                <div className="mb-2 font-semibold text-green-800">
-                  {friend.name} จ่าย {paidItems.length} รายการ
-                </div>
-                <ul className="space-y-1 text-sm text-gray-700">
-                  {paidItems.map((item, idx) => (
-                    <li key={item.id} className="border-b pb-1">
-                      <div className="flex justify-between">
-                        <span>
-                          {idx + 1}. {item.name}
-                        </span>
-                        <span className="font-medium">{item.price.toLocaleString()} บาท</span>
-                      </div>
-                      <div className="ml-4 text-xs text-gray-500">
-                        คนที่หารด้วย:{' '}
-                        {(item.friendIds ?? [])
-                          .map((fid) => friendHash[fid]?.name || '-')
-                          .join(' | ')}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )
-          })}
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <WalletOutlined className="text-xl text-blue-600 dark:text-blue-400" />
+            <Typography.Title level={4} className="!mb-0 !text-blue-600 dark:!text-blue-400">
+              ผู้จ่ายเงินล่วงหน้า
+            </Typography.Title>
+          </div>
+          <div className="space-y-3">
+            {data?.bill.friends.map((friend) => {
+              const paidItems = data.bill.items.filter((item) => item.payerId === friend.id)
+              if (paidItems.length === 0) return null
+
+              return (
+                <Card key={friend.id} size="small">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="font-semibold">{friend.name}</span>
+                    <Tag color="green">{paidItems.length} รายการ</Tag>
+                  </div>
+                  <ul className="space-y-2">
+                    {paidItems.map((item, idx) => (
+                      <li key={item.id}>
+                        <div className="flex justify-between text-sm">
+                          <span>
+                            {idx + 1}. {item.name}
+                          </span>
+                          <span className="font-medium">{item.price.toLocaleString()} บาท</span>
+                        </div>
+                        <Typography.Text type="secondary" className="text-xs">
+                          หารกับ:{' '}
+                          {(item.friendIds ?? [])
+                            .map((fid) => friendHash[fid]?.name || '-')
+                            .join(', ')}
+                        </Typography.Text>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              )
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Summary per person */}
-      <div className="mb-6">
-        <h2 className="mb-3 text-center text-xl font-bold text-indigo-800">สรุปของแต่ละคน</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {data?.bill.friends.map((friend) => (
-            <div
-              ref={(el) => (containerRefs.current[friend.id] = el)}
-              key={friend.id}
-              className="rounded-xl bg-gradient-to-br from-white via-indigo-50 to-indigo-100 p-4 shadow-sm"
-            >
-              <div className="mb-2 text-center text-lg font-bold text-indigo-700">
-                {friend.name}
-              </div>
-              <div className="space-y-2 text-sm">
-                <b className="text-gray-800">รายการ</b>
-                <ul className="list-disc pl-5">
+      {/* สรุปของแต่ละคน */}
+      <div>
+        <div className="mb-3 flex items-center gap-2">
+          <TeamOutlined className="text-xl text-blue-600 dark:text-blue-400" />
+          <Typography.Title level={4} className="!mb-0 !text-blue-600 dark:!text-blue-400">
+            สรุปของแต่ละคน
+          </Typography.Title>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {data?.bill.friends.map((friend) => {
+            const net = friendPaid[friend.id] - friendBill[friend.id]
+            const friendTransactions = transactions.filter(
+              (t) => t.from === friend.id || t.to === friend.id
+            )
+
+            return (
+              <Card
+                ref={(el) => {
+                  containerRefs.current[friend.id] = el
+                }}
+                key={friend.id}
+                size="small"
+              >
+                <div className="mb-2 text-center text-base font-semibold">{friend.name}</div>
+
+                <ul className="space-y-1 text-sm">
                   {data?.bill.items
                     .filter((item) => item.friendIds?.includes(friend.id))
                     .map((item) => (
-                      <li key={item.id} className="flex justify-between text-gray-700">
+                      <li key={item.id} className="flex justify-between">
                         <span>{item.name}</span>
-                        <span className="text-right">
+                        <span>
                           {Math.floor(item.price / item.friendIds!.length).toLocaleString()} บาท
                         </span>
                       </li>
                     ))}
                 </ul>
-                {friendBill[friend.id] !== 0 && (
-                  <div className="flex justify-between font-semibold text-gray-800">
-                    <span>ยอดรวม</span>
-                    <span>{Math.floor(friendBill[friend.id]).toLocaleString()} บาท</span>
-                  </div>
-                )}
-                {friendPaid[friend.id] > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>ชำระแล้ว</span>
-                    <span>{Math.floor(friendPaid[friend.id]).toLocaleString()} บาท</span>
-                  </div>
-                )}
-                {/* ผลต่าง */}
-                {friendPaid[friend.id] > friendBill[friend.id] && (
-                  <div className="flex justify-between font-semibold text-blue-700">
-                    <span>ต้องได้รับคืน</span>
-                    <span>
-                      {(friendPaid[friend.id] - friendBill[friend.id]).toLocaleString()} บาท
-                    </span>
-                  </div>
-                )}
-                {friendPaid[friend.id] < friendBill[friend.id] && (
-                  <div className="flex justify-between font-semibold text-red-600">
-                    <span>ค้างชำระ</span>
-                    <span>
-                      {(friendBill[friend.id] - friendPaid[friend.id]).toLocaleString()} บาท
-                    </span>
+
+                <Divider className="my-3" />
+
+                <div className="space-y-1 text-sm">
+                  {friendBill[friend.id] !== 0 && (
+                    <div className="flex justify-between font-medium">
+                      <span>ยอดรวม</span>
+                      <span>{Math.floor(friendBill[friend.id]).toLocaleString()} บาท</span>
+                    </div>
+                  )}
+                  {friendPaid[friend.id] > 0 && (
+                    <div className="flex justify-between">
+                      <Typography.Text type="success">ชำระแล้ว</Typography.Text>
+                      <Typography.Text type="success">
+                        {Math.floor(friendPaid[friend.id]).toLocaleString()} บาท
+                      </Typography.Text>
+                    </div>
+                  )}
+                </div>
+
+                {net !== 0 && (
+                  <div
+                    className={`mt-3 rounded-lg px-4 py-3 text-center text-base font-semibold ${
+                      net > 0
+                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300'
+                        : 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300'
+                    }`}
+                  >
+                    {net > 0
+                      ? `ต้องได้รับคืน ${net.toLocaleString()} บาท`
+                      : `ค้างชำระ ${(-net).toLocaleString()} บาท`}
                   </div>
                 )}
 
-                {/* Transactions */}
-                {transactions
-                  .filter((t) => t.from === friend.id || t.to === friend.id)
-                  .map((t, i) => {
-                    const from = data.bill.friends.find((f) => f.id === t.from)?.name
-                    const to = data.bill.friends.find((f) => f.id === t.to)?.name
-                    const isPayer = t.from === friend.id
+                {friendTransactions.length > 0 && (
+                  <>
+                    <Divider className="my-3" />
+                    <div className="space-y-1">
+                      {friendTransactions.map((t, i) => {
+                        const from = data.bill.friends.find((f) => f.id === t.from)?.name
+                        const to = data.bill.friends.find((f) => f.id === t.to)?.name
+                        const isPayer = t.from === friend.id
 
-                    return (
-                      <div key={i} className="ml-1 text-xs text-gray-600">
-                        {isPayer ? (
-                          <span className="flex justify-between">
-                            <span>
-                              จ่ายให้ <b>{to}</b>
-                            </span>
-                            <span>{t.amount.toLocaleString()} บาท</span>
-                          </span>
-                        ) : (
-                          <span className="flex justify-between">
-                            <span>
-                              ได้รับจาก <b>{from}</b>
-                            </span>
-                            <span>{t.amount.toLocaleString()} บาท</span>
-                          </span>
-                        )}
-                      </div>
-                    )
-                  })}
-              </div>
-            </div>
-          ))}
+                        return (
+                          <div key={i} className="flex justify-between text-xs">
+                            <Typography.Text type="secondary">
+                              {isPayer ? (
+                                <>
+                                  จ่ายให้ <b>{to}</b>
+                                </>
+                              ) : (
+                                <>
+                                  ได้รับจาก <b>{from}</b>
+                                </>
+                              )}
+                            </Typography.Text>
+                            <Typography.Text type="secondary">
+                              {t.amount.toLocaleString()} บาท
+                            </Typography.Text>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </>
+                )}
+              </Card>
+            )
+          })}
         </div>
       </div>
 
-      {/* Save Button */}
-      <div className="mt-5 flex justify-center gap-2 text-center">
-        <Button
-          type="primary"
-          size="large"
-          onClick={() => {
-            navigate(-1)
-          }}
-        >
+      {/* Actions */}
+      <div className="flex justify-center gap-2">
+        <Button icon={<ArrowLeftOutlined />} size="large" onClick={() => navigate(-1)}>
           กลับ
         </Button>
-        <Button type="primary" size="large" onClick={handleDownloadAll}>
-          💾 บันทึกเป็นรูปภาพ
+        <Button type="primary" icon={<DownloadOutlined />} size="large" onClick={handleDownloadAll}>
+          บันทึกเป็นรูปภาพ
         </Button>
       </div>
     </div>

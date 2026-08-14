@@ -34,8 +34,8 @@ export const AddItem = ({ onAddItem, items }: AddItemProps) => {
   }
 
   return (
-    <div className="rounded-lg bg-gray-50 p-4 shadow-sm md:px-8 md:py-4">
-      <h3 className="mb-2 text-lg font-semibold">เพิ่มรายการ</h3>
+    <div className="rounded-lg bg-gray-50 p-4 shadow-sm md:px-8 md:py-4 dark:bg-slate-800">
+      <h3 className="mb-2 text-lg font-semibold text-slate-800 dark:text-slate-100">เพิ่มรายการ</h3>
       <Form
         onFinish={onFinish}
         form={form}

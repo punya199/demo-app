@@ -7,7 +7,37 @@
   display: none !important;
 }
 
-body{
+body {
   height: 100vh;
+  background-color: #f8fafc;
+}
+
+.dark body {
+  background-color: #020617;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  -webkit-text-fill-color: #1f2937;
+  caret-color: #1f2937;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #141414 inset;
+  -webkit-text-fill-color: #e2e8f0;
+  caret-color: #e2e8f0;
 }
 

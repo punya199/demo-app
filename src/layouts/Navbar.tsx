@@ -11,6 +11,7 @@ import { useGetMe, usePermissionRouteAllow, UserRole } from '../service'
 import { EnumPermissionFeatureName } from '../services/permission/permission.params'
 import { apiClient } from '../utils/api-client'
 import { checkRole, sleep } from '../utils/helper'
+import { useScreen } from '../utils/responsive-helper'
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -18,6 +19,7 @@ const appVersion = import.meta.env.VITE_APP_VERSION || 'unknown'
 
 const Navbar = () => {
   const navigate = useNavigate()
+  const { lg: isDesktopNav } = useScreen()
   const [open, setOpen] = useState(false)
   const { data: user } = useGetMe()
   const isLoggedIn = !!user?.user?.id
@@ -134,25 +136,25 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 px-4 shadow-sm backdrop-blur sm:px-6 dark:border-slate-800 dark:bg-slate-900/90">
-      <div className="flex h-16 items-center justify-between gap-4">
-        <Link to={appPath.home()} className="shrink-0">
-          <TypingAnimation
-            className="text-xl font-bold text-slate-900 dark:text-white"
-            duration={80}
-          >
-            YaYa
-          </TypingAnimation>
-        </Link>
+      {isDesktopNav ? (
+        <div className="flex h-16 items-center justify-between gap-4">
+          <Link to={appPath.home()} className="shrink-0">
+            <TypingAnimation
+              className="text-xl font-bold text-slate-900 dark:text-white"
+              duration={80}
+            >
+              YaYa
+            </TypingAnimation>
+          </Link>
 
-        <Menu
-          mode="horizontal"
-          items={items}
-          selectable={false}
-          className="hidden min-w-0 flex-1 !justify-center !border-none !bg-transparent lg:flex"
-        />
+          <Menu
+            mode="horizontal"
+            items={items}
+            selectable={false}
+            className="min-w-0 flex-1 !justify-center !border-none !bg-transparent"
+          />
 
-        <div className="flex items-center gap-2">
-          <div className="hidden items-center lg:flex">
+          <div className="flex items-center">
             {isLoggedIn ? (
               <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
@@ -173,16 +175,29 @@ const Navbar = () => {
               </Link>
             )}
           </div>
-
-          <motion.div whileTap={{ scale: 0.9 }} className="lg:hidden">
-            <Button
-              type="text"
-              icon={<MenuOutlined className="text-lg text-slate-700 dark:text-slate-200" />}
-              onClick={showDrawer}
-            />
-          </motion.div>
         </div>
-      </div>
+      ) : (
+        <div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4">
+          <div />
+          <Link to={appPath.home()}>
+            <TypingAnimation
+              className="text-xl font-bold text-slate-900 dark:text-white"
+              duration={80}
+            >
+              YaYa
+            </TypingAnimation>
+          </Link>
+          <div className="flex justify-end">
+            <motion.div whileTap={{ scale: 0.9 }}>
+              <Button
+                type="text"
+                icon={<MenuOutlined className="text-lg text-slate-700 dark:text-slate-200" />}
+                onClick={showDrawer}
+              />
+            </motion.div>
+          </div>
+        </div>
+      )}
 
       <Drawer title="Menu" placement="right" onClose={onClose} open={open} width={300}>
         <Menu mode="inline" items={items} selectable={false} />

@@ -43,14 +43,16 @@ const PageSaveBillToImage = () => {
   const params = useParams()
   const navigate = useNavigate()
   const billId = params.billId
+  // บิลตัวอย่าง id ไม่ใช่ UUID จริง เรียก backend จริงไม่ได้ - ใช้ข้อมูลตัวอย่างตรงๆ ไม่ต้อง fetch
+  const isMockBill = billId === String(mockBill.id)
   const { data } = useQuery({
     queryKey: ['BillList', billId],
     queryFn: async () => {
       const { data } = await apiClient.get<GetBillResponse>(`/bills/${billId}`)
       return data
     },
-    // ข้อมูลตัวอย่างไว้ดูหน้าตอนยังไม่ได้เชื่อมต่อ backend - ลบทิ้งได้เมื่อเชื่อมต่อแล้ว
-    initialData: { bill: mockBill },
+    enabled: !isMockBill,
+    placeholderData: isMockBill ? { bill: mockBill } : undefined,
   })
   const friendHash = keyBy(data?.bill.friends || [], (e) => e.id)
   const friendBill = useMemo(() => {
@@ -233,7 +235,9 @@ const PageSaveBillToImage = () => {
                 key={friend.id}
                 size="small"
               >
-                <div className="mb-2 text-center text-base font-semibold">{friend.name}</div>
+                <div className="mb-3 text-center text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {friend.name}
+                </div>
 
                 <ul className="space-y-1 text-sm">
                   {data?.bill.items

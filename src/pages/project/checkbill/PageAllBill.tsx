@@ -38,8 +38,10 @@ const PageAllBill = () => {
       const { data } = await apiClient.get<GetBillsResponse>(`/bills`)
       return data
     },
-    // ข้อมูลตัวอย่างไว้ดูหน้าตอนยังไม่ได้เชื่อมต่อ backend - ลบทิ้งได้เมื่อเชื่อมต่อแล้ว
-    initialData: { bills: [mockBill] },
+    // ข้อมูลตัวอย่างไว้โชว์ระหว่างรอ/ตอนยังไม่ได้เชื่อมต่อ backend - ใช้ placeholderData (ไม่ใช่ initialData)
+    // เพราะ initialData จะถูกมองว่าเป็นข้อมูลที่ fetch มาแล้วจริง ทำให้ query ไม่ไปดึงข้อมูลจริงซ้ำ
+    // ตราบใน staleTime (5 นาที) ที่ตั้งไว้ใน App.tsx
+    placeholderData: { bills: [mockBill] },
   })
 
   const { mutate: deleteBill } = useMutation({

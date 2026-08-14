@@ -38,7 +38,9 @@ const PageEditBill = () => {
       const { data } = await apiClient.get<GetBillResponse>(`/bills/${billId}`)
       return data
     },
-    initialData: isMockBill ? { bill: mockBill } : undefined,
+    // บิลตัวอย่าง id ไม่ใช่ UUID จริง เรียก backend จริงไม่ได้ - ใช้ข้อมูลตัวอย่างตรงๆ ไม่ต้อง fetch
+    enabled: !isMockBill,
+    placeholderData: isMockBill ? { bill: mockBill } : undefined,
   })
 
   const onSave = async (body: SaveBody) => {

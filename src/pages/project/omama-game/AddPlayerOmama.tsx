@@ -1,5 +1,11 @@
-import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons'
-import { Button, Form, Input } from 'antd'
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  DeleteOutlined,
+  UserAddOutlined,
+} from '@ant-design/icons'
+import { Avatar, Button, Form, Input, Tooltip } from 'antd'
+import { motion } from 'motion/react'
 
 interface AddPlayerProps {
   userNameList?: string[]
@@ -17,8 +23,8 @@ const AddPlayerOmama = (props: AddPlayerProps) => {
   }
 
   return (
-    <div className="flex max-w-5xl flex-col rounded-lg bg-gray-100 p-4 shadow-md">
-      <Form form={form} onFinish={onFinish} className="flex items-center gap-2">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <Form form={form} onFinish={onFinish} layout="inline" className="flex gap-2">
         <Form.Item
           name="playerName"
           rules={[
@@ -32,46 +38,60 @@ const AddPlayerOmama = (props: AddPlayerProps) => {
               },
             },
           ]}
-          className="flex-1"
+          className="!mr-0 flex-1"
         >
           <Input
-            placeholder="Enter player name"
-            className="rounded-lg border border-gray-300 p-2"
+            placeholder="ชื่อผู้เล่น"
+            prefix={<UserAddOutlined className="text-slate-400" />}
           />
         </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" className="rounded-lg">
+        <Form.Item className="!mr-0">
+          <Button type="primary" htmlType="submit">
             เพิ่มชื่อ
           </Button>
         </Form.Item>
       </Form>
-      <div>
+
+      <div className="mt-3 space-y-2">
         {props.userNameList?.map((name, index) => (
-          <div
+          <motion.div
             key={name}
-            className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white p-2 shadow-sm"
+            layout
+            className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-2 dark:border-slate-800 dark:bg-slate-800/50"
           >
-            <div className="flex-1 text-gray-700">{name}</div>
-            <div>
+            <Avatar size="small" style={{ backgroundColor: '#2563eb' }}>
+              {index + 1}
+            </Avatar>
+            <div className="flex-1 font-medium text-slate-700 dark:text-slate-200">{name}</div>
+            <Tooltip title="เลื่อนขึ้น">
               <Button
+                size="small"
                 icon={<CaretUpOutlined />}
                 disabled={index === 0}
                 onClick={() => {
                   props.upperIndexName(index)
                 }}
-              ></Button>
+              />
+            </Tooltip>
+            <Tooltip title="เลื่อนลง">
               <Button
+                size="small"
                 icon={<CaretDownOutlined />}
                 disabled={index + 1 === props.userNameList?.length}
                 onClick={() => {
                   props.downIndexName(index)
                 }}
-              ></Button>
-            </div>
-            <Button onClick={() => props.removeUserName(name)} className="!text-red-500">
-              ลบ
-            </Button>
-          </div>
+              />
+            </Tooltip>
+            <Tooltip title="ลบผู้เล่น">
+              <Button
+                size="small"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => props.removeUserName(name)}
+              />
+            </Tooltip>
+          </motion.div>
         ))}
       </div>
     </div>

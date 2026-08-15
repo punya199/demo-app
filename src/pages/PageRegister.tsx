@@ -1,3 +1,4 @@
+import { ArrowLeftOutlined } from '@ant-design/icons'
 import { useMutation } from '@tanstack/react-query'
 import { Button, Form, Input } from 'antd'
 import { AxiosError } from 'axios'
@@ -44,6 +45,14 @@ const PageRegister = () => {
   return (
     <div className="login-container flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-300 to-purple-400 dark:from-slate-900 dark:to-slate-800">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-slate-900">
+        <Button
+          type="text"
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate(appPath.login())}
+          className="!mb-2 !px-1 text-gray-600 dark:text-slate-300"
+        >
+          Back
+        </Button>
         <h2 className="mb-6 text-center text-3xl font-bold text-gray-800 dark:text-slate-100">
           <TypingAnimation className="text-3xl" delay={200}>
             Register

@@ -2,7 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { IGetUserResponse, IGetUsersResponse } from '../../service'
 import { apiClient } from '../../utils/api-client'
 import { sleep } from '../../utils/helper'
-import { IEditUserPermissionsParams, IGetUserPermissionsResponse } from './user.params'
+import {
+  IChangePasswordParams,
+  IEditUserParams,
+  IEditUserPermissionsParams,
+  IGetUserPermissionsResponse,
+} from './user.params'
 
 export const useGetUsers = () => {
   return useQuery({
@@ -35,6 +40,44 @@ export const useGetUserPermissions = (userId: string) => {
       return data
     },
     enabled: !!userId,
+  })
+}
+
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: async (params: IChangePasswordParams) => {
+      const [{ data }] = await Promise.all([
+        apiClient.put(`/users/me/password`, params),
+        sleep(300),
+      ])
+      return data
+    },
+  })
+}
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const [{ data }] = await Promise.all([apiClient.delete(`/users/${userId}`), sleep(300)])
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
+  })
+}
+
+export const useEditUser = (userId: string) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (params: IEditUserParams) => {
+      const [{ data }] = await Promise.all([apiClient.put(`/users/${userId}`, params), sleep(300)])
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
   })
 }
 

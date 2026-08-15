@@ -1,4 +1,5 @@
-import { Button } from 'antd'
+import { EditOutlined, PlayCircleOutlined, UserAddOutlined } from '@ant-design/icons'
+import { Segmented, Typography } from 'antd'
 import { useCallback, useState } from 'react'
 
 import { cardTitleData, ICardTitleData, INameDataType } from '../random-card/cardGame-data'
@@ -57,39 +58,35 @@ const PageOmama = () => {
     setUserNameList(listName)
   }
 
+  const segmentedOptions = [
+    { label: 'ผู้เล่น', value: 1, icon: <UserAddOutlined /> },
+    ...(userNameList.length > 1
+      ? [
+          { label: 'เริ่มเกม', value: 2, icon: <PlayCircleOutlined /> },
+          { label: 'แก้ไขกฎ', value: 3, icon: <EditOutlined /> },
+        ]
+      : []),
+  ]
+
   return (
-    <div className="flex w-full justify-center">
-      <div className="flex w-5xl flex-col gap-3 p-4">
-        <div className="rounded-2xl bg-blue-400 px-4 py-2 text-center text-2xl font-bold">
-          Game Omama
+    <div className="flex w-full justify-center px-4 py-6">
+      <div className="flex w-full max-w-5xl flex-col gap-4">
+        <Typography.Title
+          level={3}
+          className="!mb-0 text-center !text-blue-700 dark:!text-blue-300"
+        >
+          Omama
+        </Typography.Title>
+
+        <div className="flex justify-center">
+          <Segmented
+            value={isAddingPlayer}
+            onChange={(value) => setIsAddingPlayer(value as number)}
+            options={segmentedOptions}
+            size="large"
+          />
         </div>
-        <div className="flex items-center gap-1 sm:grid sm:grid-cols-3 sm:justify-between sm:gap-4">
-          <Button
-            type="primary"
-            className="!h-9 w-3/5 sm:w-full"
-            onClick={() => setIsAddingPlayer(1)}
-          >
-            เพิ่มชื่อหรือแก้ไขชื่อผู้เล่น
-          </Button>
-          {userNameList.length > 1 && (
-            <Button
-              type="primary"
-              className="!h-9 w-1/5 sm:w-full"
-              onClick={() => setIsAddingPlayer(2)}
-            >
-              เริ่มเกม
-            </Button>
-          )}
-          {userNameList.length > 1 && (
-            <Button
-              type="primary"
-              className="!h-9 w-1/5 sm:w-full"
-              onClick={() => setIsAddingPlayer(3)}
-            >
-              แก้ไขกฎ
-            </Button>
-          )}
-        </div>
+
         {isAddingPlayer === 1 && (
           <AddPlayerOmama
             userNameList={userNameList}

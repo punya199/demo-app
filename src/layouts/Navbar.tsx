@@ -1,4 +1,10 @@
-import { DownOutlined, LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons'
+import {
+  DownOutlined,
+  LockOutlined,
+  LogoutOutlined,
+  MenuOutlined,
+  UserOutlined,
+} from '@ant-design/icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Avatar, Button, Drawer, Dropdown, Menu, MenuProps, Space } from 'antd'
 import { motion } from 'motion/react'
@@ -12,6 +18,7 @@ import { EnumPermissionFeatureName } from '../services/permission/permission.par
 import { apiClient } from '../utils/api-client'
 import { checkRole, sleep } from '../utils/helper'
 import { useScreen } from '../utils/responsive-helper'
+import { ChangePasswordModal } from './ChangePasswordModal'
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -21,6 +28,7 @@ const Navbar = () => {
   const navigate = useNavigate()
   const { lg: isDesktopNav } = useScreen()
   const [open, setOpen] = useState(false)
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false)
   const { data: user } = useGetMe()
   const isLoggedIn = !!user?.user?.id
   const queryClient = useQueryClient()
@@ -127,6 +135,12 @@ const Navbar = () => {
     },
     { type: 'divider' },
     {
+      key: 'change-password',
+      label: 'Change Password',
+      icon: <LockOutlined />,
+      onClick: () => setChangePasswordOpen(true),
+    },
+    {
       key: 'logout',
       label: 'Logout',
       icon: <LogoutOutlined />,
@@ -212,6 +226,16 @@ const Navbar = () => {
                 </div>
                 <Button
                   block
+                  icon={<LockOutlined />}
+                  onClick={() => {
+                    setChangePasswordOpen(true)
+                    onClose()
+                  }}
+                >
+                  Change Password
+                </Button>
+                <Button
+                  block
                   icon={<LogoutOutlined />}
                   onClick={() => {
                     handleLogout()
@@ -234,6 +258,8 @@ const Navbar = () => {
           </Space>
         </div>
       </Drawer>
+
+      <ChangePasswordModal open={changePasswordOpen} onClose={() => setChangePasswordOpen(false)} />
     </header>
   )
 }

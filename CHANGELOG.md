@@ -1,3 +1,10 @@
+## [1.6.30](https://github.com/punya199/demo-app/compare/v1.6.29...v1.6.30) (2026-08-17)
+
+
+### Fix
+
+* Use demo-app image tag instead of latest in docker-build workflow ([8a7fd8a](https://github.com/punya199/demo-app/commit/8a7fd8a5cba4b1f11208bb12eb8b20e295a159f0))
+
 ## [1.6.29](https://github.com/punya199/demo-app/compare/v1.6.28...v1.6.29) (2026-08-17)
 
 

@@ -1,7 +1,7 @@
 {
   "name": "test1",
   "private": true,
-  "version": "1.6.27",
+  "version": "1.6.28",
   "type": "module",
   "engines": {
     "node": ">=20.0.0"

@@ -1,3 +1,14 @@
+## [1.6.28](https://github.com/punya199/demo-app/compare/v1.6.27...v1.6.28) (2026-08-17)
+
+
+### Fix
+
+* Add edit-in-place to Check Bill, polish global UI, restrict register username ([cb373c7](https://github.com/punya199/demo-app/commit/cb373c7738e10e0ca4c48ed5d2df017ca398a6c5))
+* Add user management actions and refresh Game pages UI ([21f4a1d](https://github.com/punya199/demo-app/commit/21f4a1db727b012a535a4c96a7622a4609bc1a3d))
+* Mobile navbar centering and Check Bill query fetching bugs ([26051b9](https://github.com/punya199/demo-app/commit/26051b926adec89dba78143ff81560303c9114c8))
+* Modernize UI with dark mode and improve Check Bill UX ([b22723b](https://github.com/punya199/demo-app/commit/b22723b90f90ab7c0c665b9f26a9c91a537d3352))
+* Set up Vitest and add first frontend tests ([1f5361d](https://github.com/punya199/demo-app/commit/1f5361d50cca96fe3483fd461c719b7950c1eab8))
+
 ## [1.6.27](https://github.com/punya199/demo-app/compare/v1.6.26...v1.6.27) (2025-10-21)
 
 

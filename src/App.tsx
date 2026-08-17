@@ -9,7 +9,9 @@ import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Authorize } from './components/Authorize'
+import { useGetMe, UserRole } from './service'
 import { EnumPermissionFeatureName } from './services/permission/permission.params'
+import { checkRole } from './utils/helper'
 import { useThemeStore } from './utils/theme-store'
 
 const Pnotfound = lazy(() => import('./layouts/Pnotfound'))
@@ -166,6 +168,18 @@ const queryClient = new QueryClient({
     },
   },
 })
+const DevTools = () => {
+  const { data: user } = useGetMe()
+  if (!checkRole(UserRole.SUPER_ADMIN, user?.user?.role)) return null
+
+  return (
+    <>
+      <ScreenSizeIndicator />
+      <ReactQueryDevtools />
+    </>
+  )
+}
+
 const App = () => {
   const mode = useThemeStore((state) => state.mode)
 
@@ -190,8 +204,7 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {appConfig().VITE_IS_DEVELOPMENT && <ScreenSizeIndicator />}
-      {appConfig().VITE_IS_DEVELOPMENT && <ReactQueryDevtools />}
+      {appConfig().VITE_IS_DEVELOPMENT && <DevTools />}
       <ConfigProvider theme={themeConfig}>
         <AntdApp>
           <RouterProvider router={router} />

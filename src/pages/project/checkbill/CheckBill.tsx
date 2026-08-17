@@ -1,13 +1,15 @@
 import { Button, Divider, Input, message, Modal, Select, SelectProps } from 'antd'
 import { AnimatePresence, motion } from 'motion/react'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { MdDelete } from 'react-icons/md'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { MdDelete, MdEdit } from 'react-icons/md'
 import { Link, useNavigate } from 'react-router-dom'
 import { appPath } from '../../../config/app-paths'
 import { useGetMe } from '../../../service'
 import AddFriends, { Friend } from './AddFriends'
 import { AddItem, Item } from './AddItem'
 import { useCheckBillStore } from './check-bill-store'
+import { EditFriendModal } from './EditFriendModal'
+import { EditItemModal } from './EditItemModal'
 import { mockBill } from './mock-bill-data'
 import { Bill } from './PageAllBill'
 
@@ -28,6 +30,8 @@ const CheckBill = (props: CheckBillPorps) => {
   const navigate = useNavigate()
   const selectRefs = useRef<Record<string, { blur: () => void } | null>>({})
   const { items, friends, title, setFriends, setItems, setTitle } = useCheckBillStore()
+  const [editingItem, setEditingItem] = useState<Item | null>(null)
+  const [editingFriend, setEditingFriend] = useState<Friend | null>(null)
   useEffect(() => {
     if (props.bill) {
       setItems(props.bill.items)
@@ -55,6 +59,24 @@ const CheckBill = (props: CheckBillPorps) => {
     (friend: Friend) => {
       setFriends([...friends, { ...friend }])
       message.success('เพิ่มเพื่อนเรียบร้อยแล้ว')
+    },
+    [friends, setFriends]
+  )
+
+  const handleSaveEditItem = useCallback(
+    (itemId: string, updates: { name: string; price: number }) => {
+      setItems(items.map((item) => (item.id === itemId ? { ...item, ...updates } : item)))
+      message.success('แก้ไขรายการเรียบร้อยแล้ว')
+    },
+    [items, setItems]
+  )
+
+  const handleSaveEditFriend = useCallback(
+    (friendId: string, updates: { name: string }) => {
+      setFriends(
+        friends.map((friend) => (friend.id === friendId ? { ...friend, ...updates } : friend))
+      )
+      message.success('แก้ไขชื่อเรียบร้อยแล้ว')
     },
     [friends, setFriends]
   )
@@ -328,19 +350,34 @@ const CheckBill = (props: CheckBillPorps) => {
                       {new Intl.NumberFormat().format(item.price)} บาท
                     </div>
                   </div>
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex-shrink-0 rounded-2xl bg-red-100 shadow-xl transition-all duration-300 dark:bg-red-900/40"
-                  >
-                    <Button
-                      type="link"
-                      onClick={() => handleDeleteItem(item.id)}
-                      className="h-auto p-0 leading-none !text-red-600 dark:!text-red-400"
+                  <div className="flex flex-shrink-0 items-center gap-1">
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="rounded-2xl bg-blue-100 shadow-xl transition-all duration-300 dark:bg-blue-900/40"
                     >
-                      <MdDelete size={24} />
-                    </Button>
-                  </motion.div>
+                      <Button
+                        type="link"
+                        onClick={() => setEditingItem(item)}
+                        className="h-auto p-0 leading-none !text-blue-600 dark:!text-blue-400"
+                      >
+                        <MdEdit size={24} />
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="rounded-2xl bg-red-100 shadow-xl transition-all duration-300 dark:bg-red-900/40"
+                    >
+                      <Button
+                        type="link"
+                        onClick={() => handleDeleteItem(item.id)}
+                        className="h-auto p-0 leading-none !text-red-600 dark:!text-red-400"
+                      >
+                        <MdDelete size={24} />
+                      </Button>
+                    </motion.div>
+                  </div>
                 </div>
               </div>
 
@@ -470,16 +507,28 @@ const CheckBill = (props: CheckBillPorps) => {
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-2xl font-bold text-slate-800 dark:text-slate-100">
                     {friend.name}
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleDeleteFriend(friend.id)}
-                      className="cursor-pointer rounded-2xl bg-red-100 shadow-xl transition-all duration-300 dark:bg-red-900/40"
-                    >
-                      <Button type="link" className="!text-red-600 dark:!text-red-400">
-                        <MdDelete size={22} />
-                      </Button>
-                    </motion.div>
+                    <div className="flex items-center gap-1">
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setEditingFriend(friend)}
+                        className="cursor-pointer rounded-2xl bg-blue-100 shadow-xl transition-all duration-300 dark:bg-blue-900/40"
+                      >
+                        <Button type="link" className="!text-blue-600 dark:!text-blue-400">
+                          <MdEdit size={20} />
+                        </Button>
+                      </motion.div>
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleDeleteFriend(friend.id)}
+                        className="cursor-pointer rounded-2xl bg-red-100 shadow-xl transition-all duration-300 dark:bg-red-900/40"
+                      >
+                        <Button type="link" className="!text-red-600 dark:!text-red-400">
+                          <MdDelete size={20} />
+                        </Button>
+                      </motion.div>
+                    </div>
                   </div>
 
                   <div>
@@ -578,6 +627,21 @@ const CheckBill = (props: CheckBillPorps) => {
           </div>
         )}
       </div>
+
+      <EditItemModal
+        open={!!editingItem}
+        item={editingItem}
+        items={items}
+        onSave={handleSaveEditItem}
+        onClose={() => setEditingItem(null)}
+      />
+      <EditFriendModal
+        open={!!editingFriend}
+        friend={editingFriend}
+        friends={friends}
+        onSave={handleSaveEditFriend}
+        onClose={() => setEditingFriend(null)}
+      />
     </div>
   )
 }

@@ -74,7 +74,13 @@ const PageRegister = () => {
               </span>
             }
             name="username"
-            rules={[{ required: true, message: 'Please input your username!' }]}
+            rules={[
+              { required: true, message: 'Please input your username!' },
+              {
+                pattern: /^[A-Za-z0-9]+$/,
+                message: 'Username must be English letters and numbers only',
+              },
+            ]}
           >
             <Input className="focus:ring-opacity-50 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 dark:border-slate-600" />
           </Form.Item>

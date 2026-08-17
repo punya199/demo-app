@@ -64,6 +64,7 @@ const PageManageUser = () => {
       dataIndex: 'username',
       key: 'username',
       ellipsis: false,
+      minWidth: 160,
       render: (username: string, record) => (
         <div className="flex items-center gap-3">
           <Avatar style={{ backgroundColor: roleColor[record.role] }}>
@@ -179,8 +180,13 @@ const PageManageUser = () => {
         />
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <Table rowKey={(e) => e.id} dataSource={filteredUsers} columns={columns} />
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <Table
+          rowKey={(e) => e.id}
+          dataSource={filteredUsers}
+          columns={columns}
+          scroll={{ x: 'max-content' }}
+        />
       </div>
 
       <EditUserModal

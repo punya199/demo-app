@@ -1,5 +1,7 @@
 import styled from '@emotion/styled'
 import { Col, Grid, Row, Tag } from 'antd'
+import { useGetMe, UserRole } from '../service'
+import { checkRole } from '../utils/helper'
 // import { useScreen } from '../utils/responsive-helper'
 
 const Layout = styled.div`
@@ -10,7 +12,11 @@ const Layout = styled.div`
   pointer-events: none;
 `
 export const ScreenSizeIndicator = () => {
+  const { data: user } = useGetMe()
   const { xs, sm, md, lg, xl, xxl } = Grid.useBreakpoint()
+
+  if (!checkRole(UserRole.SUPER_ADMIN, user?.user?.role)) return null
+
   return (
     <Layout>
       <Row gutter={6} wrap={false}>

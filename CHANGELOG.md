@@ -1,3 +1,10 @@
+## [1.6.29](https://github.com/punya199/demo-app/compare/v1.6.28...v1.6.29) (2026-08-17)
+
+
+### Fix
+
+* Bump Node.js to 22 in docker-build workflow ([c40b250](https://github.com/punya199/demo-app/commit/c40b250f7cf9c06acf0d464d3a67975fa548af93))
+
 ## [1.6.28](https://github.com/punya199/demo-app/compare/v1.6.27...v1.6.28) (2026-08-17)
 
 

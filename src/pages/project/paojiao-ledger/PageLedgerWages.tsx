@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { computeWageTotals } from './ledger-calculations'
 import { useLedgerContext } from './ledger-context'
 import { fmtFull, THB } from './ledger-format'
+import { useAddLedgerWage } from './ledger-query'
 import { ledgerColor, ledgerFont } from './ledger-tokens'
 import { useLedgerStore } from './ledger-store'
 import { LedgerCard, LedgerField, LedgerH1 } from './ledger-ui'
@@ -16,6 +17,7 @@ const PageLedgerWages = () => {
   const { data, base } = useLedgerContext()
   const extraWages = useLedgerStore((s) => s.extraWages)
   const addWage = useLedgerStore((s) => s.addWage)
+  const addLedgerWage = useAddLedgerWage()
 
   const lastEntry = base.entries[base.entries.length - 1]
   const [wDate, setWDate] = useState(lastEntry?.date ?? '')
@@ -33,6 +35,10 @@ const PageLedgerWages = () => {
     if (!wDate || Number.isNaN(amount)) return
     addWage({ date: wDate, amount })
     setWAmount('')
+    // Persist to the sheet in the background - until Google Sheets is configured (Phase B) this
+    // rejects and the wage only lives in this session, same as it did before this endpoint existed.
+    // useMutation's mutate() (as opposed to mutateAsync) already swallows/tracks the rejection.
+    addLedgerWage.mutate({ date: wDate, amount })
   }
 
   return (

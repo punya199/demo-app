@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { filterEntriesByMonth, getMonthChips } from './ledger-calculations'
 import { useLedgerContext } from './ledger-context'
 import { fmtFull, THB } from './ledger-format'
+import { useAddLedgerEntry } from './ledger-query'
 import { ledgerColor, ledgerFont } from './ledger-tokens'
 import { LedgerEntryDirection } from './ledger-types'
 import { useLedgerStore } from './ledger-store'
@@ -26,6 +27,7 @@ const PageLedgerEntries = () => {
   const { data, base } = useLedgerContext()
   const extraEntries = useLedgerStore((s) => s.extraEntries)
   const addEntry = useLedgerStore((s) => s.addEntry)
+  const addLedgerEntry = useAddLedgerEntry()
 
   const lastEntry = base.entries[base.entries.length - 1]
   const [fDate, setFDate] = useState(lastEntry?.date ?? '')
@@ -48,9 +50,7 @@ const PageLedgerEntries = () => {
       setFlash('ใส่วันที่และจำนวนเงินก่อน')
       return
     }
-    addEntry({
-      id: 9000 + extraEntries.length,
-      row: 0,
+    const entry = {
       date: fDate,
       item: fItem,
       inCash: 0,
@@ -59,10 +59,15 @@ const PageLedgerEntries = () => {
       outBank: 0,
       note: fNote,
       [fDir]: amount,
-    })
+    }
+    addEntry({ id: 9000 + extraEntries.length, row: 0, ...entry })
     setFAmount('')
     setFNote('')
     setFlash(`บันทึกแล้ว · ${THB(amount)} บาท`)
+    // Persist to the sheet in the background - until Google Sheets is configured (Phase B) this
+    // rejects and the entry only lives in this session, same as it did before this endpoint existed.
+    // useMutation's mutate() (as opposed to mutateAsync) already swallows/tracks the rejection.
+    addLedgerEntry.mutate(entry)
   }
 
   return (

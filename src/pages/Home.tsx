@@ -3,6 +3,7 @@ import {
   HomeOutlined,
   PlaySquareOutlined,
   TeamOutlined,
+  WalletOutlined,
 } from '@ant-design/icons'
 import { Card } from 'antd'
 import { motion, Variants } from 'motion/react'
@@ -10,6 +11,7 @@ import { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { TypingAnimation } from '../components/magicui/typing-animation'
 import { appPath } from '../config/app-paths'
+import { LEDGER_ALLOWED_USERNAMES } from './project/paojiao-ledger/ledger-access'
 import { useGetMe, usePermissionRouteAllow, UserRole } from '../service'
 import { EnumPermissionFeatureName } from '../services/permission/permission.params'
 import { checkRole } from '../utils/helper'
@@ -67,6 +69,14 @@ const Home = () => {
       icon: <TeamOutlined />,
       path: appPath.manageUser(),
       visible: isSuperAdmin,
+    },
+    {
+      title: 'เจ้ปุ้ม พาเจียว',
+      icon: <WalletOutlined />,
+      path: appPath.paojiaoLedgerEntries(),
+      // Private ledger for specific people, regardless of role - match the backend's
+      // AuthUserWithUsername check so this tile only shows up for those accounts.
+      visible: !!user?.user?.username && LEDGER_ALLOWED_USERNAMES.includes(user.user.username),
     },
   ]
 

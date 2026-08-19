@@ -23,4 +23,8 @@ export const appPath = {
   ),
   manageUser: generatePath('/manage-user'),
   manageUserDetail: generatePath<{ param: { userId: string } }>('/manage-user/:userId'),
+  paojiaoLedgerEntries: generatePath('/paojiao-ledger/entries'),
+  paojiaoLedgerSummary: generatePath('/paojiao-ledger/summary'),
+  paojiaoLedgerShare: generatePath('/paojiao-ledger/share'),
+  paojiaoLedgerWages: generatePath('/paojiao-ledger/wages'),
 }

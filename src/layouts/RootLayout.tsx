@@ -11,6 +11,9 @@ import Navbar from './Navbar'
 const RootLayout = () => {
   const location = useLocation()
   const isHome = location.pathname === appPath.home()
+  // The ledger has its own full-page sidebar shell (own branding, own nav) - the site's
+  // Navbar would just duplicate it.
+  const isPaojiaoLedger = location.pathname.startsWith('/paojiao-ledger')
   const mode = useThemeStore((state) => state.mode)
 
   return (
@@ -24,7 +27,7 @@ const RootLayout = () => {
         color={mode === 'dark' ? 'rgb(96, 165, 250)' : 'rgb(37, 99, 235)'}
       />
 
-      {!isHome && <Navbar />}
+      {!isHome && !isPaojiaoLedger && <Navbar />}
       <div className="flex-1 overflow-y-auto">
         <Suspense fallback={<LoadingSpin />}>
           <AnimatePresence mode="wait">

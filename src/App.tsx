@@ -9,6 +9,8 @@ import { ScreenSizeIndicator } from './layouts/ScreenSizeIndicator'
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Authorize } from './components/Authorize'
+import { PaojiaoLedgerGuard } from './pages/project/paojiao-ledger/PaojiaoLedgerGuard'
+import { PaojiaoLedgerShell } from './pages/project/paojiao-ledger/PaojiaoLedgerShell'
 import { useGetMe, UserRole } from './service'
 import { EnumPermissionFeatureName } from './services/permission/permission.params'
 import { checkRole } from './utils/helper'
@@ -24,6 +26,10 @@ const PageRegister = lazy(() => import('./pages/PageRegister'))
 const CardGame = lazy(() => import('./pages/project/random-card/CardGame'))
 const PageOmama = lazy(() => import('./pages/project/omama-game/PageOmama'))
 const PageAllBill = lazy(() => import('./pages/project/checkbill/PageAllBill'))
+const PageLedgerEntries = lazy(() => import('./pages/project/paojiao-ledger/PageLedgerEntries'))
+const PageLedgerSummary = lazy(() => import('./pages/project/paojiao-ledger/PageLedgerSummary'))
+const PageLedgerShare = lazy(() => import('./pages/project/paojiao-ledger/PageLedgerShare'))
+const PageLedgerWages = lazy(() => import('./pages/project/paojiao-ledger/PageLedgerWages'))
 const PageCreateBill = lazy(() => import('./pages/project/checkbill/PageCreateBill'))
 const PageEditBill = lazy(() => import('./pages/project/checkbill/PageEditBill'))
 const PageSaveBillToImage = lazy(() => import('./pages/project/checkbill/PageSaveBillToImage'))
@@ -152,6 +158,46 @@ const router = createBrowserRouter([
       {
         path: appPath.manageUser(),
         element: <PageManageUser />,
+      },
+      {
+        path: appPath.paojiaoLedgerEntries(),
+        element: (
+          <PaojiaoLedgerGuard>
+            <PaojiaoLedgerShell>
+              <PageLedgerEntries />
+            </PaojiaoLedgerShell>
+          </PaojiaoLedgerGuard>
+        ),
+      },
+      {
+        path: appPath.paojiaoLedgerSummary(),
+        element: (
+          <PaojiaoLedgerGuard>
+            <PaojiaoLedgerShell>
+              <PageLedgerSummary />
+            </PaojiaoLedgerShell>
+          </PaojiaoLedgerGuard>
+        ),
+      },
+      {
+        path: appPath.paojiaoLedgerShare(),
+        element: (
+          <PaojiaoLedgerGuard>
+            <PaojiaoLedgerShell>
+              <PageLedgerShare />
+            </PaojiaoLedgerShell>
+          </PaojiaoLedgerGuard>
+        ),
+      },
+      {
+        path: appPath.paojiaoLedgerWages(),
+        element: (
+          <PaojiaoLedgerGuard>
+            <PaojiaoLedgerShell>
+              <PageLedgerWages />
+            </PaojiaoLedgerShell>
+          </PaojiaoLedgerGuard>
+        ),
       },
     ],
   },

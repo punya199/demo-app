@@ -1,3 +1,10 @@
+## [1.6.31](https://github.com/punya199/demo-app/compare/v1.6.30...v1.6.31) (2026-08-19)
+
+
+### Fix
+
+* Add Paojiao Ledger (private 4-screen accounting app) ([65863ee](https://github.com/punya199/demo-app/commit/65863ee5d40b601eb7f8262bcfedcf09c8974281))
+
 ## [1.6.30](https://github.com/punya199/demo-app/compare/v1.6.29...v1.6.30) (2026-08-17)
 
 

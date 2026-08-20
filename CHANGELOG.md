@@ -1,3 +1,11 @@
+## [1.6.32](https://github.com/punya199/demo-app/compare/v1.6.31...v1.6.32) (2026-08-20)
+
+
+### Fix
+
+* Add edit entry + mobile responsive UI to paojiao-ledger entries page ([baee145](https://github.com/punya199/demo-app/commit/baee145c31c6f6865d0bd4aaf5c6602f63e172ba))
+* Persist Paojiao Ledger add-entry/add-wage to the backend ([797d4dc](https://github.com/punya199/demo-app/commit/797d4dc65daf8520a6e8cf5349c7b3368c434390))
+
 ## [1.6.31](https://github.com/punya199/demo-app/compare/v1.6.30...v1.6.31) (2026-08-19)
 
 

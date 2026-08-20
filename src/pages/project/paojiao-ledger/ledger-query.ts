@@ -35,3 +35,13 @@ export const useAddLedgerWage = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: LEDGER_QUERY_KEY }),
   })
 }
+
+export const useEditLedgerEntry = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ row, entry }: { row: number; entry: AddLedgerEntryPayload }) => {
+      await apiClient.put(`/paojiao-ledger/entries/${row}`, entry)
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: LEDGER_QUERY_KEY }),
+  })
+}

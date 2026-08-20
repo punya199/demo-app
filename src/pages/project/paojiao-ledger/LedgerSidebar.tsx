@@ -34,6 +34,7 @@ export const LedgerSidebar = () => {
 
   return (
     <aside
+      className="paojiao-ledger-sidebar"
       style={{
         background: ledgerColor.darkSurface,
         color: ledgerColor.darkText,

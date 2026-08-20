@@ -1,6 +1,10 @@
+import { ConfigProvider, theme } from 'antd'
+import thTH from 'antd/locale/th_TH'
+import 'dayjs/locale/th'
 import { PropsWithChildren, useEffect } from 'react'
 import { LoadingSpin } from '../../../layouts/LoadingSpin'
 import { computeBase } from './ledger-calculations'
+import { LedgerBottomNav } from './LedgerBottomNav'
 import { LedgerContext } from './ledger-context'
 import { LEDGER_FONT_STYLESHEET_HREF, ledgerColor, ledgerFont } from './ledger-tokens'
 import { useLedgerData } from './ledger-query'
@@ -44,19 +48,25 @@ export const PaojiaoLedgerShell = ({ children }: PropsWithChildren) => {
   const base = computeBase(data, extraEntries)
 
   return (
-    <LedgerContext.Provider value={{ data, base }}>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '232px 1fr',
-          minHeight: '100%',
-          alignItems: 'stretch',
-          fontFamily: ledgerFont.sans,
-          background: ledgerColor.pageBg,
-          color: ledgerColor.textPrimary,
-        }}
-      >
-        <style>{`
+    // The ledger never uses the site's dark/light toggle (its own design is always light/cream),
+    // but any AntD component used within it (Modal, DatePicker, ...) would otherwise inherit
+    // whatever theme the rest of the site is currently in - forcing the light algorithm here
+    // keeps every AntD component in the ledger consistent with its own always-light design.
+    <ConfigProvider theme={{ algorithm: theme.defaultAlgorithm }} locale={thTH}>
+      <LedgerContext.Provider value={{ data, base }}>
+        <div
+          className="paojiao-ledger-shell"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '232px 1fr',
+            minHeight: '100%',
+            alignItems: 'stretch',
+            fontFamily: ledgerFont.sans,
+            background: ledgerColor.pageBg,
+            color: ledgerColor.textPrimary,
+          }}
+        >
+          <style>{`
           .paojiao-ledger input:focus,
           .paojiao-ledger select:focus {
             outline: 2px solid ${ledgerColor.accent};
@@ -65,12 +75,46 @@ export const PaojiaoLedgerShell = ({ children }: PropsWithChildren) => {
           .paojiao-ledger-primary-btn:hover {
             background: ${ledgerColor.accent} !important;
           }
+          /* Not scoped under .paojiao-ledger - AntD's Modal renders its content into a portal
+             attached to document.body, outside this shell's own DOM subtree, so a descendant
+             selector wouldn't reach the date picker used inside EditEntryModal. */
+          .ledger-date-picker.ant-picker {
+            padding: 9px 10px;
+            border-radius: 8px;
+            border-color: ${ledgerColor.inputBorder};
+          }
+          .ledger-date-picker.ant-picker:hover,
+          .ledger-date-picker.ant-picker-focused {
+            border-color: ${ledgerColor.accent} !important;
+          }
+          /* Desktop sidebar becomes a fixed bottom tab bar below this width - a 232px side
+             column doesn't fit a phone screen, so LedgerBottomNav takes over instead. */
+          @media (max-width: 768px) {
+            .paojiao-ledger-shell {
+              display: block !important;
+            }
+            .paojiao-ledger-sidebar {
+              display: none !important;
+            }
+            .paojiao-ledger-bottom-nav {
+              display: flex !important;
+            }
+            .paojiao-ledger-main {
+              padding: 20px 16px 88px !important;
+              max-width: none !important;
+            }
+          }
         `}</style>
-        <LedgerSidebar />
-        <main className="paojiao-ledger" style={{ padding: '34px 40px 60px', maxWidth: 1180 }}>
-          {children}
-        </main>
-      </div>
-    </LedgerContext.Provider>
+          <LedgerSidebar />
+          <main
+            className="paojiao-ledger paojiao-ledger-main"
+            style={{ padding: '34px 40px 60px', maxWidth: 1180, margin: '0 auto', width: '100%' }}
+          >
+            {children}
+          </main>
+          <LedgerBottomNav />
+        </div>
+      </LedgerContext.Provider>
+    </ConfigProvider>
   )
 }

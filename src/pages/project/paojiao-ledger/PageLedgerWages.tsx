@@ -28,7 +28,12 @@ const PageLedgerWages = () => {
     () => computeWageTotals(base.entries, allWages),
     [base.entries, allWages]
   )
-  const wageRows = useMemo(() => [...allWages].reverse(), [allWages])
+  // Sort by date, not just insertion order - a backdated wage entry still gets appended at the
+  // next sheet row, so a plain reverse() would put it in the wrong place in the list.
+  const wageRows = useMemo(
+    () => [...allWages].sort((a, b) => b.date.localeCompare(a.date)),
+    [allWages]
+  )
 
   const handleAddWage = () => {
     const amount = parseFloat(wAmount)

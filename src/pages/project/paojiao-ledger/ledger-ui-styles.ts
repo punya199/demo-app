@@ -14,6 +14,7 @@ export const ledgerInputStyle: CSSProperties = {
   border: `1px solid ${ledgerColor.inputBorder}`,
   borderRadius: 8,
   background: '#FFF',
+  color: ledgerColor.textPrimary,
   fontFamily: ledgerFont.sans,
   fontSize: 14,
   width: '100%',

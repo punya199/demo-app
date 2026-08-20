@@ -12,6 +12,7 @@ interface LedgerStoreState {
 interface LedgerStoreActions {
   addEntry: (entry: LedgerEntry) => void
   addWage: (wage: LedgerWage) => void
+  removeExtraEntry: (id: number) => void
   setRatio: (ratio: number) => void
 }
 
@@ -21,5 +22,9 @@ export const useLedgerStore = create<LedgerStoreState & LedgerStoreActions>((set
   ratio: 50,
   addEntry: (entry) => set((s) => ({ extraEntries: [...s.extraEntries, entry] })),
   addWage: (wage) => set((s) => ({ extraWages: [...s.extraWages, wage] })),
+  // Called once the backend confirms a locally-added entry actually persisted, so it isn't
+  // shown twice (once from this optimistic list, once from the refetched real sheet data).
+  removeExtraEntry: (id) =>
+    set((s) => ({ extraEntries: s.extraEntries.filter((e) => e.id !== id) })),
   setRatio: (ratio) => set({ ratio }),
 }))

@@ -1,3 +1,10 @@
+## [1.6.33](https://github.com/punya199/demo-app/compare/v1.6.32...v1.6.33) (2026-08-21)
+
+
+### Fix
+
+* Round profit breakdown, revenue charts, item category management, and layout fixes for paojiao-ledger ([c6000a6](https://github.com/punya199/demo-app/commit/c6000a65b59559a2ee3f3e1ef0f4be3128aa76ff))
+
 ## [1.6.32](https://github.com/punya199/demo-app/compare/v1.6.31...v1.6.32) (2026-08-20)
 
 

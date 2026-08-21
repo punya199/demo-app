@@ -58,7 +58,10 @@ export const PaojiaoLedgerShell = ({ children }: PropsWithChildren) => {
           className="paojiao-ledger-shell"
           style={{
             display: 'grid',
-            gridTemplateColumns: '232px 1fr',
+            // minmax(0, 1fr), not bare 1fr - a grid track defaults to min-width: auto, so a wide
+            // unshrinkable child (e.g. the draff-sales line chart's fixed-width SVG) would force
+            // this whole column wider instead of the intended overflow-x:auto scroll kicking in.
+            gridTemplateColumns: '232px minmax(0, 1fr)',
             minHeight: '100%',
             alignItems: 'stretch',
             fontFamily: ledgerFont.sans,
@@ -74,6 +77,18 @@ export const PaojiaoLedgerShell = ({ children }: PropsWithChildren) => {
           }
           .paojiao-ledger-primary-btn:hover {
             background: ${ledgerColor.accent} !important;
+          }
+          .paojiao-ledger input[type=number]::-webkit-inner-spin-button,
+          .paojiao-ledger input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
+          .paojiao-ledger input[type=number] {
+            -moz-appearance: textfield;
+          }
+          .paojiao-ledger-row-action:hover {
+            border-color: ${ledgerColor.accent} !important;
+            color: ${ledgerColor.accent} !important;
           }
           /* Not scoped under .paojiao-ledger - AntD's Modal renders its content into a portal
              attached to document.body, outside this shell's own DOM subtree, so a descendant
@@ -108,7 +123,13 @@ export const PaojiaoLedgerShell = ({ children }: PropsWithChildren) => {
           <LedgerSidebar />
           <main
             className="paojiao-ledger paojiao-ledger-main"
-            style={{ padding: '34px 40px 60px', maxWidth: 1180, margin: '0 auto', width: '100%' }}
+            style={{
+              padding: '34px 40px 60px',
+              maxWidth: 1180,
+              margin: '0 auto',
+              width: '100%',
+              minWidth: 0,
+            }}
           >
             {children}
           </main>

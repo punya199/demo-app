@@ -39,6 +39,7 @@ export const computeBase = (data: LedgerData, extraEntries: LedgerEntry[]): Ledg
 export interface PeriodBar {
   v: number
   label: string
+  date: string // ISO date this bar represents - lets a chart space points by real elapsed time
 }
 
 export interface PeriodView {
@@ -60,7 +61,7 @@ export const computeSummaryPeriod = (
   data: LedgerData,
   entries: LedgerEntry[],
   rounds: LedgerRound[],
-  period: LedgerSummaryPeriod
+  period: Exclude<LedgerSummaryPeriod, 'day' | 'expenses'>
 ): PeriodView => {
   const lastRow = data.lastRoundRow
   const openCount = entries.filter((e) => e.row > lastRow || !e.row).length
@@ -81,7 +82,7 @@ export const computeSummaryPeriod = (
         ? `อีก ${openCount} รายการหลังรอบล่าสุดยังไม่ปิดรอบ จึงยังไม่นับเป็นกำไร`
         : '',
       carry,
-      bars: rounds.map((r) => ({ v: r.profit, label: fmtDay(r.date) })),
+      bars: rounds.map((r) => ({ v: r.profit, label: fmtDay(r.date), date: r.date })),
     }
   }
 
@@ -100,56 +101,145 @@ export const computeSummaryPeriod = (
       perDayDiv: last.date ? daysBetween(last.date, prevDate) : 1,
       periodNote: openCount ? `มีอีก ${openCount} รายการหลังวันปิดรอบ ที่จะไปอยู่ในรอบถัดไป` : '',
       carry: 0,
-      bars: rounds.map((r) => ({ v: r.profit, label: fmtDay(r.date) })),
+      bars: rounds.map((r) => ({ v: r.profit, label: fmtDay(r.date), date: r.date })),
     }
   }
 
-  if (period === 'month') {
-    const byMonth: Record<string, LedgerRound[]> = {}
-    rounds.forEach((r) => {
-      const k = monthKey(r.date)
-      ;(byMonth[k] ??= []).push(r)
-    })
-    const keys = Object.keys(byMonth).sort()
-    const lastK = keys[keys.length - 1] ?? ''
-    const win = inRoundBlocks(entries, byMonth[lastK] ?? [])
-    const periodIn = sum(win, (e) => e.inCash + e.inBank)
-    const periodOut = sum(win, (e) => e.outCash + e.outBank)
-    return {
-      periodProfit: periodIn - periodOut,
-      periodIn,
-      periodOut,
-      periodLabel: `เดือน ${lastK ? monthLabel(lastK) : ''} · ${(byMonth[lastK] ?? []).length} รอบที่ปิดในเดือนนี้`,
-      chartTitle: 'กำไรรายเดือน',
-      perDayDiv: new Set(win.map((e) => e.date)).size || 1,
-      periodNote: '',
-      carry: 0,
-      bars: keys.map((k) => ({ v: sum(byMonth[k], (r) => r.profit), label: monthLabel(k) })),
-    }
-  }
-
-  // period === 'day'
-  const dates = [...new Set(entries.map((e) => e.date))].sort()
-  const lastD = dates[dates.length - 1] ?? ''
-  const win = entries.filter((e) => e.date === lastD)
+  // period === 'month'
+  const byMonth: Record<string, LedgerRound[]> = {}
+  rounds.forEach((r) => {
+    const k = monthKey(r.date)
+    ;(byMonth[k] ??= []).push(r)
+  })
+  const keys = Object.keys(byMonth).sort()
+  const lastK = keys[keys.length - 1] ?? ''
+  const win = inRoundBlocks(entries, byMonth[lastK] ?? [])
   const periodIn = sum(win, (e) => e.inCash + e.inBank)
   const periodOut = sum(win, (e) => e.outCash + e.outBank)
   return {
     periodProfit: periodIn - periodOut,
     periodIn,
     periodOut,
-    periodLabel: `วันที่ ${lastD ? fmtFull(lastD) : ''}`,
-    chartTitle: 'เข้า−ออก 14 วันล่าสุด',
-    perDayDiv: 1,
+    periodLabel: `เดือน ${lastK ? monthLabel(lastK) : ''} · ${(byMonth[lastK] ?? []).length} รอบที่ปิดในเดือนนี้`,
+    chartTitle: 'กำไรรายเดือน',
+    perDayDiv: new Set(win.map((e) => e.date)).size || 1,
     periodNote: '',
     carry: 0,
-    bars: dates.slice(-14).map((d) => {
-      const w = entries.filter((e) => e.date === d)
-      return {
-        v: sum(w, (e) => e.inCash + e.inBank) - sum(w, (e) => e.outCash + e.outBank),
-        label: fmtDay(d),
-      }
-    }),
+    bars: keys.map((k) => ({
+      v: sum(byMonth[k], (r) => r.profit),
+      label: monthLabel(k),
+      date: `${k}-01`,
+    })),
+  }
+}
+
+// Labor payments and the misc/catch-all bucket aren't "bought from a supplier" - excluded from
+// vendor spend so it answers "bought how much from whom", not general cash outflow.
+const VENDOR_SPEND_EXCLUDED_ITEMS = new Set(['ค่าแรงยายปิ่น', 'อื่นๆ'])
+
+export interface VendorSpendRow {
+  item: string
+  amount: number
+}
+
+export interface VendorSpendView {
+  periodLabel: string
+  totalOut: number
+  rows: VendorSpendRow[]
+}
+
+// "Bought how much from whom" - item text already doubles as the vendor label for purchase
+// entries (e.g. "มัน ดิ๊ก" = cassava bought from ดิ๊ก), so grouping by item is grouping by vendor.
+// `windowDays`, when given, anchors a trailing window on the latest entry's date (not the system
+// clock, since this app is driven entirely by whenever the sheet was last updated) - e.g. latest
+// date 21 ส.ค. with windowDays=30 starts the window 22 ก.ค., inclusive. Omit it for the ledger's
+// whole lifetime, starting from `startDate`. Amounts are rounded to whole baht for this view only
+// (a ranking, not an exact statement).
+export const computeVendorSpend = (
+  entries: LedgerEntry[],
+  startDate: string,
+  windowDays?: number
+): VendorSpendView => {
+  const lastDate = entries[entries.length - 1]?.date ?? ''
+  const fromIso =
+    windowDays !== undefined && lastDate
+      ? new Date(new Date(lastDate).getTime() - windowDays * DAY_MS).toISOString().slice(0, 10)
+      : startDate
+  const cutoffMs = new Date(fromIso).getTime()
+
+  const win = entries.filter(
+    (e) =>
+      new Date(e.date).getTime() >= cutoffMs &&
+      !VENDOR_SPEND_EXCLUDED_ITEMS.has(e.item) &&
+      e.outCash + e.outBank > 0
+  )
+
+  const totals = new Map<string, number>()
+  for (const e of win) {
+    totals.set(e.item, (totals.get(e.item) ?? 0) + e.outCash + e.outBank)
+  }
+  const rows = [...totals.entries()]
+    .map(([item, amount]) => ({ item, amount: Math.round(amount) }))
+    .sort((a, b) => b.amount - a.amount)
+
+  return {
+    periodLabel: lastDate ? `${fmtFull(fromIso)} ถึง ${fmtFull(lastDate)}` : '',
+    totalOut: sum(rows, (r) => r.amount),
+    rows,
+  }
+}
+
+// Matches the item text the backend uses to auto-detect a round's closing row (see
+// OIL_SALE_ITEM in ledger-sheet-parser.ts) and the fixed "sell dregs" category.
+const OIL_SALE_ITEM = 'ขาย น้ำมัน'
+const DRAFF_SALE_ITEM = 'ขาย กาก'
+
+export interface RevenueBreakdownView {
+  periodLabel: string
+  total: number
+  count: number
+  perAverage: number
+  bars: PeriodBar[]
+}
+
+// Revenue only - unlike round.profit, this doesn't net out that round's purchases/expenses, so
+// it answers "how much oil did we actually sell for" per round, not "what did the round net".
+// A round's oil-sale revenue can span two rows (a split cash/bank settlement, see deriveRounds on
+// the backend), so this sums every oil-sale entry inside the round's block, not just the closer.
+export const computeOilSalesPerRound = (
+  rounds: LedgerRound[],
+  entries: LedgerEntry[]
+): RevenueBreakdownView => {
+  const bars = rounds.map((r) => {
+    const win = entries.filter(
+      (e) => e.row >= r.fromRow && e.row <= r.toRow && e.item === OIL_SALE_ITEM
+    )
+    return { v: sum(win, (e) => e.inCash + e.inBank), label: fmtDay(r.date), date: r.date }
+  })
+  const total = sum(bars, (b) => b.v)
+  return {
+    periodLabel: rounds.length ? `ทุกรอบที่ปิดแล้ว (${rounds.length} รอบ)` : '',
+    total,
+    count: rounds.length,
+    perAverage: rounds.length ? total / rounds.length : 0,
+    bars,
+  }
+}
+
+// "ขาย กาก" isn't tied to rounds at all - just a regular income item, so this is a flat
+// chronological list of every sale, not sliced by round.
+export const computeDraffSales = (entries: LedgerEntry[]): RevenueBreakdownView => {
+  const sales = entries.filter((e) => e.item === DRAFF_SALE_ITEM)
+  const bars = sales.map((e) => ({ v: e.inCash + e.inBank, label: fmtDay(e.date), date: e.date }))
+  const total = sum(bars, (b) => b.v)
+  return {
+    periodLabel: sales.length
+      ? `${fmtFull(sales[0].date)} ถึง ${fmtFull(sales[sales.length - 1].date)}`
+      : '',
+    total,
+    count: sales.length,
+    perAverage: sales.length ? total / sales.length : 0,
+    bars,
   }
 }
 
@@ -207,6 +297,17 @@ export const getMonthChips = (entries: LedgerEntry[]): MonthChip[] => {
 
 export const filterEntriesByMonth = (entries: LedgerEntry[], month: string) =>
   month === 'all' ? entries : entries.filter((e) => monthKey(e.date) === month)
+
+// Distinct item categories actually present in the ledger, Thai-alphabetical - not the full
+// dropdown category list (some categories may have zero entries), and not scoped to any month
+// filter, so the row of pills stays stable as the user switches months.
+export const getItemChips = (entries: LedgerEntry[]): string[] =>
+  [...new Set(entries.map((e) => e.item))].sort((a, b) => a.localeCompare(b, 'th'))
+
+// Multi-select: an empty `items` set means "no filter" (show everything), matching how the
+// "ทั้งหมด" pill resets selection rather than being one selectable item among the rest.
+export const filterEntriesByItems = (entries: LedgerEntry[], items: ReadonlySet<string>) =>
+  items.size === 0 ? entries : entries.filter((e) => items.has(e.item))
 
 export interface WithdrawalRow {
   dateText: string

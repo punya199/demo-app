@@ -1,8 +1,9 @@
-import { Form, Input, Modal } from 'antd'
+import { Button, Form, Input, Modal, Popconfirm } from 'antd'
 import { useEffect } from 'react'
 import { AppInputNumber } from '../../../components/AppInputNumber'
 import { LedgerDatePicker } from './LedgerDatePicker'
-import { ledgerInputStyle, ledgerPillStyle } from './ledger-ui-styles'
+import { LedgerItemSelect } from './LedgerItemSelect'
+import { ledgerPillStyle } from './ledger-ui-styles'
 import { LedgerEntry, LedgerEntryDirection } from './ledger-types'
 
 const DIR_OPTIONS: { dir: LedgerEntryDirection; label: string }[] = [
@@ -26,6 +27,11 @@ interface EditEntryModalProps {
   items: string[]
   onSave: (row: number, values: EditEntryFormValues) => void
   onClose: () => void
+  onManageItems: () => void
+  // Only rows after the last closed round can be deleted (see deleteEntry in
+  // paojiao-ledger.service.ts) - the delete button only appears when this entry qualifies.
+  canDelete: boolean
+  onDelete: (row: number) => void
 }
 
 const DirectionPicker = ({
@@ -49,7 +55,16 @@ const DirectionPicker = ({
   </div>
 )
 
-export const EditEntryModal = ({ open, entry, items, onSave, onClose }: EditEntryModalProps) => {
+export const EditEntryModal = ({
+  open,
+  entry,
+  items,
+  onSave,
+  onClose,
+  onManageItems,
+  canDelete,
+  onDelete,
+}: EditEntryModalProps) => {
   const [form] = Form.useForm<EditEntryFormValues>()
 
   useEffect(() => {
@@ -71,15 +86,42 @@ export const EditEntryModal = ({ open, entry, items, onSave, onClose }: EditEntr
     onClose()
   }
 
+  const handleDelete = () => {
+    if (!entry) return
+    onDelete(entry.row)
+    onClose()
+  }
+
   return (
     <Modal
       title="แก้ไขรายการ"
       open={open}
       onCancel={onClose}
-      onOk={() => form.submit()}
-      okText="บันทึก"
-      cancelText="ยกเลิก"
       destroyOnHidden
+      // Narrower than AntD's 520px default - fit-content lets the direction-picker pill row (the
+      // widest thing in this form) set the dialog's width instead of leaving empty side margins.
+      width="fit-content"
+      footer={[
+        canDelete && (
+          <Popconfirm
+            key="delete"
+            title="ลบรายการนี้?"
+            description="ลบแล้วกู้คืนไม่ได้"
+            okText="ลบ"
+            cancelText="ยกเลิก"
+            okButtonProps={{ danger: true }}
+            onConfirm={handleDelete}
+          >
+            <Button danger>ลบ</Button>
+          </Popconfirm>
+        ),
+        <Button key="cancel" onClick={onClose}>
+          ยกเลิก
+        </Button>,
+        <Button key="ok" type="primary" onClick={() => form.submit()}>
+          บันทึก
+        </Button>,
+      ]}
     >
       <Form form={form} layout="vertical" onFinish={onFinish} className="mt-4">
         <Form.Item
@@ -95,13 +137,7 @@ export const EditEntryModal = ({ open, entry, items, onSave, onClose }: EditEntr
           label="รายการ"
           rules={[{ required: true, message: 'กรุณาเลือกรายการ' }]}
         >
-          <select style={ledgerInputStyle}>
-            {items.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+          <LedgerItemSelect items={items} onManageClick={onManageItems} />
         </Form.Item>
 
         <Form.Item

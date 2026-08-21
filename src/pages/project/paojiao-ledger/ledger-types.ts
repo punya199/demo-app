@@ -52,4 +52,11 @@ export interface LedgerData {
 
 export type LedgerEntryDirection = 'inCash' | 'inBank' | 'outCash' | 'outBank'
 
-export type LedgerSummaryPeriod = 'round' | 'day' | 'month' | 'all'
+export type LedgerSummaryPeriod =
+  | 'round'
+  | 'oilSales'
+  | 'draffSales'
+  | 'day'
+  | 'expenses'
+  | 'month'
+  | 'all'

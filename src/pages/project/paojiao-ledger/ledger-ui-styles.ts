@@ -49,4 +49,5 @@ export const ledgerPillStyle = (active: boolean): CSSProperties => ({
   cursor: 'pointer',
   whiteSpace: 'nowrap',
   fontFamily: ledgerFont.sans,
+  transition: 'background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease',
 })

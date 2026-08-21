@@ -1,12 +1,19 @@
 import { message } from 'antd'
 import dayjs from 'dayjs'
 import { CSSProperties, useMemo, useState } from 'react'
-import { filterEntriesByMonth, getMonthChips } from './ledger-calculations'
+import {
+  filterEntriesByItems,
+  filterEntriesByMonth,
+  getItemChips,
+  getMonthChips,
+} from './ledger-calculations'
 import { useLedgerContext } from './ledger-context'
 import { EditEntryFormValues, EditEntryModal } from './EditEntryModal'
 import { fmtFull, THB } from './ledger-format'
 import { LedgerDatePicker } from './LedgerDatePicker'
-import { useAddLedgerEntry, useEditLedgerEntry } from './ledger-query'
+import { LedgerItemEditorModal } from './LedgerItemEditorModal'
+import { LedgerItemSelect } from './LedgerItemSelect'
+import { useAddLedgerEntry, useDeleteLedgerEntry, useEditLedgerEntry } from './ledger-query'
 import { ledgerColor, ledgerFont } from './ledger-tokens'
 import { LedgerEntry, LedgerEntryDirection } from './ledger-types'
 import { useLedgerStore } from './ledger-store'
@@ -28,24 +35,28 @@ const DIR_OPTIONS: { dir: LedgerEntryDirection; label: string }[] = [
 const numCellStyle = { fontFamily: ledgerFont.mono, fontSize: 15, textAlign: 'right' as const }
 // วันที่ 100 / รายการ 150 (fixed, ellipsis-truncated if longer) / เงินเข้า+เงินออก 75 each /
 // หมายเหตุ flexible (minmax(0,1fr) - a plain 1fr won't shrink below its content's width, which
-// is what let the item/note cells wrap ugly one-word-per-line at in-between widths) / จัดการ 50.
-const ROW_TEMPLATE = '100px 150px 75px 75px 70px minmax(0, 1fr) 50px'
+// is what let the item/note cells wrap ugly one-word-per-line at in-between widths) / จัดการ 68
+// (wide enough for the bordered pill button, not just the plain text link it used to be).
+const ROW_TEMPLATE = '100px 150px 75px 75px 70px minmax(0, 1fr) 68px'
 const truncateStyle: CSSProperties = {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 }
 
+// Small bordered pill, same visual language as ledgerPillStyle - previously a bare underlined
+// text link, which read as an odd one-off next to every other clickable control on this page.
 const rowActionStyle: CSSProperties = {
-  border: 'none',
-  background: 'none',
-  padding: 0,
-  fontSize: 12.5,
+  border: `1px solid ${ledgerColor.inputBorder}`,
+  background: ledgerColor.cardSurface,
+  borderRadius: 99,
+  padding: '4px 12px',
+  fontSize: 12,
   fontWeight: 500,
   fontFamily: ledgerFont.sans,
-  color: ledgerColor.accent,
+  color: ledgerColor.textSecondary,
   cursor: 'pointer',
-  textDecoration: 'underline',
+  transition: 'border-color 0.15s ease, color 0.15s ease',
 }
 
 const PageLedgerEntries = () => {
@@ -55,6 +66,7 @@ const PageLedgerEntries = () => {
   const removeExtraEntry = useLedgerStore((s) => s.removeExtraEntry)
   const addLedgerEntry = useAddLedgerEntry()
   const editLedgerEntry = useEditLedgerEntry()
+  const deleteLedgerEntry = useDeleteLedgerEntry()
 
   const [fDate, setFDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [fItem, setFItem] = useState(data.items[0])
@@ -62,10 +74,26 @@ const PageLedgerEntries = () => {
   const [fNote, setFNote] = useState('')
   const [fDir, setFDir] = useState<LedgerEntryDirection>('outBank')
   const [month, setMonth] = useState('all')
+  const [itemFilter, setItemFilter] = useState<Set<string>>(new Set())
   const [editingEntry, setEditingEntry] = useState<LedgerEntry | null>(null)
+  const [managingItems, setManagingItems] = useState(false)
 
   const monthChips = useMemo(() => getMonthChips(base.entries), [base.entries])
-  const filtered = useMemo(() => filterEntriesByMonth(base.entries, month), [base.entries, month])
+  // Chip list is built from all entries, not the month-filtered subset, so the row of item pills
+  // stays stable as the user switches months instead of pills popping in and out.
+  const itemChips = useMemo(() => getItemChips(base.entries), [base.entries])
+  const toggleItemFilter = (item: string) =>
+    setItemFilter((prev) => {
+      const next = new Set(prev)
+      if (next.has(item)) next.delete(item)
+      else next.add(item)
+      return next
+    })
+
+  const filtered = useMemo(() => {
+    const byMonth = filterEntriesByMonth(base.entries, month)
+    return filterEntriesByItems(byMonth, itemFilter)
+  }, [base.entries, month, itemFilter])
   // Sort by date, not just row order - an entry logged for an earlier date still gets appended
   // at the next sheet row (rows track when it was entered, not what date it's for), so a plain
   // reverse() puts it in the wrong place whenever an entry is backdated.
@@ -122,6 +150,13 @@ const PageLedgerEntries = () => {
     )
   }
 
+  const handleDeleteEntry = (row: number) => {
+    deleteLedgerEntry.mutate(row, {
+      onSuccess: () => message.success('ลบรายการแล้ว'),
+      onError: () => message.error('ลบไม่สำเร็จ ลองใหม่อีกครั้ง'),
+    })
+  }
+
   return (
     <div
       style={{
@@ -151,7 +186,11 @@ const PageLedgerEntries = () => {
           className="paojiao-ledger-add-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: '130px 150px 140px 1fr',
+            // Last column is minmax(0, 1fr), not a bare 1fr - a bare 1fr track won't shrink below
+            // the note input's own intrinsic min-content width, which pushed it (and its label)
+            // past the card's right edge at narrower viewport widths instead of shrinking to fit.
+            // Same class of overflow bug as the summary line chart (see LineChartCard).
+            gridTemplateColumns: '130px 150px 140px minmax(0, 1fr)',
             gap: 14,
           }}
         >
@@ -159,17 +198,12 @@ const PageLedgerEntries = () => {
             <LedgerDatePicker value={fDate} onChange={setFDate} />
           </LedgerField>
           <LedgerField label="รายการ">
-            <select
+            <LedgerItemSelect
               value={fItem}
-              onChange={(e) => setFItem(e.target.value)}
-              style={ledgerInputStyle}
-            >
-              {data.items.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
+              items={data.items}
+              onChange={setFItem}
+              onManageClick={() => setManagingItems(true)}
+            />
           </LedgerField>
           <LedgerField label="จำนวนเงิน">
             <input
@@ -180,7 +214,7 @@ const PageLedgerEntries = () => {
               style={ledgerMonoInputStyle}
             />
           </LedgerField>
-          <LedgerField label="หมายเหตุ">
+          <LedgerField label="หมายเหตุ" style={{ minWidth: 0 }}>
             <input
               type="text"
               value={fNote}
@@ -232,6 +266,26 @@ const PageLedgerEntries = () => {
             style={ledgerPillStyle(month === m.key)}
           >
             {m.label}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+        <button
+          type="button"
+          onClick={() => setItemFilter(new Set())}
+          style={ledgerPillStyle(itemFilter.size === 0)}
+        >
+          ทุกรายการ
+        </button>
+        {itemChips.map((item) => (
+          <button
+            key={item}
+            type="button"
+            onClick={() => toggleItemFilter(item)}
+            style={ledgerPillStyle(itemFilter.has(item))}
+          >
+            {item}
           </button>
         ))}
       </div>
@@ -322,7 +376,12 @@ const PageLedgerEntries = () => {
                 </span>
                 {isSynced ? (
                   <div style={{ textAlign: 'center' }}>
-                    <button type="button" onClick={() => setEditingEntry(e)} style={rowActionStyle}>
+                    <button
+                      type="button"
+                      onClick={() => setEditingEntry(e)}
+                      className="paojiao-ledger-row-action"
+                      style={rowActionStyle}
+                    >
                       แก้ไข
                     </button>
                   </div>
@@ -426,6 +485,7 @@ const PageLedgerEntries = () => {
                     <button
                       type="button"
                       onClick={() => setEditingEntry(e)}
+                      className="paojiao-ledger-row-action"
                       style={{ ...rowActionStyle, flexShrink: 0 }}
                     >
                       แก้ไข
@@ -482,10 +542,19 @@ const PageLedgerEntries = () => {
       </section>
 
       <style>{`
-        @media (max-width: 768px) {
+        /* The add-entry grid's 3 fixed-width columns (130+150+140=420px) plus gaps need ~462px
+           just for themselves, before the note field gets anything - with the 232px sidebar and
+           this page's own padding subtracted from the window, that stops fitting anywhere below
+           roughly 940px wide, well above the 768px breakpoint everything else on this page (the
+           sidebar/bottom-nav switch) uses. No grid-track trick fixes this: fixed px columns don't
+           have any width to give up. Below this width the grid switches to the same 2-column
+           stack the sub-768px layout already uses, just triggered earlier for this one element. */
+        @media (max-width: 940px) {
           .paojiao-ledger-add-grid {
             grid-template-columns: 1fr 1fr !important;
           }
+        }
+        @media (max-width: 768px) {
           .paojiao-ledger-table-desktop {
             display: none !important;
           }
@@ -515,7 +584,12 @@ const PageLedgerEntries = () => {
         items={data.items}
         onSave={handleEditSave}
         onClose={() => setEditingEntry(null)}
+        onManageItems={() => setManagingItems(true)}
+        canDelete={editingEntry !== null && editingEntry.row > data.lastRoundRow}
+        onDelete={handleDeleteEntry}
       />
+
+      <LedgerItemEditorModal open={managingItems} onClose={() => setManagingItems(false)} />
     </div>
   )
 }

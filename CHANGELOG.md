@@ -1,3 +1,10 @@
+## [1.6.34](https://github.com/punya199/demo-app/compare/v1.6.33...v1.6.34) (2026-08-22)
+
+
+### Fix
+
+* Round-summary/bar-chart responsive layout, chart scrolling, and text-wrap fixes for paojiao-ledger ([a7eec0b](https://github.com/punya199/demo-app/commit/a7eec0b1d179f65f5acb0304f1a6103576670d2c))
+
 ## [1.6.33](https://github.com/punya199/demo-app/compare/v1.6.32...v1.6.33) (2026-08-21)
 
 

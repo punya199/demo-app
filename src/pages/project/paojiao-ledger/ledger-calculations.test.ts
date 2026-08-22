@@ -240,7 +240,7 @@ describe('computeVendorSpend', () => {
       { item: 'มัน หมอน', amount: 500 },
     ])
     expect(view.totalOut).toBe(1801)
-    expect(view.periodLabel).toBe('11 ม.ค. 69 ถึง 10 ก.พ. 69')
+    expect(view.periodLabel).toBe('ข้อมูลจากวันที่ 11 ม.ค. 69 ถึง 10 ก.พ. 69')
   })
 
   it('with no window, sums over the whole ledger from startDate - the old entry now counts', () => {
@@ -252,7 +252,9 @@ describe('computeVendorSpend', () => {
       { item: 'มัน หมอน', amount: 500 },
     ])
     expect(view.totalOut).toBe(11800)
-    expect(view.periodLabel).toBe('1 พ.ย. 68 ถึง 10 ก.พ. 69')
+    // The whole-lifetime label is pinned to a fixed display string, not derived from the
+    // startDate passed in - see WHOLE_LIFETIME_LABEL_START's comment for why.
+    expect(view.periodLabel).toBe('ข้อมูลจากวันที่ 10 ก.ค. 69 ถึง 10 ก.พ. 69')
   })
 
   it('returns an empty view when there are no entries', () => {
@@ -331,8 +333,8 @@ describe('computeOilSalesPerRound', () => {
     const view = computeOilSalesPerRound(rounds, entries)
 
     expect(view.bars).toEqual([
-      { v: 5000, label: '1 ม.ค.', date: '2026-01-01' },
-      { v: 3000, label: '5 ม.ค.', date: '2026-01-05' }, // rows 4+5, split settlement - row 2's "ขาย กาก" excluded
+      { v: 5000, label: '01/01', date: '2026-01-01' },
+      { v: 3000, label: '05/01', date: '2026-01-05' }, // rows 4+5, split settlement - row 2's "ขาย กาก" excluded
     ])
     expect(view.total).toBe(8000)
     expect(view.count).toBe(2)
@@ -391,8 +393,8 @@ describe('computeDraffSales', () => {
     const view = computeDraffSales(entries)
 
     expect(view.bars).toEqual([
-      { v: 300, label: '3 ม.ค.', date: '2026-01-03' },
-      { v: 450, label: '10 ม.ค.', date: '2026-01-10' },
+      { v: 300, label: '03/01', date: '2026-01-03' },
+      { v: 450, label: '10/01', date: '2026-01-10' },
     ])
     expect(view.total).toBe(750)
     expect(view.count).toBe(2)

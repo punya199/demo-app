@@ -24,11 +24,18 @@ export const RoundDetailModal = ({ round, entries, onClose }: RoundDetailModalPr
 
   return (
     <Modal
-      title={round ? `รอบปิด ${fmtFull(round.date)}` : ''}
+      title={
+        round && (
+          <span style={{ fontSize: 19, fontWeight: 700 }}>{`รอบปิด ${fmtFull(round.date)}`}</span>
+        )
+      }
       open={!!round}
       onCancel={onClose}
       footer={null}
       destroyOnHidden
+      // Fixed rather than the AntD 520px default - that left a lot of empty width next to the
+      // กำไร/เงินได้/เงินจ่าย stats row (which is the widest thing here, since it doesn't wrap).
+      width={440}
     >
       {round && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -78,7 +85,9 @@ export const RoundDetailModal = ({ round, entries, onClose }: RoundDetailModalPr
                   key={e.id}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '70px 1fr 90px',
+                    // First column was 70px - just short of "19 ส.ค. 69" at this font size, which
+                    // wrapped the 2-digit year onto its own line. 84px gives it room on one line.
+                    gridTemplateColumns: '84px 1fr 90px',
                     gap: 10,
                     alignItems: 'center',
                     padding: '9px 14px',
@@ -90,6 +99,7 @@ export const RoundDetailModal = ({ round, entries, onClose }: RoundDetailModalPr
                       fontFamily: ledgerFont.mono,
                       fontSize: 12.5,
                       color: ledgerColor.textMuted,
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {fmtFull(e.date)}
@@ -97,7 +107,7 @@ export const RoundDetailModal = ({ round, entries, onClose }: RoundDetailModalPr
                   <span style={{ fontSize: 13.5, minWidth: 0, overflow: 'hidden' }}>
                     <div style={{ fontWeight: 500 }}>{e.item}</div>
                     {e.note && (
-                      <div style={{ fontSize: 11.5, color: ledgerColor.textFaint }}>{e.note}</div>
+                      <div style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{e.note}</div>
                     )}
                   </span>
                   <span

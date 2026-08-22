@@ -40,6 +40,70 @@ const FADE_IN_KEYFRAMES = `
 }
 `
 
+// Three widths for the profit/figures row in SummaryPeriodContent: wide enough to push the
+// figures to the far edge and grow the profit number, medium enough to keep them on one row
+// without the forced gap, and narrow enough that they need to stack (the original layout).
+//
+// The two breakpoints below (900px / 1060px) are NOT guesses - the row sits behind a 232px fixed
+// sidebar plus ~136px of main/card padding, so the viewport needed to fit both blocks side by
+// side is far higher than it looks from the card alone. Measured empirically with an isolated
+// repro of this exact markup at the real font sizes: the row needs ~904px of viewport before it
+// stops wrapping at the base (medium-tier) font sizes, and ~1044px once the wide-tier fonts below
+// are applied (bigger text needs more room). Both got a ~15px safety margin against font-metric
+// variance across browsers. Earlier guesses (860px/560px) were well inside the range where
+// flex-wrap was still silently collapsing the row to a stack regardless of what these rules said.
+const ROUND_SUMMARY_RESPONSIVE_STYLES = `
+.paojiao-ledger-round-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  /* flex-start, not center - centering against the profit block's full height (including its
+     much taller number) pushed the figures block lower than intended. Top-aligning puts it level
+     with the top of the profit number instead, matching the reference layout. */
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 20px 34px;
+}
+.paojiao-ledger-round-profit-value {
+  font-size: 56px;
+}
+.paojiao-ledger-round-figure-label {
+  font-size: 12.5px;
+}
+.paojiao-ledger-round-figure-value {
+  font-size: 20px;
+}
+/* Wide is the only tier where the figures column sits beside the profit column instead of
+   below it - there's room to grow there that the stacked (medium/narrow) tiers don't have. */
+@media (min-width: 1060px) {
+  .paojiao-ledger-round-summary-row {
+    justify-content: space-between;
+  }
+  .paojiao-ledger-round-profit-value {
+    font-size: 68px;
+  }
+  .paojiao-ledger-round-figure-label {
+    font-size: 14px;
+  }
+  .paojiao-ledger-round-figure-value {
+    font-size: 24px;
+  }
+}
+@media (max-width: 899px) {
+  .paojiao-ledger-round-summary-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+/* Same breakpoint the shell already uses to switch the sidebar for a bottom nav - below it, 3
+   equal grid columns leave each stat card too narrow for its own label, cutting text off. */
+@media (max-width: 768px) {
+  .paojiao-ledger-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+`
+
 const PageLedgerSummary = () => {
   const { data, base } = useLedgerContext()
   const [period, setPeriod] = useState<LedgerSummaryPeriod>('round')
@@ -47,7 +111,7 @@ const PageLedgerSummary = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 26 }}>
-      <style>{FADE_IN_KEYFRAMES}</style>
+      <style>{FADE_IN_KEYFRAMES + ROUND_SUMMARY_RESPONSIVE_STYLES}</style>
       <LedgerH1>สรุปเงิน</LedgerH1>
       <PeriodPills period={period} onSelectPeriod={setPeriod} />
 
@@ -127,6 +191,21 @@ const PeriodPills = ({
   </div>
 )
 
+// Fixed width per bar, not flex:1 dividing the card evenly - with enough bars (a full year of
+// rounds, say) that squeezed every column down below what an unrotated date label like "14 สค"
+// needs at readable size, and the nowrap label text spilled into neighboring columns instead of
+// shrinking, reading as garbled overlapping text. Wide bar sets scroll horizontally instead, same
+// fix as LineChartCard used for the same class of problem.
+const BAR_MIN_WIDTH = 34
+// Every bar column shares the exact same upH/dnH/gaps/label height, so this total is identical
+// for all of them - computed once here instead of leaving each column's height to flex packing,
+// which is what let the baseline appear to wobble between bars (see BAR_LABEL_HEIGHT's comment).
+const BAR_GAP = 6
+const BAR_LABEL_HEIGHT = 14 // fixed, not auto - auto height made the column's total content
+// height (and therefore where flex's justify-content:flex-end packed the baseline) depend on
+// font metrics that could differ by a sub-pixel between browsers/renders, which is exactly the
+// kind of "off by a hair" gap that reads as a misaligned line across bars.
+
 const BarChartCard = ({
   title,
   legend,
@@ -137,100 +216,154 @@ const BarChartCard = ({
   legend: string
   chart: ChartLayout
   onBarClick?: (index: number) => void
-}) => (
-  <section
-    style={{
-      ...ledgerCardStyle,
-      padding: '24px 26px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 20,
-    }}
-  >
-    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-      <span style={{ fontSize: 15, fontWeight: 600 }}>{title}</span>
-      <span style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{legend}</span>
-    </div>
-    <div style={{ display: 'flex', alignItems: 'stretch', gap: 10, height: 240 }}>
-      {chart.bars.map((b, i) => (
+}) => {
+  // Every column is exactly this tall - deterministic, not left to flex packing to work out (see
+  // BAR_LABEL_HEIGHT's comment) - so the zero-baseline overlay below can be positioned at a single
+  // top offset that's guaranteed correct for every bar, rather than each bar drawing its own
+  // 1px hairline that left a visible gap wherever the row's `gap` fell between two bars.
+  const rowHeight = chart.upH + BAR_GAP + 1 + BAR_GAP + chart.dnH + BAR_GAP + BAR_LABEL_HEIGHT
+
+  return (
+    <section
+      style={{
+        ...ledgerCardStyle,
+        padding: '24px 26px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 20,
+        minWidth: 0,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 15, fontWeight: 600 }}>{title}</span>
+        <span style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{legend}</span>
+      </div>
+      {/* Same direction:rtl/ltr pairing as LineChartCard - scrolls to the newest (rightmost) bars
+        by default, with no JS/timing needed. Two things this needs that the first attempt
+        missed: the inner row must be display: inline-flex, not flex - a block-level flex
+        container's own width:auto still just fills its parent (this scroll box) regardless of
+        its flex-shrink:0 children refusing to shrink, so the children silently overflowed the
+        row without the row itself ever reporting a wider scrollWidth to this box - nothing was
+        ever detected as overflowing, so there was nothing to scroll and nothing for direction:
+        rtl to anchor to the right. inline-flex shrinks the row to its content's real width
+        instead, like LineChartCard's SVG wrapper already does with inline-block. Second,
+        minWidth: 0 on this box itself (not just the section) - as a flex item its own automatic
+        min-width otherwise matches its unwrapped content width, which independently defeats
+        overflow-x:auto the same way and pushes the overflow onto the page instead (also why
+        swiping the chart used to drag the whole page). overscrollBehaviorX keeps a swipe that
+        does hit this box's own scroll limit from then bleeding into the page underneath it. */}
+      <div
+        style={{
+          overflowX: 'auto',
+          direction: 'rtl',
+          minWidth: 0,
+          overscrollBehaviorX: 'contain',
+        }}
+      >
         <div
-          key={i}
-          onClick={onBarClick ? () => onBarClick(i) : undefined}
           style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end',
-            gap: 6,
-            minWidth: 0,
-            cursor: onBarClick ? 'pointer' : undefined,
+            direction: 'ltr',
+            display: 'inline-flex',
+            position: 'relative',
+            gap: 10,
+            height: rowHeight,
           }}
         >
+          {/* One continuous line the full width of the row (bars and gaps both), instead of every
+            bar drawing its own 1px segment - those left the gap between each pair of bars with
+            nothing drawn there at all, which read as the line being broken/misaligned rather
+            than genuinely continuous. */}
           <div
             style={{
-              height: chart.upH,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-end',
-              gap: 4,
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: chart.upH + BAR_GAP,
+              height: 1,
+              background: ledgerColor.hairline,
             }}
-          >
-            <span
+          />
+          {chart.bars.map((b, i) => (
+            <div
+              key={i}
+              onClick={onBarClick ? () => onBarClick(i) : undefined}
               style={{
-                fontFamily: ledgerFont.mono,
-                fontSize: 10.5,
-                textAlign: 'center',
-                color: ledgerColor.moneyIn,
-                visibility: b.positive ? 'visible' : 'hidden',
+                flex: `0 0 ${BAR_MIN_WIDTH}px`,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: BAR_GAP,
+                cursor: onBarClick ? 'pointer' : undefined,
               }}
             >
-              {b.valueText}
-            </span>
-            <div
-              style={{
-                height: b.upHeightPx,
-                background: ledgerColor.moneyIn,
-                borderRadius: '4px 4px 0 0',
-              }}
-            />
-          </div>
-          <div style={{ height: 1, background: ledgerColor.hairline }} />
-          <div style={{ height: chart.dnH, display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <div
-              style={{
-                height: b.downHeightPx,
-                background: ledgerColor.moneyOut,
-                borderRadius: '0 0 4px 4px',
-              }}
-            />
-            <span
-              style={{
-                fontFamily: ledgerFont.mono,
-                fontSize: 10.5,
-                textAlign: 'center',
-                color: ledgerColor.moneyOut,
-                visibility: b.positive ? 'hidden' : 'visible',
-              }}
-            >
-              {b.negText}
-            </span>
-          </div>
-          <div
-            style={{
-              fontFamily: ledgerFont.mono,
-              fontSize: 11,
-              color: ledgerColor.textFaint,
-              textAlign: 'center',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {b.label}
-          </div>
+              <div
+                style={{
+                  height: chart.upH,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  gap: 4,
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: ledgerFont.mono,
+                    fontSize: 10.5,
+                    textAlign: 'center',
+                    color: ledgerColor.moneyIn,
+                    visibility: b.positive ? 'visible' : 'hidden',
+                  }}
+                >
+                  {b.valueText}
+                </span>
+                <div
+                  style={{
+                    height: b.upHeightPx,
+                    background: ledgerColor.moneyIn,
+                    borderRadius: '4px 4px 0 0',
+                  }}
+                />
+              </div>
+              <div style={{ height: 1 }} />
+              <div style={{ height: chart.dnH, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <div
+                  style={{
+                    height: b.downHeightPx,
+                    background: ledgerColor.moneyOut,
+                    borderRadius: '0 0 4px 4px',
+                  }}
+                />
+                <span
+                  style={{
+                    fontFamily: ledgerFont.mono,
+                    fontSize: 10.5,
+                    textAlign: 'center',
+                    color: ledgerColor.moneyOut,
+                    visibility: b.positive ? 'hidden' : 'visible',
+                  }}
+                >
+                  {b.negText}
+                </span>
+              </div>
+              <div
+                style={{
+                  fontFamily: ledgerFont.mono,
+                  fontSize: 11,
+                  lineHeight: `${BAR_LABEL_HEIGHT}px`,
+                  height: BAR_LABEL_HEIGHT,
+                  color: ledgerColor.textFaint,
+                  textAlign: 'center',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {b.label}
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-  </section>
-)
+      </div>
+    </section>
+  )
+}
 
 // Fixed pixel coordinates (not viewBox stretching) so the line/dots/text never distort - wide
 // data sets just scroll horizontally instead, same as any other wide content on this page.
@@ -290,8 +423,14 @@ const LineChartCard = ({
           edge when the chart is wider than its card. direction:rtl on the scroll container makes
           its native initial scroll position the right edge (CSS-only, no effect/timing needed);
           direction:ltr on the inner wrapper puts the chart's own content back in normal reading
-          order so numbers/dates aren't mirrored. */}
-      <div style={{ overflowX: 'auto', direction: 'rtl' }}>
+          order so numbers/dates aren't mirrored. minWidth: 0 and overscrollBehaviorX: 'contain'
+          are the same fix applied to BarChartCard's identical scroll wrapper - without minWidth:
+          0 this flex item's automatic min-width matches its unwrapped content width, silently
+          defeating the local overflow-x:auto (nothing overflows *this* box, the page does
+          instead) and letting a swipe that reaches the scroll limit bleed into the page. */}
+      <div
+        style={{ overflowX: 'auto', direction: 'rtl', minWidth: 0, overscrollBehaviorX: 'contain' }}
+      >
         <div style={{ direction: 'ltr', display: 'inline-block' }}>
           <svg width={svgWidth} height={LINE_HEIGHT} style={{ display: 'block' }}>
             <polyline
@@ -364,23 +503,35 @@ const VendorSpendContent = ({
         <div style={{ fontSize: 13.5, color: ledgerColor.textMuted, letterSpacing: '0.03em' }}>
           {view.periodLabel}
         </div>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
-          <span style={{ fontSize: 22, fontWeight: 700, color: ledgerColor.moneyOut }}>
-            รายจ่ายรวม
-          </span>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap' }}>
           <span
             style={{
-              fontFamily: ledgerFont.mono,
-              fontSize: 56,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-              lineHeight: 1,
+              fontSize: 22,
+              fontWeight: 700,
               color: ledgerColor.moneyOut,
+              whiteSpace: 'nowrap',
             }}
           >
-            {THB0(view.totalOut)}
+            รายจ่ายรวม
           </span>
-          <span style={{ fontSize: 18, color: ledgerColor.textMuted }}>บาท</span>
+          {/* Grouped for the same reason as RevenueContent's equivalent - "บาท" wrapping onto its
+              own line, separated from the number, looked worse than the number+unit wrapping
+              together as one unit. */}
+          <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8 }}>
+            <span
+              style={{
+                fontFamily: ledgerFont.mono,
+                fontSize: 56,
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+                color: ledgerColor.moneyOut,
+              }}
+            >
+              {THB0(view.totalOut)}
+            </span>
+            <span style={{ fontSize: 18, color: ledgerColor.textMuted }}>บาท</span>
+          </span>
         </div>
         <div style={{ display: 'flex', gap: 34, flexWrap: 'wrap', paddingTop: 4 }}>
           {[
@@ -491,21 +642,35 @@ const RevenueContent = ({
         <div style={{ fontSize: 13.5, color: ledgerColor.textMuted, letterSpacing: '0.03em' }}>
           {view.periodLabel}
         </div>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
-          <span style={{ fontSize: 22, fontWeight: 700, color: ledgerColor.moneyIn }}>{title}</span>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap' }}>
           <span
             style={{
-              fontFamily: ledgerFont.mono,
-              fontSize: 56,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-              lineHeight: 1,
+              fontSize: 22,
+              fontWeight: 700,
               color: ledgerColor.moneyIn,
+              whiteSpace: 'nowrap',
             }}
           >
-            {THB0(view.total)}
+            {title}
           </span>
-          <span style={{ fontSize: 18, color: ledgerColor.textMuted }}>บาท</span>
+          {/* Number and unit grouped into one inline-flex item, not two separate flex children of
+              the outer row - otherwise "บาท" could wrap onto its own line by itself whenever the
+              row ran short on space, leaving the number without its unit right next to it. */}
+          <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8 }}>
+            <span
+              style={{
+                fontFamily: ledgerFont.mono,
+                fontSize: 56,
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+                color: ledgerColor.moneyIn,
+              }}
+            >
+              {THB0(view.total)}
+            </span>
+            <span style={{ fontSize: 18, color: ledgerColor.textMuted }}>บาท</span>
+          </span>
         </div>
         <div style={{ display: 'flex', gap: 34, flexWrap: 'wrap', paddingTop: 4 }}>
           {[
@@ -610,43 +775,52 @@ const SummaryPeriodContent = ({
         <div style={{ fontSize: 13.5, color: ledgerColor.textMuted, letterSpacing: '0.03em' }}>
           {view.periodLabel}
         </div>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
-          <span style={{ fontSize: 22, fontWeight: 700, color: verdictColor }}>
-            {isLoss ? 'ขาดทุน' : 'กำไร'}
-          </span>
-          <span
-            style={{
-              fontFamily: ledgerFont.mono,
-              fontSize: 56,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-              lineHeight: 1,
-            }}
-          >
-            {thbSigned0(view.periodProfit)}
-          </span>
-          <span style={{ fontSize: 18, color: ledgerColor.textMuted }}>บาท</span>
-        </div>
-        <div style={{ display: 'flex', gap: 34, flexWrap: 'wrap', paddingTop: 4 }}>
-          {figures.map((f) => (
-            <div key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <span style={{ fontSize: 12.5, color: ledgerColor.textMuted }}>{f.label}</span>
-              <span
-                style={{
-                  fontFamily: ledgerFont.mono,
-                  fontSize: 20,
-                  fontWeight: 500,
-                  color: f.color,
-                }}
-              >
-                {f.value}
-              </span>
+        <div className="paojiao-ledger-round-summary-row">
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
+            <span style={{ fontSize: 22, fontWeight: 700, color: verdictColor }}>
+              {isLoss ? 'ขาดทุน' : 'กำไร'}
+            </span>
+            <span
+              className="paojiao-ledger-round-profit-value"
+              style={{
+                fontFamily: ledgerFont.mono,
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+              }}
+            >
+              {thbSigned0(view.periodProfit)}
+            </span>
+            <span style={{ fontSize: 18, color: ledgerColor.textMuted }}>บาท</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', gap: 34, flexWrap: 'wrap' }}>
+              {figures.map((f) => (
+                <div key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <span
+                    className="paojiao-ledger-round-figure-label"
+                    style={{ color: ledgerColor.textMuted }}
+                  >
+                    {f.label}
+                  </span>
+                  <span
+                    className="paojiao-ledger-round-figure-value"
+                    style={{
+                      fontFamily: ledgerFont.mono,
+                      fontWeight: 500,
+                      color: f.color,
+                    }}
+                  >
+                    {f.value}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
+            {view.periodNote && (
+              <div style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{view.periodNote}</div>
+            )}
+          </div>
         </div>
-        {view.periodNote && (
-          <div style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{view.periodNote}</div>
-        )}
       </section>
 
       <BarChartCard
@@ -662,7 +836,10 @@ const SummaryPeriodContent = ({
         }
       />
 
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+      <section
+        className="paojiao-ledger-stats-grid"
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}
+      >
         {[
           { label: 'กำไรทั้งหมด (รวมยอดยกมา)', value: THB0(profitAll) },
           { label: 'เงินสด + บัญชี วันนี้', value: THB0(onHand) },

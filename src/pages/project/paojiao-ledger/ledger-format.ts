@@ -23,11 +23,11 @@ export const thbSigned = (n: number) => (n < 0 ? '−' : '') + THB(Math.abs(n))
 
 const parseIsoDate = (iso: string) => new Date(iso + 'T00:00:00')
 
-// "14 ก.ค." - no year, used on chart x-axis labels.
-export const fmtDay = (iso: string) => {
-  const d = parseIsoDate(iso)
-  return `${d.getDate()} ${TH_MONTH[d.getMonth()]}`
-}
+// "14/08" - numeric day/month, no year. Used on chart x-axis labels, where every extra px per
+// label counts (see BAR_MIN_WIDTH/BarChartCard) and a Thai month name (with or without periods)
+// read as visually busy at that size. Sliced straight from the iso string, already zero-padded -
+// no Date object needed for this one.
+export const fmtDay = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`
 
 // "14 ก.ค. 69" - Thai short month + Buddhist 2-digit year.
 export const fmtFull = (iso: string) => {

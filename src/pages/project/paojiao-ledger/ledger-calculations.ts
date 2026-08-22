@@ -155,6 +155,14 @@ export interface VendorSpendView {
 // date 21 ส.ค. with windowDays=30 starts the window 22 ก.ค., inclusive. Omit it for the ledger's
 // whole lifetime, starting from `startDate`. Amounts are rounded to whole baht for this view only
 // (a ranking, not an exact statement).
+// The live sheet's own "วันที่เริ่ม" cell (the source of `startDate`) is stale - it still holds
+// the date tracking began overall, before older history was split off into a separate archive
+// tab that this app never reads entry-level data from. `startDate` still doubles as a safe (if
+// too-early) cutoff for the whole-lifetime filter below, but the label shown to the user is
+// pinned to the live sheet's actual first entry instead, per explicit decision not to touch the
+// sheet cell just to fix display text.
+const WHOLE_LIFETIME_LABEL_START = '10 ก.ค. 69'
+
 export const computeVendorSpend = (
   entries: LedgerEntry[],
   startDate: string,
@@ -182,8 +190,9 @@ export const computeVendorSpend = (
     .map(([item, amount]) => ({ item, amount: Math.round(amount) }))
     .sort((a, b) => b.amount - a.amount)
 
+  const labelFrom = windowDays !== undefined ? fmtFull(fromIso) : WHOLE_LIFETIME_LABEL_START
   return {
-    periodLabel: lastDate ? `${fmtFull(fromIso)} ถึง ${fmtFull(lastDate)}` : '',
+    periodLabel: lastDate ? `ข้อมูลจากวันที่ ${labelFrom} ถึง ${fmtFull(lastDate)}` : '',
     totalOut: sum(rows, (r) => r.amount),
     rows,
   }

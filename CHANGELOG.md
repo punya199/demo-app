@@ -1,3 +1,10 @@
+## [1.6.35](https://github.com/punya199/demo-app/compare/v1.6.34...v1.6.35) (2026-08-22)
+
+
+### Fix
+
+* Overhaul the /paojiao-ledger/share page - add-withdrawal form and layout fixes ([0e907ac](https://github.com/punya199/demo-app/commit/0e907acb67fe9cd361ec29573ceeeec565606386))
+
 ## [1.6.34](https://github.com/punya199/demo-app/compare/v1.6.33...v1.6.34) (2026-08-22)
 
 

@@ -1,7 +1,15 @@
 // Business logic ported 1:1 from design_handoff_paojiao_ledger/design/ledger-app.dc.html
 // (Component.renderVals). See the README's "Calculations" section for the spec these
 // implement - rounds are row blocks, not date ranges; always slice by `row`.
-import { fmtDay, fmtFull, monthKey, monthLabel, THB } from './ledger-format'
+import {
+  fmtDay,
+  fmtFull,
+  fmtShort,
+  monthKey,
+  monthLabel,
+  monthLabelShort,
+  THB,
+} from './ledger-format'
 import {
   LedgerData,
   LedgerEntry,
@@ -127,7 +135,7 @@ export const computeSummaryPeriod = (
     carry: 0,
     bars: keys.map((k) => ({
       v: sum(byMonth[k], (r) => r.profit),
-      label: monthLabel(k),
+      label: monthLabelShort(k),
       date: `${k}-01`,
     })),
   }
@@ -358,14 +366,19 @@ export const computeShares = (
       taken,
       left,
       progressPct,
-      rows: [
-        { dateText: 'ยกมา', label: 'ยอดเดิม', amount: opening },
-        ...rows.map((w) => ({
-          dateText: fmtFull(w.date),
+      // The opening/carried-forward balance is already folded into `taken` above - it isn't a
+      // withdrawal that happened on the live sheet, so it doesn't belong in this history list
+      // (there's no "ยกมา" row here the way there used to be).
+      // Sorted by date, not sheet row order - a withdrawal logged out of date order (e.g. a
+      // backdated entry, or one typed straight into the sheet) would otherwise show up wherever
+      // its row happens to sit rather than where it belongs chronologically.
+      rows: [...rows]
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .map((w) => ({
+          dateText: fmtShort(w.date),
           label: w.note || (w.bank ? 'โอน' : 'เงินสด'),
           amount: w.cash + w.bank,
         })),
-      ],
     }
   })
 }

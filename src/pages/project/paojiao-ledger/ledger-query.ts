@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../../../utils/api-client'
-import { LedgerData, LedgerEntry, LedgerWage } from './ledger-types'
+import { LedgerData, LedgerEntry, LedgerWage, LedgerWithdrawal } from './ledger-types'
 
 const LEDGER_QUERY_KEY = ['paojiao-ledger']
 
@@ -31,6 +31,16 @@ export const useAddLedgerWage = () => {
   return useMutation({
     mutationFn: async (wage: LedgerWage) => {
       await apiClient.post('/paojiao-ledger/wages', wage)
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: LEDGER_QUERY_KEY }),
+  })
+}
+
+export const useAddLedgerWithdrawal = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (withdrawal: LedgerWithdrawal) => {
+      await apiClient.post('/paojiao-ledger/withdrawals', withdrawal)
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: LEDGER_QUERY_KEY }),
   })

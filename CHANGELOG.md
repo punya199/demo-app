@@ -1,3 +1,10 @@
+## [1.6.36](https://github.com/punya199/demo-app/compare/v1.6.35...v1.6.36) (2026-08-24)
+
+
+### Fix
+
+* Wage/withdrawal edit UI, layout fixes, and add save-as-image to paojiao-ledger summary ([acad86d](https://github.com/punya199/demo-app/commit/acad86d1662f4ff3b6877f3eaf8e1e8744317713))
+
 ## [1.6.35](https://github.com/punya199/demo-app/compare/v1.6.34...v1.6.35) (2026-08-22)
 
 

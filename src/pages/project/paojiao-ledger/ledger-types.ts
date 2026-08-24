@@ -21,6 +21,7 @@ export interface LedgerRound {
 
 export interface LedgerWithdrawal {
   who: LedgerPerson
+  row: number
   date: string
   bank: number
   cash: number
@@ -28,8 +29,13 @@ export interface LedgerWithdrawal {
 }
 
 export interface LedgerWage {
+  row: number
   date: string
   amount: number
+  // Local-only marker for an optimistic add not yet confirmed persisted - never present on data
+  // that came from the API. Lets removeExtraWage find and clear this exact entry once the
+  // backend confirms it, the same way LedgerEntry's `id` does for extraEntries.
+  tempId?: number
 }
 
 export interface LedgerOpening {

@@ -1,6 +1,7 @@
 import { message } from 'antd'
 import dayjs from 'dayjs'
-import { CSSProperties, useMemo, useState } from 'react'
+import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
+import { MdFilterAltOff } from 'react-icons/md'
 import {
   filterEntriesByItems,
   filterEntriesByMonth,
@@ -13,11 +14,12 @@ import { fmtFull, THB } from './ledger-format'
 import { LedgerDatePicker } from './LedgerDatePicker'
 import { LedgerItemEditorModal } from './LedgerItemEditorModal'
 import { LedgerItemSelect } from './LedgerItemSelect'
+import { RoundCelebration } from './RoundCelebration'
 import { useAddLedgerEntry, useDeleteLedgerEntry, useEditLedgerEntry } from './ledger-query'
 import { ledgerColor, ledgerFont } from './ledger-tokens'
 import { LedgerEntry, LedgerEntryDirection } from './ledger-types'
 import { useLedgerStore } from './ledger-store'
-import { LedgerCard, LedgerField, LedgerH1 } from './ledger-ui'
+import { LedgerCard, LedgerEmptyState, LedgerField, LedgerH1 } from './ledger-ui'
 import {
   ledgerInputStyle,
   ledgerMonoInputStyle,
@@ -77,6 +79,25 @@ const PageLedgerEntries = () => {
   const [itemFilter, setItemFilter] = useState<Set<string>>(new Set())
   const [editingEntry, setEditingEntry] = useState<LedgerEntry | null>(null)
   const [managingItems, setManagingItems] = useState(false)
+  const [celebrateProfit, setCelebrateProfit] = useState<number | null>(null)
+
+  // Fires the celebration when a fresh round shows up in refetched data with profit > 0 - not
+  // inside handleSubmit's onSuccess, since that fires before the invalidated query has actually
+  // refetched, so base.rounds there would still be the stale pre-add list. null on the first run
+  // means "just mounted", not "a round closed" - it only compares against a real previous count.
+  const prevRoundsCountRef = useRef<number | null>(null)
+  useEffect(() => {
+    const count = base.rounds.length
+    if (prevRoundsCountRef.current === null) {
+      prevRoundsCountRef.current = count
+      return
+    }
+    if (count > prevRoundsCountRef.current) {
+      const newest = base.rounds[base.rounds.length - 1]
+      if (newest && newest.profit > 0) setCelebrateProfit(newest.profit)
+    }
+    prevRoundsCountRef.current = count
+  }, [base.rounds])
 
   const monthChips = useMemo(() => getMonthChips(base.entries), [base.entries])
   // Chip list is built from all entries, not the month-filtered subset, so the row of item pills
@@ -257,38 +278,40 @@ const PageLedgerEntries = () => {
         </div>
       </LedgerCard>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        {monthChips.map((m) => (
-          <button
-            key={m.key}
-            type="button"
-            onClick={() => setMonth(m.key)}
-            style={ledgerPillStyle(month === m.key)}
-          >
-            {m.label}
-          </button>
-        ))}
-      </div>
+      <LedgerCard style={{ gap: 12 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          {monthChips.map((m) => (
+            <button
+              key={m.key}
+              type="button"
+              onClick={() => setMonth(m.key)}
+              style={ledgerPillStyle(month === m.key)}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        <button
-          type="button"
-          onClick={() => setItemFilter(new Set())}
-          style={ledgerPillStyle(itemFilter.size === 0)}
-        >
-          ทุกรายการ
-        </button>
-        {itemChips.map((item) => (
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <button
-            key={item}
             type="button"
-            onClick={() => toggleItemFilter(item)}
-            style={ledgerPillStyle(itemFilter.has(item))}
+            onClick={() => setItemFilter(new Set())}
+            style={ledgerPillStyle(itemFilter.size === 0)}
           >
-            {item}
+            ทุกรายการ
           </button>
-        ))}
-      </div>
+          {itemChips.map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => toggleItemFilter(item)}
+              style={ledgerPillStyle(itemFilter.has(item))}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </LedgerCard>
 
       <section style={{ ...LedgerCardOverflowStyle }}>
         <div className="paojiao-ledger-table-desktop">
@@ -313,6 +336,17 @@ const PageLedgerEntries = () => {
             <span>หมายเหตุ</span>
             <span style={{ textAlign: 'center' }}>จัดการ</span>
           </div>
+          {visible.length === 0 && (
+            <LedgerEmptyState
+              icon={MdFilterAltOff}
+              title="ไม่พบรายการ"
+              subtitle={
+                base.entries.length === 0
+                  ? 'ยังไม่มีรายการบันทึกไว้'
+                  : 'ลองเปลี่ยนเดือนหรือหมวดหมู่ที่เลือกไว้ดูนะ'
+              }
+            />
+          )}
           {visible.map((e, i) => {
             const vIn = e.inCash + e.inBank
             const vOut = e.outCash + e.outBank
@@ -436,6 +470,17 @@ const PageLedgerEntries = () => {
         </div>
 
         <div className="paojiao-ledger-table-mobile" style={{ display: 'none' }}>
+          {visible.length === 0 && (
+            <LedgerEmptyState
+              icon={MdFilterAltOff}
+              title="ไม่พบรายการ"
+              subtitle={
+                base.entries.length === 0
+                  ? 'ยังไม่มีรายการบันทึกไว้'
+                  : 'ลองเปลี่ยนเดือนหรือหมวดหมู่ที่เลือกไว้ดูนะ'
+              }
+            />
+          )}
           {visible.map((e, i) => {
             // Usually exactly one of these four is non-zero, but a cash<->bank transfer entry
             // (e.g. "ถอนเงิน") can have both an in and an out side at once - show every side
@@ -561,19 +606,26 @@ const PageLedgerEntries = () => {
           .paojiao-ledger-table-mobile {
             display: block !important;
           }
-          /* Not enough room for a single row of 4 pills plus the button on a narrow phone -
-             below this width the pills fold into a 2x2 grid and the button drops to its own
-             full-width row. iPad and up (>= this breakpoint) keeps everything on one row. */
+          /* Not enough room for the button alongside the pills on a narrow phone - below this
+             width the button drops to its own full-width row below the pills. iPad and up (>=
+             this breakpoint) keeps everything on one row. */
           .paojiao-ledger-dir-row {
             flex-direction: column !important;
           }
           .paojiao-ledger-pills-grid {
             display: grid !important;
-            grid-template-columns: repeat(2, max-content) !important;
+            grid-template-columns: repeat(4, max-content) !important;
           }
           .paojiao-ledger-submit-btn {
             width: 100% !important;
             margin-left: 0 !important;
+          }
+        }
+        /* The 4 pills alone (button already on its own row from the rule above) still don't fit
+           one row below this width - fold them into a 2x2 grid here instead. */
+        @media (max-width: 500px) {
+          .paojiao-ledger-pills-grid {
+            grid-template-columns: repeat(2, max-content) !important;
           }
         }
       `}</style>
@@ -590,6 +642,8 @@ const PageLedgerEntries = () => {
       />
 
       <LedgerItemEditorModal open={managingItems} onClose={() => setManagingItems(false)} />
+
+      <RoundCelebration profit={celebrateProfit} onDone={() => setCelebrateProfit(null)} />
     </div>
   )
 }

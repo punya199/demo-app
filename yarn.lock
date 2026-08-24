@@ -7313,6 +7313,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"modern-screenshot@npm:^4.7.0":
+  version: 4.7.0
+  resolution: "modern-screenshot@npm:4.7.0"
+  checksum: 10c0/9c5fbe4f4c73d3dcf0ba7fb76c1671ad148fdedffc84700e0b8ca1c1640a6ab1930718ae1424b0a6517b98d8f18c898ea0e62ee0ca57a25bfce7b914df721a63
+  languageName: node
+  linkType: hard
+
 "motion-dom@npm:^12.23.12":
   version: 12.23.12
   resolution: "motion-dom@npm:12.23.12"
@@ -10473,6 +10480,7 @@ __metadata:
     jsdom: "npm:^30.0.1"
     lint-staged: "npm:^15.2.2"
     lodash: "npm:^4.17.21"
+    modern-screenshot: "npm:^4.7.0"
     motion: "npm:^12.23.12"
     postcss: "npm:^8.5.3"
     prettier: "npm:^3.6.2"

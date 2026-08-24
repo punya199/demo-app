@@ -1,14 +1,20 @@
 import { message } from 'antd'
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
+import { MdSavings } from 'react-icons/md'
 import { computeShares } from './ledger-calculations'
 import { useLedgerContext } from './ledger-context'
+import { EditWithdrawalFormValues, EditWithdrawalModal } from './EditWithdrawalModal'
 import { LedgerDatePicker } from './LedgerDatePicker'
 import { THB, thbSigned } from './ledger-format'
-import { useAddLedgerWithdrawal } from './ledger-query'
+import {
+  useAddLedgerWithdrawal,
+  useDeleteLedgerWithdrawal,
+  useEditLedgerWithdrawal,
+} from './ledger-query'
 import { ledgerColor, ledgerFont } from './ledger-tokens'
 import { useLedgerStore } from './ledger-store'
-import { LedgerCard, LedgerField, LedgerH1 } from './ledger-ui'
+import { LedgerCard, LedgerEmptyState, LedgerField, LedgerH1 } from './ledger-ui'
 import {
   ledgerCardStyle,
   ledgerFieldLabelStyle,
@@ -17,7 +23,17 @@ import {
   ledgerPillStyle,
   ledgerPrimaryButtonStyle,
 } from './ledger-ui-styles'
-import { LedgerPerson } from './ledger-types'
+import { LedgerPerson, LedgerWithdrawal } from './ledger-types'
+
+const rowActionStyle = {
+  border: 'none',
+  background: 'none',
+  color: ledgerColor.textFaint,
+  fontSize: 12,
+  fontFamily: ledgerFont.sans,
+  cursor: 'pointer',
+  padding: '2px 4px',
+}
 
 // This page shows large baht totals where cents aren't meaningful to the user - round to whole
 // baht for every figure here (same convention as PageLedgerSummary).
@@ -37,12 +53,15 @@ const PageLedgerShare = () => {
   const ratio = useLedgerStore((s) => s.ratio)
   const setRatio = useLedgerStore((s) => s.setRatio)
   const addWithdrawal = useAddLedgerWithdrawal()
+  const editWithdrawal = useEditLedgerWithdrawal()
+  const deleteWithdrawal = useDeleteLedgerWithdrawal()
 
   const [fWho, setFWho] = useState<LedgerPerson>(PEOPLE[0])
   const [fDate, setFDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [fType, setFType] = useState<'cash' | 'bank'>('bank')
   const [fAmount, setFAmount] = useState('')
   const [fNote, setFNote] = useState('')
+  const [editingWithdrawal, setEditingWithdrawal] = useState<LedgerWithdrawal | null>(null)
 
   const people = useMemo(
     () => computeShares(data, base.profitAll, ratio),
@@ -73,6 +92,26 @@ const PageLedgerShare = () => {
           message.success(`บันทึกการถอนแล้ว · ${THB(amount)} บาท`)
         },
         onError: () => message.error('บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง'),
+      }
+    )
+  }
+
+  const handleEditWithdrawalSave = (who: string, row: number, values: EditWithdrawalFormValues) => {
+    editWithdrawal.mutate(
+      { who, row, withdrawal: values },
+      {
+        onSuccess: () => message.success(`แก้ไขแล้ว · ${THB(values.cash + values.bank)} บาท`),
+        onError: () => message.error('แก้ไขไม่สำเร็จ ลองใหม่อีกครั้ง'),
+      }
+    )
+  }
+
+  const handleDeleteWithdrawal = (who: string, row: number) => {
+    deleteWithdrawal.mutate(
+      { who: who as LedgerPerson, row },
+      {
+        onSuccess: () => message.success('ลบรายการถอนแล้ว'),
+        onError: () => message.error('ลบไม่สำเร็จ ลองใหม่อีกครั้ง'),
       }
     )
   }
@@ -252,7 +291,10 @@ const PageLedgerShare = () => {
         </div>
       </LedgerCard>
 
-      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+      <section
+        className="paojiao-ledger-share-person-grid"
+        style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}
+      >
         {people.map((p) => (
           <div key={p.name} style={{ ...ledgerCardStyle, overflow: 'hidden' }}>
             <div
@@ -271,14 +313,25 @@ const PageLedgerShare = () => {
                 <span style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{p.ratioPct}%</span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <span style={{ fontSize: 12, color: ledgerColor.textMuted }}>ส่วนแบ่ง</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
+                  <span
+                    style={{ fontSize: 12, color: ledgerColor.textMuted, whiteSpace: 'nowrap' }}
+                  >
+                    ส่วนแบ่ง
+                  </span>
                   <span style={{ fontFamily: ledgerFont.mono, fontSize: 24, fontWeight: 600 }}>
                     {THB0(p.share)}
                   </span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <span style={{ fontSize: 12, color: ledgerColor.textMuted, textAlign: 'right' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: ledgerColor.textMuted,
+                      textAlign: 'right',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
                     ถอนไปแล้ว
                   </span>
                   <span
@@ -337,12 +390,20 @@ const PageLedgerShare = () => {
                   display: 'flex',
                   alignItems: 'baseline',
                   justifyContent: 'space-between',
+                  gap: 10,
                   padding: '10px 14px',
                   borderRadius: 10,
                   background: p.left < 0 ? '#FBEAEA' : '#EAF5EE',
                 }}
               >
-                <span style={{ fontSize: 13, fontWeight: 600, color: ledgerColor.textSecondary }}>
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: ledgerColor.textSecondary,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   ถอนได้อีก
                 </span>
                 <span
@@ -350,6 +411,7 @@ const PageLedgerShare = () => {
                     fontFamily: ledgerFont.mono,
                     fontSize: 26,
                     fontWeight: 700,
+                    whiteSpace: 'nowrap',
                     color: p.left < 0 ? ledgerColor.moneyOut : ledgerColor.moneyIn,
                   }}
                 >
@@ -369,38 +431,76 @@ const PageLedgerShare = () => {
                 ประวัติการถอน
               </div>
               {p.rows.length === 0 ? (
-                <div style={{ fontSize: 12.5, color: ledgerColor.textFaint, padding: '7px 0' }}>
-                  ยังไม่มีรายการถอน
-                </div>
+                <LedgerEmptyState
+                  compact
+                  icon={MdSavings}
+                  title="ยังไม่มีรายการถอน"
+                  subtitle="ถอนครั้งแรกจะขึ้นตรงนี้"
+                />
               ) : (
-                p.rows.map((w, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '72px 1fr auto',
-                      gap: 10,
-                      padding: '7px 0',
-                      borderBottom: `1px solid ${ledgerColor.rowDivider}`,
-                      alignItems: 'center',
-                    }}
-                  >
-                    <span
+                // Capped to roughly 5 rows (~34px each) - a long history otherwise grew this card
+                // taller than the whole rest of the page. Newest-first sort (see computeShares)
+                // means the 5 visible without scrolling are always the most recent.
+                <div style={{ maxHeight: 172, overflowY: 'auto', minWidth: 0 }}>
+                  {p.rows.map((w, i) => (
+                    <div
+                      key={i}
                       style={{
-                        fontFamily: ledgerFont.mono,
-                        fontSize: 13,
-                        color: ledgerColor.textMuted,
-                        whiteSpace: 'nowrap',
+                        display: 'grid',
+                        gridTemplateColumns: '72px minmax(0, 1fr) auto auto',
+                        gap: 10,
+                        padding: '7px 0',
+                        borderBottom: `1px solid ${ledgerColor.rowDivider}`,
+                        alignItems: 'center',
                       }}
                     >
-                      {w.dateText}
-                    </span>
-                    <span style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{w.label}</span>
-                    <span style={{ fontFamily: ledgerFont.mono, fontSize: 14, fontWeight: 500 }}>
-                      {THB(w.amount)}
-                    </span>
-                  </div>
-                ))
+                      <span
+                        style={{
+                          fontFamily: ledgerFont.mono,
+                          fontSize: 13,
+                          color: ledgerColor.textMuted,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {w.dateText}
+                      </span>
+                      {/* Truncate with an ellipsis, not wrap - a longer note (or a long free-typed
+                          one, like a stray test entry) wrapping mid-syllable read as broken text
+                          rather than a note that's simply too long for the row (same fix as the
+                          entries table's item-name column uses). */}
+                      <span
+                        style={{
+                          fontSize: 12.5,
+                          color: ledgerColor.textFaint,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                        title={w.label}
+                      >
+                        {w.label}
+                      </span>
+                      <span style={{ fontFamily: ledgerFont.mono, fontSize: 14, fontWeight: 500 }}>
+                        {THB(w.amount)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          // p.rows is a display-only projection (dateText/label, no raw
+                          // date/cash/bank/note) - look the full record back up by row for the
+                          // edit form, which needs those raw fields.
+                          const raw = data.withdrawals.find(
+                            (x) => x.who === p.name && x.row === w.row
+                          )
+                          if (raw) setEditingWithdrawal(raw)
+                        }}
+                        style={rowActionStyle}
+                      >
+                        แก้ไข
+                      </button>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
@@ -419,7 +519,25 @@ const PageLedgerShare = () => {
             grid-template-columns: 1fr 1fr !important;
           }
         }
+        /* The two person cards never had a narrow-screen fallback at all - always 2 columns, so
+           on a phone each card was squeezed to roughly half the already-narrow viewport, wrapping
+           short labels like "ถอนได้อีก" onto 3 lines and clipping others outright. Stacking to
+           one column below the same breakpoint the shell uses for its own sidebar/bottom-nav
+           switch gives each card the full content width instead. */
+        @media (max-width: 768px) {
+          .paojiao-ledger-share-person-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
       `}</style>
+
+      <EditWithdrawalModal
+        open={editingWithdrawal !== null}
+        withdrawal={editingWithdrawal}
+        onSave={handleEditWithdrawalSave}
+        onClose={() => setEditingWithdrawal(null)}
+        onDelete={handleDeleteWithdrawal}
+      />
     </div>
   )
 }

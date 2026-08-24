@@ -87,8 +87,8 @@ const fixture: LedgerData = {
     { date: '2026-01-05', fromRow: 1, toRow: 2, profit: 700 },
     { date: '2026-01-10', fromRow: 3, toRow: 4, profit: 1500 },
   ],
-  withdrawals: [{ who: 'น้าปุ้ม', date: '2026-01-12', bank: 200, cash: 0, note: '' }],
-  wages: [{ date: '2026-01-01', amount: 100 }],
+  withdrawals: [{ who: 'น้าปุ้ม', row: 5, date: '2026-01-12', bank: 200, cash: 0, note: '' }],
+  wages: [{ row: 5, date: '2026-01-01', amount: 100 }],
   items: ['ขาย', 'ซื้อ', 'ค่าแรงยายปิ่น'],
 }
 
@@ -494,9 +494,10 @@ describe('computeShares', () => {
 
 describe('computeWageTotals', () => {
   it('sums unpaid wage entries and what has actually been paid out', () => {
-    const { wagePaid, wageTotal } = computeWageTotals(fixture.entries, fixture.wages)
+    const { wagePaid, wageTotal, wageUnpaid } = computeWageTotals(fixture.entries, fixture.wages)
 
     expect(wagePaid).toBe(200) // entry 5's out amounts
     expect(wageTotal).toBe(100)
+    expect(wageUnpaid).toBe(-100) // already paid out more than what's logged as earned
   })
 })

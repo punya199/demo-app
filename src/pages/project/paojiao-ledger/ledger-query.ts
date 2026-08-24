@@ -26,21 +26,76 @@ export const useAddLedgerEntry = () => {
   })
 }
 
+type AddLedgerWagePayload = Omit<LedgerWage, 'row'>
+
 export const useAddLedgerWage = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (wage: LedgerWage) => {
+    mutationFn: async (wage: AddLedgerWagePayload) => {
       await apiClient.post('/paojiao-ledger/wages', wage)
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: LEDGER_QUERY_KEY }),
   })
 }
 
+export const useEditLedgerWage = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ row, wage }: { row: number; wage: AddLedgerWagePayload }) => {
+      await apiClient.put(`/paojiao-ledger/wages/${row}`, wage)
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: LEDGER_QUERY_KEY }),
+  })
+}
+
+export const useDeleteLedgerWage = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (row: number) => {
+      await apiClient.delete(`/paojiao-ledger/wages/${row}`)
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: LEDGER_QUERY_KEY }),
+  })
+}
+
+type AddLedgerWithdrawalPayload = Omit<LedgerWithdrawal, 'row'>
+
 export const useAddLedgerWithdrawal = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (withdrawal: LedgerWithdrawal) => {
+    mutationFn: async (withdrawal: AddLedgerWithdrawalPayload) => {
       await apiClient.post('/paojiao-ledger/withdrawals', withdrawal)
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: LEDGER_QUERY_KEY }),
+  })
+}
+
+export const useEditLedgerWithdrawal = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      who,
+      row,
+      withdrawal,
+    }: {
+      who: string
+      row: number
+      withdrawal: Omit<AddLedgerWithdrawalPayload, 'who'>
+    }) => {
+      await apiClient.put(
+        `/paojiao-ledger/withdrawals/${encodeURIComponent(who)}/${row}`,
+        withdrawal
+      )
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: LEDGER_QUERY_KEY }),
+  })
+}
+
+export const useDeleteLedgerWithdrawal = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ who, row }: { who: string; row: number }) => {
+      await apiClient.delete(`/paojiao-ledger/withdrawals/${encodeURIComponent(who)}/${row}`)
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: LEDGER_QUERY_KEY }),
   })

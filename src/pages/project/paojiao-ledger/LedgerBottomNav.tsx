@@ -39,6 +39,7 @@ export const LedgerBottomNav = () => {
         left: 0,
         right: 0,
         bottom: 0,
+        height: 70,
         display: 'none',
         background: ledgerColor.darkSurface,
         borderTop: `1px solid ${ledgerColor.darkDivider}`,

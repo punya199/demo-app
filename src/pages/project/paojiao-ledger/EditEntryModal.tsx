@@ -111,6 +111,7 @@ export const EditEntryModal = ({
             cancelText="ยกเลิก"
             okButtonProps={{ danger: true }}
             onConfirm={handleDelete}
+            styles={{ root: { width: 280 } }}
           >
             <Button danger>ลบ</Button>
           </Popconfirm>

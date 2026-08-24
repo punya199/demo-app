@@ -327,6 +327,7 @@ export const filterEntriesByItems = (entries: LedgerEntry[], items: ReadonlySet<
   items.size === 0 ? entries : entries.filter((e) => items.has(e.item))
 
 export interface WithdrawalRow {
+  row: number
   dateText: string
   label: string
   amount: number
@@ -369,12 +370,14 @@ export const computeShares = (
       // The opening/carried-forward balance is already folded into `taken` above - it isn't a
       // withdrawal that happened on the live sheet, so it doesn't belong in this history list
       // (there's no "ยกมา" row here the way there used to be).
-      // Sorted by date, not sheet row order - a withdrawal logged out of date order (e.g. a
-      // backdated entry, or one typed straight into the sheet) would otherwise show up wherever
-      // its row happens to sit rather than where it belongs chronologically.
+      // Sorted by date (newest first), not sheet row order - a withdrawal logged out of date
+      // order (e.g. a backdated entry, or one typed straight into the sheet) would otherwise show
+      // up wherever its row happens to sit rather than where it belongs chronologically. Newest
+      // first so the most recent entries are the ones visible before the list needs to scroll.
       rows: [...rows]
-        .sort((a, b) => a.date.localeCompare(b.date))
+        .sort((a, b) => b.date.localeCompare(a.date))
         .map((w) => ({
+          row: w.row,
           dateText: fmtShort(w.date),
           label: w.note || (w.bank ? 'โอน' : 'เงินสด'),
           amount: w.cash + w.bank,
@@ -386,5 +389,9 @@ export const computeShares = (
 export const computeWageTotals = (entries: LedgerEntry[], allWages: { amount: number }[]) => {
   const wagePaid = sum(entries, (e) => (e.item === 'ค่าแรงยายปิ่น' ? e.outCash + e.outBank : 0))
   const wageTotal = sum(allWages, (w) => w.amount)
-  return { wagePaid, wageTotal }
+  // What's still owed - the wage table logs what's earned per day worked, separately from
+  // wagePaid (actual cash handed over, recorded as its own ledger entry), so the "not yet paid"
+  // figure has to net one against the other rather than just showing the raw logged total.
+  const wageUnpaid = wageTotal - wagePaid
+  return { wagePaid, wageTotal, wageUnpaid }
 }

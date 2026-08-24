@@ -1,4 +1,6 @@
-import { useMemo, useState } from 'react'
+import { message } from 'antd'
+import { useMemo, useRef, useState } from 'react'
+import { MdDownload, MdShowChart, MdStorefront } from 'react-icons/md'
 import {
   ChartLayout,
   computeChartLayout,
@@ -10,10 +12,11 @@ import {
   RevenueBreakdownView,
 } from './ledger-calculations'
 import { useLedgerContext } from './ledger-context'
-import { thbSigned, THB } from './ledger-format'
+import { fmtFull, thbSigned, THB } from './ledger-format'
+import { saveElementAsImage } from './ledger-save-image'
 import { ledgerColor, ledgerFont } from './ledger-tokens'
 import { LedgerData, LedgerEntry, LedgerRound, LedgerSummaryPeriod } from './ledger-types'
-import { LedgerH1 } from './ledger-ui'
+import { LedgerEmptyState, LedgerH1 } from './ledger-ui'
 import { ledgerCardStyle, ledgerPillStyle } from './ledger-ui-styles'
 import { RoundDetailModal } from './RoundDetailModal'
 
@@ -104,19 +107,136 @@ const ROUND_SUMMARY_RESPONSIVE_STYLES = `
 }
 `
 
+// Every rule above keys off the browser's actual viewport width, not this card's own width - so
+// saving an image gets a different look depending on whatever screen the button happened to be
+// pressed on (see handleSaveImage's toggling of this class). This locks the export to always look
+// like the narrow/stacked tier, which is a deliberate choice - it fits the export width chosen
+// below and, unlike the wide (>=1060px) tier, never needs the two columns sitting side by side.
+// !important on every property here: the >=1060px tier isn't @media-gated by width once this
+// class is on (only by the real viewport, which the export capture can't control), so it can still
+// be "active" underneath and would otherwise win on the specificity tie against the mobile-only
+// !important grid rule above.
+const EXPORT_MODE_WIDTH = 560
+const EXPORT_MODE_STYLES = `
+.paojiao-ledger-export-mode {
+  width: ${EXPORT_MODE_WIDTH}px !important;
+}
+.paojiao-ledger-export-mode .paojiao-ledger-round-summary-row {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+}
+.paojiao-ledger-export-mode .paojiao-ledger-round-profit-value {
+  font-size: 56px !important;
+}
+.paojiao-ledger-export-mode .paojiao-ledger-round-figure-label {
+  font-size: 12.5px !important;
+}
+.paojiao-ledger-export-mode .paojiao-ledger-round-figure-value {
+  font-size: 20px !important;
+}
+.paojiao-ledger-export-mode .paojiao-ledger-stats-grid {
+  grid-template-columns: 1fr !important;
+}
+/* The real bug behind a figure (e.g. "เฉลี่ยต่อวัน") rendering outside its own card: when it wraps
+   to a second line during capture, the capture library mis-places the wrapped part outside its
+   flex parent instead of stacking it below the first line - a capture-only rendering bug, not a
+   real overflow (it fits fine unwrapped on screen at this width). Forcing a single line sidesteps
+   it. EXPORT_MODE_WIDTH has enough margin over what it actually needs so this holds even if
+   capture-time font metrics run a bit wider than what the live page measures (an earlier,
+   narrower width had no such margin, which is what let this surface in the first place). */
+.paojiao-ledger-export-mode .paojiao-ledger-figures-row {
+  flex-wrap: nowrap !important;
+}
+/* Dropped from the export entirely rather than fixed in place - not worth carrying the same
+   wrap-related capture bug for a note that's only really useful in-app anyway. */
+.paojiao-ledger-export-mode .paojiao-ledger-period-note {
+  display: none !important;
+}
+/* Same "force a single line rather than trust it fits" reasoning as the figures row above - a
+   chart title (e.g. "กำไรแต่ละรอบขายน้ำมัน") was wrapping onto a second line during capture even
+   with the width this class sets, room to spare on screen. */
+.paojiao-ledger-export-mode .paojiao-ledger-chart-title {
+  white-space: nowrap !important;
+}
+/* The round's line-item breakdown only ever needs to exist for the saved image (see
+   lastRoundRows in SummaryPeriodContent) - display:none keeps it out of the live page's normal
+   flow entirely rather than just visually hiding it, so it costs nothing when not exporting. */
+.paojiao-ledger-export-only {
+  display: none;
+}
+.paojiao-ledger-export-mode .paojiao-ledger-export-only {
+  display: block !important;
+}
+/* Opposite of export-only - stays visible on the live page but is dropped from the saved image
+   (used on the กำไรทั้งหมด/เงินสด+บัญชี stat cards, which are less relevant once the round's own
+   profit figure and line items are already in the image). */
+.paojiao-ledger-export-mode .paojiao-ledger-export-hide {
+  display: none !important;
+}
+`
+
 const PageLedgerSummary = () => {
   const { data, base } = useLedgerContext()
   const [period, setPeriod] = useState<LedgerSummaryPeriod>('round')
   const [selectedRound, setSelectedRound] = useState<LedgerRound | null>(null)
+  const [savingImage, setSavingImage] = useState(false)
+  const captureRef = useRef<HTMLDivElement>(null)
+
+  const handleSaveImage = async () => {
+    if (!captureRef.current || savingImage) return
+    setSavingImage(true)
+    // Locks the export to always look the same regardless of the actual screen it's saved from -
+    // see EXPORT_MODE_STYLES above for why a CSS class (not a JS style override) is what does that.
+    captureRef.current.classList.add('paojiao-ledger-export-mode')
+    // Forces the browser to commit that class's layout changes before the capture reads the DOM -
+    // without this, the capture could run against a layout still mid-reflow from the class just
+    // being added, which is exactly the kind of stale-geometry read that produced the "เฉลี่ยต่อวัน
+    // renders outside the card" bug in the first place.
+    void captureRef.current.offsetHeight
+    try {
+      await saveElementAsImage(captureRef.current, `เจ้ปุ้ม-สรุปเงิน-${period}.png`)
+    } catch {
+      message.error('บันทึกรูปภาพไม่สำเร็จ ลองใหม่อีกครั้ง')
+    } finally {
+      captureRef.current.classList.remove('paojiao-ledger-export-mode')
+      setSavingImage(false)
+    }
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 26 }}>
-      <style>{FADE_IN_KEYFRAMES + ROUND_SUMMARY_RESPONSIVE_STYLES}</style>
-      <LedgerH1>สรุปเงิน</LedgerH1>
+      <style>{FADE_IN_KEYFRAMES + ROUND_SUMMARY_RESPONSIVE_STYLES + EXPORT_MODE_STYLES}</style>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 12,
+        }}
+      >
+        <LedgerH1>สรุปเงิน</LedgerH1>
+        <button
+          type="button"
+          onClick={handleSaveImage}
+          disabled={savingImage}
+          style={{
+            ...ledgerPillStyle(false),
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            opacity: savingImage ? 0.6 : 1,
+          }}
+        >
+          <MdDownload size={15} />
+          {savingImage ? 'กำลังบันทึก...' : 'บันทึกเป็นรูปภาพ'}
+        </button>
+      </div>
       <PeriodPills period={period} onSelectPeriod={setPeriod} />
 
       <div
         key={period}
+        ref={captureRef}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -213,7 +333,7 @@ const BarChartCard = ({
   onBarClick,
 }: {
   title: string
-  legend: string
+  legend?: string
   chart: ChartLayout
   onBarClick?: (index: number) => void
 }) => {
@@ -235,8 +355,10 @@ const BarChartCard = ({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 15, fontWeight: 600 }}>{title}</span>
-        <span style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{legend}</span>
+        <span className="paojiao-ledger-chart-title" style={{ fontSize: 15, fontWeight: 600 }}>
+          {title}
+        </span>
+        {legend && <span style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{legend}</span>}
       </div>
       {/* Same direction:rtl/ltr pairing as LineChartCard - scrolls to the newest (rightmost) bars
         by default, with no JS/timing needed. Two things this needs that the first attempt
@@ -416,7 +538,9 @@ const LineChartCard = ({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 15, fontWeight: 600 }}>{title}</span>
+        <span className="paojiao-ledger-chart-title" style={{ fontSize: 15, fontWeight: 600 }}>
+          {title}
+        </span>
         <span style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{legend}</span>
       </div>
       {/* Points run oldest-to-newest left-to-right, so the most recent sale is off the right
@@ -533,7 +657,10 @@ const VendorSpendContent = ({
             <span style={{ fontSize: 18, color: ledgerColor.textMuted }}>บาท</span>
           </span>
         </div>
-        <div style={{ display: 'flex', gap: 34, flexWrap: 'wrap', paddingTop: 4 }}>
+        <div
+          className="paojiao-ledger-figures-row"
+          style={{ display: 'flex', gap: 34, flexWrap: 'wrap', paddingTop: 4 }}
+        >
           {[
             { label: 'จำนวนผู้ขาย', value: String(view.rows.length) },
             { label: 'เฉลี่ยต่อวัน', value: THB0(view.totalOut / perDayDivisor) },
@@ -570,7 +697,12 @@ const VendorSpendContent = ({
         </div>
 
         {view.rows.length === 0 && (
-          <div style={{ fontSize: 13.5, color: ledgerColor.textFaint }}>ไม่มีรายจ่ายในช่วงนี้</div>
+          <LedgerEmptyState
+            compact
+            icon={MdStorefront}
+            title="ไม่มีรายจ่ายในช่วงนี้"
+            subtitle="ลองดูช่วงเวลาอื่นดูนะ"
+          />
         )}
 
         {view.rows.map((row) => (
@@ -672,7 +804,10 @@ const RevenueContent = ({
             <span style={{ fontSize: 18, color: ledgerColor.textMuted }}>บาท</span>
           </span>
         </div>
-        <div style={{ display: 'flex', gap: 34, flexWrap: 'wrap', paddingTop: 4 }}>
+        <div
+          className="paojiao-ledger-figures-row"
+          style={{ display: 'flex', gap: 34, flexWrap: 'wrap', paddingTop: 4 }}
+        >
           {[
             { label: countLabel, value: String(view.count) },
             { label: perLabel, value: THB0(view.perAverage) },
@@ -695,15 +830,12 @@ const RevenueContent = ({
       </section>
 
       {view.bars.length === 0 ? (
-        <section
-          style={{
-            ...ledgerCardStyle,
-            padding: '24px 26px',
-            fontSize: 13.5,
-            color: ledgerColor.textFaint,
-          }}
-        >
-          ยังไม่มีข้อมูล
+        <section style={{ ...ledgerCardStyle }}>
+          <LedgerEmptyState
+            icon={MdShowChart}
+            title="ยังไม่มีข้อมูล"
+            subtitle="ข้อมูลจะขึ้นที่นี่เมื่อมีรายการขาย"
+          />
         </section>
       ) : chartType === 'line' ? (
         <LineChartCard title={chartTitle} legend="เขียว = ยอดขาย" bars={view.bars} />
@@ -746,6 +878,20 @@ const SummaryPeriodContent = ({
 
   const isLoss = view.periodProfit < 0
   const verdictColor = isLoss ? ledgerColor.moneyOut : ledgerColor.moneyIn
+
+  // Only meaningful for 'round' - it's the one tab with a single unambiguous "the round" ('all'/
+  // 'month' cover several at once). Hidden on the live page (see .paojiao-ledger-export-only in
+  // EXPORT_MODE_STYLES) - shown only in the saved image, appended after everything else, so
+  // someone sharing the round's headline profit figure can also hand over its line-item backup
+  // without a second export/round-detail step.
+  const lastRound = period === 'round' ? rounds[rounds.length - 1] : undefined
+  const lastRoundRows = useMemo(
+    () =>
+      lastRound
+        ? entries.filter((e) => e.row >= lastRound.fromRow && e.row <= lastRound.toRow)
+        : [],
+    [entries, lastRound]
+  )
 
   const figures: { label: string; value: string; color: string }[] = [
     { label: 'เงินได้', value: THB0(view.periodIn), color: ledgerColor.moneyIn },
@@ -794,7 +940,10 @@ const SummaryPeriodContent = ({
             <span style={{ fontSize: 18, color: ledgerColor.textMuted }}>บาท</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ display: 'flex', gap: 34, flexWrap: 'wrap' }}>
+            <div
+              className="paojiao-ledger-figures-row"
+              style={{ display: 'flex', gap: 34, flexWrap: 'wrap' }}
+            >
               {figures.map((f) => (
                 <div key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <span
@@ -817,7 +966,12 @@ const SummaryPeriodContent = ({
               ))}
             </div>
             {view.periodNote && (
-              <div style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{view.periodNote}</div>
+              <div
+                className="paojiao-ledger-period-note"
+                style={{ fontSize: 12.5, color: ledgerColor.textFaint }}
+              >
+                {view.periodNote}
+              </div>
             )}
           </div>
         </div>
@@ -825,7 +979,6 @@ const SummaryPeriodContent = ({
 
       <BarChartCard
         title={view.chartTitle}
-        legend="เขียว = กำไร · แดง = ขาดทุน"
         chart={chart}
         // Bars are one-per-round only for 'round'/'all' - 'month' aggregates several rounds into
         // each bar, so there's no single round to open there.
@@ -841,12 +994,13 @@ const SummaryPeriodContent = ({
         style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}
       >
         {[
-          { label: 'กำไรทั้งหมด (รวมยอดยกมา)', value: THB0(profitAll) },
-          { label: 'เงินสด + บัญชี วันนี้', value: THB0(onHand) },
-          { label: 'รอบขายน้ำมัน', value: String(rounds.length) },
+          { label: 'กำไรทั้งหมด (รวมยอดยกมา)', value: THB0(profitAll), hideInExport: true },
+          { label: 'เงินสด + บัญชี วันนี้', value: THB0(onHand), hideInExport: true },
+          { label: 'รอบขายน้ำมัน', value: String(rounds.length), hideInExport: true },
         ].map((s) => (
           <div
             key={s.label}
+            className={s.hideInExport ? 'paojiao-ledger-export-hide' : undefined}
             style={{
               ...ledgerCardStyle,
               padding: '20px 22px',
@@ -862,6 +1016,66 @@ const SummaryPeriodContent = ({
           </div>
         ))}
       </section>
+
+      {lastRound && (
+        <section className="paojiao-ledger-export-only" style={{ ...ledgerCardStyle }}>
+          <div
+            style={{
+              padding: '20px 22px 8px',
+              fontSize: 13,
+              fontWeight: 600,
+              color: ledgerColor.textMuted,
+            }}
+          >
+            {`รายการในรอบ · ${lastRoundRows.length} รายการ · แถว ${lastRound.fromRow}-${lastRound.toRow}`}
+          </div>
+          {lastRoundRows.map((e) => {
+            const inAmount = e.inCash + e.inBank
+            const outAmount = e.outCash + e.outBank
+            return (
+              <div
+                key={e.id}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '84px 1fr 90px',
+                  gap: 10,
+                  alignItems: 'center',
+                  padding: '9px 22px',
+                  borderBottom: `1px solid ${ledgerColor.rowDivider}`,
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: ledgerFont.mono,
+                    fontSize: 12.5,
+                    color: ledgerColor.textMuted,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {fmtFull(e.date)}
+                </span>
+                <span style={{ fontSize: 13.5, minWidth: 0, overflow: 'hidden' }}>
+                  <div style={{ fontWeight: 500 }}>{e.item}</div>
+                  {e.note && (
+                    <div style={{ fontSize: 12.5, color: ledgerColor.textFaint }}>{e.note}</div>
+                  )}
+                </span>
+                <span
+                  style={{
+                    fontFamily: ledgerFont.mono,
+                    fontSize: 13.5,
+                    fontWeight: 500,
+                    textAlign: 'right',
+                    color: inAmount ? ledgerColor.moneyIn : ledgerColor.moneyOut,
+                  }}
+                >
+                  {inAmount ? `+${THB(inAmount)}` : `−${THB(outAmount)}`}
+                </span>
+              </div>
+            )
+          })}
+        </section>
+      )}
     </>
   )
 }

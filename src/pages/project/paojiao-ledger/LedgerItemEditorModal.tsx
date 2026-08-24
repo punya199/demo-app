@@ -1,4 +1,4 @@
-import { message, Modal } from 'antd'
+import { message, Modal, Popconfirm } from 'antd'
 import { CSSProperties, useState } from 'react'
 import {
   LedgerItemRecord,
@@ -142,13 +142,19 @@ export const LedgerItemEditorModal = ({ open, onClose }: LedgerItemEditorModalPr
                       >
                         แก้ไข
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(item)}
-                        style={smallActionStyle(ledgerColor.moneyOut)}
+                      <Popconfirm
+                        title="ลบหมวดหมู่นี้?"
+                        description="ลบแล้วกู้คืนไม่ได้"
+                        okText="ลบ"
+                        cancelText="ยกเลิก"
+                        okButtonProps={{ danger: true }}
+                        onConfirm={() => handleDelete(item)}
+                        styles={{ root: { width: 280 } }}
                       >
-                        ลบ
-                      </button>
+                        <button type="button" style={smallActionStyle(ledgerColor.moneyOut)}>
+                          ลบ
+                        </button>
+                      </Popconfirm>
                     </>
                   )}
                 </>

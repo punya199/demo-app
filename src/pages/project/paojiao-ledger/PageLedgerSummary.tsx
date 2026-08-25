@@ -67,7 +67,7 @@ const ROUND_SUMMARY_RESPONSIVE_STYLES = `
   gap: 20px 34px;
 }
 .paojiao-ledger-round-profit-value {
-  font-size: 56px;
+  font-size: 48px;
 }
 .paojiao-ledger-round-figure-label {
   font-size: 12.5px;
@@ -82,7 +82,7 @@ const ROUND_SUMMARY_RESPONSIVE_STYLES = `
     justify-content: space-between;
   }
   .paojiao-ledger-round-profit-value {
-    font-size: 68px;
+    font-size: 60px;
   }
   .paojiao-ledger-round-figure-label {
     font-size: 14px;
@@ -127,7 +127,7 @@ const EXPORT_MODE_STYLES = `
   gap: 12px !important;
 }
 .paojiao-ledger-export-mode .paojiao-ledger-round-profit-value {
-  font-size: 56px !important;
+  font-size: 48px !important;
 }
 .paojiao-ledger-export-mode .paojiao-ledger-round-figure-label {
   font-size: 12.5px !important;
@@ -159,16 +159,7 @@ const EXPORT_MODE_STYLES = `
 .paojiao-ledger-export-mode .paojiao-ledger-chart-title {
   white-space: nowrap !important;
 }
-/* The round's line-item breakdown only ever needs to exist for the saved image (see
-   lastRoundRows in SummaryPeriodContent) - display:none keeps it out of the live page's normal
-   flow entirely rather than just visually hiding it, so it costs nothing when not exporting. */
-.paojiao-ledger-export-only {
-  display: none;
-}
-.paojiao-ledger-export-mode .paojiao-ledger-export-only {
-  display: block !important;
-}
-/* Opposite of export-only - stays visible on the live page but is dropped from the saved image
+/* Stays visible on the live page but is dropped from the saved image
    (used on the กำไรทั้งหมด/เงินสด+บัญชี stat cards, which are less relevant once the round's own
    profit figure and line items are already in the image). */
 .paojiao-ledger-export-mode .paojiao-ledger-export-hide {
@@ -331,11 +322,15 @@ const BarChartCard = ({
   legend,
   chart,
   onBarClick,
+  activeIndex,
 }: {
   title: string
   legend?: string
   chart: ChartLayout
   onBarClick?: (index: number) => void
+  // Which bar the profit card above is currently showing (period==='round' only) - gives the
+  // click somewhere to visibly land instead of just updating the card with no on-chart feedback.
+  activeIndex?: number
 }) => {
   // Every column is exactly this tall - deterministic, not left to flex packing to work out (see
   // BAR_LABEL_HEIGHT's comment) - so the zero-baseline overlay below can be positioned at a single
@@ -442,6 +437,7 @@ const BarChartCard = ({
                     height: b.upHeightPx,
                     background: ledgerColor.moneyIn,
                     borderRadius: '4px 4px 0 0',
+                    border: i === activeIndex ? `2px solid ${ledgerColor.accent}` : undefined,
                   }}
                 />
               </div>
@@ -452,6 +448,7 @@ const BarChartCard = ({
                     height: b.downHeightPx,
                     background: ledgerColor.moneyOut,
                     borderRadius: '0 0 4px 4px',
+                    border: i === activeIndex ? `2px solid ${ledgerColor.accent}` : undefined,
                   }}
                 />
                 <span
@@ -870,9 +867,14 @@ const SummaryPeriodContent = ({
   period: Exclude<LedgerSummaryPeriod, 'day' | 'expenses' | 'oilSales' | 'draffSales'>
   onRoundClick?: (round: LedgerRound) => void
 }) => {
+  // Which round the 'round' tab is pinned to - null (the default, reset every time this
+  // component remounts on a period switch, since the parent keys it by period) means "the
+  // latest", clicking a bar pins it to that bar's round instead of opening a modal.
+  const [manualRound, setManualRound] = useState<LedgerRound | null>(null)
+
   const view = useMemo(
-    () => computeSummaryPeriod(data, entries, rounds, period),
-    [data, entries, rounds, period]
+    () => computeSummaryPeriod(data, entries, rounds, period, manualRound ?? undefined),
+    [data, entries, rounds, period, manualRound]
   )
   const chart = useMemo(() => computeChartLayout(view.bars), [view.bars])
 
@@ -880,11 +882,9 @@ const SummaryPeriodContent = ({
   const verdictColor = isLoss ? ledgerColor.moneyOut : ledgerColor.moneyIn
 
   // Only meaningful for 'round' - it's the one tab with a single unambiguous "the round" ('all'/
-  // 'month' cover several at once). Hidden on the live page (see .paojiao-ledger-export-only in
-  // EXPORT_MODE_STYLES) - shown only in the saved image, appended after everything else, so
-  // someone sharing the round's headline profit figure can also hand over its line-item backup
-  // without a second export/round-detail step.
-  const lastRound = period === 'round' ? rounds[rounds.length - 1] : undefined
+  // 'month' cover several at once). Shown on the live page (replacing the totals grid dropped
+  // from this tab) and carried into the saved image the same way.
+  const lastRound = period === 'round' ? (manualRound ?? rounds[rounds.length - 1]) : undefined
   const lastRoundRows = useMemo(
     () =>
       lastRound
@@ -909,11 +909,16 @@ const SummaryPeriodContent = ({
   return (
     <>
       <section
+        // Re-keying on the displayed round remounts this card whenever a click swaps it out, so
+        // the same fade+rise the period tabs already use plays here too - without it, clicking a
+        // bar just snapped the numbers over with no transition at all.
+        key={lastRound ? `round-${lastRound.fromRow}` : 'no-round'}
         style={{
           ...ledgerCardStyle,
           borderLeft: `6px solid ${verdictColor}`,
           padding: '26px 28px',
           display: 'flex',
+          animation: 'ledgerSummaryFadeIn 0.25s ease',
           flexDirection: 'column',
           gap: 12,
         }}
@@ -980,45 +985,63 @@ const SummaryPeriodContent = ({
       <BarChartCard
         title={view.chartTitle}
         chart={chart}
+        activeIndex={lastRound ? rounds.findIndex((r) => r === lastRound) : undefined}
         // Bars are one-per-round only for 'round'/'all' - 'month' aggregates several rounds into
         // each bar, so there's no single round to open there.
         onBarClick={
-          (period === 'round' || period === 'all') && onRoundClick
-            ? (i) => rounds[i] && onRoundClick(rounds[i])
-            : undefined
+          period === 'round'
+            ? // Pins the profit card/entries list above to the clicked round instead of opening
+              // the detail modal - 'all'/'oilSales' still open it (see the fallback below), since
+              // neither has a single-round card of its own for a click to update in place.
+              (i) => rounds[i] && setManualRound(rounds[i])
+            : period === 'all' && onRoundClick
+              ? (i) => rounds[i] && onRoundClick(rounds[i])
+              : undefined
         }
       />
 
-      <section
-        className="paojiao-ledger-stats-grid"
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}
-      >
-        {[
-          { label: 'กำไรทั้งหมด (รวมยอดยกมา)', value: THB0(profitAll), hideInExport: true },
-          { label: 'เงินสด + บัญชี วันนี้', value: THB0(onHand), hideInExport: true },
-          { label: 'รอบขายน้ำมัน', value: String(rounds.length), hideInExport: true },
-        ].map((s) => (
-          <div
-            key={s.label}
-            className={s.hideInExport ? 'paojiao-ledger-export-hide' : undefined}
-            style={{
-              ...ledgerCardStyle,
-              padding: '20px 22px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 6,
-            }}
-          >
-            <span style={{ fontSize: 12.5, color: ledgerColor.textMuted }}>{s.label}</span>
-            <span style={{ fontFamily: ledgerFont.mono, fontSize: 30, fontWeight: 600 }}>
-              {s.value}
-            </span>
-          </div>
-        ))}
-      </section>
+      {/* Dropped from the 'round' tab per request - that tab's own profit card above already
+          covers the headline figures, so this row of totals read as redundant there. Still
+          shown for 'all'/'month', where there's no single round card carrying that context. */}
+      {period !== 'round' && (
+        <section
+          className="paojiao-ledger-stats-grid"
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}
+        >
+          {[
+            { label: 'กำไรทั้งหมด (รวมยอดยกมา)', value: THB0(profitAll), hideInExport: true },
+            { label: 'เงินสด + บัญชี วันนี้', value: THB0(onHand), hideInExport: true },
+            { label: 'รอบขายน้ำมัน', value: String(rounds.length), hideInExport: true },
+          ].map((s) => (
+            <div
+              key={s.label}
+              className={s.hideInExport ? 'paojiao-ledger-export-hide' : undefined}
+              style={{
+                ...ledgerCardStyle,
+                padding: '20px 22px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 6,
+              }}
+            >
+              <span style={{ fontSize: 12.5, color: ledgerColor.textMuted }}>{s.label}</span>
+              <span style={{ fontFamily: ledgerFont.mono, fontSize: 30, fontWeight: 600 }}>
+                {s.value}
+              </span>
+            </div>
+          ))}
+        </section>
+      )}
 
       {lastRound && (
-        <section className="paojiao-ledger-export-only" style={{ ...ledgerCardStyle }}>
+        <section
+          key={`round-rows-${lastRound.fromRow}`}
+          style={{
+            ...ledgerCardStyle,
+            overflow: 'hidden',
+            animation: 'ledgerSummaryFadeIn 0.25s ease',
+          }}
+        >
           <div
             style={{
               padding: '20px 22px 8px',

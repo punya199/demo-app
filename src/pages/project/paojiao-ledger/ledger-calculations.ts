@@ -69,7 +69,10 @@ export const computeSummaryPeriod = (
   data: LedgerData,
   entries: LedgerEntry[],
   rounds: LedgerRound[],
-  period: Exclude<LedgerSummaryPeriod, 'day' | 'expenses'>
+  period: Exclude<LedgerSummaryPeriod, 'day' | 'expenses'>,
+  // 'round' only - lets the caller pin the profit card/chart to a round the user clicked on the
+  // bar chart instead of always the latest. Defaults to latest when omitted.
+  selectedRound?: LedgerRound
 ): PeriodView => {
   const lastRow = data.lastRoundRow
   const openCount = entries.filter((e) => e.row > lastRow || !e.row).length
@@ -95,19 +98,30 @@ export const computeSummaryPeriod = (
   }
 
   if (period === 'round') {
-    const last = rounds[rounds.length - 1] ?? { profit: 0, date: '', fromRow: 0, toRow: 0 }
+    const latest = rounds[rounds.length - 1]
+    const last = selectedRound ?? latest ?? { profit: 0, date: '', fromRow: 0, toRow: 0 }
+    const isLatest = last === latest
     const win = inRoundBlocks(entries, [last])
     const periodIn = sum(win, (e) => e.inCash + e.inBank)
     const periodOut = sum(win, (e) => e.outCash + e.outBank)
-    const prevDate = rounds.length > 1 ? rounds[rounds.length - 2].date : data.startDate
+    // The round immediately before whichever one is being shown, not always second-to-last -
+    // matters once a click can pin `last` to an earlier round instead of the latest.
+    const lastIdx = rounds.findIndex((r) => r === last)
+    const prevDate = lastIdx > 0 ? rounds[lastIdx - 1].date : data.startDate
     return {
       periodProfit: periodIn - periodOut,
       periodIn,
       periodOut,
-      periodLabel: `รอบล่าสุด ปิดรอบ ${last.date ? fmtFull(last.date) : ''}`,
+      // "รอบล่าสุด" (latest round) would be misleading once a click pins this to an earlier one.
+      periodLabel: isLatest
+        ? `รอบล่าสุด ปิดรอบ ${last.date ? fmtFull(last.date) : ''}`
+        : `ปิดรอบ ${last.date ? fmtFull(last.date) : ''}`,
       chartTitle: 'กำไรแต่ละรอบขายน้ำมัน',
       perDayDiv: last.date ? daysBetween(last.date, prevDate) : 1,
-      periodNote: openCount ? `มีอีก ${openCount} รายการหลังวันปิดรอบ ที่จะไปอยู่ในรอบถัดไป` : '',
+      // Entries not yet in a closed round only ever trail the actual latest round - an earlier,
+      // already-superseded round has no such "still open" tail to note.
+      periodNote:
+        isLatest && openCount ? `มีอีก ${openCount} รายการหลังวันปิดรอบ ที่จะไปอยู่ในรอบถัดไป` : '',
       carry: 0,
       bars: rounds.map((r) => ({ v: r.profit, label: fmtDay(r.date), date: r.date })),
     }

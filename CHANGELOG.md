@@ -1,3 +1,10 @@
+## [1.6.37](https://github.com/punya199/demo-app/compare/v1.6.36...v1.6.37) (2026-08-25)
+
+
+### Fix
+
+* Click-to-select round on the summary chart, and remove 'test' account ([ad4c874](https://github.com/punya199/demo-app/commit/ad4c87420d6c17d4fa5d180503989ba70077827a))
+
 ## [1.6.36](https://github.com/punya199/demo-app/compare/v1.6.35...v1.6.36) (2026-08-24)
 
 

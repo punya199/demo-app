@@ -75,7 +75,7 @@ const fixture: LedgerData = {
       id: 5,
       row: 5,
       date: '2026-01-15',
-      item: 'ค่าแรงยายปิ่น',
+      item: 'ค่าแรง',
       inCash: 0,
       inBank: 0,
       outCash: 200,
@@ -89,7 +89,7 @@ const fixture: LedgerData = {
   ],
   withdrawals: [{ who: 'น้าปุ้ม', row: 5, date: '2026-01-12', bank: 200, cash: 0, note: '' }],
   wages: [{ row: 5, date: '2026-01-01', amount: 100 }],
-  items: ['ขาย', 'ซื้อ', 'ค่าแรงยายปิ่น'],
+  items: ['ขาย', 'ซื้อ', 'ค่าแรง'],
 }
 
 describe('computeBase', () => {
@@ -201,7 +201,7 @@ describe('computeVendorSpend', () => {
       id: 5,
       row: 5,
       date: '2026-02-10',
-      item: 'ค่าแรงยายปิ่น',
+      item: 'ค่าแรง',
       inCash: 0,
       inBank: 0,
       outCash: 200,
@@ -450,7 +450,7 @@ describe('getMonthChips / filterEntriesByMonth', () => {
 
 describe('getItemChips / filterEntriesByItems', () => {
   it('lists distinct items present, Thai-alphabetical, with no "all" entry of its own', () => {
-    expect(getItemChips(fixture.entries)).toEqual(['ขาย', 'ค่าแรงยายปิ่น', 'ซื้อ'])
+    expect(getItemChips(fixture.entries)).toEqual(['ขาย', 'ค่าแรง', 'ซื้อ'])
   })
 
   it('an empty selection means no filter - every entry passes through', () => {
@@ -464,9 +464,9 @@ describe('getItemChips / filterEntriesByItems', () => {
   })
 
   it('a multi-item selection is a union, not an intersection', () => {
-    const result = filterEntriesByItems(fixture.entries, new Set(['ขาย', 'ค่าแรงยายปิ่น']))
+    const result = filterEntriesByItems(fixture.entries, new Set(['ขาย', 'ค่าแรง']))
     expect(result).toHaveLength(3)
-    expect(result.map((e) => e.item).sort()).toEqual(['ขาย', 'ขาย', 'ค่าแรงยายปิ่น'].sort())
+    expect(result.map((e) => e.item).sort()).toEqual(['ขาย', 'ขาย', 'ค่าแรง'].sort())
   })
 })
 

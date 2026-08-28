@@ -27,11 +27,16 @@ import {
   ledgerPrimaryButtonStyle,
 } from './ledger-ui-styles'
 
-const DIR_OPTIONS: { dir: LedgerEntryDirection; label: string }[] = [
-  { dir: 'inCash', label: 'เข้า · เงินสด' },
-  { dir: 'inBank', label: 'เข้า · บัญชี' },
-  { dir: 'outCash', label: 'ออก · เงินสด' },
-  { dir: 'outBank', label: 'ออก · บัญชี' },
+// Four independent optional amount fields, not one exclusive direction picker - a currency
+// exchange (แลกเงิน) needs both an in and an out at once, and an oil sale paid partly cash/partly
+// bank needs both cash and bank on the in side at once. Forcing those into two separate rows
+// used to risk splitting one settlement into two rounds if the rows ever landed non-adjacent
+// (see deriveRounds' same-item-run handling in ledger-sheet-parser.ts).
+const MONEY_FIELDS: { key: LedgerEntryDirection; label: string; dir: 'in' | 'out' }[] = [
+  { key: 'inCash', label: 'เข้า · เงินสด', dir: 'in' },
+  { key: 'inBank', label: 'เข้า · บัญชี', dir: 'in' },
+  { key: 'outCash', label: 'ออก · เงินสด', dir: 'out' },
+  { key: 'outBank', label: 'ออก · บัญชี', dir: 'out' },
 ]
 
 const numCellStyle = { fontFamily: ledgerFont.mono, fontSize: 15, textAlign: 'right' as const }
@@ -72,9 +77,13 @@ const PageLedgerEntries = () => {
 
   const [fDate, setFDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [fItem, setFItem] = useState(data.items[0])
-  const [fAmount, setFAmount] = useState('')
+  const [fAmounts, setFAmounts] = useState<Record<LedgerEntryDirection, string>>({
+    inCash: '',
+    inBank: '',
+    outCash: '',
+    outBank: '',
+  })
   const [fNote, setFNote] = useState('')
-  const [fDir, setFDir] = useState<LedgerEntryDirection>('outBank')
   const [month, setMonth] = useState('all')
   const [itemFilter, setItemFilter] = useState<Set<string>>(new Set())
   const [editingEntry, setEditingEntry] = useState<LedgerEntry | null>(null)
@@ -126,26 +135,21 @@ const PageLedgerEntries = () => {
   const visibleOut = filtered.reduce((a, e) => a + e.outCash + e.outBank, 0)
 
   const handleSubmit = () => {
-    const amount = parseFloat(fAmount)
-    if (!amount || !fDate) {
-      message.warning('ใส่วันที่และจำนวนเงินก่อน')
+    const inCash = parseFloat(fAmounts.inCash) || 0
+    const inBank = parseFloat(fAmounts.inBank) || 0
+    const outCash = parseFloat(fAmounts.outCash) || 0
+    const outBank = parseFloat(fAmounts.outBank) || 0
+    const total = inCash + inBank + outCash + outBank
+    if (!total || !fDate) {
+      message.warning('ใส่วันที่และจำนวนเงินอย่างน้อย 1 ช่องก่อน')
       return
     }
-    const entry = {
-      date: fDate,
-      item: fItem,
-      inCash: 0,
-      inBank: 0,
-      outCash: 0,
-      outBank: 0,
-      note: fNote,
-      [fDir]: amount,
-    }
+    const entry = { date: fDate, item: fItem, inCash, inBank, outCash, outBank, note: fNote }
     const tempId = 9000 + extraEntries.length
     addEntry({ id: tempId, row: 0, ...entry })
-    setFAmount('')
+    setFAmounts({ inCash: '', inBank: '', outCash: '', outBank: '' })
     setFNote('')
-    message.success(`บันทึกแล้ว · ${THB(amount)} บาท`)
+    message.success(`บันทึกแล้ว · ${THB(total)} บาท`)
     // Persist to the sheet in the background - until Google Sheets is configured (Phase B) this
     // rejects and the entry only lives in this session, same as it did before this endpoint existed.
     addLedgerEntry.mutate(entry, { onSuccess: () => removeExtraEntry(tempId) })
@@ -155,17 +159,17 @@ const PageLedgerEntries = () => {
     const entry = {
       date: values.date,
       item: values.item,
-      inCash: 0,
-      inBank: 0,
-      outCash: 0,
-      outBank: 0,
+      inCash: values.inCash || 0,
+      inBank: values.inBank || 0,
+      outCash: values.outCash || 0,
+      outBank: values.outBank || 0,
       note: values.note,
-      [values.dir]: values.amount,
     }
+    const total = entry.inCash + entry.inBank + entry.outCash + entry.outBank
     editLedgerEntry.mutate(
       { row, entry },
       {
-        onSuccess: () => message.success(`แก้ไขแล้ว · ${THB(values.amount)} บาท`),
+        onSuccess: () => message.success(`แก้ไขแล้ว · ${THB(total)} บาท`),
         onError: () => message.error('แก้ไขไม่สำเร็จ ลองใหม่อีกครั้ง'),
       }
     )
@@ -202,7 +206,25 @@ const PageLedgerEntries = () => {
       </div>
 
       <LedgerCard>
-        <div style={{ fontSize: 15, fontWeight: 600 }}>เพิ่มรายการ</div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            flexWrap: 'wrap',
+          }}
+        >
+          <span style={{ fontSize: 20, fontWeight: 700 }}>เพิ่มรายการ</span>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="paojiao-ledger-primary-btn"
+            style={ledgerPrimaryButtonStyle}
+          >
+            บันทึกรายการ
+          </button>
+        </div>
         <div
           className="paojiao-ledger-add-grid"
           style={{
@@ -210,8 +232,10 @@ const PageLedgerEntries = () => {
             // Last column is minmax(0, 1fr), not a bare 1fr - a bare 1fr track won't shrink below
             // the note input's own intrinsic min-content width, which pushed it (and its label)
             // past the card's right edge at narrower viewport widths instead of shrinking to fit.
-            // Same class of overflow bug as the summary line chart (see LineChartCard).
-            gridTemplateColumns: '130px 150px 140px minmax(0, 1fr)',
+            // Same class of overflow bug as the summary line chart (see LineChartCard). Below
+            // 550px there isn't room for all three plus a usable note field, so this stacks to
+            // 2 columns there (see the @media rule below) instead of squeezing indefinitely.
+            gridTemplateColumns: '116px 145px minmax(0, 1fr)',
             gap: 14,
           }}
         >
@@ -226,15 +250,6 @@ const PageLedgerEntries = () => {
               onManageClick={() => setManagingItems(true)}
             />
           </LedgerField>
-          <LedgerField label="จำนวนเงิน">
-            <input
-              type="number"
-              value={fAmount}
-              onChange={(e) => setFAmount(e.target.value)}
-              placeholder="0"
-              style={ledgerMonoInputStyle}
-            />
-          </LedgerField>
           <LedgerField label="หมายเหตุ" style={{ minWidth: 0 }}>
             <input
               type="text"
@@ -246,70 +261,95 @@ const PageLedgerEntries = () => {
           </LedgerField>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={{ fontSize: 12.5, color: ledgerColor.textMuted }}>เข้า / ออก</span>
+          <span style={{ fontSize: 12.5, color: ledgerColor.textMuted }}>
+            เข้า / ออก · ใส่ได้มากกว่า 1 ช่อง (เช่น แลกเงิน หรือขายได้ทั้งเงินสด+บัญชี)
+          </span>
           <div
-            className="paojiao-ledger-dir-row"
-            style={{ display: 'flex', alignItems: 'stretch', gap: 14 }}
+            className="paojiao-ledger-pills-grid"
+            style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}
           >
-            <div
-              className="paojiao-ledger-pills-grid"
-              style={{ display: 'flex', gap: 8, flexShrink: 0 }}
-            >
-              {DIR_OPTIONS.map((opt) => (
-                <button
-                  key={opt.dir}
-                  type="button"
-                  onClick={() => setFDir(opt.dir)}
-                  style={ledgerPillStyle(fDir === opt.dir)}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="paojiao-ledger-primary-btn paojiao-ledger-submit-btn"
-              style={{ ...ledgerPrimaryButtonStyle, marginLeft: 'auto', flexShrink: 0 }}
-            >
-              บันทึกรายการ
-            </button>
+            {MONEY_FIELDS.map((f) => (
+              <LedgerField
+                key={f.key}
+                label={f.label}
+                className="paojiao-ledger-money-field"
+                style={{ width: 108 }}
+                labelStyle={{ color: f.dir === 'in' ? ledgerColor.moneyIn : ledgerColor.moneyOut }}
+              >
+                <input
+                  type="number"
+                  value={fAmounts[f.key]}
+                  onChange={(e) => setFAmounts((prev) => ({ ...prev, [f.key]: e.target.value }))}
+                  placeholder="0"
+                  style={ledgerMonoInputStyle}
+                />
+              </LedgerField>
+            ))}
           </div>
         </div>
       </LedgerCard>
 
-      <LedgerCard style={{ gap: 12 }}>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          {monthChips.map((m) => (
-            <button
-              key={m.key}
-              type="button"
-              onClick={() => setMonth(m.key)}
-              style={ledgerPillStyle(month === m.key)}
-            >
-              {m.label}
-            </button>
-          ))}
+      <LedgerCard style={{ gap: 14 }}>
+        {/* Labeled + separated from the item-filter group below - both rows used the exact same
+            pill style with only a small gap between them, which read as one long undifferentiated
+            block of pills rather than two separate filters (month vs. item). */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span
+            style={{
+              fontSize: 11.5,
+              fontWeight: 700,
+              color: ledgerColor.textFaint,
+              letterSpacing: '0.04em',
+            }}
+          >
+            เดือน
+          </span>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            {monthChips.map((m) => (
+              <button
+                key={m.key}
+                type="button"
+                onClick={() => setMonth(m.key)}
+                style={ledgerPillStyle(month === m.key)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <button
-            type="button"
-            onClick={() => setItemFilter(new Set())}
-            style={ledgerPillStyle(itemFilter.size === 0)}
+        <div style={{ height: 1, background: ledgerColor.rowDivider }} />
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span
+            style={{
+              fontSize: 11.5,
+              fontWeight: 700,
+              color: ledgerColor.textFaint,
+              letterSpacing: '0.04em',
+            }}
           >
-            ทุกรายการ
-          </button>
-          {itemChips.map((item) => (
+            รายการ
+          </span>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
             <button
-              key={item}
               type="button"
-              onClick={() => toggleItemFilter(item)}
-              style={ledgerPillStyle(itemFilter.has(item))}
+              onClick={() => setItemFilter(new Set())}
+              style={ledgerPillStyle(itemFilter.size === 0)}
             >
-              {item}
+              ทุกรายการ
             </button>
-          ))}
+            {itemChips.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => toggleItemFilter(item)}
+                style={ledgerPillStyle(itemFilter.has(item))}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
         </div>
       </LedgerCard>
 
@@ -587,14 +627,7 @@ const PageLedgerEntries = () => {
       </section>
 
       <style>{`
-        /* The add-entry grid's 3 fixed-width columns (130+150+140=420px) plus gaps need ~462px
-           just for themselves, before the note field gets anything - with the 232px sidebar and
-           this page's own padding subtracted from the window, that stops fitting anywhere below
-           roughly 940px wide, well above the 768px breakpoint everything else on this page (the
-           sidebar/bottom-nav switch) uses. No grid-track trick fixes this: fixed px columns don't
-           have any width to give up. Below this width the grid switches to the same 2-column
-           stack the sub-768px layout already uses, just triggered earlier for this one element. */
-        @media (max-width: 940px) {
+        @media (max-width: 550px) {
           .paojiao-ledger-add-grid {
             grid-template-columns: 1fr 1fr !important;
           }
@@ -606,26 +639,21 @@ const PageLedgerEntries = () => {
           .paojiao-ledger-table-mobile {
             display: block !important;
           }
-          /* Not enough room for the button alongside the pills on a narrow phone - below this
-             width the button drops to its own full-width row below the pills. iPad and up (>=
-             this breakpoint) keeps everything on one row. */
-          .paojiao-ledger-dir-row {
-            flex-direction: column !important;
-          }
           .paojiao-ledger-pills-grid {
             display: grid !important;
             grid-template-columns: repeat(4, max-content) !important;
           }
-          .paojiao-ledger-submit-btn {
-            width: 100% !important;
-            margin-left: 0 !important;
-          }
         }
-        /* The 4 pills alone (button already on its own row from the rule above) still don't fit
-           one row below this width - fold them into a 2x2 grid here instead. */
+        /* The 4 money fields alone (button already on its own row from the rule above) still
+           don't fit one row below this width - fold them into a 2x2 grid here instead, and let
+           each field stretch to fill its column (1fr, not max-content) rather than sitting at
+           its fixed 108px desktop width with unused space on either side. */
         @media (max-width: 500px) {
           .paojiao-ledger-pills-grid {
-            grid-template-columns: repeat(2, max-content) !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .paojiao-ledger-money-field {
+            width: 100% !important;
           }
         }
       `}</style>

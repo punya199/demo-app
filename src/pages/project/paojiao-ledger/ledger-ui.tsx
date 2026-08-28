@@ -22,9 +22,19 @@ export const LedgerField = ({
   label,
   children,
   style,
-}: PropsWithChildren<{ label: string; style?: CSSProperties }>) => (
-  <label style={{ display: 'flex', flexDirection: 'column', gap: 6, ...style }}>
-    <span style={ledgerFieldLabelStyle}>{label}</span>
+  labelStyle,
+  className,
+}: PropsWithChildren<{
+  label: string
+  style?: CSSProperties
+  labelStyle?: CSSProperties
+  className?: string
+}>) => (
+  <label
+    className={className}
+    style={{ display: 'flex', flexDirection: 'column', gap: 6, ...style }}
+  >
+    <span style={{ ...ledgerFieldLabelStyle, ...labelStyle }}>{label}</span>
     {children}
   </label>
 )

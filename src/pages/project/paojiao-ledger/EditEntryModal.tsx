@@ -1,23 +1,17 @@
-import { Button, Form, Input, Modal, Popconfirm } from 'antd'
+import { Button, Form, Input, message, Modal, Popconfirm } from 'antd'
 import { useEffect } from 'react'
 import { AppInputNumber } from '../../../components/AppInputNumber'
 import { LedgerDatePicker } from './LedgerDatePicker'
 import { LedgerItemSelect } from './LedgerItemSelect'
-import { ledgerPillStyle } from './ledger-ui-styles'
-import { LedgerEntry, LedgerEntryDirection } from './ledger-types'
-
-const DIR_OPTIONS: { dir: LedgerEntryDirection; label: string }[] = [
-  { dir: 'inCash', label: 'เข้า · เงินสด' },
-  { dir: 'inBank', label: 'เข้า · บัญชี' },
-  { dir: 'outCash', label: 'ออก · เงินสด' },
-  { dir: 'outBank', label: 'ออก · บัญชี' },
-]
+import { LedgerEntry } from './ledger-types'
 
 export interface EditEntryFormValues {
   date: string
   item: string
-  amount: number
-  dir: LedgerEntryDirection
+  inCash?: number
+  inBank?: number
+  outCash?: number
+  outBank?: number
   note: string
 }
 
@@ -34,26 +28,15 @@ interface EditEntryModalProps {
   onDelete: (row: number) => void
 }
 
-const DirectionPicker = ({
-  value,
-  onChange,
-}: {
-  value?: LedgerEntryDirection
-  onChange?: (v: LedgerEntryDirection) => void
-}) => (
-  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-    {DIR_OPTIONS.map((opt) => (
-      <button
-        key={opt.dir}
-        type="button"
-        onClick={() => onChange?.(opt.dir)}
-        style={ledgerPillStyle(value === opt.dir)}
-      >
-        {opt.label}
-      </button>
-    ))}
-  </div>
-)
+const amountInputProps = {
+  thousandSeparator: ',',
+  allowNegative: false,
+  decimalScale: 2,
+  allowLeadingZeros: false,
+  placeholder: '0',
+  isAllowed: ({ floatValue }: { floatValue?: number }) =>
+    floatValue === undefined || floatValue >= 0,
+}
 
 export const EditEntryModal = ({
   open,
@@ -69,12 +52,13 @@ export const EditEntryModal = ({
 
   useEffect(() => {
     if (open && entry) {
-      const dir = DIR_OPTIONS.map((o) => o.dir).find((d) => entry[d] > 0) ?? 'outBank'
       form.setFieldsValue({
         date: entry.date,
         item: entry.item,
-        amount: entry[dir] || undefined,
-        dir,
+        inCash: entry.inCash || undefined,
+        inBank: entry.inBank || undefined,
+        outCash: entry.outCash || undefined,
+        outBank: entry.outBank || undefined,
         note: entry.note,
       })
     }
@@ -82,6 +66,14 @@ export const EditEntryModal = ({
 
   const onFinish = (values: EditEntryFormValues) => {
     if (!entry) return
+    // No single amount field is `required` - a currency-exchange entry needs two at once (e.g.
+    // outCash + inBank) and a split cash/bank sale needs two on the same side (inCash + inBank),
+    // so this checks "at least one of the four" instead, same as the add form.
+    const hasAmount = [values.inCash, values.inBank, values.outCash, values.outBank].some((v) => v)
+    if (!hasAmount) {
+      message.warning('ใส่จำนวนเงินอย่างน้อย 1 ช่อง')
+      return
+    }
     onSave(entry.row, values)
     onClose()
   }
@@ -98,8 +90,6 @@ export const EditEntryModal = ({
       open={open}
       onCancel={onClose}
       destroyOnHidden
-      // Narrower than AntD's 520px default - fit-content lets the direction-picker pill row (the
-      // widest thing in this form) set the dialog's width instead of leaving empty side margins.
       width="fit-content"
       footer={[
         canDelete && (
@@ -141,23 +131,22 @@ export const EditEntryModal = ({
           <LedgerItemSelect items={items} onManageClick={onManageItems} />
         </Form.Item>
 
-        <Form.Item
-          name="amount"
-          label="จำนวนเงิน"
-          rules={[{ required: true, message: 'กรุณาใส่จำนวนเงิน' }]}
-        >
-          <AppInputNumber
-            thousandSeparator=","
-            allowNegative={false}
-            decimalScale={2}
-            allowLeadingZeros={false}
-            placeholder="0"
-            isAllowed={({ floatValue }) => floatValue === undefined || floatValue >= 0}
-          />
+        {/* Four independent optional fields, not one amount+direction picker - a currency
+            exchange (แลกเงิน) needs both an in and an out at once, and an oil sale paid partly
+            cash/partly bank needs both cash and bank on the in side at once. Forcing those into
+            two separate rows used to risk splitting one settlement into two rounds if the rows
+            ever landed non-adjacent (see deriveRounds' same-item-run handling). */}
+        <Form.Item name="inCash" label="เข้า · เงินสด">
+          <AppInputNumber {...amountInputProps} />
         </Form.Item>
-
-        <Form.Item name="dir" label="เข้า / ออก">
-          <DirectionPicker />
+        <Form.Item name="inBank" label="เข้า · บัญชี">
+          <AppInputNumber {...amountInputProps} />
+        </Form.Item>
+        <Form.Item name="outCash" label="ออก · เงินสด">
+          <AppInputNumber {...amountInputProps} />
+        </Form.Item>
+        <Form.Item name="outBank" label="ออก · บัญชี">
+          <AppInputNumber {...amountInputProps} />
         </Form.Item>
 
         <Form.Item name="note" label="หมายเหตุ">

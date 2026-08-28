@@ -157,7 +157,7 @@ export const computeSummaryPeriod = (
 
 // Labor payments and the misc/catch-all bucket aren't "bought from a supplier" - excluded from
 // vendor spend so it answers "bought how much from whom", not general cash outflow.
-const VENDOR_SPEND_EXCLUDED_ITEMS = new Set(['ค่าแรงยายปิ่น', 'อื่นๆ'])
+const VENDOR_SPEND_EXCLUDED_ITEMS = new Set(['ค่าแรง', 'อื่นๆ'])
 
 export interface VendorSpendRow {
   item: string
@@ -401,7 +401,7 @@ export const computeShares = (
 }
 
 export const computeWageTotals = (entries: LedgerEntry[], allWages: { amount: number }[]) => {
-  const wagePaid = sum(entries, (e) => (e.item === 'ค่าแรงยายปิ่น' ? e.outCash + e.outBank : 0))
+  const wagePaid = sum(entries, (e) => (e.item === 'ค่าแรง' ? e.outCash + e.outBank : 0))
   const wageTotal = sum(allWages, (w) => w.amount)
   // What's still owed - the wage table logs what's earned per day worked, separately from
   // wagePaid (actual cash handed over, recorded as its own ledger entry), so the "not yet paid"

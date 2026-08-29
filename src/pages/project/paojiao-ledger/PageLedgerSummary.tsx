@@ -1058,6 +1058,10 @@ const SummaryPeriodContent = ({
             return (
               <div
                 key={e.id}
+                // Dropped from the saved image only - a "เปลี่ยนเงิน" row is an internal
+                // cash<->bank transfer, not a real sale/expense, so it doesn't add anything
+                // useful for someone reading the exported summary and just adds noise.
+                className={e.item === 'เปลี่ยนเงิน' ? 'paojiao-ledger-export-hide' : undefined}
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '84px 1fr 90px',

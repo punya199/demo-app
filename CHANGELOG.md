@@ -1,3 +1,10 @@
+## [1.6.39](https://github.com/punya199/demo-app/compare/v1.6.38...v1.6.39) (2026-08-29)
+
+
+### Fix
+
+* Exclude เปลี่ยนเงิน rows from the saved summary image ([a04e921](https://github.com/punya199/demo-app/commit/a04e92141be32fb5d4e0fbff04237182c95c017d))
+
 ## [1.6.38](https://github.com/punya199/demo-app/compare/v1.6.37...v1.6.38) (2026-08-29)
 
 

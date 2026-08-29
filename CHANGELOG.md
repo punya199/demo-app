@@ -1,3 +1,10 @@
+## [1.6.38](https://github.com/punya199/demo-app/compare/v1.6.37...v1.6.38) (2026-08-29)
+
+
+### Fix
+
+* Entries can carry multiple in/out amounts, item filter/save-btn layout, "ค่าแรง" rename ([cd3c5e0](https://github.com/punya199/demo-app/commit/cd3c5e08c9742aa33a6dc7117e5731eb957dd9fd))
+
 ## [1.6.37](https://github.com/punya199/demo-app/compare/v1.6.36...v1.6.37) (2026-08-25)
 
 

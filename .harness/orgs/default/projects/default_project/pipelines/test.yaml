@@ -4,16 +4,10 @@ pipeline:
   projectIdentifier: default_project
   orgIdentifier: default
   tags: {}
-  properties:
-    ci:
-      codebase:
-        connectorRef: account.github_punya
-        repoName: demo-app
-        build: <+input>
   stages:
     - stage:
-        name: build
-        identifier: build
+        name: Build
+        identifier: Build
         description: ""
         type: CI
         spec:
@@ -27,17 +21,21 @@ pipeline:
             os: Linux
             arch: Amd64
           runtime:
-            type: Docker
+            type: Cloud
             spec:
-              harnessImageConnectorRef: account.harnessImage
+              imageSpec:
+                imageName: ubuntu-22
           execution:
             steps:
               - step:
                   type: Run
-                  name: yarn install
-                  identifier: yarn_install
+                  name: Yarn Install
+                  identifier: Yarn_Install
                   spec:
-                    connectorRef: account.harnessImage
-                    image: node:16
                     shell: Sh
                     command: yarn install
+  properties:
+    ci:
+      codebase:
+        repoName: account.harness-filestore
+        build: <+input>

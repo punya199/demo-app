@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-ssr
+coverage
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+.pnp.*
+
+.env*
+public/config/env-config.js
+
+yarn.lock
+CHANGELOG.md
+*.log

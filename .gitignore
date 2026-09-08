@@ -40,3 +40,5 @@ VERSION
 public/config/env-config.js
 
 package-lock.json
+
+.claude/

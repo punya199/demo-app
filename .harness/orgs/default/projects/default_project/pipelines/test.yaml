@@ -1,0 +1,43 @@
+pipeline:
+  name: test
+  identifier: test
+  projectIdentifier: default_project
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.github_punya
+        repoName: demo-app
+        build: <+input>
+  stages:
+    - stage:
+        name: build
+        identifier: build
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+            override: true
+          buildIntelligence:
+            enabled: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Docker
+            spec:
+              harnessImageConnectorRef: account.harnessImage
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: yarn install
+                  identifier: yarn_install
+                  spec:
+                    connectorRef: account.harnessImage
+                    image: node:16
+                    shell: Sh
+                    command: yarn install

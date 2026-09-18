@@ -53,8 +53,10 @@ export const PageVoting = () => {
             type="link"
             icon={<CopyOutlined />}
             onClick={() => {
-              navigator.clipboard.writeText(link)
-              message.success('Link copied')
+              navigator.clipboard
+                .writeText(link)
+                .then(() => message.success('Link copied'))
+                .catch(() => message.error('Could not copy the link'))
             }}
           >
             Copy link

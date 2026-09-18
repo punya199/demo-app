@@ -11,10 +11,11 @@ import {
   Skeleton,
   Typography,
 } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { EnumPollType, IPollOptionData } from './voting-interface'
+import { EnumPollType } from './voting-interface'
 import { moveItem } from './voting-helper'
+import { PollResults } from './PollResults'
 import { useGetPublicPoll, useSubmitVote } from './voting-service'
 
 export const PageVotePublic = () => {
@@ -26,12 +27,23 @@ export const PageVotePublic = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [rankedIds, setRankedIds] = useState<string[]>([])
   const [hasVoted, setHasVoted] = useState(false)
+  // Seed local selection state from the server exactly once per poll load, not on every
+  // background refetch - otherwise a refetch (window refocus, another tab) would silently
+  // discard whatever the voter is mid-way through picking/reordering.
+  const initializedForPollId = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!poll) return
+    if (!poll || initializedForPollId.current === poll.id) return
+    initializedForPollId.current = poll.id
+
+    const validOptionIds = new Set(poll.options.map((option) => option.id))
     // Sort by rank first - the server doesn't guarantee selections come back in rank order.
-    const myVote = [...(data?.myVote ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
-    const myVoteOptionIds = myVote.map((selection) => selection.optionId)
+    // Drop any option id the poll no longer has (e.g. edited after this vote was cast).
+    const myVoteOptionIds = [...(data?.myVote ?? [])]
+      .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+      .map((selection) => selection.optionId)
+      .filter((optionId) => validOptionIds.has(optionId))
+
     setHasVoted(myVoteOptionIds.length > 0)
     if (poll.pollType === EnumPollType.RANKING) {
       const fallback = poll.options.map((option) => option.id)
@@ -39,9 +51,7 @@ export const PageVotePublic = () => {
     } else {
       setSelectedIds(myVoteOptionIds)
     }
-    // Only re-derive from server state, not on every local edit.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poll?.id, data?.myVote])
+  }, [poll, data?.myVote])
 
   const optionsById = useMemo(() => {
     return new Map((poll?.options ?? []).map((option) => [option.id, option]))
@@ -78,15 +88,19 @@ export const PageVotePublic = () => {
 
   const canSubmit =
     poll.pollType === EnumPollType.RANKING ? rankedIds.length > 0 : selectedIds.length > 0
+  // maxSelections is number | null - `> 0` guards a stray 0 (which ?? alone would not catch)
+  // from disabling every checkbox and making the poll unvotable.
+  const multipleChoiceLimit =
+    poll.maxSelections && poll.maxSelections > 0 ? poll.maxSelections : poll.options.length
 
   return (
     <div className="mx-auto max-w-xl space-y-4 py-6">
       <Typography.Title level={4}>{poll.title}</Typography.Title>
       {poll.description && <Typography.Paragraph>{poll.description}</Typography.Paragraph>}
 
-      {poll.isClosed ? (
-        <Alert type="warning" showIcon message="This poll is closed" />
-      ) : (
+      {poll.isClosed && <Alert type="warning" showIcon message="This poll is closed" />}
+
+      {!poll.isClosed && (
         <>
           {hasVoted && (
             <Alert
@@ -117,14 +131,13 @@ export const PageVotePublic = () => {
               className="w-full"
               value={selectedIds}
               onChange={(values) => {
-                const limit = poll.maxSelections ?? poll.options.length
-                setSelectedIds((values as string[]).slice(0, limit))
+                setSelectedIds((values as string[]).slice(0, multipleChoiceLimit))
               }}
             >
               <Flex vertical gap={8}>
                 {poll.options.map((option) => {
-                  const limit = poll.maxSelections ?? poll.options.length
-                  const disabled = !selectedIds.includes(option.id) && selectedIds.length >= limit
+                  const disabled =
+                    !selectedIds.includes(option.id) && selectedIds.length >= multipleChoiceLimit
                   return (
                     <Checkbox key={option.id} value={option.id} disabled={disabled}>
                       {option.label}
@@ -161,7 +174,7 @@ export const PageVotePublic = () => {
                     />,
                   ]}
                 >
-                  {index + 1}. {(optionsById.get(optionId) as IPollOptionData)?.label}
+                  {index + 1}. {optionsById.get(optionId)?.label}
                 </List.Item>
               )}
             />
@@ -172,6 +185,8 @@ export const PageVotePublic = () => {
           </Button>
         </>
       )}
+
+      {hasVoted && <PollResults slug={slug} pollType={poll.pollType} isClosed={poll.isClosed} />}
     </div>
   )
 }

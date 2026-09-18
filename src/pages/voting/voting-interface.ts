@@ -51,3 +51,16 @@ export interface IVoteSelection {
 export interface ISubmitVoteParams {
   optionIds: string[]
 }
+
+export interface IPollResultOption {
+  optionId: string
+  label: string
+  // Vote count for single/multiple-choice, Borda score for ranking.
+  score: number
+}
+
+export interface IPollResultsData {
+  pollType: EnumPollType
+  totalVotes: number
+  results: IPollResultOption[]
+}

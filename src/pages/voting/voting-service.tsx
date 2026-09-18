@@ -3,6 +3,7 @@ import { apiClient } from '../../utils/api-client'
 import {
   ICreatePollParams,
   IPollData,
+  IPollResultsData,
   IPublicPollData,
   ISubmitVoteParams,
   IVoteSelection,
@@ -58,6 +59,19 @@ export const useGetPublicPoll = (slug?: string) => {
       return data
     },
     enabled: !!slug,
+  })
+}
+
+export const useGetPollResults = (slug?: string, options?: { isClosed?: boolean }) => {
+  return useQuery({
+    queryKey: ['polls', 'public', slug, 'results'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IPollResultsData>(`/polls/public/${slug}/results`)
+      return data
+    },
+    enabled: !!slug,
+    // A closed poll's tally can never change again - no point polling it forever.
+    refetchInterval: options?.isClosed ? false : 3000,
   })
 }
 

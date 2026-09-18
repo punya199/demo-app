@@ -1,11 +1,11 @@
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AnimatePresence, motion } from 'motion/react'
 import { Suspense } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { matchPath, Outlet, useLocation } from 'react-router-dom'
 import { appConfig } from '../config/app-config'
 import { FlickeringGrid } from '../components/magicui/flickering-grid'
 import { ThemeToggle } from '../components/ThemeToggle'
-import { appPath } from '../config/app-paths'
+import { appPath, VOTE_ROUTE_TEMPLATE } from '../config/app-paths'
 import { useGetMe, UserRole } from '../service'
 import { checkRole } from '../utils/helper'
 import { useThemeStore } from '../utils/theme-store'
@@ -37,7 +37,7 @@ const RootLayout = () => {
   // Public, unauthenticated voting page: Navbar/DevTools call useGetMe(), whose 401 triggers a
   // force-redirect to /login on refresh failure - a visitor with a stale session must never be
   // bounced off a link they were never asked to log in for.
-  const isPublicVote = location.pathname.startsWith('/vote/')
+  const isPublicVote = !!matchPath(VOTE_ROUTE_TEMPLATE, location.pathname)
   const hideAuthenticatedChrome = isPaojiaoLedger || isPublicVote
   const mode = useThemeStore((state) => state.mode)
 

@@ -2,7 +2,9 @@ name: yaya-app
 
 services:
   app:
-    image: acelectic/yaya-developer:latest
+    image: docker.io/acelectic/yaya-developer:demo-app
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - 5173:80

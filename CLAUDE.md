@@ -22,7 +22,18 @@ yarn vitest run -t "test name"              # Run tests matching a name
 
 Package manager is **Yarn 4.9.1 (Berry)** — do not use npm/pnpm, lockfile is `yarn.lock`. Node >= 20 required (see `.nvmrc`: 20.18.1).
 
-Pre-commit runs `lint-staged` via Husky (`eslint --fix --max-warnings=0` + `prettier --write` on staged `.ts/.tsx/.js/.jsx`, `prettier --write` on `src/**/*.json`). Releases are automated via semantic-release on `main` using the `eslint` commit-message preset (conventional commits drive the version bump) — do not hand-edit `CHANGELOG.md` or `package.json`'s `version`.
+Pre-commit runs `lint-staged` via Husky (`eslint --fix --max-warnings=0` + `prettier --write` on staged `.ts/.tsx/.js/.jsx`, `prettier --write` on `src/**/*.json`). Releases are automated via semantic-release on `main` using the ESLint commit-message convention (drives the version bump) — do not hand-edit `CHANGELOG.md` or `package.json`'s `version`.
+
+Commit summary format is `Tag: description` (e.g. `New: add poll ranking support`) — a commit whose summary doesn't start with one of these tags is invisible to the release tooling (no version bump, no changelog entry):
+
+- `Fix` — a bug fix
+- `Update` — a backwards-compatible enhancement
+- `New` — a new feature
+- `Breaking` — a backwards-incompatible change
+- `Docs` — documentation only
+- `Build` — build process only
+- `Upgrade` — a dependency upgrade
+- `Chore` — refactoring, tests, anything non-user-facing
 
 ## Architecture
 

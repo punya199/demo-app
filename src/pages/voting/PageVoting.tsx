@@ -47,7 +47,7 @@ export const PageVoting = () => {
       dataIndex: 'slug',
       key: 'slug',
       render: (slug: string) => {
-        const link = `${window.location.origin}/vote/${slug}`
+        const link = `${window.location.origin}${appPath.voteBySlug({ param: { slug } })}`
         return (
           <Button
             type="link"

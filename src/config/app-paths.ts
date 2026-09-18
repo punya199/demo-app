@@ -29,4 +29,5 @@ export const appPath = {
   paojiaoLedgerWages: generatePath('/paojiao-ledger/wages'),
   voting: generatePath('/voting'),
   votingCreate: generatePath('/voting/create'),
+  voteBySlug: generatePath<{ param: { slug: string } }>('/vote/:slug'),
 }

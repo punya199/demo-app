@@ -31,3 +31,23 @@ export interface ICreatePollParams {
   maxSelections?: number
   closesAt?: string
 }
+
+export interface IPublicPollData {
+  id: string
+  title: string
+  description: string | null
+  slug: string
+  pollType: EnumPollType
+  maxSelections: number | null
+  isClosed: boolean
+  options: IPollOptionData[]
+}
+
+export interface IVoteSelection {
+  optionId: string
+  rank: number | null
+}
+
+export interface ISubmitVoteParams {
+  optionIds: string[]
+}

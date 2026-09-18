@@ -70,6 +70,9 @@ const PageVotingCreate = lazy(() =>
     default: module.PageVotingCreate,
   }))
 )
+const PageVotePublic = lazy(() =>
+  import('./pages/voting/PageVotePublic').then((module) => ({ default: module.PageVotePublic }))
+)
 
 const router = createBrowserRouter([
   {
@@ -169,6 +172,11 @@ const router = createBrowserRouter([
             <PageVoting />
           </Authorize>
         ),
+      },
+      {
+        // Public - no <Authorize>. This must work for anyone with the link, logged in or not.
+        path: appPath.voteBySlug(),
+        element: <PageVotePublic />,
       },
       {
         path: appPath.manageUserDetail(),

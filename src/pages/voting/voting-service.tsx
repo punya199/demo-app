@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../../utils/api-client'
-import { ICreatePollParams, IPollData } from './voting-interface'
+import {
+  ICreatePollParams,
+  IPollData,
+  IPublicPollData,
+  ISubmitVoteParams,
+  IVoteSelection,
+} from './voting-interface'
 
 interface IGetMyPollsResponse {
   polls: IPollData[]
@@ -8,6 +14,17 @@ interface IGetMyPollsResponse {
 
 interface IGetPollResponse {
   poll: IPollData
+}
+
+interface IGetPublicPollResponse {
+  poll: IPublicPollData
+  myVote: IVoteSelection[] | null
+}
+
+interface ISubmitVoteResponse {
+  vote: {
+    selections: IVoteSelection[]
+  }
 }
 
 export const useGetMyPolls = () => {
@@ -29,6 +46,33 @@ export const useCreatePoll = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['polls'] })
+    },
+  })
+}
+
+export const useGetPublicPoll = (slug?: string) => {
+  return useQuery({
+    queryKey: ['polls', 'public', slug],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IGetPublicPollResponse>(`/polls/public/${slug}`)
+      return data
+    },
+    enabled: !!slug,
+  })
+}
+
+export const useSubmitVote = (slug?: string) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (params: ISubmitVoteParams) => {
+      const { data } = await apiClient.post<ISubmitVoteResponse>(
+        `/polls/public/${slug}/vote`,
+        params
+      )
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['polls', 'public', slug] })
     },
   })
 }

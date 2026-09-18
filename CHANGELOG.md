@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/punya199/demo-app/compare/v1.7.0...v1.7.1) (2026-09-18)
+
+
+### Fix
+
+* document the ESLint commit-message tag format ([744638a](https://github.com/punya199/demo-app/commit/744638ac728ee10d954dbbf34068d2387cb2c650))
+
 ## [1.6.39](https://github.com/punya199/demo-app/compare/v1.6.38...v1.6.39) (2026-08-29)
 
 

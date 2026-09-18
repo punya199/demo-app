@@ -1,5 +1,10 @@
 import { generatePath } from '../utils/generate-path'
 
+// Exported so route-matching code (e.g. RootLayout deciding when to hide authenticated chrome)
+// can check against the same pattern appPath.voteBySlug builds its URLs from, instead of
+// duplicating the '/vote/' literal.
+export const VOTE_ROUTE_TEMPLATE = '/vote/:slug'
+
 export const appPath = {
   home: generatePath('/'),
   randomCard: generatePath('/random-card'),
@@ -27,4 +32,8 @@ export const appPath = {
   paojiaoLedgerSummary: generatePath('/paojiao-ledger/summary'),
   paojiaoLedgerShare: generatePath('/paojiao-ledger/share'),
   paojiaoLedgerWages: generatePath('/paojiao-ledger/wages'),
+  voting: generatePath('/voting'),
+  votingCreate: generatePath('/voting/create'),
+  votingEdit: generatePath<{ param: { pollId: string } }>('/voting/:pollId/edit'),
+  voteBySlug: generatePath<{ param: { slug: string } }>(VOTE_ROUTE_TEMPLATE),
 }

@@ -1,11 +1,11 @@
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AnimatePresence, motion } from 'motion/react'
 import { Suspense } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { matchPath, Outlet, useLocation } from 'react-router-dom'
 import { appConfig } from '../config/app-config'
 import { FlickeringGrid } from '../components/magicui/flickering-grid'
 import { ThemeToggle } from '../components/ThemeToggle'
-import { appPath } from '../config/app-paths'
+import { appPath, VOTE_ROUTE_TEMPLATE } from '../config/app-paths'
 import { useGetMe, UserRole } from '../service'
 import { checkRole } from '../utils/helper'
 import { useThemeStore } from '../utils/theme-store'
@@ -34,6 +34,11 @@ const RootLayout = () => {
   // The ledger has its own full-page sidebar shell (own branding, own nav, no theme toggle) -
   // the site's Navbar/ThemeToggle/DevTools would just duplicate or overlap it.
   const isPaojiaoLedger = location.pathname.startsWith('/paojiao-ledger')
+  // Public, unauthenticated voting page: Navbar/DevTools call useGetMe(), whose 401 triggers a
+  // force-redirect to /login on refresh failure - a visitor with a stale session must never be
+  // bounced off a link they were never asked to log in for.
+  const isPublicVote = !!matchPath(VOTE_ROUTE_TEMPLATE, location.pathname)
+  const hideAuthenticatedChrome = isPaojiaoLedger || isPublicVote
   const mode = useThemeStore((state) => state.mode)
 
   return (
@@ -47,7 +52,7 @@ const RootLayout = () => {
         color={mode === 'dark' ? 'rgb(96, 165, 250)' : 'rgb(37, 99, 235)'}
       />
 
-      {!isHome && !isPaojiaoLedger && <Navbar />}
+      {!isHome && !hideAuthenticatedChrome && <Navbar />}
       <div className="flex-1 overflow-y-auto">
         <Suspense fallback={<LoadingSpin />}>
           <AnimatePresence mode="wait">
@@ -65,7 +70,7 @@ const RootLayout = () => {
         </Suspense>
       </div>
       {!isPaojiaoLedger && <ThemeToggle />}
-      {appConfig().VITE_IS_DEVELOPMENT && !isPaojiaoLedger && <DevTools />}
+      {appConfig().VITE_IS_DEVELOPMENT && !hideAuthenticatedChrome && <DevTools />}
     </div>
   )
 }

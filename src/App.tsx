@@ -62,6 +62,20 @@ const PageHouseRentOverview = lazy(() =>
     default: module.PageHouseRentOverview,
   }))
 )
+const PageVoting = lazy(() =>
+  import('./pages/voting/PageVoting').then((module) => ({ default: module.PageVoting }))
+)
+const PageVotingCreate = lazy(() =>
+  import('./pages/voting/PageVotingCreate').then((module) => ({
+    default: module.PageVotingCreate,
+  }))
+)
+const PageVotePublic = lazy(() =>
+  import('./pages/voting/PageVotePublic').then((module) => ({ default: module.PageVotePublic }))
+)
+const PageVotingEdit = lazy(() =>
+  import('./pages/voting/PageVotingEdit').then((module) => ({ default: module.PageVotingEdit }))
+)
 
 const router = createBrowserRouter([
   {
@@ -145,6 +159,35 @@ const router = createBrowserRouter([
             <PageHouseRent />
           </Authorize>
         ),
+      },
+      {
+        path: appPath.votingCreate(),
+        element: (
+          <Authorize featureName={EnumPermissionFeatureName.VOTING} requiredCreate>
+            <PageVotingCreate />
+          </Authorize>
+        ),
+      },
+      {
+        path: appPath.voting(),
+        element: (
+          <Authorize featureName={EnumPermissionFeatureName.VOTING} requiredRead>
+            <PageVoting />
+          </Authorize>
+        ),
+      },
+      {
+        path: appPath.votingEdit(),
+        element: (
+          <Authorize featureName={EnumPermissionFeatureName.VOTING} requiredUpdate>
+            <PageVotingEdit />
+          </Authorize>
+        ),
+      },
+      {
+        // Public - no <Authorize>. This must work for anyone with the link, logged in or not.
+        path: appPath.voteBySlug(),
+        element: <PageVotePublic />,
       },
       {
         path: appPath.manageUserDetail(),

@@ -37,6 +37,9 @@ const Navbar = () => {
   const menuHouseRentAllowed = usePermissionRouteAllow(EnumPermissionFeatureName.HOUSE_RENT, {
     requiredRead: true,
   })
+  const menuVotingAllowed = usePermissionRouteAllow(EnumPermissionFeatureName.VOTING, {
+    requiredRead: true,
+  })
 
   const { mutate: logout } = useMutation({
     mutationFn: async () => {
@@ -97,6 +100,17 @@ const Navbar = () => {
             import('../pages/project/checkbill/PageAllBill')
           },
         },
+        menuVotingAllowed && {
+          key: 'sub5',
+          label: 'Voting',
+          onClick: () => {
+            navigate(appPath.voting())
+            onClose()
+          },
+          onMouseEnter: () => {
+            import('../pages/voting/PageVoting')
+          },
+        },
         ...(checkRole(UserRole.SUPER_ADMIN, user?.user?.role)
           ? [
               menuHouseRentAllowed && {
@@ -124,7 +138,7 @@ const Navbar = () => {
             ]
           : []),
       ]),
-    [menuHouseRentAllowed, navigate, user?.user?.role]
+    [menuHouseRentAllowed, menuVotingAllowed, navigate, user?.user?.role]
   )
 
   const userMenuItems: MenuProps['items'] = [

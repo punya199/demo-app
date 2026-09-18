@@ -1,12 +1,12 @@
-import { CopyOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Flex, message, Table, TableColumnType, Tag, Typography } from 'antd'
+import { CopyOutlined, PlusOutlined, StopOutlined } from '@ant-design/icons'
+import { Button, Flex, message, Modal, Table, TableColumnType, Tag, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { Link } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
 import { useGetFeaturePermissionAction } from '../../service'
 import { EnumPermissionFeatureName } from '../../services/permission/permission.params'
 import { EnumPollType, IPollData } from './voting-interface'
-import { useGetMyPolls } from './voting-service'
+import { useClosePoll, useGetMyPolls } from './voting-service'
 
 const pollTypeLabel: Record<EnumPollType, string> = {
   [EnumPollType.SINGLE]: 'Single choice',
@@ -17,6 +17,7 @@ const pollTypeLabel: Record<EnumPollType, string> = {
 export const PageVoting = () => {
   const { data: myPollsData, isLoading } = useGetMyPolls()
   const { data: permissionAction } = useGetFeaturePermissionAction(EnumPermissionFeatureName.VOTING)
+  const { mutate: closePoll } = useClosePoll()
 
   const columns: TableColumnType<IPollData>[] = [
     {
@@ -63,6 +64,32 @@ export const PageVoting = () => {
           </Button>
         )
       },
+    },
+    {
+      title: 'Actions',
+      dataIndex: 'id',
+      key: 'actions',
+      render: (id: string, record) =>
+        permissionAction?.canUpdate &&
+        !record.closedAt && (
+          <Button
+            type="link"
+            danger
+            icon={<StopOutlined />}
+            onClick={() => {
+              Modal.confirm({
+                title: 'Close this poll?',
+                content: 'Voting will stop immediately. This cannot be undone.',
+                onOk: () =>
+                  closePoll(id, {
+                    onError: () => message.error('Could not close the poll'),
+                  }),
+              })
+            }}
+          >
+            Close
+          </Button>
+        ),
     },
   ]
 

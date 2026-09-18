@@ -51,6 +51,19 @@ export const useCreatePoll = () => {
   })
 }
 
+export const useClosePoll = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (pollId: string) => {
+      const { data } = await apiClient.post<IGetPollResponse>(`/polls/${pollId}/close`)
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['polls'] })
+    },
+  })
+}
+
 export const useGetPublicPoll = (slug?: string) => {
   return useQuery({
     queryKey: ['polls', 'public', slug],

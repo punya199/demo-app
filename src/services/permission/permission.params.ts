@@ -3,6 +3,7 @@ export enum EnumPermissionFeatureName {
   BILL = 'bill',
   USER = 'user',
   USER_PERMISSIONS = 'user_permissions',
+  VOTING = 'voting',
 }
 
 export interface IPermissionAction {

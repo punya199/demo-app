@@ -62,6 +62,14 @@ const PageHouseRentOverview = lazy(() =>
     default: module.PageHouseRentOverview,
   }))
 )
+const PageVoting = lazy(() =>
+  import('./pages/voting/PageVoting').then((module) => ({ default: module.PageVoting }))
+)
+const PageVotingCreate = lazy(() =>
+  import('./pages/voting/PageVotingCreate').then((module) => ({
+    default: module.PageVotingCreate,
+  }))
+)
 
 const router = createBrowserRouter([
   {
@@ -143,6 +151,22 @@ const router = createBrowserRouter([
         element: (
           <Authorize featureName={EnumPermissionFeatureName.HOUSE_RENT} requiredRead>
             <PageHouseRent />
+          </Authorize>
+        ),
+      },
+      {
+        path: appPath.votingCreate(),
+        element: (
+          <Authorize featureName={EnumPermissionFeatureName.VOTING} requiredCreate>
+            <PageVotingCreate />
+          </Authorize>
+        ),
+      },
+      {
+        path: appPath.voting(),
+        element: (
+          <Authorize featureName={EnumPermissionFeatureName.VOTING} requiredRead>
+            <PageVoting />
           </Authorize>
         ),
       },

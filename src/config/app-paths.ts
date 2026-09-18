@@ -27,4 +27,6 @@ export const appPath = {
   paojiaoLedgerSummary: generatePath('/paojiao-ledger/summary'),
   paojiaoLedgerShare: generatePath('/paojiao-ledger/share'),
   paojiaoLedgerWages: generatePath('/paojiao-ledger/wages'),
+  voting: generatePath('/voting'),
+  votingCreate: generatePath('/voting/create'),
 }

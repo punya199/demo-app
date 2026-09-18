@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/punya199/demo-app/compare/v1.7.1...v1.7.2) (2026-09-18)
+
+
+### Fix
+
+* use full image reference and expose port in docker-compose ([f64ac70](https://github.com/punya199/demo-app/commit/f64ac70e790741394efad945fac5339f7da1f7a4))
+
 ## [1.7.1](https://github.com/punya199/demo-app/compare/v1.7.0...v1.7.1) (2026-09-18)
 
 

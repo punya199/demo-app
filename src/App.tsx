@@ -73,6 +73,9 @@ const PageVotingCreate = lazy(() =>
 const PageVotePublic = lazy(() =>
   import('./pages/voting/PageVotePublic').then((module) => ({ default: module.PageVotePublic }))
 )
+const PageVotingEdit = lazy(() =>
+  import('./pages/voting/PageVotingEdit').then((module) => ({ default: module.PageVotingEdit }))
+)
 
 const router = createBrowserRouter([
   {
@@ -170,6 +173,14 @@ const router = createBrowserRouter([
         element: (
           <Authorize featureName={EnumPermissionFeatureName.VOTING} requiredRead>
             <PageVoting />
+          </Authorize>
+        ),
+      },
+      {
+        path: appPath.votingEdit(),
+        element: (
+          <Authorize featureName={EnumPermissionFeatureName.VOTING} requiredUpdate>
+            <PageVotingEdit />
           </Authorize>
         ),
       },

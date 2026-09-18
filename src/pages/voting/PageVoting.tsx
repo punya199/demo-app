@@ -1,4 +1,4 @@
-import { CopyOutlined, PlusOutlined, StopOutlined } from '@ant-design/icons'
+import { CopyOutlined, EditOutlined, PlusOutlined, StopOutlined } from '@ant-design/icons'
 import { Button, Flex, message, Modal, Table, TableColumnType, Tag, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { Link } from 'react-router-dom'
@@ -70,25 +70,39 @@ export const PageVoting = () => {
       dataIndex: 'id',
       key: 'actions',
       render: (id: string, record) =>
-        permissionAction?.canUpdate &&
-        !record.closedAt && (
-          <Button
-            type="link"
-            danger
-            icon={<StopOutlined />}
-            onClick={() => {
-              Modal.confirm({
-                title: 'Close this poll?',
-                content: 'Voting will stop immediately. This cannot be undone.',
-                onOk: () =>
-                  closePoll(id, {
-                    onError: () => message.error('Could not close the poll'),
-                  }),
-              })
-            }}
-          >
-            Close
-          </Button>
+        permissionAction?.canUpdate && (
+          <Flex gap={4}>
+            <Link to={appPath.votingEdit({ param: { pollId: id } })}>
+              <Button
+                type="link"
+                icon={<EditOutlined />}
+                onMouseEnter={() => {
+                  import('./PageVotingEdit')
+                }}
+              >
+                Edit
+              </Button>
+            </Link>
+            {!record.closedAt && (
+              <Button
+                type="link"
+                danger
+                icon={<StopOutlined />}
+                onClick={() => {
+                  Modal.confirm({
+                    title: 'Close this poll?',
+                    content: 'Voting will stop immediately. This cannot be undone.',
+                    onOk: () =>
+                      closePoll(id, {
+                        onError: () => message.error('Could not close the poll'),
+                      }),
+                  })
+                }}
+              >
+                Close
+              </Button>
+            )}
+          </Flex>
         ),
     },
   ]

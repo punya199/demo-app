@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../../utils/api-client'
 import {
   ICreatePollParams,
+  IEditPollParams,
   IPollData,
   IPollResultsData,
   IPublicPollData,
@@ -43,6 +44,30 @@ export const useCreatePoll = () => {
   return useMutation({
     mutationFn: async (params: ICreatePollParams) => {
       const { data } = await apiClient.post<IGetPollResponse>(`/polls`, params)
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['polls'] })
+    },
+  })
+}
+
+export const useGetPoll = (pollId?: string) => {
+  return useQuery({
+    queryKey: ['polls', pollId],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IGetPollResponse>(`/polls/${pollId}`)
+      return data
+    },
+    enabled: !!pollId,
+  })
+}
+
+export const useEditPoll = (pollId?: string) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (params: IEditPollParams) => {
+      const { data } = await apiClient.put<IGetPollResponse>(`/polls/${pollId}`, params)
       return data
     },
     onSuccess: () => {

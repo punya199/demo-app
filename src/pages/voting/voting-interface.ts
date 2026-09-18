@@ -21,6 +21,9 @@ export interface IPollData {
   closedAt: string | null
   createdAt: string
   options: IPollOptionData[]
+  // Only present on responses that compute it (getMyPolls, getPollById) - whether to lock
+  // options editing, per the same rule the backend enforces.
+  hasVotes?: boolean
 }
 
 export interface ICreatePollParams {
@@ -30,6 +33,12 @@ export interface ICreatePollParams {
   options: string[]
   maxSelections?: number
   closesAt?: string
+}
+
+export interface IEditPollParams {
+  title?: string
+  description?: string
+  options?: string[]
 }
 
 export interface IPublicPollData {

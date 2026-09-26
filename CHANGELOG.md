@@ -1,3 +1,18 @@
+## [1.8.1](https://github.com/punya199/demo-app/compare/v1.8.0...v1.8.1) (2026-09-26)
+
+
+### Chore
+
+* remove dead commented-out code in CustomCell ([d36188b](https://github.com/punya199/demo-app/commit/d36188b50372bb33b41cbd100d327528b5892c34))
+
+### Docs
+
+* document commit-tag requirement for semantic-release/docker-build ([42f2bbb](https://github.com/punya199/demo-app/commit/42f2bbbd9099f47ec200a936436820b0c4353347))
+
+### Fix
+
+* extract router config from App.tsx into src/router.tsx ([6bdc399](https://github.com/punya199/demo-app/commit/6bdc39934ec35885f914b5cb393fb4f4fae5fcb5))
+
 # [1.8.0](https://github.com/punya199/demo-app/compare/v1.7.2...v1.8.0) (2026-09-26)
 
 

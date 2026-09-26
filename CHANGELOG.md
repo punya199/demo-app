@@ -1,3 +1,18 @@
+# [1.8.0](https://github.com/punya199/demo-app/compare/v1.7.2...v1.8.0) (2026-09-26)
+
+
+### Fix
+
+* navigate to the new record's detail page after saving a house rent ([eef661e](https://github.com/punya199/demo-app/commit/eef661edf2ae9abc4f1ae9c8fa0729ce7aefac99))
+
+### New
+
+* support PDF attachments in house rent uploads ([54af49f](https://github.com/punya199/demo-app/commit/54af49f0b8855c462a6a7d1a10edf92940ee3dca))
+
+### Update
+
+* align PDF attachment styling with app theme and layout conventions ([f44ffcf](https://github.com/punya199/demo-app/commit/f44ffcf2c80d22c666bf99248d3d7a03406ea039))
+
 ## [1.7.2](https://github.com/punya199/demo-app/compare/v1.7.1...v1.7.2) (2026-09-18)
 
 

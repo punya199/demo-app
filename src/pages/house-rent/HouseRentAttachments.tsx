@@ -11,7 +11,7 @@ export const HouseRentAttachments = (props: IHouseRentAttachmentsProps) => {
 
   return (
     <Card>
-      <Typography.Title level={4}>แนบไฟล์รูปภาพ</Typography.Title>
+      <Typography.Title level={4}>แนบไฟล์รูปภาพ/เอกสาร PDF</Typography.Title>
       <Form.Item name="attachments" hidden>
         <Input />
       </Form.Item>

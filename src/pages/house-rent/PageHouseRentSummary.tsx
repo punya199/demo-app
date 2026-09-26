@@ -3,14 +3,13 @@ import { useMemo, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useReactToPrint } from 'react-to-print'
 import { NotFound } from '../../components/NotFound'
-import { appConfig } from '../../config/app-config'
 import { LoadingSpin } from '../../layouts/LoadingSpin'
 import { BasicInfoSection } from './components/BasicInfoSection'
 import { HouseRentSummaryContent, SummarySection } from './components/HouseRentSummaryContent'
 import { HouseRentSummaryHeader } from './components/HouseRentSummaryHeader'
 import { MemberDetailsSection } from './components/MemberDetailsSection'
 import { RentalDetailsSection } from './components/RentalDetailsSection'
-import { calculateElectricitySummary } from './house-rent-helper'
+import { calculateElectricitySummary, mapAttachmentToUploadFile } from './house-rent-helper'
 import { IHouseRentFormValues } from './house-rent-interface'
 import { useGetHouseRent } from './house-rent-service'
 
@@ -67,12 +66,7 @@ export const PageHouseRentSummary = () => {
         houseRentData.houseRent.rents,
         houseRentData.houseRent.members
       ),
-      attachments: houseRentData.houseRent.attachments.map((attachment) => ({
-        uid: attachment.id,
-        name: attachment.fileName,
-        url: `${appConfig().VITE_API_DOMAIN}/attachments/${attachment.id}/file`,
-        thumbUrl: `${appConfig().VITE_API_DOMAIN}/attachments/${attachment.id}/file?thumbnail=true`,
-      })),
+      attachments: houseRentData.houseRent.attachments.map(mapAttachmentToUploadFile),
     }
   }, [houseRentData])
 
@@ -120,35 +114,36 @@ export const PageHouseRentSummary = () => {
           <HouseRentSummaryHeader data={summaryData} onPrint={handlePrint} />
 
           <div ref={printRef}>
-
             <HouseRentSummaryContent>
-              <SummarySection
-                title="Basic Information"
-                colSpan={{ default: 1, lg: 6 }}
-              >
+              <SummarySection title="Basic Information" colSpan={{ default: 1, lg: 6 }}>
                 <BasicInfoSection data={summaryData} />
               </SummarySection>
 
-              <SummarySection
-                title="Electricity Summary"
-                colSpan={{ default: 1, lg: 6 }}
-              >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <SummarySection title="Electricity Summary" colSpan={{ default: 1, lg: 6 }}>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <span className="font-medium text-gray-700">Total Units:</span>
-                    <span className="ml-2 font-semibold">{summaryData.electricitySummary.totalUnit.toLocaleString()} kWh</span>
+                    <span className="ml-2 font-semibold">
+                      {summaryData.electricitySummary.totalUnit.toLocaleString()} kWh
+                    </span>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Total Price:</span>
-                    <span className="ml-2 font-semibold">฿{summaryData.electricitySummary.totalPrice.toLocaleString()}</span>
+                    <span className="ml-2 font-semibold">
+                      ฿{summaryData.electricitySummary.totalPrice.toLocaleString()}
+                    </span>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Price per Unit:</span>
-                    <span className="ml-2 font-semibold">฿{summaryData.electricitySummary.pricePerUnit.toFixed(2)}</span>
+                    <span className="ml-2 font-semibold">
+                      ฿{summaryData.electricitySummary.pricePerUnit.toFixed(2)}
+                    </span>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Shared Units:</span>
-                    <span className="ml-2 font-semibold">{summaryData.electricitySummary.shareUnit.toLocaleString()} kWh</span>
+                    <span className="ml-2 font-semibold">
+                      {summaryData.electricitySummary.shareUnit.toLocaleString()} kWh
+                    </span>
                   </div>
                 </div>
               </SummarySection>

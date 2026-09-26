@@ -18,7 +18,7 @@ interface IBaseData {
   updaterId?: string
   deleterId?: string
 }
-interface IHouseRentAttachmentData extends IBaseData {
+export interface IHouseRentAttachmentData extends IBaseData {
   attachableId?: string
   attachableType?: string
   fileName: string

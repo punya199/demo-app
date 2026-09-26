@@ -1,9 +1,25 @@
+import { UploadFile } from 'antd'
 import { round, sumBy } from 'lodash'
+import { appConfig } from '../../config/app-config'
 import {
   IElectricitySummaryData,
   IHouseRentDetailData,
   IHouseRentMemberData,
 } from './house-rent-interface'
+import { IHouseRentAttachmentData } from './house-rent-service'
+
+export const mapAttachmentToUploadFile = (attachment: IHouseRentAttachmentData): UploadFile => {
+  const isImage = attachment.mimeType.startsWith('image/')
+  return {
+    uid: attachment.id,
+    name: attachment.fileName,
+    type: attachment.mimeType,
+    url: `${appConfig().VITE_API_DOMAIN}/attachments/${attachment.id}/file`,
+    thumbUrl: isImage
+      ? `${appConfig().VITE_API_DOMAIN}/attachments/${attachment.id}/file?thumbnail=true`
+      : undefined,
+  }
+}
 
 export const calculateElectricitySummary = (
   rents: IHouseRentDetailData[],

@@ -1,6 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons'
 import type { GetProp, UploadFile, UploadProps } from 'antd'
-import { Image, Upload } from 'antd'
+import { Image, message, Upload } from 'antd'
 import { UploadChangeParam } from 'antd/es/upload/interface'
 import { get } from 'lodash'
 import { useCallback, useMemo, useState } from 'react'
@@ -8,6 +8,10 @@ import { appConfig } from '../config/app-config'
 import { IHouseRentFormValues } from '../pages/house-rent/house-rent-interface'
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
+
+const ACCEPTED_MIME_TYPES = ['image/png', 'image/jpeg', 'application/pdf']
+
+const isPdfFile = (file: UploadFile) => file.type === 'application/pdf'
 
 const getBase64 = (file: FileType): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -28,18 +32,30 @@ export const AppUploadFiles = (props: IAppUploadFilesProps) => {
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
 
-
   const fileList = useMemo((): UploadFile[] => {
     return [...(value || [])]
   }, [value])
 
   const handlePreview = useCallback(async (file: UploadFile) => {
+    if (isPdfFile(file)) {
+      window.open(file.url, '_blank', 'noopener,noreferrer')
+      return
+    }
+
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj as FileType)
     }
 
     setPreviewImage(file.url || (file.preview as string))
     setPreviewOpen(true)
+  }, [])
+
+  const beforeUpload = useCallback((file: FileType) => {
+    if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
+      message.error('รองรับเฉพาะไฟล์รูปภาพ (PNG, JPEG) หรือ PDF เท่านั้น')
+      return Upload.LIST_IGNORE
+    }
+    return true
   }, [])
 
   const handleChange = useCallback(
@@ -68,13 +84,12 @@ export const AppUploadFiles = (props: IAppUploadFilesProps) => {
     []
   )
 
-
-
   return (
     <>
       <Upload
         action={`${appConfig().VITE_API_DOMAIN}/attachments/upload`}
-        accept="image/png,image/jpeg,image/jpeg"
+        accept={ACCEPTED_MIME_TYPES.join(',')}
+        beforeUpload={beforeUpload}
         withCredentials={true}
         listType="picture-card"
         fileList={fileList}

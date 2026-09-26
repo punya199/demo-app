@@ -3,11 +3,10 @@ import { chain } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { NotFound } from '../../components/NotFound'
-import { appConfig } from '../../config/app-config'
 import { LoadingSpin } from '../../layouts/LoadingSpin'
 import { useGetFeaturePermissionAction } from '../../service'
 import { EnumPermissionFeatureName } from '../../services/permission/permission.params'
-import { calculateElectricitySummary } from './house-rent-helper'
+import { calculateElectricitySummary, mapAttachmentToUploadFile } from './house-rent-helper'
 import { IHouseRentFormValues } from './house-rent-interface'
 import { useGetHouseRent, useUpdateHouseRent } from './house-rent-service'
 import { HouseRentForm } from './HouseRentForm'
@@ -53,14 +52,7 @@ export const PageHouseRentDetail = () => {
         houseRentData.houseRent.rents,
         houseRentData.houseRent.members
       ),
-      attachments: houseRentData.houseRent.attachments.map((attachment) => {
-        return {
-          uid: attachment.id,
-          name: attachment.fileName,
-          url: `${appConfig().VITE_API_DOMAIN}/attachments/${attachment.id}/file`,
-          thumbUrl: `${appConfig().VITE_API_DOMAIN}/attachments/${attachment.id}/file?thumbnail=true`,
-        }
-      }),
+      attachments: houseRentData.houseRent.attachments.map(mapAttachmentToUploadFile),
     }
   }, [houseRentData])
 

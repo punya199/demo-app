@@ -86,7 +86,6 @@ const OverviewChart = (props: IOverviewChartProps) => {
           }
         }
       })
-      .orderBy('title', 'asc')
       .value()
   }, [props, data])
 
@@ -227,13 +226,13 @@ export const PageHouseRentOverview = () => {
 
   const data = useMemo(() => {
     return chain(overviewData?.data ?? [])
+      .orderBy('title', 'asc')
       .map((d) => {
         return {
           ...d,
           title: dayjs(d.title).format('MM/YYYY'),
         }
       })
-      .orderBy('title', 'asc')
       .value()
   }, [overviewData])
 

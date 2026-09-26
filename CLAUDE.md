@@ -35,6 +35,8 @@ Commit summary format is `Tag: description` (e.g. `New: add poll ranking support
 - `Upgrade` — a dependency upgrade
 - `Chore` — refactoring, tests, anything non-user-facing
 
+**Always tag commits `Fix:`, `Update:`, or `New:`** — never `Chore:`/`Docs:`/`Build:`/`Upgrade:`, even for trivial changes. `.github/workflows/docker-build.yml`'s `build-and-push` job only runs when semantic-release's `Release` job actually publishes a new version; the other tags don't bump the version, so the Docker build/publish step gets silently skipped.
+
 ## Architecture
 
 React 18 + TypeScript SPA (Vite 6) — a multi-tool app bundling several unrelated features behind one router/auth shell, not a single-purpose product. Path alias `@/*` → `./src/*`.

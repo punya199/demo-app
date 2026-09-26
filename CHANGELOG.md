@@ -1,3 +1,11 @@
+## [1.8.2](https://github.com/punya199/demo-app/compare/v1.8.1...v1.8.2) (2026-09-26)
+
+
+### Fix
+
+* order overview chart data by title after mapping ([4a27dc4](https://github.com/punya199/demo-app/commit/4a27dc44ebbf8e28085b39686038e73df34165ef))
+* sort overview chart by parsed date instead of raw title string ([0e86884](https://github.com/punya199/demo-app/commit/0e868845a427b06b0da616a85d627bc29ec36e88))
+
 ## [1.8.1](https://github.com/punya199/demo-app/compare/v1.8.0...v1.8.1) (2026-09-26)
 
 

@@ -1,6 +1,6 @@
-import { PlusOutlined } from '@ant-design/icons'
+import { FilePdfOutlined, PlusOutlined } from '@ant-design/icons'
 import type { GetProp, UploadFile, UploadProps } from 'antd'
-import { Image, message, Upload } from 'antd'
+import { Image, message, theme, Upload } from 'antd'
 import { UploadChangeParam } from 'antd/es/upload/interface'
 import { get } from 'lodash'
 import { useCallback, useMemo, useState } from 'react'
@@ -31,6 +31,7 @@ export const AppUploadFiles = (props: IAppUploadFilesProps) => {
   const { value, onChange, disabled } = props
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
+  const { token } = theme.useToken()
 
   const fileList = useMemo((): UploadFile[] => {
     return [...(value || [])]
@@ -96,6 +97,7 @@ export const AppUploadFiles = (props: IAppUploadFilesProps) => {
         onPreview={handlePreview}
         onChange={handleChange}
         disabled={disabled}
+        iconRender={() => <FilePdfOutlined style={{ fontSize: 28, color: token.colorPrimary }} />}
       >
         {(value?.length && value?.length >= 8) || disabled ? null : uploadButton}
       </Upload>

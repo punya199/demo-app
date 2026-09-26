@@ -1,4 +1,4 @@
-import { Card, Form, Input, Typography } from 'antd'
+import { Card, Form, Grid, Input, Typography } from 'antd'
 
 import { AppUploadFiles } from '../../components/AppUploadFiles'
 
@@ -8,9 +8,10 @@ interface IHouseRentAttachmentsProps {
 
 export const HouseRentAttachments = (props: IHouseRentAttachmentsProps) => {
   const { viewMode } = props
+  const { md } = Grid.useBreakpoint()
 
   return (
-    <Card>
+    <Card size={md ? 'default' : 'small'}>
       <Typography.Title level={4}>แนบไฟล์รูปภาพ/เอกสาร PDF</Typography.Title>
       <Form.Item name="attachments" hidden>
         <Input />

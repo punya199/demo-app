@@ -28,18 +28,11 @@ export const PageHouseRentCreate = () => {
           attachmentIds,
         },
         {
-          onSuccess: () => {
+          onSuccess: (response) => {
             message.success('บันทึกข้อมูลสำเร็จ')
-            const houseRentId = data.id ?? ''
-            if (houseRentId) {
-              navigate(appPath.houseRentDetail({ param: { houseRentId } }), {
-                replace: true,
-              })
-            } else {
-              navigate(appPath.houseRent(), {
-                replace: true,
-              })
-            }
+            navigate(appPath.houseRentDetail({ param: { houseRentId: response.houseRent.id } }), {
+              replace: true,
+            })
           },
         }
       )

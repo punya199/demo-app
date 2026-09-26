@@ -1,7 +1,8 @@
 import { Empty, message } from 'antd'
 import { chain } from 'lodash'
 import { useCallback, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { appPath } from '../../config/app-paths'
 import { LoadingSpin } from '../../layouts/LoadingSpin'
 import { useGetFeaturePermissionAction } from '../../service'
 import { EnumPermissionFeatureName } from '../../services/permission/permission.params'
@@ -13,6 +14,7 @@ import { HouseRentForm } from './HouseRentForm'
 export const PageHouseRentDetailClone = () => {
   const { houseRentId } = useParams<{ houseRentId: string }>()
   const { data: houseRentData, isLoading } = useGetHouseRent(houseRentId)
+  const navigate = useNavigate()
 
   const { mutate: saveHouseRent, isPending } = useCreateHouseRent()
   const { data: permissionAction } = useGetFeaturePermissionAction(
@@ -31,8 +33,11 @@ export const PageHouseRentDetailClone = () => {
           attachmentIds,
         },
         {
-          onSuccess: () => {
+          onSuccess: (response) => {
             message.success('บันทึกข้อมูลสำเร็จ')
+            navigate(appPath.houseRentDetail({ param: { houseRentId: response.houseRent.id } }), {
+              replace: true,
+            })
           },
           onError: () => {
             message.error('บันทึกข้อมูลไม่สำเร็จ')
@@ -40,7 +45,7 @@ export const PageHouseRentDetailClone = () => {
         }
       )
     },
-    [saveHouseRent]
+    [saveHouseRent, navigate]
   )
 
   const defaultValues = useMemo((): IHouseRentFormValues | undefined => {

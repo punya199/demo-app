@@ -141,7 +141,6 @@ export const CustomCell = (props: ICustomCellProps) => {
         minHeight: '32px',
         display: 'flex',
         alignItems: 'center',
-        // padding: isEdit ? '0' : '4px 8px',
         textAlign: align,
         justifyContent:
           align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start',

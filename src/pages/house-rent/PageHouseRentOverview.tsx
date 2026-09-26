@@ -226,7 +226,7 @@ export const PageHouseRentOverview = () => {
 
   const data = useMemo(() => {
     return chain(overviewData?.data ?? [])
-      .orderBy('title', 'asc')
+      .orderBy((d) => dayjs(d.title), 'asc')
       .map((d) => {
         return {
           ...d,

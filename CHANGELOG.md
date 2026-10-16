@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/punya199/demo-app/compare/v1.10.0...v1.11.0) (2026-10-16)
+
+
+### Update
+
+* require rebasing main onto origin before pushing (CLAUDE.md) ([21cef33](https://github.com/punya199/demo-app/commit/21cef3333573216dc9c271e8783bad3da7e484dc))
+
 # [1.10.0](https://github.com/punya199/demo-app/compare/v1.9.1...v1.10.0) (2026-10-16)
 
 

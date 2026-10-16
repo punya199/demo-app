@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { SaveOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
-import { Button, Col, Divider, Flex, Form, Grid, Input, Row } from 'antd'
+import { Button, Col, Divider, Flex, Form, Grid, Input, Row, theme } from 'antd'
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -89,6 +89,7 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
 
   // const { data, setData, setElectricitySummary } = useHouseRentStore()
   const { md } = Grid.useBreakpoint()
+  const { token } = theme.useToken()
   const [form] = Form.useForm()
   const electricitySummary = Form.useWatch('electricitySummary', form)
 
@@ -162,6 +163,9 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
           className="space-y-4 py-6 md:p-4"
           css={css`
             background-color: #585858;
+            .dark & {
+              background-color: ${token.colorBgLayout};
+            }
             height: 100%;
           `}
         >
@@ -210,14 +214,14 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
             left: 0;
             width: 100%;
             z-index: 1000;
-            background-color: #fff;
+            background-color: ${token.colorBgContainer};
           `}
         >
           <Flex
             justify="space-between"
             gap={8}
             css={css`
-              background-color: #fff;
+              background-color: ${token.colorBgContainer};
               padding: 16px;
               border-radius: 8px;
             `}

@@ -1,6 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
-import { Button, Flex, Form, Grid, Select, Table, Typography } from 'antd'
+import { Button, Flex, Form, Grid, Select, Table, Typography, theme } from 'antd'
 import { DefaultOptionType } from 'antd/es/select'
 import { ColumnType } from 'antd/es/table'
 import dayjs, { Dayjs } from 'dayjs'
@@ -24,6 +24,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
   const { value, onChange, summary, viewMode } = props
   const [isInit, setIsInit] = useState(false)
   const { md } = Grid.useBreakpoint()
+  const { token } = theme.useToken()
 
   const form = Form.useFormInstance<IHouseRentFormValues>()
   const rents = Form.useWatch('rents', form)
@@ -311,7 +312,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
           cursor: pointer;
           transition: background-color 0.2s;
           &:hover {
-            background-color: #f0f0f0;
+            background-color: ${token.colorFillSecondary};
           }
         }
       `}
@@ -327,7 +328,7 @@ export const HouseRentMemberTableField = (props: IHouseRentMemberTableFieldProps
         return (
           <Table.Summary.Row
             css={css`
-              background-color: #f0f0f0;
+              background-color: ${token.colorFillSecondary};
             `}
           >
             <Table.Summary.Cell index={0}>

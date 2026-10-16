@@ -6,7 +6,7 @@ import {
   ProjectOutlined,
 } from '@ant-design/icons'
 import { css } from '@emotion/react'
-import { Button, Flex, Modal, Table, TableColumnType, Typography } from 'antd'
+import { Button, Flex, Modal, Table, TableColumnType, Typography, theme } from 'antd'
 import dayjs from 'dayjs'
 import { keyBy, sumBy } from 'lodash'
 import { useMemo } from 'react'
@@ -24,6 +24,7 @@ import {
 } from './house-rent-service'
 
 export const PageHouseRent = () => {
+  const { token } = theme.useToken()
   const { data: houseRentListData, isLoading } = useGetHouseRentList()
   const { data: permissionAction } = useGetFeaturePermissionAction(
     EnumPermissionFeatureName.HOUSE_RENT
@@ -156,7 +157,7 @@ export const PageHouseRent = () => {
     <div
       className="space-y-4 py-6 md:p-4"
       css={css`
-        background-color: #f3f3f3;
+        background-color: ${token.colorBgLayout};
         height: 100%;
       `}
     >

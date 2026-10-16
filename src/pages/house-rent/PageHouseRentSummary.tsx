@@ -109,7 +109,7 @@ export const PageHouseRentSummary = () => {
         `}
       />
 
-      <div className="min-h-screen bg-gray-50 print:bg-white">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 print:bg-white">
         <div className="container mx-auto py-8 print:py-4">
           <HouseRentSummaryHeader data={summaryData} onPrint={handlePrint} />
 
@@ -122,25 +122,33 @@ export const PageHouseRentSummary = () => {
               <SummarySection title="Electricity Summary" colSpan={{ default: 1, lg: 6 }}>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <span className="font-medium text-gray-700">Total Units:</span>
+                    <span className="font-medium text-gray-700 dark:text-slate-300">
+                      Total Units:
+                    </span>
                     <span className="ml-2 font-semibold">
                       {summaryData.electricitySummary.totalUnit.toLocaleString()} kWh
                     </span>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-700">Total Price:</span>
+                    <span className="font-medium text-gray-700 dark:text-slate-300">
+                      Total Price:
+                    </span>
                     <span className="ml-2 font-semibold">
                       ฿{summaryData.electricitySummary.totalPrice.toLocaleString()}
                     </span>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-700">Price per Unit:</span>
+                    <span className="font-medium text-gray-700 dark:text-slate-300">
+                      Price per Unit:
+                    </span>
                     <span className="ml-2 font-semibold">
                       ฿{summaryData.electricitySummary.pricePerUnit.toFixed(2)}
                     </span>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-700">Shared Units:</span>
+                    <span className="font-medium text-gray-700 dark:text-slate-300">
+                      Shared Units:
+                    </span>
                     <span className="ml-2 font-semibold">
                       {summaryData.electricitySummary.shareUnit.toLocaleString()} kWh
                     </span>

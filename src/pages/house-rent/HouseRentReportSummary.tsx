@@ -1,5 +1,5 @@
 import { css } from '@emotion/react'
-import { Flex, Form, Grid, Typography } from 'antd'
+import { Flex, Form, Grid, Typography, theme } from 'antd'
 import Table, { ColumnType } from 'antd/es/table'
 import { chain, filter, keyBy, round, sumBy } from 'lodash'
 import { useMemo } from 'react'
@@ -41,6 +41,7 @@ export const HouseRentReportSummary = () => {
   const paymentFeeData = Form.useWatch('paymentFee', form)
 
   const { md } = Grid.useBreakpoint()
+  const { token } = theme.useToken()
 
   const { data: userOptions } = useGetUserOptions()
 
@@ -268,7 +269,7 @@ export const HouseRentReportSummary = () => {
           return (
             <Table.Summary.Row
               css={css`
-                background-color: #f0f0f0;
+                background-color: ${token.colorFillSecondary};
               `}
             >
               <Table.Summary.Cell index={0} align="center">

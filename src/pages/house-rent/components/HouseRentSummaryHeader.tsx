@@ -13,8 +13,8 @@ export const HouseRentSummaryHeader = ({ data, onPrint }: IHouseRentSummaryHeade
   const dateRange = useMemo(() => {
     if (!data.rents || data.rents.length === 0) return ''
 
-    const sortedRents = [...data.rents].sort((a, b) =>
-      dayjs(a.month).valueOf() - dayjs(b.month).valueOf()
+    const sortedRents = [...data.rents].sort(
+      (a, b) => dayjs(a.month).valueOf() - dayjs(b.month).valueOf()
     )
 
     const startDate = dayjs(sortedRents[0].month).format('MMM YYYY')
@@ -32,24 +32,17 @@ export const HouseRentSummaryHeader = ({ data, onPrint }: IHouseRentSummaryHeade
   }
 
   return (
-    <div className="mb-8 no-print">
-      <div className="text-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          {data.name}
-        </h1>
-        <p className="text-lg text-gray-600 mb-1">House Rent Summary</p>
+    <div className="no-print mb-8">
+      <div className="mb-6 text-center">
+        <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-slate-100">{data.name}</h1>
+        <p className="mb-1 text-lg text-gray-600 dark:text-slate-300">House Rent Summary</p>
         {dateRange && (
-          <p className="text-sm text-gray-500">Period: {dateRange}</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400">Period: {dateRange}</p>
         )}
       </div>
 
       <Flex justify="center" className="mb-6">
-        <Button
-          type="primary"
-          icon={<PrinterOutlined />}
-          onClick={handlePrint}
-          size="large"
-        >
+        <Button type="primary" icon={<PrinterOutlined />} onClick={handlePrint} size="large">
           Print Summary
         </Button>
       </Flex>

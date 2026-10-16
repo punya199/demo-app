@@ -9,23 +9,23 @@ export const BasicInfoSection = ({ data }: IBasicInfoSectionProps) => {
     {
       label: 'House Name',
       value: data.name,
-      fullWidth: true
+      fullWidth: true,
     },
     {
       label: 'Base House Rent',
-      value: `฿${data.baseHouseRent.toLocaleString()}`
+      value: `฿${data.baseHouseRent.toLocaleString()}`,
     },
     {
       label: 'Payment Fee',
-      value: `฿${data.paymentFee.toLocaleString()}`
+      value: `฿${data.paymentFee.toLocaleString()}`,
     },
     {
       label: 'Internet (per month)',
-      value: `฿${data.internet.pricePerMonth.toLocaleString()}`
+      value: `฿${data.internet.pricePerMonth.toLocaleString()}`,
     },
     {
       label: 'Air Condition (per unit)',
-      value: `฿${data.airCondition.pricePerUnit.toLocaleString()}`
+      value: `฿${data.airCondition.pricePerUnit.toLocaleString()}`,
     },
   ]
 
@@ -34,15 +34,18 @@ export const BasicInfoSection = ({ data }: IBasicInfoSectionProps) => {
       {infoItems.map((item, index) => (
         <div
           key={index}
-          className={`${item.fullWidth
-            ? 'col-span-full border-b pb-3 mb-3'
-            : 'flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0'
-            }`}
+          className={`${
+            item.fullWidth
+              ? 'col-span-full mb-3 border-b pb-3'
+              : 'flex items-center justify-between border-b border-gray-100 py-2 last:border-b-0 dark:border-slate-800'
+          }`}
         >
-          <span className="font-medium text-gray-700 text-sm">
+          <span className="text-sm font-medium text-gray-700 dark:text-slate-300">
             {item.label}:
           </span>
-          <span className={`font-semibold ${item.fullWidth ? 'text-lg text-gray-900 mt-1' : 'text-gray-900'}`}>
+          <span
+            className={`font-semibold ${item.fullWidth ? 'mt-1 text-lg text-gray-900 dark:text-slate-100' : 'text-gray-900 dark:text-slate-100'}`}
+          >
             {item.value}
           </span>
         </div>

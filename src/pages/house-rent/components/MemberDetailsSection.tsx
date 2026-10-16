@@ -73,10 +73,11 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
         )
 
         // Deductions
-        const deductInternet = filter(
-          member.payInternetMonthIds,
-          (payInternetMonthId) => !!rentsHash[payInternetMonthId]
-        ).length * (data.internet?.pricePerMonth || 0)
+        const deductInternet =
+          filter(
+            member.payInternetMonthIds,
+            (payInternetMonthId) => !!rentsHash[payInternetMonthId]
+          ).length * (data.internet?.pricePerMonth || 0)
 
         const deductElectricity = chain(member.payElectricityMonthIds)
           .sumBy((id) => {
@@ -126,9 +127,7 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
       key: 'userName',
       width: '12%',
       fixed: 'left',
-      render: (userName: string) => (
-        <div className="font-medium">{userName}</div>
-      ),
+      render: (userName: string) => <div className="font-medium">{userName}</div>,
     },
     {
       title: 'House Rent',
@@ -192,9 +191,7 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
       key: 'total',
       width: '10%',
       align: 'right',
-      render: (value: number) => (
-        <div className="font-semibold">฿{value.toLocaleString()}</div>
-      ),
+      render: (value: number) => <div className="font-semibold">฿{value.toLocaleString()}</div>,
     },
     {
       title: 'Deduct Internet',
@@ -202,7 +199,7 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
       key: 'deductInternet',
       width: '8%',
       align: 'right',
-      render: (value: number) => value > 0 ? `-฿${value.toLocaleString()}` : '-',
+      render: (value: number) => (value > 0 ? `-฿${value.toLocaleString()}` : '-'),
     },
     {
       title: 'Deduct Electricity',
@@ -210,7 +207,7 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
       key: 'deductElectricity',
       width: '8%',
       align: 'right',
-      render: (value: number) => value > 0 ? `-฿${value.toLocaleString()}` : '-',
+      render: (value: number) => (value > 0 ? `-฿${value.toLocaleString()}` : '-'),
     },
     {
       title: 'Final Total',
@@ -219,7 +216,7 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
       width: '10%',
       align: 'right',
       render: (value: number) => (
-        <div className="font-bold text-blue-600">฿{value.toLocaleString()}</div>
+        <div className="font-bold text-blue-600 dark:text-blue-400">฿{value.toLocaleString()}</div>
       ),
     },
     {
@@ -229,25 +226,30 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
       width: '8%',
       align: 'right',
       render: (value: number) => (
-        <div className="font-semibold text-green-600">฿{value.toLocaleString()}</div>
+        <div className="font-semibold text-green-600 dark:text-green-400">
+          ฿{value.toLocaleString()}
+        </div>
       ),
     },
   ]
 
   // Calculate totals
-  const totals = useMemo(() => ({
-    houseRent: sumBy(memberSummaries, 'houseRent'),
-    airCondition: sumBy(memberSummaries, 'airCondition'),
-    internet: sumBy(memberSummaries, 'internet'),
-    water: sumBy(memberSummaries, 'water'),
-    electricity: sumBy(memberSummaries, 'electricity'),
-    electricityShare: sumBy(memberSummaries, 'electricityShare'),
-    paymentFee: sumBy(memberSummaries, 'paymentFee'),
-    total: sumBy(memberSummaries, 'total'),
-    deductInternet: sumBy(memberSummaries, 'deductInternet'),
-    deductElectricity: sumBy(memberSummaries, 'deductElectricity'),
-    totalAfterDeduct: sumBy(memberSummaries, 'totalAfterDeduct'),
-  }), [memberSummaries])
+  const totals = useMemo(
+    () => ({
+      houseRent: sumBy(memberSummaries, 'houseRent'),
+      airCondition: sumBy(memberSummaries, 'airCondition'),
+      internet: sumBy(memberSummaries, 'internet'),
+      water: sumBy(memberSummaries, 'water'),
+      electricity: sumBy(memberSummaries, 'electricity'),
+      electricityShare: sumBy(memberSummaries, 'electricityShare'),
+      paymentFee: sumBy(memberSummaries, 'paymentFee'),
+      total: sumBy(memberSummaries, 'total'),
+      deductInternet: sumBy(memberSummaries, 'deductInternet'),
+      deductElectricity: sumBy(memberSummaries, 'deductElectricity'),
+      totalAfterDeduct: sumBy(memberSummaries, 'totalAfterDeduct'),
+    }),
+    [memberSummaries]
+  )
 
   return (
     <div className="space-y-4">
@@ -262,19 +264,45 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
           className="print:text-xs"
           summary={() => (
             <Table.Summary fixed>
-              <Table.Summary.Row className="bg-gray-50 font-semibold">
+              <Table.Summary.Row className="bg-gray-50 font-semibold dark:bg-slate-800/60">
                 <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
-                <Table.Summary.Cell index={1} align="right">฿{totals.houseRent.toLocaleString()}</Table.Summary.Cell>
-                <Table.Summary.Cell index={2} align="right">฿{totals.airCondition.toLocaleString()}</Table.Summary.Cell>
-                <Table.Summary.Cell index={3} align="right">฿{totals.internet.toLocaleString()}</Table.Summary.Cell>
-                <Table.Summary.Cell index={4} align="right">฿{totals.water.toLocaleString()}</Table.Summary.Cell>
-                <Table.Summary.Cell index={5} align="right">฿{totals.electricity.toLocaleString()}</Table.Summary.Cell>
-                <Table.Summary.Cell index={6} align="right">฿{totals.electricityShare.toLocaleString()}</Table.Summary.Cell>
-                <Table.Summary.Cell index={7} align="right">฿{totals.paymentFee.toLocaleString()}</Table.Summary.Cell>
-                <Table.Summary.Cell index={8} align="right" className="font-bold">฿{totals.total.toLocaleString()}</Table.Summary.Cell>
-                <Table.Summary.Cell index={9} align="right">-฿{totals.deductInternet.toLocaleString()}</Table.Summary.Cell>
-                <Table.Summary.Cell index={10} align="right">-฿{totals.deductElectricity.toLocaleString()}</Table.Summary.Cell>
-                <Table.Summary.Cell index={11} align="right" className="font-bold text-blue-600">฿{totals.totalAfterDeduct.toLocaleString()}</Table.Summary.Cell>
+                <Table.Summary.Cell index={1} align="right">
+                  ฿{totals.houseRent.toLocaleString()}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2} align="right">
+                  ฿{totals.airCondition.toLocaleString()}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={3} align="right">
+                  ฿{totals.internet.toLocaleString()}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={4} align="right">
+                  ฿{totals.water.toLocaleString()}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={5} align="right">
+                  ฿{totals.electricity.toLocaleString()}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={6} align="right">
+                  ฿{totals.electricityShare.toLocaleString()}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={7} align="right">
+                  ฿{totals.paymentFee.toLocaleString()}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={8} align="right" className="font-bold">
+                  ฿{totals.total.toLocaleString()}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={9} align="right">
+                  -฿{totals.deductInternet.toLocaleString()}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={10} align="right">
+                  -฿{totals.deductElectricity.toLocaleString()}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell
+                  index={11}
+                  align="right"
+                  className="font-bold text-blue-600 dark:text-blue-400"
+                >
+                  ฿{totals.totalAfterDeduct.toLocaleString()}
+                </Table.Summary.Cell>
                 <Table.Summary.Cell index={12} align="right"></Table.Summary.Cell>
               </Table.Summary.Row>
             </Table.Summary>
@@ -283,12 +311,16 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
       </div>
 
       {/* Mobile Cards */}
-      <div className="md:hidden space-y-4">
+      <div className="space-y-4 md:hidden">
         {memberSummaries.map((member) => (
-          <div key={member.userId} className="bg-gray-50 rounded-lg p-4" css={css`
+          <div
+            key={member.userId}
+            className="rounded-lg bg-gray-50 p-4 dark:bg-slate-800/60"
+            css={css`
               page-break-inside: avoid;
-          `}>
-            <div className="font-semibold text-lg mb-3 text-center text-gray-900">
+            `}
+          >
+            <div className="mb-3 text-center text-lg font-semibold text-gray-900 dark:text-slate-100">
               {member.userName}
             </div>
             <div className="space-y-2">
@@ -328,33 +360,39 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
               </div>
 
               {(member.deductInternet > 0 || member.deductElectricity > 0) && (
-                <div className="border-t pt-2 space-y-1">
-                  <div className="text-sm font-medium text-red-600">Deductions:</div>
+                <div className="space-y-1 border-t pt-2">
+                  <div className="text-sm font-medium text-red-600 dark:text-red-400">
+                    Deductions:
+                  </div>
                   {member.deductInternet > 0 && (
                     <div className="flex justify-between text-sm">
                       <span>Internet:</span>
-                      <span className="text-red-600">-฿{member.deductInternet.toLocaleString()}</span>
+                      <span className="text-red-600 dark:text-red-400">
+                        -฿{member.deductInternet.toLocaleString()}
+                      </span>
                     </div>
                   )}
                   {member.deductElectricity > 0 && (
                     <div className="flex justify-between text-sm">
                       <span>Electricity:</span>
-                      <span className="text-red-600">-฿{member.deductElectricity.toLocaleString()}</span>
+                      <span className="text-red-600 dark:text-red-400">
+                        -฿{member.deductElectricity.toLocaleString()}
+                      </span>
                     </div>
                   )}
                 </div>
               )}
 
-              <div className="bg-blue-50 rounded p-3 border-2 border-blue-200">
-                <div className="flex justify-between items-center">
+              <div className="rounded border-2 border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/40">
+                <div className="flex items-center justify-between">
                   <span className="font-semibold">Final Total:</span>
-                  <span className="text-lg font-bold text-blue-600">
+                  <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
                     ฿{member.totalAfterDeduct.toLocaleString()}
                   </span>
                 </div>
-                <div className="flex justify-between items-center mt-1">
-                  <span className="text-sm text-gray-600">Per Month:</span>
-                  <span className="text-sm font-semibold text-green-600">
+                <div className="mt-1 flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-slate-300">Per Month:</span>
+                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">
                     ฿{member.totalSeparate.toLocaleString()}
                   </span>
                 </div>
@@ -364,8 +402,8 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
         ))}
 
         {/* Mobile Summary */}
-        <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
-          <div className="font-semibold text-lg mb-3 text-center text-blue-900">
+        <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/40">
+          <div className="mb-3 text-center text-lg font-semibold text-blue-900 dark:text-blue-200">
             All Members Total
           </div>
           <div className="space-y-2 text-sm">
@@ -395,10 +433,12 @@ export const MemberDetailsSection = ({ data }: IMemberDetailsSectionProps) => {
                 <span className="font-medium">฿{totals.electricityShare.toLocaleString()}</span>
               </div>
             </div>
-            <div className="border-t pt-2 font-bold text-lg">
+            <div className="border-t pt-2 text-lg font-bold">
               <div className="flex justify-between">
                 <span>Grand Total:</span>
-                <span className="text-blue-600">฿{totals.totalAfterDeduct.toLocaleString()}</span>
+                <span className="text-blue-600 dark:text-blue-400">
+                  ฿{totals.totalAfterDeduct.toLocaleString()}
+                </span>
               </div>
             </div>
           </div>

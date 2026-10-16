@@ -7,8 +7,6 @@ interface IRentalDetailsSectionProps {
   rents: IHouseRentDetailData[]
 }
 
-
-
 export const RentalDetailsSection = ({ rents }: IRentalDetailsSectionProps) => {
   const columns: ColumnsType<IHouseRentDetailData> = [
     {
@@ -41,7 +39,7 @@ export const RentalDetailsSection = ({ rents }: IRentalDetailsSectionProps) => {
       render: (_, record) => (
         <div className="text-right">
           <div>฿{record.electricity.totalPrice.toLocaleString()}</div>
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-gray-500 dark:text-slate-400">
             {record.electricity.unit.toLocaleString()} kWh
           </div>
         </div>
@@ -54,11 +52,7 @@ export const RentalDetailsSection = ({ rents }: IRentalDetailsSectionProps) => {
       key: 'total',
       render: (_, record) => {
         const total = record.houseRentPrice + record.waterPrice + record.electricity.totalPrice
-        return (
-          <div className="text-right font-semibold">
-            ฿{total.toLocaleString()}
-          </div>
-        )
+        return <div className="text-right font-semibold">฿{total.toLocaleString()}</div>
       },
       align: 'right',
       width: '10%',
@@ -79,12 +73,10 @@ export const RentalDetailsSection = ({ rents }: IRentalDetailsSectionProps) => {
   const grandTotal = totals.houseRent + totals.water + totals.electricity
 
   // Sort rents by month
-  const sortedRents = [...rents].sort((a, b) =>
-    dayjs(a.month).valueOf() - dayjs(b.month).valueOf()
-  )
+  const sortedRents = [...rents].sort((a, b) => dayjs(a.month).valueOf() - dayjs(b.month).valueOf())
 
   return (
-    <div className="space-y-4 ">
+    <div className="space-y-4">
       {/* Desktop Table */}
       <div className="hidden md:block">
         <Table
@@ -96,7 +88,7 @@ export const RentalDetailsSection = ({ rents }: IRentalDetailsSectionProps) => {
           className="print:text-xs"
           summary={() => (
             <Table.Summary fixed>
-              <Table.Summary.Row className="bg-gray-50 font-semibold">
+              <Table.Summary.Row className="bg-gray-50 font-semibold dark:bg-slate-800/60">
                 <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
                 <Table.Summary.Cell index={1} align="right">
                   ฿{totals.houseRent.toLocaleString()}
@@ -107,7 +99,7 @@ export const RentalDetailsSection = ({ rents }: IRentalDetailsSectionProps) => {
                 <Table.Summary.Cell index={3} align="right">
                   <div>
                     <div>฿{totals.electricity.toLocaleString()}</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 dark:text-slate-400">
                       {totals.electricityUnits.toLocaleString()} kWh
                     </div>
                   </div>
@@ -122,12 +114,12 @@ export const RentalDetailsSection = ({ rents }: IRentalDetailsSectionProps) => {
       </div>
 
       {/* Mobile Cards */}
-      <div className="md:hidden space-y-4">
+      <div className="space-y-4 md:hidden">
         {sortedRents.map((rent, index) => {
           const total = rent.houseRentPrice + rent.waterPrice + rent.electricity.totalPrice
           return (
-            <div key={rent.id || index} className="bg-gray-50 rounded-lg p-4">
-              <div className="font-semibold text-lg mb-3 text-center">
+            <div key={rent.id || index} className="rounded-lg bg-gray-50 p-4 dark:bg-slate-800/60">
+              <div className="mb-3 text-center text-lg font-semibold">
                 {dayjs(rent.month).format('MMM YYYY')}
               </div>
               <div className="space-y-2">
@@ -142,8 +134,10 @@ export const RentalDetailsSection = ({ rents }: IRentalDetailsSectionProps) => {
                 <div className="flex justify-between">
                   <span>Electricity:</span>
                   <div className="text-right">
-                    <div className="font-medium">฿{rent.electricity.totalPrice.toLocaleString()}</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="font-medium">
+                      ฿{rent.electricity.totalPrice.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-slate-400">
                       {rent.electricity.unit.toLocaleString()} kWh
                     </div>
                   </div>
@@ -158,8 +152,8 @@ export const RentalDetailsSection = ({ rents }: IRentalDetailsSectionProps) => {
         })}
 
         {/* Mobile Summary */}
-        <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
-          <div className="font-semibold text-lg mb-3 text-center text-blue-900">
+        <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/40">
+          <div className="mb-3 text-center text-lg font-semibold text-blue-900 dark:text-blue-200">
             Grand Total
           </div>
           <div className="space-y-2">
@@ -175,12 +169,12 @@ export const RentalDetailsSection = ({ rents }: IRentalDetailsSectionProps) => {
               <span>Electricity:</span>
               <div className="text-right">
                 <div className="font-medium">฿{totals.electricity.toLocaleString()}</div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-500 dark:text-slate-400">
                   {totals.electricityUnits.toLocaleString()} kWh
                 </div>
               </div>
             </div>
-            <div className="flex justify-between border-t pt-2 font-bold text-lg">
+            <div className="flex justify-between border-t pt-2 text-lg font-bold">
               <span>Grand Total:</span>
               <span>฿{grandTotal.toLocaleString()}</span>
             </div>

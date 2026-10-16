@@ -1,6 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons'
 import { css } from '@emotion/react'
-import { Button, Flex, Form, Grid, Table, Typography } from 'antd'
+import { Button, Flex, Form, Grid, Table, Typography, theme } from 'antd'
 import { ColumnType } from 'antd/es/table'
 import dayjs, { Dayjs } from 'dayjs'
 import { compact, set, sumBy } from 'lodash'
@@ -19,6 +19,7 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
   const { value, onChange, viewMode } = props
   const [isInit, setIsInit] = useState(false)
   const { md } = Grid.useBreakpoint()
+  const { token } = theme.useToken()
 
   const form = Form.useFormInstance<IHouseRentFormValues>()
   const internet = Form.useWatch('internet', form)
@@ -180,7 +181,7 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
           cursor: pointer;
           transition: background-color 0.2s;
           &:hover {
-            background-color: #f0f0f0;
+            background-color: ${token.colorFillSecondary};
           }
         }
       `}
@@ -193,7 +194,7 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
         return (
           <Table.Summary.Row
             css={css`
-              background-color: #f0f0f0;
+              background-color: ${token.colorFillSecondary};
             `}
           >
             <Table.Summary.Cell index={0} align="center" />

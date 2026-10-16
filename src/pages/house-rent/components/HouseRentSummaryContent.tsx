@@ -9,17 +9,15 @@ export const HouseRentSummaryContent = ({ children }: IHouseRentSummaryContentPr
   return (
     <div className="space-y-8 print:space-y-6">
       {/* Print-specific header for printed pages */}
-      <div className="hidden print:block text-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">House Rent Summary</h1>
-        <p className="text-sm text-gray-600 mt-1">
+      <div className="mb-6 hidden text-center print:block">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">House Rent Summary</h1>
+        <p className="mt-1 text-sm text-gray-600 dark:text-slate-300">
           Generated on {dayjs().tz().format('DD/MM/YYYY HH:mm')}
         </p>
       </div>
 
       {/* Responsive grid container */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 print:gap-6">
-        {children}
-      </div>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 print:gap-6">{children}</div>
     </div>
   )
 }
@@ -41,7 +39,7 @@ export const SummarySection = ({
   children,
   className = '',
   printBreak = false,
-  colSpan = { default: 1, lg: 12 }
+  colSpan = { default: 1, lg: 12 },
 }: ISummarySection) => {
   // Map colSpan values to actual Tailwind classes
   const getGridColClass = (defaultSpan: number = 1, lgSpan: number = 12) => {
@@ -83,13 +81,11 @@ export const SummarySection = ({
 
   return (
     <div className={`${gridColClass} ${printBreakClass} ${className}`}>
-      <div className="bg-white rounded-lg shadow-sm p-6 print:shadow-none print:border print:rounded-none">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4 print:text-lg">
+      <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-slate-900 print:rounded-none print:border print:shadow-none">
+        <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-slate-100 print:text-lg">
           {title}
         </h2>
-        <div className="space-y-4">
-          {children}
-        </div>
+        <div className="space-y-4">{children}</div>
       </div>
     </div>
   )

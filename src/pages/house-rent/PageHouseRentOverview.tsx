@@ -1,5 +1,5 @@
 import { css } from '@emotion/react'
-import { Flex, Grid, Table, TableColumnType, Typography } from 'antd'
+import { Flex, Grid, Table, TableColumnType, Typography, theme } from 'antd'
 import dayjs from 'dayjs'
 import { chain, get } from 'lodash'
 import { Fragment, useMemo } from 'react'
@@ -195,6 +195,7 @@ export const PageHouseRentOverview = () => {
   const { data: userListData, isLoading: isUserListLoading } = useGetHouseRentUserList()
   const { data: overviewData, isLoading: isOverviewLoading } = useGetHouseRentOverview()
   const { md } = Grid.useBreakpoint()
+  const { token } = theme.useToken()
   const userColumns = useMemo(
     (): TableColumnType<IUser>[] => [
       {
@@ -240,7 +241,7 @@ export const PageHouseRentOverview = () => {
     <div
       className="space-y-4 py-6 md:p-4"
       css={css`
-        background-color: #f3f3f3;
+        background-color: ${token.colorBgLayout};
         height: 100%;
       `}
     >
@@ -253,7 +254,7 @@ export const PageHouseRentOverview = () => {
               display: grid;
               grid-template-columns: 1fr;
               gap: 20px;
-              background-color: #fff;
+              background-color: ${token.colorBgContainer};
               padding: 20px;
             `,
             md &&

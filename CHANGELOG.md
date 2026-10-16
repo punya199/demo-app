@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/punya199/demo-app/compare/v1.9.0...v1.9.1) (2026-10-16)
+
+
+### Fix
+
+* forward /api unchanged to backend now serving under /api/v1 ([fae7a3e](https://github.com/punya199/demo-app/commit/fae7a3ef56a639b41a0fe47e9f2d9a56b508bb3f))
+
 # [1.9.0](https://github.com/punya199/demo-app/compare/v1.8.2...v1.9.0) (2026-10-16)
 
 

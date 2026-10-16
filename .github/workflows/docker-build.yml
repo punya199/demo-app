@@ -122,7 +122,7 @@ jobs:
           mkdir -p dist/config
           cat > dist/config/env-config.js <<'JS'
           window._env_ = {}
-          window._env_.VITE_API_DOMAIN = '/api'
+          window._env_.VITE_API_DOMAIN = '/api/v1'
           window._env_.VITE_IS_DEVELOPMENT = 'false'
           JS
 

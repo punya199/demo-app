@@ -2,7 +2,7 @@
 
 ## Cloudflare Pages deploy
 
-On every release, `.github/workflows/docker-build.yml` (`deploy-pages` job) builds the app, writes `dist/config/env-config.js` with `VITE_API_DOMAIN = '/api'` (same origin), and runs `wrangler pages deploy`. `functions/api/[[path]].ts` proxies `/api/*` to the backend, stripping the `/api` prefix (same as the old ingress rewrite), so cookies stay first-party. Unknown routes fall back to `index.html` (Pages SPA default, no `404.html`).
+On every release, `.github/workflows/docker-build.yml` (`deploy-pages` job) builds the app, writes `dist/config/env-config.js` with `VITE_API_DOMAIN = '/api/v1'` (same origin), and runs `wrangler pages deploy`. `functions/api/[[path]].ts` proxies `/api/*` to the backend with the path unchanged (the backend serves under `/api/v1`), so cookies stay first-party. Unknown routes fall back to `index.html` (Pages SPA default, no `404.html`).
 
 One-time setup:
 

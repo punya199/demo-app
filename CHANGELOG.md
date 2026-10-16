@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/punya199/demo-app/compare/v1.8.2...v1.9.0) (2026-10-16)
+
+
+### New
+
+* deploy frontend to Cloudflare Pages with same-origin /api proxy ([1934b26](https://github.com/punya199/demo-app/commit/1934b26cd0715c88efc9c511ff557a7cd9780f1d))
+
 ## [1.8.2](https://github.com/punya199/demo-app/compare/v1.8.1...v1.8.2) (2026-09-26)
 
 

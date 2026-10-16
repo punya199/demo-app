@@ -37,6 +37,8 @@ Commit summary format is `Tag: description` (e.g. `New: add poll ranking support
 
 **Always tag commits `Fix:`, `Update:`, or `New:`** — never `Chore:`/`Docs:`/`Build:`/`Upgrade:`, even for trivial changes. `.github/workflows/docker-build.yml`'s `build-and-push` job only runs when semantic-release's `Release` job actually publishes a new version; the other tags don't bump the version, so the Docker build/publish step gets silently skipped.
 
+**Before pushing `main`, run `git fetch origin && git rebase origin/main`** so the push is a fast-forward. semantic-release pushes its own `chore(release)` commit (version bump + CHANGELOG) to `main` after every release, so a local `main` is usually one commit behind origin. Never merge origin into local `main` (it creates a merge commit) and never force-push (it deletes the release commit).
+
 ## Architecture
 
 React 18 + TypeScript SPA (Vite 6) — a multi-tool app bundling several unrelated features behind one router/auth shell, not a single-purpose product. Path alias `@/*` → `./src/*`.

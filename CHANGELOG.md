@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/punya199/demo-app/compare/v1.9.1...v1.10.0) (2026-10-16)
+
+
+### Update
+
+* support dark mode in house-rent ([6650fb1](https://github.com/punya199/demo-app/commit/6650fb168830a2d518496af31f425138cb7728a2))
+
 ## [1.9.1](https://github.com/punya199/demo-app/compare/v1.9.0...v1.9.1) (2026-10-16)
 
 

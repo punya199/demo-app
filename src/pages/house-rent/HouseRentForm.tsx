@@ -12,6 +12,7 @@ import {
   IHouseRentMemberData,
 } from './house-rent-interface'
 import { HouseRentAttachments } from './HouseRentAttachments'
+import { HouseRentAttachmentsView } from './HouseRentAttachmentsView'
 import { HouseRentDetailTableField } from './HouseRentDetailTableField'
 import { HouseRentMasterDataField } from './HouseRentMasterDataField'
 import { HouseRentMemberTableField } from './HouseRentMemberTableField'
@@ -198,8 +199,13 @@ export const HouseRentForm = (props: IHouseRentFormProps) => {
             </Col>
 
             <Col xs={24} md={24}>
-              <HouseRentAttachments viewMode={viewMode} />
+              <HouseRentAttachmentsView />
             </Col>
+            {!viewMode && (
+              <Col xs={24} md={24}>
+                <HouseRentAttachments />
+              </Col>
+            )}
 
             <Divider />
             <Col xs={24} md={24}>

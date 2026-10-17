@@ -1,12 +1,11 @@
 import { Empty, message } from 'antd'
-import { chain } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
 import { LoadingSpin } from '../../layouts/LoadingSpin'
 import { useGetFeaturePermissionAction } from '../../service'
 import { EnumPermissionFeatureName } from '../../services/permission/permission.params'
-import { calculateElectricitySummary } from './house-rent-helper'
+import { buildSaveParams, calculateElectricitySummary } from './house-rent-helper'
 import { IHouseRentFormValues } from './house-rent-interface'
 import { useCreateHouseRent, useGetHouseRent } from './house-rent-service'
 import { HouseRentForm } from './HouseRentForm'
@@ -23,27 +22,17 @@ export const PageHouseRentDetailClone = () => {
 
   const handleSubmit = useCallback(
     (data: IHouseRentFormValues) => {
-      const attachmentIds = chain(data.attachments)
-        .map((attachment) => attachment.uid)
-        .compact()
-        .value()
-      saveHouseRent(
-        {
-          ...data,
-          attachmentIds,
+      saveHouseRent(buildSaveParams(data), {
+        onSuccess: (response) => {
+          message.success('บันทึกข้อมูลสำเร็จ')
+          navigate(appPath.houseRentDetail({ param: { houseRentId: response.houseRent.id } }), {
+            replace: true,
+          })
         },
-        {
-          onSuccess: (response) => {
-            message.success('บันทึกข้อมูลสำเร็จ')
-            navigate(appPath.houseRentDetail({ param: { houseRentId: response.houseRent.id } }), {
-              replace: true,
-            })
-          },
-          onError: () => {
-            message.error('บันทึกข้อมูลไม่สำเร็จ')
-          },
-        }
-      )
+        onError: () => {
+          message.error('บันทึกข้อมูลไม่สำเร็จ')
+        },
+      })
     },
     [saveHouseRent, navigate]
   )
@@ -53,6 +42,7 @@ export const PageHouseRentDetailClone = () => {
     return {
       ...houseRentData.houseRent,
       name: '',
+      rents: houseRentData.houseRent.rents.map((rent) => ({ ...rent, files: [] })),
       electricitySummary: calculateElectricitySummary(
         houseRentData.houseRent.rents,
         houseRentData.houseRent.members

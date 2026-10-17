@@ -1,5 +1,6 @@
 import { UploadFile } from 'antd'
 import { Dayjs } from 'dayjs'
+import type { IHouseRentAttachmentData } from './house-rent-service'
 
 export interface IElectricitySummaryData {
   totalUnit: number
@@ -17,6 +18,9 @@ export interface IHouseRentDetailData {
     totalPrice: number
     unit: number
   }
+  attachments?: IHouseRentAttachmentData[] // from API
+  files?: UploadFile[] // form state
+  attachmentIds?: string[] // save payload
 }
 
 export interface IHouseRentMemberData {

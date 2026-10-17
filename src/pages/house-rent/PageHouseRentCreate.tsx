@@ -1,10 +1,10 @@
 import { message } from 'antd'
-import { chain } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { appPath } from '../../config/app-paths'
 import { useGetFeaturePermissionAction } from '../../service'
 import { EnumPermissionFeatureName } from '../../services/permission/permission.params'
+import { buildSaveParams } from './house-rent-helper'
 import { IHouseRentFormValues } from './house-rent-interface'
 import { useCreateHouseRent } from './house-rent-service'
 import { HouseRentForm } from './HouseRentForm'
@@ -18,24 +18,14 @@ export const PageHouseRentCreate = () => {
 
   const handleSubmit = useCallback(
     (data: IHouseRentFormValues) => {
-      const attachmentIds = chain(data.attachments)
-        .map((attachment) => attachment.uid)
-        .compact()
-        .value()
-      saveHouseRent(
-        {
-          ...data,
-          attachmentIds,
+      saveHouseRent(buildSaveParams(data), {
+        onSuccess: (response) => {
+          message.success('บันทึกข้อมูลสำเร็จ')
+          navigate(appPath.houseRentDetail({ param: { houseRentId: response.houseRent.id } }), {
+            replace: true,
+          })
         },
-        {
-          onSuccess: (response) => {
-            message.success('บันทึกข้อมูลสำเร็จ')
-            navigate(appPath.houseRentDetail({ param: { houseRentId: response.houseRent.id } }), {
-              replace: true,
-            })
-          },
-        }
-      )
+      })
     },
     [saveHouseRent, navigate]
   )

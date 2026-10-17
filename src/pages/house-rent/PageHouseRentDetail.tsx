@@ -1,12 +1,15 @@
 import { message } from 'antd'
-import { chain } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { NotFound } from '../../components/NotFound'
 import { LoadingSpin } from '../../layouts/LoadingSpin'
 import { useGetFeaturePermissionAction } from '../../service'
 import { EnumPermissionFeatureName } from '../../services/permission/permission.params'
-import { calculateElectricitySummary, mapAttachmentToUploadFile } from './house-rent-helper'
+import {
+  buildSaveParams,
+  calculateElectricitySummary,
+  mapAttachmentToUploadFile,
+} from './house-rent-helper'
 import { IHouseRentFormValues } from './house-rent-interface'
 import { useGetHouseRent, useUpdateHouseRent } from './house-rent-service'
 import { HouseRentForm } from './HouseRentForm'
@@ -22,24 +25,14 @@ export const PageHouseRentDetail = () => {
 
   const handleSubmit = useCallback(
     (data: IHouseRentFormValues) => {
-      const attachmentIds = chain(data.attachments)
-        .map((attachment) => attachment.uid)
-        .compact()
-        .value()
-      saveHouseRent(
-        {
-          ...data,
-          attachmentIds,
+      saveHouseRent(buildSaveParams(data), {
+        onSuccess: () => {
+          message.success('บันทึกข้อมูลสำเร็จ')
         },
-        {
-          onSuccess: () => {
-            message.success('บันทึกข้อมูลสำเร็จ')
-          },
-          onError: () => {
-            message.error('บันทึกข้อมูลไม่สำเร็จ')
-          },
-        }
-      )
+        onError: () => {
+          message.error('บันทึกข้อมูลไม่สำเร็จ')
+        },
+      })
     },
     [saveHouseRent]
   )
@@ -48,6 +41,10 @@ export const PageHouseRentDetail = () => {
     if (!houseRentData) return undefined
     return {
       ...houseRentData.houseRent,
+      rents: houseRentData.houseRent.rents.map((rent) => ({
+        ...rent,
+        files: rent.attachments?.map(mapAttachmentToUploadFile) ?? [],
+      })),
       electricitySummary: calculateElectricitySummary(
         houseRentData.houseRent.rents,
         houseRentData.houseRent.members

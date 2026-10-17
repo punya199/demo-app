@@ -1,10 +1,12 @@
 import { UploadFile } from 'antd'
-import { round, sumBy } from 'lodash'
+import { chain, omit, round, sumBy } from 'lodash'
 import { appConfig } from '../../config/app-config'
 import {
   IElectricitySummaryData,
   IHouseRentDetailData,
+  IHouseRentFormValues,
   IHouseRentMemberData,
+  ISaveHouseRentParams,
 } from './house-rent-interface'
 import { IHouseRentAttachmentData } from './house-rent-service'
 
@@ -37,3 +39,18 @@ export const calculateElectricitySummary = (
     shareUnit,
   }
 }
+
+const uploadIds = (files?: UploadFile[]) =>
+  chain(files)
+    .map((file) => file.uid)
+    .compact()
+    .value()
+
+export const buildSaveParams = (data: IHouseRentFormValues): ISaveHouseRentParams => ({
+  ...omit(data, 'attachments'),
+  attachmentIds: uploadIds(data.attachments),
+  rents: data.rents.map((rent) => ({
+    ...omit(rent, ['files', 'attachments']),
+    attachmentIds: uploadIds(rent.files),
+  })),
+})

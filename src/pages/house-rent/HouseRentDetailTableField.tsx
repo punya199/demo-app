@@ -33,6 +33,7 @@ export const HouseRentDetailTableField = (props: IHouseRentDetailTableFieldProps
   const onAdd = useCallback(() => {
     const newData = [...(value || [])]
     newData.push({
+      id: v4(),
       month: dayjs(),
       houseRentPrice: 0,
       waterPrice: 0,

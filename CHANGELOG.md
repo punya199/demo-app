@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/punya199/demo-app/compare/v1.12.0...v1.13.0) (2026-10-29)
+
+
+### New
+
+* add Gem Diggers (นักขุดอัญมณี) puzzle game under the Game menu ([68ec51c](https://github.com/punya199/demo-app/commit/68ec51c2b9e59bdc03a9d32f11f4801ca5e108bd))
+
 # [1.12.0](https://github.com/punya199/demo-app/compare/v1.11.0...v1.12.0) (2026-10-17)
 
 

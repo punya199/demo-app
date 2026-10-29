@@ -9,6 +9,7 @@ export const appPath = {
   home: generatePath('/'),
   randomCard: generatePath('/random-card'),
   omamaGame: generatePath('/omama'),
+  gemDiggers: generatePath('/gem-diggers'),
   checkBillPage: generatePath('/check-bill'),
   checkBillPageCreate: generatePath('/check-bill/create'),
   checkBillPageEdit: generatePath<{ param: { billId: number } }>('/check-bill/:billId/edit'),

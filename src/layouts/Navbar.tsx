@@ -87,6 +87,14 @@ const Navbar = () => {
                 onClose()
               },
             },
+            {
+              key: 'g3',
+              label: 'นักขุดอัญมณี',
+              onClick: () => {
+                navigate(appPath.gemDiggers())
+                onClose()
+              },
+            },
           ],
         },
         {

@@ -1,0 +1,292 @@
+.gem-diggers {
+  height: 100%;
+  background: var(--bg);
+  --bg: #1a120c;
+  --panel: #3a2a1e;
+  --panel-edge: #5a4030;
+  --text: #fbefdc;
+  --muted: #c9b39a;
+  --accent: #ffcc33;
+  --accent-text: #3a2400;
+  font-family: 'Leelawadee UI', 'Noto Sans Thai', Tahoma, sans-serif;
+  color: var(--text);
+}
+
+.gem-diggers * {
+  box-sizing: border-box;
+}
+
+.gem-diggers #app {
+  height: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.gem-diggers #hud {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--panel);
+  border-bottom: 2px solid var(--panel-edge);
+}
+
+.gem-diggers #title {
+  flex: 1;
+  min-width: 0;
+}
+
+.gem-diggers #level-name {
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gem-diggers #progress {
+  margin-top: 4px;
+  height: 7px;
+  border-radius: 4px;
+  background: #1f150e;
+  overflow: hidden;
+}
+
+.gem-diggers #progress-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #ffcc33, #ff8c1a);
+  transition: width 0.2s;
+}
+
+.gem-diggers button {
+  font: inherit;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--panel-edge);
+  border: none;
+  border-radius: 10px;
+  padding: 7px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.gem-diggers button:hover:not(:disabled) {
+  filter: brightness(1.2);
+}
+
+.gem-diggers button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.gem-diggers button.icon {
+  min-width: 36px;
+  padding: 7px 0;
+}
+
+.gem-diggers button.primary {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.gem-diggers #btn-slot {
+  background: #2e6b3f;
+}
+
+.gem-diggers #stage {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.gem-diggers #game {
+  display: block;
+  touch-action: manipulation;
+}
+
+.gem-diggers #toast {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: rgba(30, 20, 12, 0.92);
+  border: 2px solid var(--accent);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.gem-diggers #toast[hidden] {
+  display: none;
+}
+
+.gem-diggers #overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 6, 3, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 10;
+}
+
+.gem-diggers #overlay[hidden] {
+  display: none;
+}
+
+.gem-diggers #panel {
+  background: var(--panel);
+  border: 2px solid var(--panel-edge);
+  border-radius: 18px;
+  padding: 22px 20px;
+  width: min(420px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.gem-diggers #panel h2 {
+  margin: 0 0 10px;
+  font-size: 24px;
+}
+
+.gem-diggers #panel p {
+  color: var(--muted);
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.gem-diggers #panel .actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.gem-diggers #panel .actions button {
+  padding: 10px 18px;
+  font-size: 16px;
+}
+
+.gem-diggers .thumb {
+  image-rendering: pixelated;
+  width: 160px;
+  height: auto;
+  border-radius: 8px;
+  border: 3px solid var(--panel-edge);
+  margin: 6px auto;
+  display: block;
+}
+
+.gem-diggers .stars {
+  font-size: 30px;
+  letter-spacing: 4px;
+  color: var(--accent);
+}
+
+.gem-diggers .stars .off {
+  color: #5a4a3a;
+}
+
+.gem-diggers .help {
+  text-align: left;
+  margin: 10px 0 0;
+  padding-left: 22px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.gem-diggers .level-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.gem-diggers .level-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  background: #2a1d14;
+  border: 2px solid var(--panel-edge);
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.gem-diggers .level-card.current {
+  border-color: var(--accent);
+}
+
+.gem-diggers .level-card canvas {
+  image-rendering: pixelated;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.gem-diggers .level-card .lock {
+  font-size: 34px;
+  height: 64px;
+  line-height: 64px;
+}
+
+.gem-diggers .level-card small {
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+@media (max-width: 420px) {
+  .gem-diggers #hud {
+    gap: 4px;
+    padding: 6px;
+  }
+  .gem-diggers #level-name {
+    font-size: 13px;
+  }
+  .gem-diggers button.icon {
+    min-width: 30px;
+  }
+  .gem-diggers #btn-slot {
+    font-size: 13px;
+    padding: 7px 6px;
+  }
+  .gem-diggers #btn-slot .long,
+  .gem-diggers #btn-help {
+    display: none;
+  }
+}
+
+.gem-diggers .mode-picker {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.gem-diggers .mode-picker button {
+  flex: 1;
+  max-width: 110px;
+  padding: 8px 0;
+}
+
+.gem-diggers #panel p.mode-info {
+  font-size: 13px;
+  min-height: 3em;
+}
+
+.gem-diggers .level-card.endless .lock {
+  font-size: 30px;
+}

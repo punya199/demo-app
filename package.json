@@ -17,7 +17,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
-    "postinstall": "husky"
+    "postinstall": "husky",
+    "gem:gen": "node node_modules/esbuild/bin/esbuild scripts/gem-diggers/gen-trays.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/gem-gen-trays.mjs --log-level=warning && node node_modules/.cache/gem-gen-trays.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "5.x",

@@ -24,6 +24,7 @@ const PageManageUser = lazy(() => import('./pages/PageManageUser'))
 const PageRegister = lazy(() => import('./pages/PageRegister'))
 const CardGame = lazy(() => import('./pages/project/random-card/CardGame'))
 const PageOmama = lazy(() => import('./pages/project/omama-game/PageOmama'))
+const PageGemDiggers = lazy(() => import('./pages/project/gem-diggers/PageGemDiggers'))
 const PageAllBill = lazy(() => import('./pages/project/checkbill/PageAllBill'))
 const PageLedgerEntries = lazy(() => import('./pages/project/paojiao-ledger/PageLedgerEntries'))
 const PageLedgerSummary = lazy(() => import('./pages/project/paojiao-ledger/PageLedgerSummary'))
@@ -96,6 +97,7 @@ export const router = createBrowserRouter([
         element: <CardGame />,
       },
       { path: appPath.omamaGame(), element: <PageOmama /> },
+      { path: appPath.gemDiggers(), element: <PageGemDiggers /> },
       {
         path: appPath.checkBillPageCreate(),
         element: <PageCreateBill />,

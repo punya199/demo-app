@@ -1,3 +1,11 @@
+# [1.17.0](https://github.com/punya199/demo-app/compare/v1.16.0...v1.17.0) (2026-10-30)
+
+
+### New
+
+* add monster adventure, shop and Dex tabs ([5a9245a](https://github.com/punya199/demo-app/commit/5a9245a3f2cd0a4e95bf8e63def1782d51abef4e))
+* add monster stamina, mini-game, evolution timer and guide ([5b41ce2](https://github.com/punya199/demo-app/commit/5b41ce2724bec59524ed96045a87b4c33045bc87))
+
 # [1.16.0](https://github.com/punya199/demo-app/compare/v1.15.0...v1.16.0) (2026-10-30)
 
 

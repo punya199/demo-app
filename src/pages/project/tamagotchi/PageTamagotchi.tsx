@@ -1,12 +1,15 @@
 import { ArrowLeftOutlined } from '@ant-design/icons'
-import { Button, Card, message, Spin, Tag, Tooltip } from 'antd'
+import { Button, Card, message, Spin, Tabs, Tag, Tooltip } from 'antd'
 import { useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { appPath } from '../../../config/app-paths'
 import { useGetMeSuspense } from '../../../service'
+import { AdventurePanel } from './AdventurePanel'
+import { DexPanel } from './DexPanel'
 import { PetSprite } from './PetSprite'
+import { ShopPanel } from './ShopPanel'
 import {
   actionOptions,
   deathCauseLabel,
@@ -22,6 +25,7 @@ import { EnumMonsterAction, EnumMonsterStage, IMonsterData } from './tamagotchi-
 import {
   useGetMonsterHistory,
   useGetMyMonster,
+  useGetWallet,
   useHatchMonster,
   useMonsterAction,
 } from './tamagotchi-service'
@@ -146,6 +150,7 @@ const MonsterScreen = (props: { monster: IMonsterData }) => {
             <StatRow label="อายุ" value={formatAge(monster.ageMinutes)} />
             <StatRow label="ฝึกในร่างนี้" value={`${monster.trainCount} ครั้ง`} />
             <StatRow label="ดูแลพลาดในร่างนี้" value={`${monster.careMistakes} ครั้ง`} />
+            <StatRow label="ผลการต่อสู้" value={`ชนะ ${monster.wins} · แพ้ ${monster.losses}`} />
           </div>
         )}
       </div>
@@ -248,6 +253,46 @@ const TamagotchiGame = () => {
   return <MonsterScreen monster={monster} />
 }
 
+const GameTabs = () => {
+  const { data: monsterData } = useGetMyMonster()
+  const { data: wallet } = useGetWallet()
+  const monster = monsterData?.monster ?? null
+  const coin = wallet?.coin ?? 0
+
+  return (
+    <div className="flex w-full flex-col gap-2">
+      <div className="text-right font-semibold text-amber-600 dark:text-amber-400">🪙 {coin}</div>
+      <Tabs
+        centered
+        destroyOnHidden
+        items={[
+          {
+            key: 'care',
+            label: 'เลี้ยง',
+            children: (
+              <div className="flex flex-col items-center gap-8">
+                <TamagotchiGame />
+                <HallOfFame />
+              </div>
+            ),
+          },
+          {
+            key: 'adventure',
+            label: 'ผจญภัย',
+            children: <AdventurePanel monster={monster} onError={showError} />,
+          },
+          {
+            key: 'shop',
+            label: 'ร้านค้า',
+            children: <ShopPanel monster={monster} coin={coin} onError={showError} />,
+          },
+          { key: 'dex', label: 'Dex', children: <DexPanel /> },
+        ]}
+      />
+    </div>
+  )
+}
+
 const PageTamagotchi = () => {
   const { data: getMeResponse } = useGetMeSuspense()
   if (!getMeResponse?.user?.id) {
@@ -268,9 +313,8 @@ const PageTamagotchi = () => {
         </Link>
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">มอนสเตอร์</h1>
       </div>
-      <div className="flex w-full max-w-sm flex-col items-center gap-8">
-        <TamagotchiGame />
-        <HallOfFame />
+      <div className="flex w-full max-w-sm flex-col items-center">
+        <GameTabs />
       </div>
     </div>
   )

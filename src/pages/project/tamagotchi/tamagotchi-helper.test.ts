@@ -1,9 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { formatAge, getActionBlocker, toHearts, toThaiErrorMessage } from './tamagotchi-helper'
+import {
+  describeBattleEvent,
+  formatAge,
+  getActionBlocker,
+  getBattleBlocker,
+  getShopBlocker,
+  hpAfter,
+  toHearts,
+  toThaiErrorMessage,
+} from './tamagotchi-helper'
 import {
   EnumMonsterAction,
   EnumMonsterLine,
   EnumMonsterStage,
+  IBattleData,
+  IBattleEvent,
   IMonsterData,
 } from './tamagotchi-interface'
 
@@ -25,6 +36,8 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   lightsOn: true,
   careMistakes: 0,
   trainCount: 0,
+  wins: 0,
+  losses: 0,
   ageMinutes: 0,
   bornAt: NOW.toISOString(),
   trainReadyAt: null,
@@ -91,5 +104,85 @@ describe('toThaiErrorMessage', () => {
     expect(toThaiErrorMessage('Monster is asleep')).toBe('มอนกำลังหลับ')
     expect(toThaiErrorMessage('boom')).toBe('ทำรายการไม่สำเร็จ')
     expect(toThaiErrorMessage(undefined)).toBe('ทำรายการไม่สำเร็จ')
+  })
+})
+
+describe('getBattleBlocker', () => {
+  it('allows a ready monster and explains every refusal', () => {
+    expect(getBattleBlocker(monster())).toBeNull()
+    expect(getBattleBlocker(null)).toBe('ยังไม่มีมอน')
+    expect(getBattleBlocker(monster({ isSleeping: true }))).toBe('มอนกำลังหลับ')
+    expect(getBattleBlocker(monster({ isSick: true }))).toBe('ป่วยอยู่ สู้ไม่ได้')
+    expect(getBattleBlocker(monster({ strength: 0 }))).toBe('แรงหมด ให้วิตามินหรือฝึกก่อน')
+  })
+
+  it('counts a partly-filled strength heart as enough to fight', () => {
+    expect(getBattleBlocker(monster({ strength: 0.2 }))).toBeNull()
+  })
+})
+
+describe('getShopBlocker', () => {
+  it('needs a hatched, awake monster and enough coins', () => {
+    expect(getShopBlocker(monster(), 15, 15)).toBeNull()
+    expect(getShopBlocker(monster(), 15, 14)).toBe('เหรียญไม่พอ')
+    expect(getShopBlocker(monster({ isSleeping: true }), 15, 99)).toBe('มอนกำลังหลับ')
+    expect(getShopBlocker(monster({ stage: EnumMonsterStage.EGG }), 15, 99)).toBe(
+      'ต้องมีมอนที่ฟักแล้ว'
+    )
+  })
+})
+
+const hit = (overrides: Partial<IBattleEvent>): IBattleEvent => ({
+  round: 1,
+  actor: 'player',
+  moveName: 'โจมตี',
+  isSkill: false,
+  damage: 5,
+  isCritical: false,
+  effectiveness: 'normal',
+  targetHp: 0,
+  ...overrides,
+})
+
+describe('hpAfter', () => {
+  const events = [
+    hit({ actor: 'player', targetHp: 25 }),
+    hit({ actor: 'enemy', targetHp: 32 }),
+    hit({ actor: 'player', targetHp: 18 }),
+  ]
+
+  it('starts at full HP and follows the latest hit on that side', () => {
+    expect(hpAfter(events, 0, 'enemy', 30)).toBe(30)
+    expect(hpAfter(events, 1, 'enemy', 30)).toBe(25)
+    expect(hpAfter(events, 1, 'player', 40)).toBe(40)
+    expect(hpAfter(events, 3, 'enemy', 30)).toBe(18)
+    expect(hpAfter(events, 3, 'player', 40)).toBe(32)
+  })
+})
+
+describe('describeBattleEvent', () => {
+  const fighter = (name: string) => ({
+    name,
+    emoji: '🧪',
+    element: EnumMonsterLine.FLAME,
+    stats: { hp: 10, atk: 1, def: 1, spd: 1 },
+    skill: { name: 'skill', power: 1.6 },
+  })
+  const battle = { player: fighter('ถ่านน้อย'), enemy: fighter('หนอนใบไม้') } as IBattleData
+
+  it('names the attacker, move and damage with any notes', () => {
+    expect(describeBattleEvent(hit({ damage: 7 }), battle)).toBe('ถ่านน้อย ใช้ โจมตี 7 ดาเมจ')
+    expect(
+      describeBattleEvent(
+        hit({
+          actor: 'enemy',
+          moveName: 'ใยเหนียว',
+          damage: 12,
+          effectiveness: 'strong',
+          isCritical: true,
+        }),
+        battle
+      )
+    ).toBe('หนอนใบไม้ ใช้ ใยเหนียว 12 ดาเมจ (ได้เปรียบธาตุ! คริติคอล!)')
   })
 })

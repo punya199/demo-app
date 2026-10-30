@@ -46,9 +46,85 @@ export interface IMonsterData {
   lightsOn: boolean
   careMistakes: number
   trainCount: number
+  wins: number
+  losses: number
   ageMinutes: number
   bornAt: string
   trainReadyAt: string | null
   diedAt: string | null
   deathCause: EnumMonsterDeathCause | null
+}
+
+export interface IBattleStats {
+  hp: number
+  atk: number
+  def: number
+  spd: number
+}
+
+export interface IFighter {
+  name: string
+  emoji: string
+  element: EnumMonsterLine
+  stats: IBattleStats
+  skill: { name: string; power: number }
+}
+
+export type BattleSide = 'player' | 'enemy'
+
+export interface IBattleEvent {
+  round: number
+  actor: BattleSide
+  moveName: string
+  isSkill: boolean
+  damage: number
+  isCritical: boolean
+  effectiveness: 'strong' | 'weak' | 'normal'
+  targetHp: number
+}
+
+export interface IBattleData {
+  stageId: string
+  won: boolean
+  rounds: number
+  events: IBattleEvent[]
+  player: IFighter
+  enemy: IFighter
+  reward: number
+  isFirstClear: boolean
+}
+
+export interface IAdventureStage {
+  id: string
+  isBoss: boolean
+  enemy: IFighter
+  reward: number
+  firstClearReward: number
+  clearCount: number
+  unlocked: boolean
+}
+
+export interface IAdventureArea {
+  id: string
+  name: string
+  emoji: string
+  recommendedStage: EnumMonsterStage
+  stages: IAdventureStage[]
+}
+
+export interface IShopItem {
+  id: string
+  name: string
+  emoji: string
+  description: string
+  price: number
+}
+
+export interface IDexEntry {
+  id: string
+  line: EnumMonsterLine
+  stage: EnumMonsterStage
+  discovered: boolean
+  name: string | null
+  emoji: string | null
 }

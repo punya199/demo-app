@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/punya199/demo-app/compare/v1.14.0...v1.15.0) (2026-10-30)
+
+
+### New
+
+* add game list page with game cards ([5841728](https://github.com/punya199/demo-app/commit/58417283a2fc69fac9899216911c20a3077cd46d))
+
 # [1.14.0](https://github.com/punya199/demo-app/compare/v1.13.0...v1.14.0) (2026-10-30)
 
 

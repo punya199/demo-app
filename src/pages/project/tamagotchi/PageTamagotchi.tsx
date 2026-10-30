@@ -1,30 +1,43 @@
 import { ArrowLeftOutlined } from '@ant-design/icons'
-import { Button, Card, message, Spin, Tag, Tooltip } from 'antd'
+import { Button, Card, message, Progress, Spin, Tabs, Tag, Tooltip } from 'antd'
 import { useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { appPath } from '../../../config/app-paths'
 import { useGetMeSuspense } from '../../../service'
+import { AdventurePanel } from './AdventurePanel'
+import { DexPanel } from './DexPanel'
+import { MinigameModal } from './MinigameModal'
 import { PetSprite } from './PetSprite'
+import { ShopPanel } from './ShopPanel'
+import { WikiPanel } from './WikiPanel'
 import {
   actionOptions,
   deathCauseLabel,
+  describeMissingConditions,
   formatAge,
   getActionBlocker,
+  getEvolutionCountdown,
+  getMinigameBlocker,
   lineOptions,
   MAX_HEARTS,
   stageLabel,
   toHearts,
   toThaiErrorMessage,
 } from './tamagotchi-helper'
-import { EnumMonsterAction, EnumMonsterStage, IMonsterData } from './tamagotchi-interface'
+import { EnumMonsterStage, IMonsterData } from './tamagotchi-interface'
 import {
   useGetMonsterHistory,
   useGetMyMonster,
+  useGetWallet,
   useHatchMonster,
   useMonsterAction,
+  useRefillStamina,
 } from './tamagotchi-service'
+
+// Must match STAMINA_REFILL_GEM_PRICE on the server (also shown in the guide).
+const STAMINA_REFILL_GEM_PRICE = 5
 
 const showError = (error: unknown) => {
   message.error(
@@ -105,12 +118,117 @@ const Memorial = (props: { monster: IMonsterData; onNewEgg: () => void }) => {
   )
 }
 
-const MonsterScreen = (props: { monster: IMonsterData }) => {
-  const { monster } = props
+const EvolutionPanel = (props: { monster: IMonsterData; fetchedAt: number; now: Date }) => {
+  const { monster, fetchedAt, now } = props
+  const { evolution } = monster
+  const countdown = getEvolutionCountdown(evolution, fetchedAt, now)
+  const isEgg = monster.stage === EnumMonsterStage.EGG
+
+  if (!countdown) {
+    const ruleToFinal = evolution.rules[0]
+    return (
+      <div className="text-sm text-slate-600 dark:text-slate-300">
+        {monster.stage === EnumMonsterStage.ULTIMATE
+          ? '🏆 ร่างสูงสุดแล้ว'
+          : ruleToFinal
+            ? `ไม่ผ่านเงื่อนไข${ruleToFinal.to.name} อยู่ร่างนี้ไปจนครบอายุ`
+            : 'ร่างสุดท้ายของสายนี้'}
+        <div className="text-xs text-slate-500 dark:text-slate-400">
+          อายุขัยเหลือ {formatAge(evolution.lifespanRemainingMinutes)}
+        </div>
+      </div>
+    )
+  }
+
+  // A perfect form only evolves if it meets the ultimate's conditions, so show what's missing.
+  const missing =
+    !evolution.next && evolution.rules[0]
+      ? describeMissingConditions(evolution.rules[0], monster)
+      : []
+
+  return (
+    <div className="text-sm">
+      <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+        <span>
+          {isEgg ? 'ฟักเป็น' : 'วิวัฒนาการเป็น'}{' '}
+          {evolution.next
+            ? `${evolution.next.emoji} ${evolution.next.name}`
+            : evolution.rules[0]
+              ? `${evolution.rules[0].to.emoji} ${evolution.rules[0].to.name} (ถ้าผ่านเงื่อนไข)`
+              : '???'}
+        </span>
+        <span className="text-xs">{countdown.percent}%</span>
+      </div>
+      <Progress percent={countdown.percent} showInfo={false} size="small" />
+      <div className="text-xs text-slate-500 dark:text-slate-400">
+        ⚡ เปิดเกมไว้ (x{evolution.onlineMultiplier}): อีก ~
+        {formatAge(Math.ceil(countdown.onlineMinutes))}
+        {' · '}ปิดเกม: อีก ~{formatAge(Math.ceil(countdown.offlineMinutes))}
+      </div>
+      {missing.length > 0 && (
+        <div className="text-xs text-amber-600 dark:text-amber-400">
+          ยังขาด: {missing.join(' · ')}
+        </div>
+      )}
+    </div>
+  )
+}
+
+const StaminaPanel = (props: { monster: IMonsterData; gem: number; now: Date }) => {
+  const { monster, gem, now } = props
+  const [isMinigameOpen, setIsMinigameOpen] = useState(false)
+  const { mutate: refill, isPending: isRefilling } = useRefillStamina()
+  const stamina = Math.round(monster.stamina)
+  const minigameBlocker = getMinigameBlocker(monster, now)
+  const refillBlocker =
+    stamina >= 100 ? 'Stamina เต็มอยู่แล้ว' : gem < STAMINA_REFILL_GEM_PRICE ? 'เพชรไม่พอ' : null
+
+  return (
+    <div className="text-sm">
+      <div className="flex items-center justify-between">
+        <span className="text-slate-600 dark:text-slate-300">Stamina</span>
+        <span className="font-medium text-slate-900 dark:text-slate-100">{stamina}/100</span>
+      </div>
+      <Progress
+        percent={stamina}
+        showInfo={false}
+        size="small"
+        strokeColor={stamina === 0 ? '#ef4444' : '#f59e0b'}
+      />
+      {stamina === 0 && (
+        <div className="text-xs text-red-500">Stamina หมด: พลังต่อสู้ลดลงครึ่งหนึ่ง</div>
+      )}
+      <div className="mt-1 flex gap-2">
+        <Tooltip title={minigameBlocker}>
+          <Button size="small" disabled={!!minigameBlocker} onClick={() => setIsMinigameOpen(true)}>
+            🎯 มินิเกม
+          </Button>
+        </Tooltip>
+        <Tooltip title={refillBlocker}>
+          <Button
+            size="small"
+            disabled={!!refillBlocker || isRefilling}
+            onClick={() => refill(undefined, { onError: showError })}
+          >
+            💎 {STAMINA_REFILL_GEM_PRICE} เติมเต็ม
+          </Button>
+        </Tooltip>
+      </div>
+      <MinigameModal
+        open={isMinigameOpen}
+        onClose={() => setIsMinigameOpen(false)}
+        onError={showError}
+      />
+    </div>
+  )
+}
+
+const MonsterScreen = (props: { monster: IMonsterData; fetchedAt: number }) => {
+  const { monster, fetchedAt } = props
   const now = useNow(5000)
+  const { data: wallet } = useGetWallet()
   const { mutate: act, isPending } = useMonsterAction()
   const isEgg = monster.stage === EnumMonsterStage.EGG
-  const isDark = monster.isSleeping && !monster.lightsOn
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -119,14 +237,10 @@ const MonsterScreen = (props: { monster: IMonsterData }) => {
           <span className="font-semibold text-slate-900 dark:text-slate-100">{monster.name}</span>
           <Tag color="blue">{stageLabel[monster.stage]}</Tag>
         </div>
-        <div
-          className={`rounded-2xl p-4 transition-colors duration-500 ${
-            isDark ? 'bg-slate-900' : 'bg-lime-100 dark:bg-lime-200'
-          }`}
-        >
+        <div className="rounded-2xl bg-lime-100 p-4 dark:bg-lime-200">
           <PetSprite
             emoji={monster.emoji}
-            isSleeping={monster.isSleeping}
+            isExhausted={!isEgg && monster.stamina <= 0}
             isSick={monster.isSick}
             isEgg={isEgg}
           />
@@ -134,53 +248,43 @@ const MonsterScreen = (props: { monster: IMonsterData }) => {
             {'💩'.repeat(monster.poops)}
           </div>
         </div>
-        {isEgg ? (
-          <p className="mt-3 text-center text-slate-600 dark:text-slate-300">
-            ไข่กำลังจะฟัก อีกไม่กี่นาที...
-          </p>
-        ) : (
+        <div className="mt-3">
+          <EvolutionPanel monster={monster} fetchedAt={fetchedAt} now={now} />
+        </div>
+        {!isEgg && (
           <div className="mt-3 flex flex-col gap-1 text-sm">
             <Hearts label="ความอิ่ม" value={monster.fullness} />
             <Hearts label="ความแข็งแรง" value={monster.strength} />
+            <StaminaPanel monster={monster} gem={wallet?.gem ?? 0} now={now} />
             <StatRow label="น้ำหนัก" value={`${monster.weight} g`} />
             <StatRow label="อายุ" value={formatAge(monster.ageMinutes)} />
             <StatRow label="ฝึกในร่างนี้" value={`${monster.trainCount} ครั้ง`} />
             <StatRow label="ดูแลพลาดในร่างนี้" value={`${monster.careMistakes} ครั้ง`} />
+            <StatRow label="ผลการต่อสู้" value={`ชนะ ${monster.wins} · แพ้ ${monster.losses}`} />
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-5 gap-2">
         {actionOptions.map((option) => {
           const blocker = getActionBlocker(monster, option.action, now)
-          const label =
-            option.action === EnumMonsterAction.LIGHTS
-              ? monster.lightsOn
-                ? 'ปิดไฟ'
-                : 'เปิดไฟ'
-              : option.label
           return (
             <Tooltip key={option.action} title={blocker}>
               <Button
                 size="large"
                 disabled={!!blocker || isPending}
                 onClick={() => act(option.action, { onError: showError })}
-                className="!h-auto !py-2"
+                className="!h-auto !px-1 !py-2"
               >
                 <span className="flex flex-col items-center leading-tight">
                   <span className="text-xl">{option.emoji}</span>
-                  <span className="text-xs">{label}</span>
+                  <span className="text-xs">{option.label}</span>
                 </span>
               </Button>
             </Tooltip>
           )
         })}
       </div>
-      {monster.isSleeping && (
-        <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-          มอนนอน 22:00–07:00 อย่าลืมปิดไฟให้ด้วย
-        </p>
-      )}
     </div>
   )
 }
@@ -215,7 +319,7 @@ const HallOfFame = () => {
 }
 
 const TamagotchiGame = () => {
-  const { data, isLoading } = useGetMyMonster()
+  const { data, isLoading, dataUpdatedAt } = useGetMyMonster()
   const queryClient = useQueryClient()
   const [isChoosingEgg, setIsChoosingEgg] = useState(false)
   const monster = data?.monster ?? null
@@ -245,7 +349,61 @@ const TamagotchiGame = () => {
   if (monster.diedAt) {
     return <Memorial monster={monster} onNewEgg={() => setIsChoosingEgg(true)} />
   }
-  return <MonsterScreen monster={monster} />
+  return <MonsterScreen monster={monster} fetchedAt={dataUpdatedAt} />
+}
+
+const GameTabs = () => {
+  const queryClient = useQueryClient()
+  const { data: monsterData } = useGetMyMonster()
+  const { data: wallet } = useGetWallet()
+  const monster = monsterData?.monster ?? null
+  const coin = wallet?.coin ?? 0
+  const speciesId = monster?.speciesId
+
+  // Reaching a new form can pay Dex-discovery gems on the server, so refresh the wallet and Dex.
+  useEffect(() => {
+    if (speciesId) {
+      queryClient.invalidateQueries({ queryKey: ['wallet'] })
+      queryClient.invalidateQueries({ queryKey: ['monster', 'dex'] })
+    }
+  }, [speciesId, queryClient])
+
+  return (
+    <div className="flex w-full flex-col gap-2">
+      <div className="flex justify-end gap-4 font-semibold">
+        <span className="text-amber-600 dark:text-amber-400">🪙 {coin}</span>
+        <span className="text-sky-600 dark:text-sky-400">💎 {wallet?.gem ?? 0}</span>
+      </div>
+      <Tabs
+        centered
+        destroyOnHidden
+        items={[
+          {
+            key: 'care',
+            label: 'เลี้ยง',
+            children: (
+              <div className="flex flex-col items-center gap-8">
+                <TamagotchiGame />
+                <HallOfFame />
+              </div>
+            ),
+          },
+          {
+            key: 'adventure',
+            label: 'ผจญภัย',
+            children: <AdventurePanel monster={monster} onError={showError} />,
+          },
+          {
+            key: 'shop',
+            label: 'ร้านค้า',
+            children: <ShopPanel monster={monster} coin={coin} onError={showError} />,
+          },
+          { key: 'dex', label: 'Dex', children: <DexPanel /> },
+          { key: 'wiki', label: 'คู่มือ', children: <WikiPanel /> },
+        ]}
+      />
+    </div>
+  )
 }
 
 const PageTamagotchi = () => {
@@ -268,9 +426,8 @@ const PageTamagotchi = () => {
         </Link>
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">มอนสเตอร์</h1>
       </div>
-      <div className="flex w-full max-w-sm flex-col items-center gap-8">
-        <TamagotchiGame />
-        <HallOfFame />
+      <div className="flex w-full max-w-sm flex-col items-center">
+        <GameTabs />
       </div>
     </div>
   )

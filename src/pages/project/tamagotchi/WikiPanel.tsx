@@ -1,0 +1,373 @@
+import { Collapse, Spin, Tag } from 'antd'
+import { ReactNode } from 'react'
+import {
+  describeConditions,
+  elementLabel,
+  formatAge,
+  lineOptions,
+  stageLabel,
+} from './tamagotchi-helper'
+import { EnumMonsterLine, EnumMonsterStage, IBattleStats, IWikiData } from './tamagotchi-interface'
+import { useGetWiki } from './tamagotchi-service'
+
+// The in-game guide. Every number comes from GET /monster/wiki (the server's rule constants), so
+// this page explains the rules exactly as the server applies them.
+
+const percent = (value: number) => `${Math.round(value * 100)}%`
+const times = (value: number) => `×${value}`
+
+const Table = (props: { head: string[]; rows: ReactNode[][] }) => (
+  <div className="overflow-x-auto">
+    <table className="w-full text-left text-xs">
+      <thead>
+        <tr className="border-b border-slate-200 dark:border-slate-700">
+          {props.head.map((cell) => (
+            <th key={cell} className="py-1 pr-2 font-semibold">
+              {cell}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {props.rows.map((row, index) => (
+          <tr key={index} className="border-b border-slate-100 dark:border-slate-800">
+            {row.map((cell, cellIndex) => (
+              <td key={cellIndex} className="py-1 pr-2 align-top">
+                {cell}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)
+
+const List = (props: { items: ReactNode[] }) => (
+  <ul className="ml-4 list-disc space-y-1 text-sm">
+    {props.items.map((item, index) => (
+      <li key={index}>{item}</li>
+    ))}
+  </ul>
+)
+
+const Heading = (props: { children: ReactNode }) => (
+  <div className="mt-3 mb-1 font-semibold text-slate-900 first:mt-0 dark:text-slate-100">
+    {props.children}
+  </div>
+)
+
+const statsText = (stats: IBattleStats) =>
+  `HP ${stats.hp} · ATK ${stats.atk} · DEF ${stats.def} · SPD ${stats.spd}`
+
+const hatchedStages = [
+  EnumMonsterStage.BABY_1,
+  EnumMonsterStage.BABY_2,
+  EnumMonsterStage.ADULT,
+  EnumMonsterStage.PERFECT,
+  EnumMonsterStage.ULTIMATE,
+] as const
+
+const buildSections = (wiki: IWikiData) => {
+  const { care, stamina, online, evolution, battle, adventure, economy } = wiki
+  const speciesName = (id: string) => {
+    const species = evolution.species.find((entry) => entry.id === id)
+    return species ? `${species.emoji} ${species.name}` : id
+  }
+
+  return [
+    {
+      key: 'start',
+      label: '🎮 วิธีเล่น',
+      children: (
+        <List
+          items={[
+            'เลือกไข่ 1 ใน 3 ธาตุ แล้วรอไข่ฟัก',
+            'ดูแลให้อิ่ม แข็งแรง สะอาด และหายป่วย เวลาในเกมเดินต่อแม้ปิดแอป',
+            'ครบเวลาแต่ละร่าง มอนจะวิวัฒนาการ ร่างที่ได้ขึ้นกับการเลี้ยง การฝึก และการชนะ',
+            'พามอนไปสู้ในโหมดผจญภัย เก็บเหรียญและเพชรไว้ซื้อของและเติม stamina',
+            `เปิดเกมค้างไว้ = ออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)} และ stamina ลดช้าลง`,
+            `มอนมีอายุขัย ${formatAge(care.lifespanMinutes)} นับจากฟัก ตายแล้วได้ไข่ใบใหม่ ความคืบหน้าผจญภัย เหรียญ เพชร และ Dex ยังอยู่`,
+          ]}
+        />
+      ),
+    },
+    {
+      key: 'care',
+      label: '🍖 การเลี้ยง',
+      children: (
+        <>
+          <Heading>ค่าสถานะ</Heading>
+          <List
+            items={[
+              `ความอิ่ม และความแข็งแรง: 0–${care.maxHearts} หัวใจ ลดลงตามเวลา (หัวใจที่ยังเหลือบางส่วนแสดงเป็นเต็มดวง)`,
+              `ไข่ฟักออกมาพร้อมความอิ่ม ${care.hatchFullness} และความแข็งแรง ${care.hatchStrength} หัวใจ`,
+              'น้ำหนัก: เพิ่มเมื่อกิน ลดเมื่อฝึกหรือสู้ ไม่ต่ำกว่าน้ำหนักขั้นต่ำของร่าง',
+              `อึ: เพิ่มตามเวลา สูงสุด ${care.maxPoops} กอง`,
+            ]}
+          />
+          <Heading>อัตราการลดตามร่าง</Heading>
+          <Table
+            head={['ร่าง', 'ความอิ่ม −1', 'แข็งแรง −1', 'อึทุก']}
+            rows={hatchedStages.map((stage) => [
+              stageLabel[stage],
+              formatAge(care.stageRates[stage].fullnessMinutes),
+              formatAge(care.stageRates[stage].strengthMinutes),
+              formatAge(care.stageRates[stage].poopEveryMinutes),
+            ])}
+          />
+          <Heading>ปุ่มดูแล</Heading>
+          <Table
+            head={['ปุ่ม', 'ผล']}
+            rows={[
+              ['🍖 ให้อาหาร', `ความอิ่ม +1, น้ำหนัก +${care.feedWeightGain}`],
+              ['💊 วิตามิน', `ความแข็งแรง +1, น้ำหนัก +${care.vitaminWeightGain}`],
+              [
+                '🥊 ฝึก',
+                `ความแข็งแรง +1, น้ำหนัก −${care.trainWeightLoss}, นับการฝึก +1 · พัก ${formatAge(care.trainCooldownMinutes)} · ป่วยอยู่ฝึกไม่ได้`,
+              ],
+              ['🧹 เก็บอึ', 'อึ = 0'],
+              ['💉 ให้ยา', 'หายป่วย (ใช้ได้เฉพาะตอนป่วย)'],
+            ]}
+          />
+          <Heading>ดูแลพลาด (care mistake)</Heading>
+          <List
+            items={[
+              `ความอิ่มหรือความแข็งแรงเป็น 0 ต่อเนื่อง ${formatAge(care.neglectFirstMistakeMinutes)} นับ 1 ครั้ง แล้วนับเพิ่มทุก ${formatAge(care.neglectRepeatMistakeMinutes)} ที่ยังเป็น 0`,
+              'นับใหม่ทุกครั้งที่วิวัฒนาการ และใช้เป็นเงื่อนไขแตกสาย',
+            ]}
+          />
+          <Heading>ป่วยและตาย</Heading>
+          <List
+            items={[
+              `ป่วยเมื่อ: อึครบ ${care.maxPoops} กอง หรือหิว (ความอิ่ม 0) ต่อเนื่อง ${formatAge(care.sickAfterHungryMinutes)}`,
+              `ตายเมื่อ: ป่วยไม่รักษา ${formatAge(care.deathAfterSickMinutes)} · หิวต่อเนื่อง ${formatAge(care.deathAfterHungryMinutes)} · อายุครบ ${formatAge(care.lifespanMinutes)}`,
+            ]}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'stamina',
+      label: '⚡ Stamina และออนไลน์',
+      children: (
+        <>
+          <Heading>Stamina</Heading>
+          <List
+            items={[
+              `0–${stamina.max} ลดลงตามเวลา: ปิดเกมหมดใน ${formatAge(stamina.drainFullMinutesOffline)} · เปิดเกมไว้หมดใน ${formatAge(stamina.drainFullMinutesOnline)}`,
+              `สู้ 1 ครั้งใช้ ${stamina.battleCost}`,
+              `Stamina หมด (0): ยังสู้ได้ แต่ค่าพลังต่อสู้ทุกค่า ${times(stamina.noStaminaStatMultiplier)}`,
+              `เติมเต็มด้วย 💎 ${stamina.refillGemPrice}`,
+            ]}
+          />
+          <Heading>มินิเกม</Heading>
+          <List
+            items={[
+              `หยุดแถบให้ตรงโซนเขียว ${stamina.minigameRounds} รอบ เล่นได้ทุก ${formatAge(stamina.minigameCooldownMinutes)}`,
+            ]}
+          />
+          <Table
+            head={['โดน', 'ได้ stamina']}
+            rows={stamina.minigameRewards.map((reward, hits) => [
+              `${hits}/${stamina.minigameRounds}`,
+              `+${reward}`,
+            ])}
+          />
+          <Heading>ออนไลน์</Heading>
+          <List
+            items={[
+              `เปิดหน้าเกมไว้บนจอ หน้าเกมจะเช็กกับเซิร์ฟเวอร์ทุก 1 นาที แต่ละนาทีที่อยู่ภายใน ${online.graceMinutes} นาทีหลังการเช็กล่าสุดนับเป็นออนไลน์`,
+              `ระหว่างออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)} และ stamina ลดช้าลงครึ่งหนึ่ง`,
+              'ความหิว ความแข็งแรง อึ และอายุ เดินตามเวลาจริงเสมอ ไม่ว่าออนไลน์หรือไม่',
+            ]}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'evolution',
+      label: '🧬 วิวัฒนาการ',
+      children: (
+        <>
+          <Table
+            head={['ร่าง', 'ปิดเกม', `เปิดเกม (${times(online.evolutionMultiplier)})`]}
+            rows={[EnumMonsterStage.EGG, ...hatchedStages].map((stage) => {
+              const duration = evolution.stageDurationMinutes[stage]
+              return [
+                stageLabel[stage],
+                duration === null ? 'ร่างสุดท้าย' : formatAge(duration),
+                duration === null
+                  ? '–'
+                  : formatAge(Math.ceil(duration / online.evolutionMultiplier)),
+              ]
+            })}
+          />
+          <List
+            items={[
+              'ครบเวลาแล้วจะดูเงื่อนไขตามลำดับ เงื่อนไขแรกที่ผ่านคือร่างที่ได้',
+              'ดูแลพลาดและการฝึกนับเฉพาะในร่างปัจจุบัน (เริ่มนับใหม่ทุกร่าง) · การชนะนับตลอดชีวิต',
+              'ร่างสมบูรณ์จะดูเงื่อนไขครั้งเดียว ถ้าไม่ผ่านจะอยู่ร่างเดิมไปจนครบอายุ',
+            ]}
+          />
+          {lineOptions.map((option) => (
+            <div key={option.line}>
+              <Heading>{elementLabel[option.line]}</Heading>
+              <div className="flex flex-col gap-2">
+                {evolution.species
+                  .filter((species) => species.line === option.line)
+                  .map((species) => (
+                    <div
+                      key={species.id}
+                      className="rounded-lg border border-slate-200 p-2 text-xs dark:border-slate-700"
+                    >
+                      <div className="text-sm font-medium">
+                        {species.emoji} {species.name} <Tag>{stageLabel[species.stage]}</Tag>
+                      </div>
+                      {species.stage !== EnumMonsterStage.EGG && (
+                        <div className="text-slate-500 dark:text-slate-400">
+                          {statsText(species.stats)} · สกิล {species.skill.name} (
+                          {times(species.skill.power)}) · น้ำหนักขั้นต่ำ {species.minWeight} g
+                        </div>
+                      )}
+                      {species.evolutions.map((rule) => (
+                        <div key={rule.to}>
+                          → {speciesName(rule.to)}: {describeConditions(rule)}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ))}
+        </>
+      ),
+    },
+    {
+      key: 'battle',
+      label: '⚔️ การต่อสู้',
+      children: (
+        <>
+          <Heading>ค่าพลังตอนสู้</Heading>
+          <List
+            items={[
+              'เริ่มจากค่าพลังของร่าง (ดูในหัวข้อวิวัฒนาการ)',
+              `ATK +${percent(battle.atkBonusPerStrengthHeart)} ต่อหัวใจความแข็งแรง`,
+              `หิว (ความอิ่ม 0): ATK ${times(battle.hungryAtkMultiplier)}`,
+              `น้ำหนักเกิน ${battle.overweightRatio} เท่าของขั้นต่ำ: SPD ${times(battle.overweightSpdMultiplier)}`,
+              `Stamina 0: ทุกค่า ${times(stamina.noStaminaStatMultiplier)}`,
+            ]}
+          />
+          <Heading>ลำดับการต่อสู้</Heading>
+          <List
+            items={[
+              'ผลัดกันตีรอบละครั้ง SPD สูงกว่าตีก่อน (เท่ากันสุ่ม)',
+              `ทุกรอบที่ ${battle.skillEveryRounds} ใช้สกิล รอบอื่นโจมตีธรรมดา (${times(1)})`,
+              `เกิน ${battle.maxRounds} รอบยังไม่จบ นับว่าแพ้`,
+              'ผลการต่อสู้ตัดสินที่เซิร์ฟเวอร์ หน้าจอแค่เล่นภาพตามผล',
+            ]}
+          />
+          <Heading>สูตรดาเมจ</Heading>
+          <div className="rounded-lg bg-slate-100 p-2 font-mono text-xs dark:bg-slate-800">
+            (ATK × พลังท่า × ธาตุ − DEF × {battle.defenseFactor}) × สุ่ม {1 - battle.damageVariance}
+            –{1 + battle.damageVariance} × คริติคอล
+          </div>
+          <List
+            items={[
+              `คริติคอล: โอกาส ${percent(battle.criticalChance)} ดาเมจ ${times(battle.criticalMultiplier)}`,
+              'ดาเมจขั้นต่ำ 1',
+            ]}
+          />
+          <Heading>ธาตุ</Heading>
+          <Table
+            head={['ธาตุ', 'ได้เปรียบ', 'เสียเปรียบ']}
+            rows={(Object.keys(battle.beats) as EnumMonsterLine[]).map((element) => {
+              const losesTo = (Object.keys(battle.beats) as EnumMonsterLine[]).find(
+                (other) => battle.beats[other] === element
+              )
+              return [
+                elementLabel[element],
+                `${elementLabel[battle.beats[element]]} ${times(battle.strongMultiplier)}`,
+                losesTo ? `${elementLabel[losesTo]} ${times(battle.weakMultiplier)}` : '–',
+              ]
+            })}
+          />
+          <Heading>ค่าใช้จ่าย</Heading>
+          <List
+            items={[
+              `สู้ 1 ครั้ง: stamina −${stamina.battleCost}, น้ำหนัก −${battle.weightLoss}`,
+              'ป่วยอยู่สู้ไม่ได้',
+            ]}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'adventure',
+      label: '🗺️ ผจญภัย',
+      children: (
+        <>
+          <List
+            items={[
+              'ปลดล็อกทีละด่าน ชนะบอสท้ายพื้นที่เพื่อเปิดพื้นที่ถัดไป',
+              `ชนะครั้งแรกได้เหรียญ ${times(adventure.firstClearMultiplier)} · บอสครั้งแรกได้เพชร`,
+              'ความคืบหน้าผูกกับบัญชี ไม่หายเมื่อเปลี่ยนมอน',
+            ]}
+          />
+          {adventure.areas.map((area) => (
+            <div key={area.id}>
+              <Heading>
+                {area.emoji} {area.name} <Tag>แนะนำ: {stageLabel[area.recommendedStage]}</Tag>
+              </Heading>
+              <Table
+                head={['ศัตรู', 'ธาตุ', 'ค่าพลัง', 'รางวัล']}
+                rows={area.stages.map((stage) => [
+                  `${stage.enemy.emoji} ${stage.enemy.name}${stage.isBoss ? ' (บอส)' : ''}`,
+                  elementLabel[stage.enemy.element],
+                  `${statsText(stage.enemy.stats)} · ${stage.enemy.skill.name} ${times(stage.enemy.skill.power)}`,
+                  `🪙 ${stage.reward}${stage.firstClearGems ? ` · 💎 ${stage.firstClearGems} ครั้งแรก` : ''}`,
+                ])}
+              />
+            </div>
+          ))}
+        </>
+      ),
+    },
+    {
+      key: 'economy',
+      label: '💰 เหรียญ เพชร และร้านค้า',
+      children: (
+        <>
+          <Table
+            head={['', 'ได้จาก', 'ใช้ทำอะไร']}
+            rows={[
+              ['🪙 เหรียญ', 'ชนะด่านผจญภัย', 'ซื้อของในร้านค้า'],
+              [
+                '💎 เพชร',
+                `ชนะบอสครั้งแรก · ค้นพบร่างใหม่ใน Dex (+${economy.dexDiscoveryGems})`,
+                `เติม stamina เต็ม (💎 ${stamina.refillGemPrice})`,
+              ],
+            ]}
+          />
+          <Heading>ร้านค้า (ใช้กับมอนทันที)</Heading>
+          <Table
+            head={['ไอเทม', 'ราคา', 'ผล']}
+            rows={economy.shopItems.map((item) => [
+              `${item.emoji} ${item.name}`,
+              `🪙 ${item.price}`,
+              item.description,
+            ])}
+          />
+        </>
+      ),
+    },
+  ]
+}
+
+export const WikiPanel = () => {
+  const { data, isLoading } = useGetWiki()
+  if (isLoading || !data) {
+    return <Spin />
+  }
+  return <Collapse className="w-full" defaultActiveKey={['start']} items={buildSections(data)} />
+}

@@ -2,20 +2,20 @@ import { motion } from 'motion/react'
 
 interface IPetSpriteProps {
   emoji: string
-  isSleeping: boolean
+  isExhausted: boolean
   isSick: boolean
   isEgg: boolean
 }
 
 export const PetSprite = (props: IPetSpriteProps) => {
-  const { emoji, isSleeping, isSick, isEgg } = props
+  const { emoji, isExhausted, isSick, isEgg } = props
 
   const animate = isEgg
     ? { rotate: [0, -8, 8, -8, 0] }
-    : isSleeping
-      ? { scale: [1, 1.04, 1] }
-      : isSick
-        ? { x: [0, -3, 3, -3, 0] }
+    : isSick
+      ? { x: [0, -3, 3, -3, 0] }
+      : isExhausted
+        ? { scale: [1, 0.96, 1] }
         : { y: [0, -14, 0] }
 
   return (
@@ -30,7 +30,7 @@ export const PetSprite = (props: IPetSpriteProps) => {
           className="text-7xl select-none"
           animate={animate}
           transition={{
-            duration: isSleeping ? 3 : isEgg ? 1.6 : 1.1,
+            duration: isExhausted ? 2.4 : isEgg ? 1.6 : 1.1,
             repeat: Infinity,
             repeatDelay: isEgg ? 1.2 : 0,
             ease: 'easeInOut',
@@ -39,16 +39,11 @@ export const PetSprite = (props: IPetSpriteProps) => {
           {emoji}
         </motion.div>
       </motion.div>
-      {isSleeping && (
-        <motion.span
-          className="absolute top-0 right-6 text-2xl"
-          animate={{ opacity: [0, 1, 0], y: [6, -10, -20] }}
-          transition={{ duration: 2.4, repeat: Infinity }}
-        >
-          💤
-        </motion.span>
+      {isSick ? (
+        <span className="absolute top-0 right-6 text-2xl">🤒</span>
+      ) : (
+        isExhausted && <span className="absolute top-0 right-6 text-2xl">😮‍💨</span>
       )}
-      {isSick && !isSleeping && <span className="absolute top-0 right-6 text-2xl">🤒</span>}
     </div>
   )
 }

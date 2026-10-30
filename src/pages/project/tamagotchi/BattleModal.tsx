@@ -90,11 +90,13 @@ export const BattleModal = (props: IBattleModalProps) => {
         {isFinished ? (
           battle.won ? (
             <span className="font-semibold text-green-600">
-              ชนะ! ได้ {battle.reward} 🪙{battle.isFirstClear && ' (เคลียร์ครั้งแรก x2)'}
+              ชนะ! ได้ {battle.reward} 🪙{battle.gemReward > 0 && ` + ${battle.gemReward} 💎`}
+              {battle.isFirstClear && ' (เคลียร์ครั้งแรก)'}
             </span>
           ) : (
             <span className="font-semibold text-red-500">
-              แพ้... {battle.rounds >= 20 ? 'หมดเวลา' : 'ลองดูแลให้แข็งแรงแล้วมาใหม่'}
+              แพ้...{' '}
+              {battle.rounds >= 20 ? 'หมดเวลา' : 'ลองดูแลให้แข็งแรงหรือเติม stamina แล้วมาใหม่'}
             </span>
           )
         ) : lastEvent ? (

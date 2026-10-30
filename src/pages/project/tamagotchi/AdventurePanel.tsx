@@ -30,7 +30,7 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
   return (
     <div className="flex w-full flex-col gap-4">
       <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-        สู้แต่ละครั้งใช้ความแข็งแรง 1 หัวใจ · ชนะครั้งแรกได้เหรียญ x2
+        สู้แต่ละครั้งใช้ stamina 10 · ชนะครั้งแรกได้เหรียญ x2 · บอสครั้งแรกได้เพชร
       </p>
       {data?.areas.map((area) => (
         <Card
@@ -66,7 +66,9 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
                       {elementLabel[stage.enemy.element]} · HP {stage.enemy.stats.hp} ·{' '}
                       {stage.clearCount > 0
                         ? `🪙 ${stage.reward} · ชนะแล้ว ${stage.clearCount} ครั้ง`
-                        : `🪙 ${stage.firstClearReward} (ครั้งแรก)`}
+                        : `🪙 ${stage.firstClearReward}${
+                            stage.firstClearGems ? ` + 💎 ${stage.firstClearGems}` : ''
+                          } (ครั้งแรก)`}
                     </div>
                   </div>
                   <Tooltip title={reason}>

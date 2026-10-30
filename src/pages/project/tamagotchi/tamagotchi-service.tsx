@@ -8,6 +8,8 @@ import {
   IDexEntry,
   IMonsterData,
   IShopItem,
+  IWallet,
+  IWikiData,
 } from './tamagotchi-interface'
 
 interface IGetMyMonsterResponse {
@@ -18,25 +20,23 @@ interface IGetMonsterHistoryResponse {
   monsters: IMonsterData[]
 }
 
-interface IWalletResponse {
-  coin: number
-}
-
 export interface IBattleResponse {
   monster: IMonsterData
   battle: IBattleData
-  coin: number
+  wallet: IWallet
 }
 
-interface IBuyShopItemResponse {
+interface IMonsterWithWalletResponse {
   monster: IMonsterData
-  coin: number
+  wallet: IWallet
 }
 
 const MY_MONSTER_KEY = ['monster', 'me']
 const WALLET_KEY = ['wallet']
 
 // The server advances the monster's clock on every read, so polling keeps hearts and poops fresh.
+// Each poll also marks the player online (evolution x2, slower stamina drain); TanStack Query
+// pauses the interval while the tab is in the background, which is what "online" should mean.
 const REFETCH_INTERVAL_MS = 60 * 1000
 
 export const useGetMyMonster = () => {
@@ -95,7 +95,7 @@ export const useGetWallet = () => {
   return useQuery({
     queryKey: WALLET_KEY,
     queryFn: async () => {
-      const { data } = await apiClient.get<IWalletResponse>(`/wallet`)
+      const { data } = await apiClient.get<IWallet>(`/wallet`)
       return data
     },
   })
@@ -130,7 +130,7 @@ export const useApplyBattleResult = () => {
   const queryClient = useQueryClient()
   return (data: IBattleResponse) => {
     queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
-    queryClient.setQueryData<IWalletResponse>(WALLET_KEY, { coin: data.coin })
+    queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
     queryClient.invalidateQueries({ queryKey: ['adventure'] })
   }
 }
@@ -149,12 +149,12 @@ export const useBuyShopItem = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (itemId: string) => {
-      const { data } = await apiClient.post<IBuyShopItemResponse>(`/shop/buy`, { itemId })
+      const { data } = await apiClient.post<IMonsterWithWalletResponse>(`/shop/buy`, { itemId })
       return data
     },
     onSuccess: (data) => {
       queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
-      queryClient.setQueryData<IWalletResponse>(WALLET_KEY, { coin: data.coin })
+      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
@@ -170,5 +170,53 @@ export const useGetMonsterDex = () => {
       const { data } = await apiClient.get<{ species: IDexEntry[] }>(`/monster/dex`)
       return data
     },
+  })
+}
+
+export const usePlayMinigame = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (hits: number) => {
+      const { data } = await apiClient.post<{ monster: IMonsterData; reward: number }>(
+        `/monster/minigame`,
+        { hits }
+      )
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+    },
+  })
+}
+
+export const useRefillStamina = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiClient.post<IMonsterWithWalletResponse>(`/monster/stamina/refill`)
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+    },
+  })
+}
+
+export const useGetWiki = () => {
+  return useQuery({
+    queryKey: ['monster', 'wiki'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IWikiData>(`/monster/wiki`)
+      return data
+    },
+    staleTime: Infinity,
   })
 }

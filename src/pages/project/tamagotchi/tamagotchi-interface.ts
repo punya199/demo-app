@@ -25,7 +25,39 @@ export enum EnumMonsterAction {
   TRAIN = 'train',
   CLEAN = 'clean',
   MEDICINE = 'medicine',
-  LIGHTS = 'lights',
+}
+
+export interface ISpeciesSummary {
+  id: string
+  name: string
+  emoji: string
+  stage: EnumMonsterStage
+}
+
+export interface IEvolutionRuleInfo {
+  to: ISpeciesSummary
+  maxCareMistakes?: number
+  minTrainCount?: number
+  minWins?: number
+  met: boolean
+}
+
+export interface IEvolutionInfo {
+  // null once the monster is in a final form.
+  durationMinutes: number | null
+  progressMinutes: number
+  // Stage-progress minutes left; each online minute counts onlineMultiplier of them.
+  remainingMinutes: number | null
+  onlineMultiplier: number
+  // The form it is on track for right now (null = would stay as it is).
+  next: ISpeciesSummary | null
+  rules: IEvolutionRuleInfo[]
+  lifespanRemainingMinutes: number
+}
+
+export interface IWallet {
+  coin: number
+  gem: number
 }
 
 // Mirrors the backend's monster view (demo-app-backend src/modules/monster/monster.service.ts).
@@ -41,9 +73,8 @@ export interface IMonsterData {
   strength: number
   weight: number
   poops: number
+  stamina: number
   isSick: boolean
-  isSleeping: boolean
-  lightsOn: boolean
   careMistakes: number
   trainCount: number
   wins: number
@@ -51,6 +82,8 @@ export interface IMonsterData {
   ageMinutes: number
   bornAt: string
   trainReadyAt: string | null
+  minigameReadyAt: string | null
+  evolution: IEvolutionInfo
   diedAt: string | null
   deathCause: EnumMonsterDeathCause | null
 }
@@ -91,6 +124,7 @@ export interface IBattleData {
   player: IFighter
   enemy: IFighter
   reward: number
+  gemReward: number
   isFirstClear: boolean
 }
 
@@ -100,6 +134,7 @@ export interface IAdventureStage {
   enemy: IFighter
   reward: number
   firstClearReward: number
+  firstClearGems: number
   clearCount: number
   unlocked: boolean
 }
@@ -127,4 +162,94 @@ export interface IDexEntry {
   discovered: boolean
   name: string | null
   emoji: string | null
+}
+
+export interface IWikiSpecies {
+  id: string
+  line: EnumMonsterLine
+  stage: EnumMonsterStage
+  name: string
+  emoji: string
+  minWeight: number
+  stats: IBattleStats
+  skill: { name: string; power: number }
+  evolutions: { to: string; maxCareMistakes?: number; minTrainCount?: number; minWins?: number }[]
+}
+
+interface IStageRates {
+  fullnessMinutes: number
+  strengthMinutes: number
+  poopEveryMinutes: number
+}
+
+type HatchedStage = Exclude<EnumMonsterStage, EnumMonsterStage.EGG>
+
+// GET /monster/wiki: the game's rule constants and data, used by the in-game guide.
+export interface IWikiData {
+  care: {
+    maxHearts: number
+    maxPoops: number
+    hatchFullness: number
+    hatchStrength: number
+    stageRates: Record<HatchedStage, IStageRates>
+    neglectFirstMistakeMinutes: number
+    neglectRepeatMistakeMinutes: number
+    sickAfterHungryMinutes: number
+    deathAfterSickMinutes: number
+    deathAfterHungryMinutes: number
+    lifespanMinutes: number
+    feedWeightGain: number
+    vitaminWeightGain: number
+    trainWeightLoss: number
+    trainCooldownMinutes: number
+  }
+  online: { graceMinutes: number; evolutionMultiplier: number }
+  stamina: {
+    max: number
+    drainFullMinutesOffline: number
+    drainFullMinutesOnline: number
+    battleCost: number
+    noStaminaStatMultiplier: number
+    minigameRounds: number
+    minigameRewards: number[]
+    minigameCooldownMinutes: number
+    refillGemPrice: number
+  }
+  evolution: {
+    stageDurationMinutes: Record<EnumMonsterStage, number | null>
+    species: IWikiSpecies[]
+  }
+  battle: {
+    atkBonusPerStrengthHeart: number
+    hungryAtkMultiplier: number
+    overweightRatio: number
+    overweightSpdMultiplier: number
+    maxRounds: number
+    skillEveryRounds: number
+    criticalChance: number
+    criticalMultiplier: number
+    strongMultiplier: number
+    weakMultiplier: number
+    defenseFactor: number
+    damageVariance: number
+    weightLoss: number
+    beats: Record<EnumMonsterLine, EnumMonsterLine>
+  }
+  adventure: {
+    firstClearMultiplier: number
+    areas: {
+      id: string
+      name: string
+      emoji: string
+      recommendedStage: EnumMonsterStage
+      stages: {
+        id: string
+        isBoss: boolean
+        reward: number
+        firstClearGems: number
+        enemy: IFighter
+      }[]
+    }[]
+  }
+  economy: { shopItems: IShopItem[]; dexDiscoveryGems: number }
 }

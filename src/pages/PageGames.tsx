@@ -30,6 +30,12 @@ const games: IGameCard[] = [
     emoji: '💎',
     path: appPath.gemDiggers(),
   },
+  {
+    title: 'มอนสเตอร์',
+    description: 'เลี้ยงมอนสเตอร์ให้วิวัฒนาการ',
+    emoji: '🥚',
+    path: appPath.tamagotchi(),
+  },
 ]
 
 const containerVariants: Variants = {

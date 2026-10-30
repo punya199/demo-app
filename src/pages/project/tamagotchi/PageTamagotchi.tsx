@@ -1,0 +1,279 @@
+import { ArrowLeftOutlined } from '@ant-design/icons'
+import { Button, Card, message, Spin, Tag, Tooltip } from 'antd'
+import { useQueryClient } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
+import { useEffect, useState } from 'react'
+import { Link, Navigate } from 'react-router-dom'
+import { appPath } from '../../../config/app-paths'
+import { useGetMeSuspense } from '../../../service'
+import { PetSprite } from './PetSprite'
+import {
+  actionOptions,
+  deathCauseLabel,
+  formatAge,
+  getActionBlocker,
+  lineOptions,
+  MAX_HEARTS,
+  stageLabel,
+  toHearts,
+  toThaiErrorMessage,
+} from './tamagotchi-helper'
+import { EnumMonsterAction, EnumMonsterStage, IMonsterData } from './tamagotchi-interface'
+import {
+  useGetMonsterHistory,
+  useGetMyMonster,
+  useHatchMonster,
+  useMonsterAction,
+} from './tamagotchi-service'
+
+const showError = (error: unknown) => {
+  message.error(
+    toThaiErrorMessage(error instanceof AxiosError ? error.response?.data?.message : undefined)
+  )
+}
+
+// Ticks once in a while so cooldown-based buttons re-enable without waiting for the next poll.
+const useNow = (intervalMs: number) => {
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), intervalMs)
+    return () => clearInterval(timer)
+  }, [intervalMs])
+  return now
+}
+
+const Hearts = (props: { label: string; value: number }) => {
+  const hearts = toHearts(props.value)
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-slate-600 dark:text-slate-300">{props.label}</span>
+      <span aria-label={`${hearts}/${MAX_HEARTS}`}>
+        {Array.from({ length: MAX_HEARTS }, (_, index) => (index < hearts ? '❤️' : '🤍')).join('')}
+      </span>
+    </div>
+  )
+}
+
+const StatRow = (props: { label: string; value: string | number }) => (
+  <div className="flex items-center justify-between">
+    <span className="text-slate-600 dark:text-slate-300">{props.label}</span>
+    <span className="font-medium text-slate-900 dark:text-slate-100">{props.value}</span>
+  </div>
+)
+
+const EggPicker = () => {
+  const { mutate: hatch, isPending } = useHatchMonster()
+  return (
+    <div className="flex w-full flex-col gap-3">
+      <p className="text-center text-slate-600 dark:text-slate-300">เลือกไข่ที่จะเลี้ยง</p>
+      {lineOptions.map((option) => (
+        <Card
+          key={option.line}
+          hoverable={!isPending}
+          className="dark:border-slate-700 dark:bg-slate-900"
+          onClick={() => !isPending && hatch(option.line, { onError: showError })}
+        >
+          <div className="flex items-center gap-4">
+            <div className="text-4xl">🥚{option.emoji}</div>
+            <div>
+              <div className="font-semibold text-slate-900 dark:text-slate-100">{option.title}</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">{option.description}</div>
+            </div>
+          </div>
+        </Card>
+      ))}
+    </div>
+  )
+}
+
+const Memorial = (props: { monster: IMonsterData; onNewEgg: () => void }) => {
+  const { monster, onNewEgg } = props
+  return (
+    <Card className="w-full text-center dark:border-slate-700 dark:bg-slate-900">
+      <div className="text-6xl">🪦</div>
+      <div className="mt-3 text-lg font-semibold text-slate-900 dark:text-slate-100">
+        {monster.emoji} {monster.name}
+      </div>
+      <div className="mt-1 text-slate-500 dark:text-slate-400">
+        {monster.deathCause && deathCauseLabel[monster.deathCause]} · อายุ{' '}
+        {formatAge(monster.ageMinutes)}
+      </div>
+      <Button type="primary" className="mt-4" onClick={onNewEgg}>
+        รับไข่ใบใหม่
+      </Button>
+    </Card>
+  )
+}
+
+const MonsterScreen = (props: { monster: IMonsterData }) => {
+  const { monster } = props
+  const now = useNow(5000)
+  const { mutate: act, isPending } = useMonsterAction()
+  const isEgg = monster.stage === EnumMonsterStage.EGG
+  const isDark = monster.isSleeping && !monster.lightsOn
+
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <div className="rounded-[2rem] border-4 border-slate-300 bg-slate-100 p-4 shadow-lg dark:border-slate-600 dark:bg-slate-800">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="font-semibold text-slate-900 dark:text-slate-100">{monster.name}</span>
+          <Tag color="blue">{stageLabel[monster.stage]}</Tag>
+        </div>
+        <div
+          className={`rounded-2xl p-4 transition-colors duration-500 ${
+            isDark ? 'bg-slate-900' : 'bg-lime-100 dark:bg-lime-200'
+          }`}
+        >
+          <PetSprite
+            emoji={monster.emoji}
+            isSleeping={monster.isSleeping}
+            isSick={monster.isSick}
+            isEgg={isEgg}
+          />
+          <div className="h-7 text-center text-xl" aria-label={`อึ ${monster.poops} กอง`}>
+            {'💩'.repeat(monster.poops)}
+          </div>
+        </div>
+        {isEgg ? (
+          <p className="mt-3 text-center text-slate-600 dark:text-slate-300">
+            ไข่กำลังจะฟัก อีกไม่กี่นาที...
+          </p>
+        ) : (
+          <div className="mt-3 flex flex-col gap-1 text-sm">
+            <Hearts label="ความอิ่ม" value={monster.fullness} />
+            <Hearts label="ความแข็งแรง" value={monster.strength} />
+            <StatRow label="น้ำหนัก" value={`${monster.weight} g`} />
+            <StatRow label="อายุ" value={formatAge(monster.ageMinutes)} />
+            <StatRow label="ฝึกในร่างนี้" value={`${monster.trainCount} ครั้ง`} />
+            <StatRow label="ดูแลพลาดในร่างนี้" value={`${monster.careMistakes} ครั้ง`} />
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        {actionOptions.map((option) => {
+          const blocker = getActionBlocker(monster, option.action, now)
+          const label =
+            option.action === EnumMonsterAction.LIGHTS
+              ? monster.lightsOn
+                ? 'ปิดไฟ'
+                : 'เปิดไฟ'
+              : option.label
+          return (
+            <Tooltip key={option.action} title={blocker}>
+              <Button
+                size="large"
+                disabled={!!blocker || isPending}
+                onClick={() => act(option.action, { onError: showError })}
+                className="!h-auto !py-2"
+              >
+                <span className="flex flex-col items-center leading-tight">
+                  <span className="text-xl">{option.emoji}</span>
+                  <span className="text-xs">{label}</span>
+                </span>
+              </Button>
+            </Tooltip>
+          )
+        })}
+      </div>
+      {monster.isSleeping && (
+        <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+          มอนนอน 22:00–07:00 อย่าลืมปิดไฟให้ด้วย
+        </p>
+      )}
+    </div>
+  )
+}
+
+const HallOfFame = () => {
+  const { data } = useGetMonsterHistory()
+  if (!data?.monsters.length) {
+    return null
+  }
+  return (
+    <div className="w-full">
+      <h2 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">Hall of Fame</h2>
+      <div className="flex flex-col gap-2">
+        {data.monsters.map((monster) => (
+          <div
+            key={monster.id}
+            className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900"
+          >
+            <span className="text-2xl">{monster.emoji}</span>
+            <div className="flex-1">
+              <div className="font-medium text-slate-900 dark:text-slate-100">{monster.name}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">
+                {stageLabel[monster.stage]} · อายุ {formatAge(monster.ageMinutes)}
+                {monster.deathCause && ` · ${deathCauseLabel[monster.deathCause]}`}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const TamagotchiGame = () => {
+  const { data, isLoading } = useGetMyMonster()
+  const queryClient = useQueryClient()
+  const [isChoosingEgg, setIsChoosingEgg] = useState(false)
+  const monster = data?.monster ?? null
+  const diedAt = monster?.diedAt
+
+  useEffect(() => {
+    if (monster && !monster.diedAt) {
+      setIsChoosingEgg(false)
+    }
+  }, [monster])
+
+  // The server only records a death when it ticks the monster, which can happen after the
+  // history was fetched - refresh it so the Hall of Fame includes the monster that just died.
+  useEffect(() => {
+    if (diedAt) {
+      queryClient.invalidateQueries({ queryKey: ['monster', 'history'] })
+    }
+  }, [diedAt, queryClient])
+
+  if (isLoading) {
+    return <Spin size="large" />
+  }
+
+  if (!monster || isChoosingEgg) {
+    return <EggPicker />
+  }
+  if (monster.diedAt) {
+    return <Memorial monster={monster} onNewEgg={() => setIsChoosingEgg(true)} />
+  }
+  return <MonsterScreen monster={monster} />
+}
+
+const PageTamagotchi = () => {
+  const { data: getMeResponse } = useGetMeSuspense()
+  if (!getMeResponse?.user?.id) {
+    return (
+      <Navigate to={appPath.login()} state={{ message: 'กรุณาเข้าสู่ระบบก่อนเข้าถึงหน้านี้' }} />
+    )
+  }
+
+  return (
+    <div className="flex min-h-full flex-col items-center gap-6 px-6 py-16">
+      <div className="relative flex w-full max-w-sm items-center justify-center">
+        <Link
+          to={appPath.games()}
+          className="absolute left-0 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+          aria-label="กลับหน้าเกม"
+        >
+          <ArrowLeftOutlined className="text-lg" />
+        </Link>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">มอนสเตอร์</h1>
+      </div>
+      <div className="flex w-full max-w-sm flex-col items-center gap-8">
+        <TamagotchiGame />
+        <HallOfFame />
+      </div>
+    </div>
+  )
+}
+
+export default PageTamagotchi

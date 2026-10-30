@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/punya199/demo-app/compare/v1.13.0...v1.14.0) (2026-10-30)
+
+
+### Update
+
+* Colony Flow style look and harder hand-drawn hard mode for Gem Diggers ([97b7b81](https://github.com/punya199/demo-app/commit/97b7b8161e4edf25545a5011c9d55a6ae8850aad))
+
 # [1.13.0](https://github.com/punya199/demo-app/compare/v1.12.0...v1.13.0) (2026-10-29)
 
 

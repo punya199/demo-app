@@ -20,14 +20,20 @@ const PageGemDiggers = () => {
               <div id="progress-fill"></div>
             </div>
           </div>
+          <button id="btn-speed" className="icon" title="ความเร็ว (Space)">
+            1x
+          </button>
+        </header>
+        <main id="stage">
+          <canvas id="game"></canvas>
+          <div id="toast" hidden></div>
+        </main>
+        <footer id="tools">
           <button id="btn-slot" title="เพิ่มช่องรอ 1 ช่อง">
             +1<span className="long"> ช่อง</span> <span id="slot-count"></span>
           </button>
           <button id="btn-hint" className="icon" title="คำใบ้ (H)">
             💡
-          </button>
-          <button id="btn-speed" className="icon" title="ความเร็ว (Space)">
-            1x
           </button>
           <button id="btn-restart" className="icon" title="เริ่มด่านใหม่ (R)">
             ↻
@@ -38,11 +44,7 @@ const PageGemDiggers = () => {
           <button id="btn-sound" className="icon" title="เปิด/ปิดเสียง">
             🔊
           </button>
-        </header>
-        <main id="stage">
-          <canvas id="game"></canvas>
-          <div id="toast" hidden></div>
-        </main>
+        </footer>
         <div id="overlay" hidden>
           <div id="panel"></div>
         </div>

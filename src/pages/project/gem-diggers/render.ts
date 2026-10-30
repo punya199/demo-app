@@ -32,24 +32,26 @@ interface Layout {
   junction: Pt // where miners turn from the yard toward the mine entrance
 }
 
-const TUNNEL = '#3a2a1e'
-const ROCK_DARK = '#4a382b'
-const PATH = '#7a5a43'
-const HIDDEN_CART = '#8a817a'
+const HIDDEN_CART = '#9a9088'
+// Warm "board game on a table" palette.
+const BG = '#f8d7b0'
+const BG_DIAMOND = '#f3cb9f'
+const FRAME = '#f9ead2'
+const FRAME_SHADOW = '#dcae7f'
+const WALKWAY = '#efd9b6'
+const FLOOR = '#e2c59d'
+const TEXT_DARK = '#6b4428'
 // One color per linked pair so the two halves can be matched across the tray.
 const PAIR_COLORS = ['#ffd54f', '#4dd0e1', '#f06292', '#aed581', '#ba68c8', '#ff8a65']
 const FONT = '"Leelawadee UI", Tahoma, sans-serif'
+// Tray rows sit one behind another at full size, this many cart heights apart.
+const TRAY_PITCH = 1.1
 
 function shade(hex: string, amt: number): string {
   const n = parseInt(hex.slice(1), 16)
   const ch = (v: number) =>
     Math.max(0, Math.min(255, Math.round(amt > 0 ? v + (255 - v) * amt : v * (1 + amt))))
   return `rgb(${ch(n >> 16)},${ch((n >> 8) & 255)},${ch(n & 255)})`
-}
-
-function isLight(hex: string): boolean {
-  const n = parseInt(hex.slice(1), 16)
-  return 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 170
 }
 
 const lerp = (a: Pt, b: Pt, t: number): Pt => ({
@@ -77,6 +79,8 @@ export class Renderer {
   private particles: Particle[] = []
   private shake = new Map<number, number>() // tray column -> seconds left
   private time = 0
+  private sprites = new Map<string, HTMLCanvasElement>()
+  private bgPattern: CanvasPattern | string | null = null
   hint: number[] = [] // tray columns the hint says to tap
 
   constructor(
@@ -108,6 +112,7 @@ export class Renderer {
   }
 
   layout() {
+    this.sprites.clear()
     // Wide screens (a desktop window) put the picture on the left at full
     // height and the tray on the right, so big pictures get big cells.
     if (this.w >= 760 && this.w > this.h * 1.15) this.layoutWide()
@@ -139,7 +144,7 @@ export class Renderer {
     const cols = tray.length
     const colGap = Math.min(110, side / cols)
     const colXs = tray.map((_, i) => panelX + side / 2 + (i - (cols - 1) / 2) * colGap)
-    const cartW = Math.min(cartH * 1.35, colGap - 22)
+    const cartW = Math.min(cartH * 1.15, colGap - 12)
     const trayY = pad + 24
     const door = { x: gridX + (board.width / 2) * cell, y: gridY + (board.height + 0.5) * cell }
     this.L = {
@@ -165,8 +170,8 @@ export class Renderer {
     const pad = 12
     const slotH = Math.min(64, Math.max(46, this.h * 0.085))
     const cartH = Math.min(62, Math.max(42, this.h * 0.075))
-    const trayH = cartH * 2.9 + 20
-    const below = 14 + slotH + 18 + trayH
+    const trayH = cartH * TRAY_PITCH * 3 + 22
+    const below = 46 + slotH + 18 + trayH
     // The picture plus one cell of path on each side plus the rock frame.
     const availW = this.w - pad * 2
     const availH = this.h - pad * 2 - below
@@ -176,7 +181,8 @@ export class Renderer {
     )
     const gridX = Math.round((this.w - cell * board.width) / 2)
     const gridY = Math.round(pad + cell * 1.3)
-    const slotY = gridY + (board.height + 1.3) * cell + 14
+    const frameBottom = gridY + (board.height + 1.3) * cell
+    const slotY = frameBottom + 46
     const rowW = Math.min(this.w - pad * 2, 520)
     const slotW = Math.min(84, (rowW - (slots.length - 1) * 8) / slots.length)
     const slotsTotal = slotW * slots.length + 8 * (slots.length - 1)
@@ -184,7 +190,7 @@ export class Renderer {
     const cols = tray.length
     const colGap = Math.min(110, rowW / cols)
     const colXs = tray.map((_, i) => this.w / 2 + (i - (cols - 1) / 2) * colGap)
-    const cartW = Math.min(cartH * 1.35, colGap - 22)
+    const cartW = Math.min(cartH * 1.15, colGap - 12)
     const door = { x: gridX + (board.width / 2) * cell, y: gridY + (board.height + 0.5) * cell }
     this.L = {
       cell,
@@ -200,7 +206,7 @@ export class Renderer {
       cartW,
       cartH,
       yard: { x: 0, y: slotY - 10, w: this.w, h: slotH + 20 },
-      junction: { x: door.x, y: slotY + slotH * 0.3 },
+      junction: { x: door.x, y: frameBottom + 22 },
     }
   }
 
@@ -285,58 +291,52 @@ export class Renderer {
     const { board } = this.game
     const c = L.cell
 
-    const bg = ctx.createLinearGradient(0, 0, 0, this.h)
-    bg.addColorStop(0, '#2c1f16')
-    bg.addColorStop(1, '#1a120c')
-    ctx.fillStyle = bg
+    ctx.fillStyle = this.background()
     ctx.fillRect(0, 0, this.w, this.h)
 
-    // Yard between the mine and the slots, joined to the entrance.
-    const door = this.px(entrance(board.width, board.height))
-    ctx.fillStyle = '#4a3427'
-    ctx.fillRect(L.yard.x, L.yard.y, L.yard.w, L.yard.h)
-    ctx.fillStyle = PATH
-    ctx.fillRect(door.x - c * 0.6, door.y, c * 1.2, L.junction.y - door.y)
-
-    // Rock frame, then the walking path that circles the picture.
+    // Cream frame the picture sits in; its inner rim is the path miners walk.
     const outer = this.px({ x: -1.3, y: -1.3 })
-    ctx.fillStyle = ROCK_DARK
+    const fw = (board.width + 2.6) * c + 12
+    const fh = (board.height + 2.6) * c + 12
+    const radius = Math.max(10, c * 0.9)
+    ctx.fillStyle = FRAME_SHADOW
     ctx.beginPath()
-    ctx.roundRect(outer.x, outer.y, (board.width + 2.6) * c, (board.height + 2.6) * c, c * 0.5)
+    ctx.roundRect(outer.x - 6, outer.y - 6 + 7, fw, fh, radius)
+    ctx.fill()
+    ctx.fillStyle = FRAME
+    ctx.beginPath()
+    ctx.roundRect(outer.x - 6, outer.y - 6, fw, fh, radius)
     ctx.fill()
     const ring = this.px({ x: -1, y: -1 })
-    ctx.fillStyle = PATH
+    ctx.fillStyle = WALKWAY
     ctx.beginPath()
-    ctx.roundRect(ring.x, ring.y, (board.width + 2) * c, (board.height + 2) * c, c * 0.35)
+    ctx.roundRect(ring.x, ring.y, (board.width + 2) * c, (board.height + 2) * c, radius * 0.6)
     ctx.fill()
-    ctx.fillStyle = PATH
-    ctx.fillRect(door.x - c * 0.6, door.y, c * 1.2, c * 0.9)
-    const mid = this.px({ x: -0.5, y: -0.5 })
-    ctx.strokeStyle = 'rgba(255,230,190,0.18)'
-    ctx.setLineDash([c * 0.25, c * 0.25])
-    ctx.lineWidth = 2
-    ctx.strokeRect(mid.x, mid.y, (board.width + 1) * c, (board.height + 1) * c)
-    ctx.setLineDash([])
+    ctx.fillStyle = FLOOR
+    ctx.fillRect(L.gridX, L.gridY, board.width * c, board.height * c)
 
+    this.drawShaft()
     this.drawCells()
     this.drawLockBadges()
 
-    // Slots.
+    // Slots: white boxes the carts park in.
     this.game.slots.forEach((cart, i) => {
       const x = L.slotXs[i] - L.slotW / 2
-      ctx.strokeStyle = 'rgba(255,230,190,0.35)'
-      ctx.setLineDash([5, 4])
-      ctx.lineWidth = 2
+      ctx.fillStyle = 'rgba(170,110,60,0.25)'
+      ctx.beginPath()
+      ctx.roundRect(x, L.slotY + 4, L.slotW, L.slotH, 10)
+      ctx.fill()
+      ctx.fillStyle = '#fffaf2'
       ctx.beginPath()
       ctx.roundRect(x, L.slotY, L.slotW, L.slotH, 10)
-      ctx.stroke()
-      ctx.setLineDash([])
+      ctx.fill()
       if (!cart) return
       const blocked = cart.minersOut === 0 && cart.remaining > 0
       const center = { x: L.slotXs[i], y: L.slotY + L.slotH / 2 }
       // When chained carts leave together, keep showing which ones belong together.
-      this.drawCart(cart, center, 1, L.slotW - 8, L.slotH - 10, {
+      this.drawCart(cart, center, 1, L.slotW - 4, L.slotH - 4, {
         dim: blocked,
+        outline: true,
         badge: !!this.game.level.together,
       })
       if (this.game.waitingForPartner(cart)) this.drawWaiting(center.x, L.slotY + L.slotH * 0.55)
@@ -349,7 +349,7 @@ export class Renderer {
       l.t += dt
       const p = { x: l.pos.x + l.t * l.t * 900, y: l.pos.y - l.t * 30 }
       ctx.globalAlpha = Math.max(0, 1 - l.t * 1.6)
-      this.drawCart(l.cart, p, 1, L.slotW - 8, L.slotH - 10, { done: true })
+      this.drawCart(l.cart, p, 1, L.slotW - 4, L.slotH - 4, { done: true, outline: true })
       ctx.globalAlpha = 1
       return l.t < 0.65
     })
@@ -374,58 +374,27 @@ export class Renderer {
     const L = this.L
     const { board, colors, original } = this.game
     const c = L.cell
-    const bevel = Math.max(1, c * 0.13)
     for (let i = 0; i < board.cells.length; i++) {
       const x = L.gridX + (i % board.width) * c
       const y = L.gridY + Math.floor(i / board.width) * c
       const v = board.cells[i]
       if (v === DUG) {
-        ctx.fillStyle = TUNNEL
-        ctx.fillRect(x, y, c, c)
         // Faint imprint of the picture that used to be here.
-        ctx.globalAlpha = 0.13
+        ctx.globalAlpha = 0.14
         ctx.fillStyle = colors[original[i]]
         ctx.fillRect(x, y, c, c)
         ctx.globalAlpha = 1
         continue
       }
-      if (v === ROCK) {
-        ctx.fillStyle = '#5d5d63'
-        ctx.fillRect(x, y, c, c)
-        ctx.fillStyle = '#7b7b83'
-        ctx.fillRect(x + c * 0.12, y + c * 0.12, c * 0.5, c * 0.35)
-        ctx.fillStyle = '#45454b'
-        ctx.fillRect(x + c * 0.45, y + c * 0.6, c * 0.45, c * 0.28)
-        continue
-      }
-      if (this.game.level.dark && !this.lit(i)) {
+      let sprite: HTMLCanvasElement
+      if (v === ROCK) sprite = this.sprite('rock', '#8d8a94')
+      else if (this.game.level.dark && !this.lit(i))
         // Dark mine: color unknown until the cell is at the edge or next to a tunnel.
-        ctx.fillStyle = (i * 7919) % 5 === 0 ? '#1d1922' : '#17141b'
-        ctx.fillRect(x, y, c, c)
-        continue
-      }
-      if (isLocked(board, i)) {
-        ctx.fillStyle = '#3d4250'
-        ctx.fillRect(x, y, c, c)
-        ctx.strokeStyle = 'rgba(255,255,255,0.08)'
-        ctx.lineWidth = 1
-        ctx.beginPath()
-        ctx.moveTo(x, y + c)
-        ctx.lineTo(x + c, y)
-        ctx.stroke()
-        ctx.strokeStyle = '#2b2f3a'
-        ctx.strokeRect(x + 0.5, y + 0.5, c - 1, c - 1)
-        continue
-      }
-      const base = colors[v]
-      ctx.fillStyle = base
-      ctx.fillRect(x, y, c, c)
-      ctx.fillStyle = shade(base, 0.35)
-      ctx.fillRect(x, y, c, bevel)
-      ctx.fillRect(x, y, bevel, c)
-      ctx.fillStyle = shade(base, -0.3)
-      ctx.fillRect(x, y + c - bevel, c, bevel)
-      ctx.fillRect(x + c - bevel, y, bevel, c)
+        sprite = this.sprite('dark', (i * 7919) % 5 === 0 ? '#3a3346' : '#332d3e')
+      else if (isLocked(board, i)) sprite = this.sprite('locked', '#6a7184')
+      else sprite = this.sprite('gem', colors[v])
+      ctx.drawImage(sprite, x, y, c, c)
+      if (v < 0 || isLocked(board, i)) continue
       if (board.armor[i] > 0) this.drawArmor(x, y, c)
       else if (this.game.originalArmor[i] > 0) this.drawCracks(x, y, c)
       if (this.game.reserved.has(i)) {
@@ -434,6 +403,115 @@ export class Renderer {
         ctx.strokeRect(x + 2, y + 2, c - 4, c - 4)
       }
     }
+  }
+
+  /**
+   * One rounded, raised block per kind and color, drawn once at the current cell
+   * size (in device pixels) and stamped onto every cell after that.
+   */
+  private sprite(kind: 'gem' | 'rock' | 'dark' | 'locked', color: string): HTMLCanvasElement {
+    const dpr = window.devicePixelRatio || 1
+    const size = Math.max(1, Math.round(this.L.cell * dpr))
+    const key = `${kind}|${color}|${size}`
+    const cached = this.sprites.get(key)
+    if (cached) return cached
+    const cv = document.createElement('canvas')
+    cv.width = size
+    cv.height = size
+    const g = cv.getContext('2d')!
+    const gap = Math.max(0.5, size * 0.05)
+    const r = size * 0.2
+    const inner = size - gap * 2
+    // Side of the block, showing below the face.
+    g.fillStyle = shade(color, -0.28)
+    g.beginPath()
+    g.roundRect(gap, gap, inner, inner, r)
+    g.fill()
+    // Face, lit from above.
+    const face = inner - size * 0.12
+    const grad = g.createLinearGradient(0, gap, 0, gap + face)
+    grad.addColorStop(0, shade(color, 0.22))
+    grad.addColorStop(1, color)
+    g.fillStyle = grad
+    g.beginPath()
+    g.roundRect(gap, gap, inner, face, r)
+    g.fill()
+    if (size >= 10) {
+      // Glint in the top-left corner.
+      g.fillStyle = 'rgba(255,255,255,0.35)'
+      g.beginPath()
+      g.roundRect(gap + size * 0.14, gap + size * 0.1, size * 0.3, size * 0.12, size * 0.06)
+      g.fill()
+    }
+    if (kind === 'rock') {
+      g.fillStyle = 'rgba(60,55,70,0.35)'
+      g.fillRect(size * 0.5, size * 0.5, size * 0.28, size * 0.16)
+      g.fillRect(size * 0.22, size * 0.62, size * 0.16, size * 0.12)
+    } else if (kind === 'locked') {
+      g.strokeStyle = 'rgba(255,255,255,0.18)'
+      g.lineWidth = Math.max(1, size * 0.06)
+      g.beginPath()
+      g.moveTo(gap + r * 0.6, gap + face - r * 0.6)
+      g.lineTo(gap + inner - r * 0.6, gap + r * 0.6)
+      g.stroke()
+    }
+    this.sprites.set(key, cv)
+    return cv
+  }
+
+  /** Peach tablecloth with a diamond pattern. */
+  private background(): CanvasPattern | string {
+    if (this.bgPattern) return this.bgPattern
+    const cv = document.createElement('canvas')
+    cv.width = 56
+    cv.height = 56
+    const g = cv.getContext('2d')!
+    g.fillStyle = BG
+    g.fillRect(0, 0, 56, 56)
+    g.fillStyle = BG_DIAMOND
+    g.beginPath()
+    g.moveTo(28, 0)
+    g.lineTo(56, 28)
+    g.lineTo(28, 56)
+    g.lineTo(0, 28)
+    g.closePath()
+    g.fill()
+    this.bgPattern = this.ctx.createPattern(cv, 'repeat') ?? BG
+    return this.bgPattern
+  }
+
+  /** The mine shaft miners walk through between the slots and the picture. */
+  private drawShaft() {
+    const ctx = this.ctx
+    const { x, y } = this.L.junction
+    const rx = Math.max(22, Math.min(40, this.L.slotW * 0.42))
+    const ry = rx * 0.38
+    // Wooden lid pushed aside.
+    ctx.fillStyle = '#b97c4b'
+    ctx.beginPath()
+    ctx.ellipse(x + rx * 1.05, y + ry * 0.25, rx * 0.85, ry * 0.95, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#d9a06d'
+    ctx.beginPath()
+    ctx.ellipse(x + rx * 1.05, y + ry * 0.05, rx * 0.85, ry * 0.85, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.strokeStyle = '#b97c4b'
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    for (const dx of [-0.25, 0, 0.25]) {
+      ctx.moveTo(x + rx * (1.05 + dx), y - ry * 0.25)
+      ctx.lineTo(x + rx * (1.05 + dx), y + ry * 0.3)
+    }
+    ctx.stroke()
+    // The hole.
+    ctx.fillStyle = '#c99566'
+    ctx.beginPath()
+    ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#3d2618'
+    ctx.beginPath()
+    ctx.ellipse(x, y + ry * 0.08, rx * 0.86, ry * 0.8, 0, 0, Math.PI * 2)
+    ctx.fill()
   }
 
   /** In a dark mine a cell shows its color once it is on the edge or touches a tunnel. */
@@ -537,10 +615,8 @@ export class Renderer {
     const L = this.L
     const shakeLeft = this.shake.get(col) ?? 0
     const dx = shakeLeft > 0 ? Math.sin(shakeLeft * 60) * 6 : 0
-    const scale = depth === 0 ? 1 : 0.82 - (depth - 1) * 0.1
-    const y =
-      L.trayY + L.cartH / 2 + (depth === 0 ? 0 : L.cartH * 0.95 + (depth - 1) * L.cartH * 0.75)
-    return { p: { x: L.colXs[col] + dx, y }, scale }
+    const y = L.trayY + L.cartH / 2 + depth * L.cartH * TRAY_PITCH
+    return { p: { x: L.colXs[col] + dx, y }, scale: 1 }
   }
 
   private drawTray(dt: number) {
@@ -561,7 +637,7 @@ export class Renderer {
           .sort((x, y) => x.c - y.c)[0]
         const a = this.cartPos.get(cart.id)
         const b = right && this.cartPos.get(right.l.id)
-        if (a && b) this.drawChain(a, b)
+        if (a && b) this.drawTube(a, b, cart, right.l)
       })
     })
 
@@ -573,8 +649,10 @@ export class Renderer {
       const ready = showReady && this.game.frontReady(ci)
       for (let d = Math.min(col.length, 3) - 1; d >= 0; d--) {
         const { p, scale } = this.trayTarget(ci, d)
+        // Back rows keep their full color so it is easy to plan ahead; the
+        // white outline marks the front row that can be tapped.
         this.drawCart(col[d], p, scale, L.cartW, L.cartH, {
-          dim: d > 0,
+          outline: d === 0,
           ring: d === 0 && ready,
           badge: true,
         })
@@ -584,9 +662,9 @@ export class Renderer {
         const deepPairs = col.slice(3).filter((c) => c.pair)
         const r = 10
         const rowW = 26 + deepPairs.length * (r * 2 + 3)
-        const y = L.trayY + L.cartH * 2.75 + 4
+        const y = L.trayY + L.cartH * TRAY_PITCH * 3 + 8
         let x = L.colXs[ci] - rowW / 2
-        ctx.fillStyle = 'rgba(255,240,220,0.6)'
+        ctx.fillStyle = TEXT_DARK
         ctx.font = `600 13px ${FONT}`
         ctx.textAlign = 'left'
         ctx.textBaseline = 'middle'
@@ -663,26 +741,38 @@ export class Renderer {
     ctx.fillText(String(pair), x, y + 1)
   }
 
-  private drawChain(a: Pt, b: Pt) {
+  /** Pipe joining two linked carts, each half in its cart's color. */
+  private drawTube(a: Pt, b: Pt, ca: Cart, cb: Cart) {
     const ctx = this.ctx
-    const len = Math.hypot(b.x - a.x, b.y - a.y)
-    const n = Math.max(2, Math.round(len / 9))
-    const angle = Math.atan2(b.y - a.y, b.x - a.x)
-    for (let i = 0; i <= n; i++) {
-      const p = lerp(a, b, i / n)
-      ctx.save()
-      ctx.translate(p.x, p.y)
-      ctx.rotate(angle + (i % 2 ? Math.PI / 2 : 0))
-      ctx.strokeStyle = '#2b2b2b'
-      ctx.lineWidth = 4.5
+    const w = Math.max(8, this.L.cartW * 0.2)
+    const m = lerp(a, b, 0.5)
+    const colorOf = (c: Cart) => (c.hidden ? HIDDEN_CART : this.game.colors[c.color])
+    ctx.lineCap = 'round'
+    ctx.strokeStyle = 'rgba(90,55,30,0.35)'
+    ctx.lineWidth = w + 4
+    ctx.beginPath()
+    ctx.moveTo(a.x, a.y)
+    ctx.lineTo(b.x, b.y)
+    ctx.stroke()
+    ctx.lineWidth = w
+    for (const [from, color] of [
+      [a, colorOf(ca)],
+      [b, colorOf(cb)],
+    ] as const) {
+      ctx.strokeStyle = color
       ctx.beginPath()
-      ctx.ellipse(0, 0, 5.5, 3.2, 0, 0, Math.PI * 2)
+      ctx.moveTo(from.x, from.y)
+      ctx.lineTo(m.x, m.y)
       ctx.stroke()
-      ctx.strokeStyle = '#d9dee6'
-      ctx.lineWidth = 2.2
-      ctx.stroke()
-      ctx.restore()
     }
+    // Shine along the pipe.
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'
+    ctx.lineWidth = w * 0.25
+    ctx.beginPath()
+    ctx.moveTo(a.x, a.y - w * 0.2)
+    ctx.lineTo(b.x, b.y - w * 0.2)
+    ctx.stroke()
+    ctx.lineCap = 'butt'
   }
 
   /** Draws a cart, easing it from wherever it was drawn last time. */
@@ -692,7 +782,7 @@ export class Renderer {
     scale: number,
     w: number,
     h: number,
-    opt: { dim?: boolean; ring?: boolean; done?: boolean; badge?: boolean } = {}
+    opt: { dim?: boolean; ring?: boolean; done?: boolean; badge?: boolean; outline?: boolean } = {}
   ) {
     let p = target
     let s = scale
@@ -714,65 +804,61 @@ export class Renderer {
 
     if (opt.ring) {
       const pulse = 0.55 + 0.45 * Math.sin(this.time * 5)
-      ctx.strokeStyle = `rgba(255,255,255,${pulse})`
-      ctx.lineWidth = 3
+      ctx.strokeStyle = `rgba(255,140,30,${pulse})`
+      ctx.lineWidth = 4
       ctx.beginPath()
       ctx.roundRect(x - 5, y - 5, cw + 10, ch + 10, 12)
       ctx.stroke()
     }
 
     ctx.save()
-    if (opt.dim) ctx.globalAlpha *= 0.55
-    // Gem pile poking out of the top: more gems as the cart fills up.
-    const delivered = cart.total - cart.remaining
-    const pile = Math.min(5, Math.ceil((delivered / cart.total) * 5))
-    for (let i = 0; i < pile; i++) {
-      const gx = x + cw * (0.2 + i * 0.15)
-      const gs = ch * 0.2
-      ctx.fillStyle = shade(color, 0.25)
-      ctx.fillRect(gx - gs / 2, y + ch * 0.12 - gs / 2 - (i % 2) * gs * 0.4, gs, gs)
-    }
-    // Cart body: a trapezoid, wider at the top.
-    const top = y + ch * 0.15
-    const bottom = y + ch * 0.8
+    // Carts further back are washed out, like they sit in the cart's shadow.
+    if (opt.dim) ctx.globalAlpha *= 0.5
+    // A chunky block: darker side underneath, lit face on top.
+    const r = Math.min(cw, ch) * 0.2
+    const face = ch * 0.86
+    ctx.fillStyle = shade(color, -0.35)
     ctx.beginPath()
-    ctx.moveTo(x, top)
-    ctx.lineTo(x + cw, top)
-    ctx.lineTo(x + cw * 0.88, bottom)
-    ctx.lineTo(x + cw * 0.12, bottom)
-    ctx.closePath()
-    ctx.fillStyle = color
+    ctx.roundRect(x, y, cw, ch, r)
     ctx.fill()
-    ctx.lineWidth = 2.5
-    ctx.strokeStyle = shade(color, -0.45)
-    ctx.stroke()
-    ctx.fillStyle = shade(color, -0.25)
-    ctx.fillRect(x + 2, top, cw - 4, ch * 0.09)
-    // Wheels.
-    ctx.fillStyle = '#2b2b2b'
-    for (const wx of [0.28, 0.72]) {
+    const grad = ctx.createLinearGradient(0, y, 0, y + face)
+    grad.addColorStop(0, shade(color, 0.2))
+    grad.addColorStop(1, color)
+    ctx.fillStyle = grad
+    ctx.beginPath()
+    ctx.roundRect(x, y, cw, face, r)
+    ctx.fill()
+    ctx.fillStyle = 'rgba(255,255,255,0.28)'
+    ctx.beginPath()
+    ctx.roundRect(x + cw * 0.1, y + ch * 0.07, cw * 0.8, ch * 0.14, ch * 0.07)
+    ctx.fill()
+    if (opt.outline) {
+      ctx.strokeStyle = '#ffffff'
+      ctx.lineWidth = 3
       ctx.beginPath()
-      ctx.arc(x + cw * wx, bottom + ch * 0.06, ch * 0.11, 0, Math.PI * 2)
-      ctx.fill()
+      ctx.roundRect(x, y, cw, ch, r)
+      ctx.stroke()
     }
-    // Count, or a question mark while the color is hidden.
-    const fs = Math.round(ch * 0.36)
-    ctx.font = `800 ${fs}px ${FONT}`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.lineWidth = 3
-    ctx.strokeStyle = 'rgba(0,0,0,0.45)'
-    // Miners still waiting in the cart: counts down as each one sets off.
+    // Miners still waiting in the cart (counts down as each one sets off),
+    // or a question mark while the color is hidden.
     const toSend = cart.remaining - cart.pending
     const label = cart.hidden ? '?' : toSend > 0 ? String(toSend) : ''
-    const ty = (top + bottom) / 2 + ch * 0.03
+    const fs = Math.round(ch * 0.46)
+    ctx.font = `900 ${fs}px ${FONT}`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.lineJoin = 'round'
+    ctx.lineWidth = Math.max(3, fs * 0.2)
+    ctx.strokeStyle = shade(color, -0.6)
+    const ty = y + face / 2 + ch * 0.03
     ctx.strokeText(label, p.x, ty)
-    ctx.fillStyle = isLight(color) && !cart.hidden ? '#2b1d12' : '#ffffff'
+    ctx.fillStyle = '#ffffff'
     ctx.fillText(label, p.x, ty)
+    ctx.lineJoin = 'miter'
     if (opt.dim && cart.minersOut === 0 && cart.remaining < cart.total) {
       ctx.fillStyle = '#fff'
       ctx.font = `700 ${Math.round(ch * 0.22)}px sans-serif`
-      ctx.fillText('z', x + cw - 6, y + 6)
+      ctx.fillText('z', x + cw - 8, y + 9)
     }
     ctx.restore()
     // Linked carts carry their pair badge at full opacity, even when dimmed further back.
@@ -815,7 +901,7 @@ export class Renderer {
   private drawMiner(m: Miner) {
     const ctx = this.ctx
     const p = this.minerPos(m)
-    const s = Math.max(9, Math.min(22, this.L.cell * 0.62))
+    const s = Math.max(13, Math.min(24, this.L.cell * 1.1))
     const color = this.game.colors[m.cart.color]
     const bob = m.state === 'dig' ? 0 : Math.sin((this.time + m.id) * 18) * s * 0.06
     const x = p.x

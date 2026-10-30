@@ -181,8 +181,19 @@ function addFrozen(tray: TrayLayout, count: number, rng: () => number) {
   }
 }
 
+// Most mystery carts a level may have: a few keep it interesting, more just hide the plan.
+export const MYSTERY_MAX = 5
+
 function addMystery(tray: TrayLayout, share: number, rng: () => number) {
   for (const col of tray.columns) col.forEach((cart, i) => (cart.hidden = i > 0 && rng() < share))
+  capMystery(tray, rng)
+}
+
+/** Reveals randomly chosen mystery carts until at most MYSTERY_MAX are left. */
+export function capMystery(tray: TrayLayout, rng: () => number) {
+  const hidden = tray.columns.flat().filter((c) => c.hidden)
+  while (hidden.length > MYSTERY_MAX)
+    hidden.splice(Math.floor(rng() * hidden.length), 1)[0].hidden = false
 }
 
 /**

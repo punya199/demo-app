@@ -1,3 +1,14 @@
+# [1.16.0](https://github.com/punya199/demo-app/compare/v1.15.0...v1.16.0) (2026-10-30)
+
+
+### New
+
+* add monster V-Pet game page and design docs ([eb6cdad](https://github.com/punya199/demo-app/commit/eb6cdadadb6ea4f3ef0896a67d12891dd4a2b1c4))
+
+### Update
+
+* add idle mode to the monster game roadmap ([ddcff33](https://github.com/punya199/demo-app/commit/ddcff339ab53679a9095f8f289537aaa4d6ac614))
+
 # [1.15.0](https://github.com/punya199/demo-app/compare/v1.14.0...v1.15.0) (2026-10-30)
 
 

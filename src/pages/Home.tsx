@@ -49,7 +49,7 @@ const Home = () => {
     {
       title: 'Game',
       icon: <PlaySquareOutlined />,
-      path: appPath.randomCard(),
+      path: appPath.games(),
       visible: true,
     },
     {

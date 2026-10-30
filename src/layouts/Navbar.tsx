@@ -70,32 +70,13 @@ const Navbar = () => {
         {
           key: 'sub1',
           label: 'Game',
-          children: [
-            {
-              key: 'g1',
-              label: 'random Card',
-              onClick: () => {
-                navigate(appPath.randomCard())
-                onClose()
-              },
-            },
-            {
-              key: 'g2',
-              label: 'Omama',
-              onClick: () => {
-                navigate(appPath.omamaGame())
-                onClose()
-              },
-            },
-            {
-              key: 'g3',
-              label: 'นักขุดอัญมณี',
-              onClick: () => {
-                navigate(appPath.gemDiggers())
-                onClose()
-              },
-            },
-          ],
+          onClick: () => {
+            navigate(appPath.games())
+            onClose()
+          },
+          onMouseEnter: () => {
+            import('../pages/PageGames')
+          },
         },
         {
           key: 'sub2',

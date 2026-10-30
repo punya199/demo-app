@@ -7,6 +7,7 @@ export const VOTE_ROUTE_TEMPLATE = '/vote/:slug'
 
 export const appPath = {
   home: generatePath('/'),
+  games: generatePath('/games'),
   randomCard: generatePath('/random-card'),
   omamaGame: generatePath('/omama'),
   gemDiggers: generatePath('/gem-diggers'),

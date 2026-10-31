@@ -126,6 +126,8 @@ export interface IBattleEvent {
   // extra hit of a double strike. `absorbed` is damage a set shield soaked up (part of `damage`).
   kind?: 'burn' | 'regen' | 'double'
   absorbed?: number
+  // Team fights: which member of the player's side attacked, or was hit when the enemy attacks.
+  member?: number
 }
 
 export interface IBattleData {
@@ -134,6 +136,8 @@ export interface IBattleData {
   rounds: number
   events: IBattleEvent[]
   player: IFighter
+  // Everyone on the player's side, the player first (a rented ally makes it two).
+  team?: IFighter[]
   enemy: IFighter
   reward: number
   gemReward: number
@@ -290,6 +294,64 @@ export interface IExpeditionSummary {
   items: string[]
 }
 
+export interface IProfile {
+  displayName: string
+  friendCode: string
+}
+
+export interface IFriend {
+  relationId: string
+  displayName: string
+  monster: { emoji: string; stage: EnumMonsterStage } | null
+  points: number
+  hasSupport: boolean
+  canGreet: boolean
+}
+
+export interface IFriendRequest {
+  relationId: string
+  displayName: string
+}
+
+export interface IFriendsData {
+  friendLimit: number
+  giftsLeft: number
+  friends: IFriend[]
+  incoming: IFriendRequest[]
+  outgoing: IFriendRequest[]
+}
+
+export interface IFriendVisit {
+  displayName: string
+  points: number
+  monster: {
+    emoji: string
+    name: string
+    stage: EnumMonsterStage
+    ageMinutes: number
+    isSick: boolean
+    isExploring: boolean
+    wins: number
+    losses: number
+    stats: IBattleStats
+  } | null
+}
+
+export interface ISupportUnit {
+  supportId: string
+  emoji: string
+  name: string
+  stage: EnumMonsterStage
+  stats: IBattleStats
+  effects: IFighterEffects | null
+  setAt: string
+  readyAt: string
+}
+
+export interface IRentableUnit extends ISupportUnit {
+  ownerName: string
+}
+
 export interface IWorldBossReward {
   coin: number
   raidToken: number
@@ -330,12 +392,15 @@ export interface IWorldBossAttackResponse {
     rounds: number
     events: IBattleEvent[]
     player: IFighter
+    team: IFighter[]
     // The boss as it was going in, with the HP the whole server had left.
     enemy: IFighter
     damage: number
     survived: boolean
   }
+  // The renter's own damage (what the ranking counts).
   damage: number
+  ally: { name: string; emoji: string; damage: number; fee: number } | null
   bossHp: number
   maxHp: number
   isKillingBlow: boolean
@@ -640,6 +705,18 @@ export interface IWikiData {
         stones: number
       }[]
     }
+  }
+  social: {
+    friendLimit: number
+    requestLimit: number
+    greetsPerDayPerFriend: number
+    giftsPerDay: number
+    pointsGreet: number
+    pointsGift: number
+    pointsRental: number
+    supportCooldownMinutes: number
+    rentalFee: number
+    rentalOwnerDailyCap: number
   }
   worldBoss: {
     dailyHits: number

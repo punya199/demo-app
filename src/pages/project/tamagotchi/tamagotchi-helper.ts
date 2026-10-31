@@ -1,4 +1,5 @@
 import {
+  ISupportUnit,
   IWorldBossReward,
   IWorldBossStatus,
   IBattleStats,
@@ -185,9 +186,11 @@ export const getUseItemBlocker = (monster: IMonsterData | null): string | null =
     : null
 
 export const describeBattleEvent = (event: IBattleEvent, battle: IBattleData) => {
-  const attacker = event.actor === 'player' ? battle.player : battle.enemy
+  // With a rented ally, `member` says which of the player's side acted (or was hit).
+  const mine = battle.team?.[event.member ?? 0] ?? battle.player
+  const attacker = event.actor === 'player' ? mine : battle.enemy
   // Burn ticks and regeneration affect the side opposite to `actor`.
-  const affected = event.actor === 'player' ? battle.enemy : battle.player
+  const affected = event.actor === 'player' ? battle.enemy : mine
   if (event.kind === 'burn') {
     return `${affected.name} ติดเผาไหม้ เสีย ${event.damage} HP`
   }
@@ -213,7 +216,10 @@ export const hpAfter = (
   side: BattleSide,
   maxHp: number
 ) => {
-  const hits = events.slice(0, shownEvents).filter((event) => event.actor !== side)
+  // In a team fight the player's bar follows the player (member 0), not the rented ally.
+  const hits = events
+    .slice(0, shownEvents)
+    .filter((event) => event.actor !== side && (side !== 'player' || (event.member ?? 0) === 0))
   return hits.length ? hits[hits.length - 1].targetHp : maxHp
 }
 
@@ -247,6 +253,20 @@ const serverMessageLabel: Record<string, string> = {
   'Clear the previous difficulty first': 'ต้องชนะระดับก่อนหน้าก่อน',
   'Clear this difficulty first': 'ต้องชนะระดับที่ดรอปเกรดนี้ก่อนถึงจะแลกได้',
   'Boss not found': 'ไม่พบบอส',
+  'Invalid friend code': 'รหัสเพื่อนไม่ถูกต้อง',
+  'Friend code not found': 'ไม่พบรหัสเพื่อนนี้',
+  'You cannot add yourself': 'เพิ่มตัวเองเป็นเพื่อนไม่ได้',
+  'Already friends': 'เป็นเพื่อนกันอยู่แล้ว',
+  'Friend request already sent': 'ส่งคำขอไปแล้ว รออีกฝ่ายตอบรับ',
+  'Friend list is full': 'รายชื่อเพื่อนเต็ม',
+  'That player has too many pending requests': 'ผู้เล่นคนนั้นมีคำขอค้างอยู่มากเกินไป',
+  'Friend request not found': 'ไม่พบคำขอเป็นเพื่อน',
+  'Friend not found': 'ไม่พบเพื่อนคนนี้',
+  'You already greeted this friend today': 'ทักทายเพื่อนคนนี้วันนี้แล้ว',
+  'Daily gift limit reached': 'ส่งของขวัญครบจำนวนของวันนี้แล้ว',
+  'Your monster is too young to be a support unit': 'ต้องเป็นร่างโตขึ้นไปถึงตั้งเป็นตัวซัพพอร์ตได้',
+  'Support unit was changed recently': 'เพิ่งเปลี่ยนตัวซัพพอร์ต รอสักครู่',
+  'Support unit is not available': 'ใช้ตัวซัพพอร์ตนี้ไม่ได้',
   'Your monster is too young for the world boss': 'ต้องเป็นร่างโตขึ้นไปถึงตีบอสโลกได้',
   'Daily world boss limit reached': 'ตีบอสโลกครบจำนวนของวันนี้แล้ว',
   'World boss is not active': 'บอสโลกตัวนี้ถูกล้มหรือหมดเวลาแล้ว',
@@ -554,4 +574,29 @@ export const formatTimeLeft = (endsAt: string, now: Date) => {
     return `${days} วัน ${hours} ชม.`
   }
   return hours > 0 ? `${hours} ชม. ${minutes % 60} นาที` : `${minutes} นาที`
+}
+
+// "ABCD2345" -> "ABCD-2345", easier to read out loud.
+export const formatFriendCode = (code: string) => `${code.slice(0, 4)}-${code.slice(4)}`
+
+export const getSupportBlocker = (
+  monster: IMonsterData | null,
+  support: ISupportUnit | null | undefined,
+  now: Date
+): string | null => {
+  if (!monster || monster.diedAt || !PVP_STAGES.includes(monster.stage)) {
+    return 'ต้องเป็นร่างโตขึ้นไปถึงตั้งเป็นตัวซัพพอร์ตได้'
+  }
+  if (support && new Date(support.readyAt) > now) {
+    const minutesLeft = Math.ceil((new Date(support.readyAt).getTime() - now.getTime()) / 60_000)
+    return `เปลี่ยนตัวซัพพอร์ตได้อีกครั้งใน ${minutesLeft} นาที`
+  }
+  return null
+}
+
+export const getGiftBlocker = (giftsLeft: number, ownedItems: number): string | null => {
+  if (giftsLeft <= 0) {
+    return 'ส่งของขวัญครบจำนวนของวันนี้แล้ว'
+  }
+  return ownedItems <= 0 ? 'ไม่มีไอเทมในกระเป๋าให้ส่ง' : null
 }

@@ -20,6 +20,7 @@ import {
   useClaimWorldBoss,
   useExchangeWorldBoss,
   useGetInventory,
+  useGetRentable,
   useGetWiki,
   useGetWorldBoss,
   useGetWorldBossRanking,
@@ -33,6 +34,7 @@ interface IWorldBossPanelProps {
 
 const toBattleData = (result: IWorldBossAttackResponse): IBattleData => ({
   stageId: 'world-boss',
+  team: result.battle.team,
   won: result.isKillingBlow,
   rounds: result.battle.rounds,
   events: result.battle.events,
@@ -47,6 +49,8 @@ const toBattleData = (result: IWorldBossAttackResponse): IBattleData => ({
 
 const describeAttack = (result: IWorldBossAttackResponse) =>
   [
+    result.ally &&
+      `${result.ally.emoji} ${result.ally.name} ช่วยตี ${result.ally.damage} (ค่าเช่า 🪙 ${result.ally.fee})`,
     result.isKillingBlow ? 'ปลิดชีพบอส! 🎉' : `ทำดาเมจ ${result.damage}`,
     result.isKillingBlow && `ทำดาเมจ ${result.damage}`,
     result.battle.survived ? 'มอนยังรอดครบรอบ' : 'มอนล้มก่อนครบรอบ',
@@ -88,11 +92,14 @@ export const WorldBossPanel = (props: IWorldBossPanelProps) => {
   const { data: status, isLoading } = useGetWorldBoss()
   const { data: wiki } = useGetWiki()
   const { data: inventory } = useGetInventory()
+  const { data: rentable } = useGetRentable()
   const { mutate: attack, isPending } = useWorldBossAttack()
   const { mutate: claim, isPending: isClaiming } = useClaimWorldBoss()
   const { mutate: exchange, isPending: isExchanging } = useExchangeWorldBoss()
   const applyResult = useApplyWorldBossResult()
   const [replay, setReplay] = useState<IWorldBossAttackResponse | null>(null)
+  // A friend's support unit to rent for the next hit; none = fight alone.
+  const [supportId, setSupportId] = useState<string | undefined>()
   const [slot, setSlot] = useState<EnumEquipmentSlot>(EnumEquipmentSlot.WEAPON)
   const [grade, setGrade] = useState<EnumEquipmentGrade>(EnumEquipmentGrade.RARE)
 
@@ -148,13 +155,37 @@ export const WorldBossPanel = (props: IWorldBossPanelProps) => {
               type="primary"
               size="large"
               disabled={!!blocker || isPending}
-              onClick={() => attack(undefined, { onSuccess: setReplay, onError })}
+              onClick={() => attack(supportId, { onSuccess: setReplay, onError })}
             >
               ⚔️ ตีบอส
             </Button>
           </Tooltip>
         </div>
       </Card>
+
+      {rentable && rentable.units.length > 0 && (
+        <Card size="small" className="dark:border-slate-700 dark:bg-slate-900">
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <span>เช่าตัวเพื่อนช่วยตี:</span>
+            <Select
+              size="small"
+              className="min-w-48"
+              allowClear
+              placeholder="ไม่เช่า (ตีคนเดียว)"
+              value={supportId}
+              onChange={setSupportId}
+              options={rentable.units.map((unit) => ({
+                value: unit.supportId,
+                label: `${unit.emoji} ${unit.name} (${unit.ownerName}) ATK ${unit.stats.atk}`,
+              }))}
+            />
+            <span className="text-xs text-slate-500">
+              ค่าเช่าสูงสุด 🪙 {rentable.fee} จ่ายให้เจ้าของ ดาเมจของตัวเช่าลด HP
+              บอสแต่ไม่นับอันดับของคุณ
+            </span>
+          </div>
+        </Card>
+      )}
 
       {status.claimable.map((entry) => (
         <Alert

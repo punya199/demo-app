@@ -133,6 +133,75 @@ export interface IBattleData {
   reward: number
   gemReward: number
   isFirstClear: boolean
+  // A piece of equipment this win dropped, or null; `dropBagFull` = it would have, but no room.
+  drop: IEquipmentItem | null
+  dropBagFull: boolean
+}
+
+export enum EnumEquipmentSlot {
+  WEAPON = 'weapon',
+  ARMOR = 'armor',
+  HELMET = 'helmet',
+  ACCESSORY = 'accessory',
+}
+
+export enum EnumEquipmentGrade {
+  COMMON = 'common',
+  RARE = 'rare',
+  EPIC = 'epic',
+  LEGENDARY = 'legendary',
+}
+
+export type StatKey = keyof IBattleStats
+
+export interface IEquipmentItem {
+  id: string
+  templateId: string
+  name: string
+  emoji: string
+  slot: EnumEquipmentSlot
+  setId: string | null
+  grade: EnumEquipmentGrade
+  mainStat: StatKey
+  // Main stat including the enhance level.
+  mainValue: number
+  subStats: Partial<Record<StatKey, number>>
+  stats: IBattleStats
+  enhanceLevel: number
+  pity: number
+  equipped: boolean
+}
+
+export interface IEquipmentData {
+  capacity: number
+  items: IEquipmentItem[]
+  setBonuses: { setId: string; name: string; pieces: number }[]
+  // The living monster's battle stats with the worn gear; null without a hatched monster.
+  stats: IBattleStats | null
+}
+
+export type EnhanceFailure = 'material' | 'drop' | 'drop_or_break'
+
+export type IEnhancePreview =
+  | { maxed: true; item: IEquipmentItem }
+  | {
+      maxed: false
+      item: IEquipmentItem
+      targetLevel: number
+      baseRate: number
+      rate: number
+      onFail: EnhanceFailure
+      canProtect: boolean
+      cost: { coin: number; stones: number }
+    }
+
+export interface IEnhanceOutcome {
+  success: boolean
+  broke: boolean
+  rate: number
+  fromLevel: number
+  toLevel: number
+  protectUsed: boolean
 }
 
 export interface IAdventureStage {
@@ -319,6 +388,40 @@ export interface IWikiData {
     autoBattleCooldownSeconds: number
     autoBattleStaminaCost: number
     autoBattleDailyCoinCap: number
+  }
+  equipment: {
+    capacity: number
+    slots: Record<EnumEquipmentSlot, { stat: StatKey; base: number }>
+    gradeMultiplier: Record<EnumEquipmentGrade, number>
+    boxPrice: number
+    boxGradeRates: Partial<Record<EnumEquipmentGrade, number>>
+    dropChancePercent: number
+    dropGradeRatesByArea: Record<string, Partial<Record<EnumEquipmentGrade, number>>>
+    dismantleStones: Record<EnumEquipmentGrade, number>
+    materials: {
+      id: string
+      name: string
+      emoji: string
+      description: string
+      price: number
+      currency: 'coin' | 'gem'
+    }[]
+    expeditionStoneEveryMinutes: number
+    enhance: {
+      maxLevel: number
+      bonusPerLevel: number
+      milestoneBonus: number
+      milestoneEvery: number
+      pityPerFail: number
+      pityMax: number
+      steps: {
+        level: number
+        rate: number
+        onFail: EnhanceFailure
+        coin: number
+        stones: number
+      }[]
+    }
   }
   economy: {
     shopItems: IShopItem[]

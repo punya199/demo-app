@@ -8,7 +8,10 @@ import {
   getBattleBlocker,
   getEvolutionCountdown,
   getMinigameBlocker,
+  describeStats,
   getAutoBattleDelayMs,
+  getEnhanceBlocker,
+  getEquipBlocker,
   getExpeditionBlocker,
   getShopBlocker,
   getUseItemBlocker,
@@ -322,5 +325,43 @@ describe('getAutoBattleDelayMs', () => {
     )
     expect(getAutoBattleDelayMs(monster(), now)).toBe(0)
     expect(getAutoBattleDelayMs(null, now)).toBe(0)
+  })
+})
+
+describe('describeStats', () => {
+  it('lists only the non-zero stats', () => {
+    expect(describeStats({ hp: 0, atk: 3, def: 0, spd: 2 })).toBe('+3 ATK · +2 SPD')
+    expect(describeStats({})).toBe('')
+  })
+})
+
+describe('getEquipBlocker', () => {
+  it('blocks gear changes while the monster is exploring', () => {
+    expect(getEquipBlocker(monster())).toBeNull()
+    expect(getEquipBlocker(null)).toBeNull()
+    expect(getEquipBlocker(monster({ expeditionAreaId: 'meadow' }))).toBe('มอนออกสำรวจอยู่')
+  })
+})
+
+describe('getEnhanceBlocker', () => {
+  const item = {} as never
+  const preview = {
+    maxed: false as const,
+    item,
+    targetLevel: 6,
+    baseRate: 0.8,
+    rate: 0.8,
+    onFail: 'material' as const,
+    canProtect: false,
+    cost: { coin: 360, stones: 2 },
+  }
+  const funds = { coin: 360, stones: 2, scrolls: 0 }
+
+  it('needs enough coins, stones and (when asked) a scroll', () => {
+    expect(getEnhanceBlocker(preview, funds, false)).toBeNull()
+    expect(getEnhanceBlocker(preview, { ...funds, coin: 359 }, false)).toBe('เหรียญไม่พอ')
+    expect(getEnhanceBlocker(preview, { ...funds, stones: 1 }, false)).toBe('หินตีบวกไม่พอ')
+    expect(getEnhanceBlocker(preview, funds, true)).toBe('ไม่มีใบกันแตก')
+    expect(getEnhanceBlocker({ maxed: true, item }, funds, false)).toBe('ตีบวกสูงสุดแล้ว')
   })
 })

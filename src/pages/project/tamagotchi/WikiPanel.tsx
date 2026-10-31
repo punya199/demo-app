@@ -4,7 +4,9 @@ import {
   describeConditions,
   elementLabel,
   formatAge,
+  gradeLabel,
   lineOptions,
+  slotLabel,
   stageLabel,
 } from './tamagotchi-helper'
 import { EnumMonsterLine, EnumMonsterStage, IBattleStats, IWikiData } from './tamagotchi-interface'
@@ -69,7 +71,11 @@ const hatchedStages = [
 ] as const
 
 const buildSections = (wiki: IWikiData) => {
-  const { care, stamina, online, evolution, battle, adventure, idle, economy } = wiki
+  const { care, stamina, online, evolution, battle, adventure, idle, equipment, economy } = wiki
+  const slotRows = Object.entries(equipment.slots).map(([slot, main]) => [
+    slotLabel[slot as keyof typeof slotLabel],
+    `${main.stat.toUpperCase()} (ฐาน ${main.base})`,
+  ])
   const speciesName = (id: string) => {
     const species = evolution.species.find((entry) => entry.id === id)
     return species ? `${species.emoji} ${species.name}` : id
@@ -374,6 +380,76 @@ const buildSections = (wiki: IWikiData) => {
                 `🪙 ${reward.coins}`,
               ])
             )}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'equipment',
+      label: '🛡️ อุปกรณ์และตีบวก',
+      children: (
+        <>
+          <Heading>อุปกรณ์ 4 ช่อง</Heading>
+          <List
+            items={[
+              `สวมได้ช่องละ 1 ชิ้น ค่าบวกเข้ากับค่าพลังของมอนตรง ๆ ผูกกับบัญชี ไม่หายเมื่อมอนตาย ส่งต่อให้ตัวใหม่ได้ กระเป๋าเก็บได้ ${equipment.capacity} ชิ้น`,
+              'สวม/ถอดไม่ได้ระหว่างมอนออกสำรวจ',
+              `เกรดคูณค่าหลัก: ${Object.entries(equipment.gradeMultiplier)
+                .map(
+                  ([grade, value]) =>
+                    `${gradeLabel[grade as keyof typeof gradeLabel]} ${times(value)}`
+                )
+                .join(' · ')}`,
+              'ไอเทมธรรมดามีค่ารองสุ่ม 1–3 ค่า ชุดเซ็ตจะมาพร้อมบอสในเฟสถัดไป',
+            ]}
+          />
+          <Table head={['ช่อง', 'ค่าหลัก']} rows={slotRows} />
+          <Heading>ที่มาของอุปกรณ์</Heading>
+          <List
+            items={[
+              `กล่องสุ่มในร้าน 🪙 ${equipment.boxPrice}: ${Object.entries(equipment.boxGradeRates)
+                .map(([grade, rate]) => `${gradeLabel[grade as keyof typeof gradeLabel]} ${rate}%`)
+                .join(' · ')}`,
+              `ชนะด่านผจญภัยด้วยตัวเองมีโอกาสดรอป ${equipment.dropChancePercent}% (ต่อสู้อัตโนมัติและสำรวจไม่ดรอป) เกรดตามพื้นที่`,
+              `สำรวจได้หินตีบวก 1 ก้อนทุก ${formatAge(equipment.expeditionStoneEveryMinutes)}`,
+              `แยกชิ้นส่วนได้หินตามเกรด (${Object.entries(equipment.dismantleStones)
+                .map(
+                  ([grade, stones]) => `${gradeLabel[grade as keyof typeof gradeLabel]} ${stones}`
+                )
+                .join(' · ')}) และเพิ่ม 1 ก้อนต่อ 2 ระดับบวก`,
+            ]}
+          />
+          <Table
+            head={['พื้นที่', 'เกรดที่ดรอป']}
+            rows={Object.entries(equipment.dropGradeRatesByArea).map(([areaId, rates]) => [
+              adventure.areas.find((area) => area.id === areaId)?.name ?? areaId,
+              Object.entries(rates)
+                .map(([grade, rate]) => `${gradeLabel[grade as keyof typeof gradeLabel]} ${rate}%`)
+                .join(' · '),
+            ])}
+          />
+          <Heading>ตีบวก (สูงสุด +{equipment.enhance.maxLevel})</Heading>
+          <List
+            items={[
+              `เพิ่มค่าหลัก ${percent(equipment.enhance.bonusPerLevel)} ต่อระดับ และอีก ${percent(equipment.enhance.milestoneBonus)} ทุก ${equipment.enhance.milestoneEvery} ระดับ`,
+              'เหรียญและหินถูกใช้ทุกครั้งที่ลอง ไม่ว่าสำเร็จหรือล้มเหลว',
+              `ล้มเหลวติดกันเพิ่มอัตราสำเร็จครั้งละ ${percent(equipment.enhance.pityPerFail)} สูงสุด ${percent(equipment.enhance.pityMax)} รีเซ็ตเมื่อสำเร็จ หน้าตีบวกแสดงอัตราจริงก่อนกดเสมอ`,
+              'ใบกันแตก: ใช้ได้ตั้งแต่ระดับที่ล้มเหลวแล้วเสียระดับหรือแตก ตัดเฉพาะเมื่อช่วยได้จริง',
+            ]}
+          />
+          <Table
+            head={['เป็นระดับ', 'อัตราสำเร็จ', 'ถ้าล้มเหลว', 'เหรียญ', 'หิน']}
+            rows={equipment.enhance.steps.map((step) => [
+              `+${step.level}`,
+              percent(step.rate),
+              step.onFail === 'material'
+                ? 'เสียวัตถุดิบ'
+                : step.onFail === 'drop'
+                  ? 'ระดับลด 1'
+                  : 'ระดับลด 1 หรือแตก',
+              `🪙 ${step.coin}`,
+              `🪨 ${step.stones}`,
+            ])}
           />
         </>
       ),

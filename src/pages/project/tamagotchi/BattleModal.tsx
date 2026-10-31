@@ -1,7 +1,7 @@
 import { Button, Modal, Progress } from 'antd'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
-import { describeBattleEvent, hpAfter } from './tamagotchi-helper'
+import { describeBattleEvent, gradeLabel, hpAfter } from './tamagotchi-helper'
 import { BattleSide, IBattleData } from './tamagotchi-interface'
 
 const STEP_MS = 700
@@ -102,6 +102,17 @@ export const BattleModal = (props: IBattleModalProps) => {
             <span className="font-semibold text-green-600">
               ชนะ! ได้ {battle.reward} 🪙{battle.gemReward > 0 && ` + ${battle.gemReward} 💎`}
               {battle.isFirstClear && ' (เคลียร์ครั้งแรก)'}
+              {battle.drop && (
+                <span className="mt-1 block text-purple-600">
+                  ได้อุปกรณ์ {battle.drop.emoji} {battle.drop.name} ({gradeLabel[battle.drop.grade]}
+                  )
+                </span>
+              )}
+              {battle.dropBagFull && (
+                <span className="mt-1 block text-amber-600">
+                  กระเป๋าอุปกรณ์เต็ม ชิ้นที่ดรอปหายไป
+                </span>
+              )}
             </span>
           ) : (
             <span className="font-semibold text-red-500">

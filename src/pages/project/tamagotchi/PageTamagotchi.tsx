@@ -12,6 +12,7 @@ import { EquipmentPanel } from './EquipmentPanel'
 import { ExpeditionPanel } from './ExpeditionPanel'
 import { MinigameModal } from './MinigameModal'
 import { PetSprite } from './PetSprite'
+import { RaidPanel } from './RaidPanel'
 import { PvpPanel } from './PvpPanel'
 import { QuestPanel } from './QuestPanel'
 import { ShopPanel } from './ShopPanel'
@@ -377,6 +378,7 @@ const GameTabs = () => {
       <div className="flex justify-end gap-4 font-semibold">
         <span className="text-amber-600 dark:text-amber-400">🪙 {coin}</span>
         <span className="text-sky-600 dark:text-sky-400">💎 {wallet?.gem ?? 0}</span>
+        <span className="text-purple-600 dark:text-purple-400">🎖️ {wallet?.raidToken ?? 0}</span>
       </div>
       <Tabs
         centered
@@ -403,6 +405,11 @@ const GameTabs = () => {
             children: <AdventurePanel monster={monster} onError={showError} />,
           },
           { key: 'quests', label: 'ภารกิจ', children: <QuestPanel onError={showError} /> },
+          {
+            key: 'raid',
+            label: 'บอส',
+            children: <RaidPanel monster={monster} onError={showError} />,
+          },
           {
             key: 'pvp',
             label: 'สนามประลอง',

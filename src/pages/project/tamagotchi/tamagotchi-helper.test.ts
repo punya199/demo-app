@@ -8,10 +8,13 @@ import {
   getBattleBlocker,
   getEvolutionCountdown,
   getMinigameBlocker,
+  describePctBonus,
+  describeSetEffect,
   describeStats,
   formatRatingChange,
   getDefenseBlocker,
   getPvpBlocker,
+  getRaidBlocker,
   getAutoBattleDelayMs,
   getEnhanceBlocker,
   getEquipBlocker,
@@ -411,5 +414,64 @@ describe('getPvpBlocker', () => {
   it('formats a rating change with its sign', () => {
     expect(formatRatingChange(1000, 1016)).toBe('1000 → 1016 (+16)')
     expect(formatRatingChange(1000, 992)).toBe('1000 → 992 (-8)')
+  })
+})
+
+describe('set effects in replays', () => {
+  const player = { name: 'เรา', emoji: '🦎', element: EnumMonsterLine.FLAME } as never
+  const enemy = { name: 'บอส', emoji: '👹', element: EnumMonsterLine.LEAF } as never
+  const battle = { player, enemy } as unknown as IBattleData
+  const event = (overrides: Partial<IBattleEvent>): IBattleEvent => ({
+    round: 1,
+    actor: 'player',
+    moveName: 'โจมตี',
+    isSkill: false,
+    damage: 7,
+    isCritical: false,
+    effectiveness: 'normal',
+    targetHp: 50,
+    ...overrides,
+  })
+
+  it('describes a burn tick against the side opposite to the actor', () => {
+    expect(describeBattleEvent(event({ kind: 'burn', actor: 'player' }), battle)).toBe(
+      'บอส ติดเผาไหม้ เสีย 7 HP'
+    )
+  })
+
+  it('describes regeneration as healing the opposite side of the actor', () => {
+    expect(describeBattleEvent(event({ kind: 'regen', actor: 'enemy' }), battle)).toBe(
+      'เรา ฟื้นฟู +7 HP'
+    )
+  })
+
+  it('names a double strike and mentions shield absorption', () => {
+    expect(describeBattleEvent(event({ kind: 'double' }), battle)).toContain('โจมตีซ้ำ')
+    expect(describeBattleEvent(event({ absorbed: 4 }), battle)).toContain('โล่ดูด 4')
+  })
+
+  it('writes effects and percent bonuses in Thai', () => {
+    expect(describeSetEffect({ burnTurns: 3 })).toBe('สกิลทำให้ศัตรูติดเผาไหม้ 3 เทิร์น')
+    expect(describeSetEffect({ shieldPct: 0.15 })).toContain('15%')
+    expect(describeSetEffect({})).toBe('')
+    expect(describePctBonus({ atk: 0.15, def: 0 })).toBe('ATK +15%')
+  })
+})
+
+describe('getRaidBlocker', () => {
+  const open = { unlocked: true }
+
+  it('mirrors the server checks in order', () => {
+    expect(getRaidBlocker(monster(), open, 3)).toBeNull()
+    expect(getRaidBlocker(null, open, 3)).toBe('ต้องมีมอนที่มีชีวิต')
+    expect(getRaidBlocker(monster({ isSick: true }), open, 3)).toBe('ป่วยอยู่ สู้ไม่ได้')
+    expect(getRaidBlocker(monster({ expeditionAreaId: 'meadow' }), open, 3)).toBe('มอนออกสำรวจอยู่')
+    expect(getRaidBlocker(monster(), { unlocked: false }, 3)).toContain('ยังไม่ปลดล็อก')
+    expect(getRaidBlocker(monster(), open, 0)).toBe('สู้บอสครบจำนวนของวันนี้แล้ว')
+  })
+
+  it('names the currency in the shop blocker', () => {
+    expect(getShopBlocker(6, 5, 'Raid Token')).toBe('Raid Tokenไม่พอ')
+    expect(getShopBlocker(6, 6, 'Raid Token')).toBeNull()
   })
 })

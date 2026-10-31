@@ -58,6 +58,7 @@ export interface IEvolutionInfo {
 export interface IWallet {
   coin: number
   gem: number
+  raidToken: number
 }
 
 // Mirrors the backend's monster view (demo-app-backend src/modules/monster/monster.service.ts).
@@ -121,6 +122,10 @@ export interface IBattleEvent {
   isCritical: boolean
   effectiveness: 'strong' | 'weak' | 'normal'
   targetHp: number
+  // Set effects: a burn tick or regen (the side whose HP changed is opposite to `actor`), or the
+  // extra hit of a double strike. `absorbed` is damage a set shield soaked up (part of `damage`).
+  kind?: 'burn' | 'regen' | 'double'
+  absorbed?: number
 }
 
 export interface IBattleData {
@@ -172,9 +177,18 @@ export interface IEquipmentItem {
   equipped: boolean
 }
 
+export interface IFighterEffects {
+  burnTurns?: number
+  shieldPct?: number
+  regenPct?: number
+  doubleStrikeChance?: number
+}
+
 export interface IEquipmentData {
   capacity: number
   items: IEquipmentItem[]
+  // Battle effects of the worn four-piece sets.
+  activeEffects: IFighterEffects
   setBonuses: { setId: string; name: string; pieces: number }[]
   // The living monster's battle stats with the worn gear; null without a hatched monster.
   stats: IBattleStats | null
@@ -276,6 +290,50 @@ export interface IExpeditionSummary {
   items: string[]
 }
 
+export interface IRaidDifficultyInfo {
+  difficulty: 'normal' | 'hard' | 'nightmare'
+  minStage: EnumMonsterStage
+  grade: EnumEquipmentGrade
+  raidTokens: number
+  exchangeCost: number
+  enemy: IFighter
+  clearCount: number
+  unlocked: boolean
+}
+
+export interface IRaidBossInfo {
+  id: string
+  name: string
+  emoji: string
+  element: EnumMonsterLine
+  setId: string
+  setName: string
+  bossTokens: number
+  difficulties: IRaidDifficultyInfo[]
+}
+
+export interface IRaidData {
+  attemptsLeft: number
+  bosses: IRaidBossInfo[]
+}
+
+export interface IRaidBattleResponse {
+  monster: IMonsterData
+  battle: {
+    won: boolean
+    rounds: number
+    events: IBattleEvent[]
+    player: IFighter
+    enemy: IFighter
+  }
+  isFirstClear: boolean
+  raidTokens: number
+  bossTokens: number
+  drop: IEquipmentItem | null
+  attemptsLeft: number
+  wallet: IWallet
+}
+
 export interface IPvpOpponent {
   id: string
   displayName: string
@@ -291,6 +349,7 @@ export interface ISeasonRewardTier {
   maxRank: number | null
   coin: number
   gem: number
+  raidToken: number
 }
 
 export interface IPvpStatus {
@@ -491,8 +550,19 @@ export interface IWikiData {
       emoji: string
       description: string
       price: number
-      currency: 'coin' | 'gem'
+      currency: 'coin' | 'gem' | 'raid_token'
     }[]
+    sets: Record<
+      string,
+      {
+        name: string
+        bonuses: {
+          pieces: 2 | 4
+          pct?: Partial<IBattleStats>
+          effect?: IFighterEffects
+        }[]
+      }
+    >
     expeditionStoneEveryMinutes: number
     enhance: {
       maxLevel: number
@@ -509,6 +579,21 @@ export interface IWikiData {
         stones: number
       }[]
     }
+  }
+  raid: {
+    dailyAttempts: number
+    bossTokensPerWin: number
+    firstClearMultiplier: number
+    exchangeCost: Partial<Record<EnumEquipmentGrade, number>>
+    bosses: { id: string; name: string; emoji: string; element: EnumMonsterLine; setId: string }[]
+    difficulties: {
+      difficulty: string
+      minStage: EnumMonsterStage
+      grade: EnumEquipmentGrade
+      raidTokens: number
+    }[]
+    setEnhanceThreshold: number
+    setEnhanceMultiplier: number
   }
   pvp: {
     stages: EnumMonsterStage[]

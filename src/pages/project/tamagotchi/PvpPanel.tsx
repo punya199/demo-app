@@ -129,7 +129,7 @@ export const PvpPanel = (props: IPvpPanelProps) => {
                 disabled={isClaiming}
                 onClick={() => claim(entry.season, { onError })}
               >
-                รับ 🪙 {entry.reward.coin} + 💎 {entry.reward.gem}
+                รับ 🪙 {entry.reward.coin} + 💎 {entry.reward.gem} + 🎖️ {entry.reward.raidToken}
               </Button>
             )
           }

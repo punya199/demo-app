@@ -7,6 +7,7 @@ import {
   useBuyShopItem,
   useGetInventory,
   useGetShopItems,
+  useGetWallet,
   useGetWiki,
   useUseInventoryItem,
 } from './tamagotchi-service'
@@ -24,6 +25,7 @@ export const ShopPanel = (props: IShopPanelProps) => {
   const { mutate: buy, isPending: isBuying } = useBuyShopItem()
   const { mutate: consume, isPending: isUsing } = useUseInventoryItem()
   const { data: wiki } = useGetWiki()
+  const { data: wallet } = useGetWallet()
   const { mutate: buyBox, isPending: isBuyingBox } = useBuyEquipmentBox()
   const { mutate: buyMaterial, isPending: isBuyingMaterial } = useBuyMaterial()
 
@@ -112,7 +114,13 @@ export const ShopPanel = (props: IShopPanelProps) => {
           </Card>
           {equipment.materials.map((material) => {
             const isGem = material.currency === 'gem'
-            const blocker = isGem ? null : getShopBlocker(material.price, coin)
+            const isToken = material.currency === 'raid_token'
+            // Gems are checked by the server; coins and raid tokens we can explain up front.
+            const blocker = isGem
+              ? null
+              : isToken
+                ? getShopBlocker(material.price, wallet?.raidToken ?? 0, 'Raid Token')
+                : getShopBlocker(material.price, coin)
             return (
               <Card
                 key={material.id}
@@ -135,7 +143,7 @@ export const ShopPanel = (props: IShopPanelProps) => {
                       disabled={!!blocker || isBuyingMaterial}
                       onClick={() => buyMaterial(material.id, { onError })}
                     >
-                      ซื้อ {isGem ? '💎' : '🪙'} {material.price}
+                      ซื้อ {isGem ? '💎' : isToken ? '🎖️' : '🪙'} {material.price}
                     </Button>
                   </Tooltip>
                 </div>

@@ -16,6 +16,8 @@ import {
   IInventoryItem,
   IMonsterData,
   IPvpBattleResponse,
+  IRaidBattleResponse,
+  IRaidData,
   IPvpHistoryEntry,
   IPvpLeaderboardEntry,
   IPvpOpponent,
@@ -588,6 +590,64 @@ export const useClaimPvpSeason = () => {
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: PVP_KEY })
+    },
+  })
+}
+
+export const useGetRaid = () => {
+  return useQuery({
+    queryKey: ['raid'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IRaidData>(`/raid`)
+      return data
+    },
+  })
+}
+
+// Like the other fights, nothing is cached until the replay has been watched (useApplyRaidResult).
+export const useRaidBattle = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { bossId: string; difficulty: string }) => {
+      const { data } = await apiClient.post<IRaidBattleResponse>(`/raid/battle`, input)
+      return data
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+      queryClient.invalidateQueries({ queryKey: ['raid'] })
+    },
+  })
+}
+
+export const useApplyRaidResult = () => {
+  const queryClient = useQueryClient()
+  return (data: IRaidBattleResponse) => {
+    queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+    queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+    queryClient.invalidateQueries({ queryKey: ['raid'] })
+    queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
+    queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
+    queryClient.invalidateQueries({ queryKey: ['quests'] })
+  }
+}
+
+export const useExchangeRaid = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { bossId: string; slot: string; grade: string }) => {
+      const { data } = await apiClient.post<IInventoryResponse & { item: IEquipmentItem }>(
+        `/raid/exchange`,
+        input
+      )
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<IInventoryResponse>(INVENTORY_KEY, { items: data.items })
+      queryClient.invalidateQueries({ queryKey: ['raid'] })
+      queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['raid'] })
     },
   })
 }

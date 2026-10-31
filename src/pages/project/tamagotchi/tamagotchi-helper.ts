@@ -1,4 +1,6 @@
 import {
+  IBattleStats,
+  IFighterEffects,
   IPvpStatus,
   EnhanceFailure,
   EnumEquipmentGrade,
@@ -168,8 +170,11 @@ export const getAutoBattleDelayMs = (monster: IMonsterData | null, now: number) 
   monster?.autoBattleReadyAt ? Math.max(0, new Date(monster.autoBattleReadyAt).getTime() - now) : 0
 
 // Buying fills the bag, so it needs no monster - only enough coins.
-export const getShopBlocker = (price: number, coin: number): string | null =>
-  coin < price ? 'เหรียญไม่พอ' : null
+export const getShopBlocker = (
+  price: number,
+  balance: number,
+  currencyLabel = 'เหรียญ'
+): string | null => (balance < price ? `${currencyLabel}ไม่พอ` : null)
 
 // Using an item from the bag needs a hatched, living monster.
 export const getUseItemBlocker = (monster: IMonsterData | null): string | null =>
@@ -179,14 +184,24 @@ export const getUseItemBlocker = (monster: IMonsterData | null): string | null =
 
 export const describeBattleEvent = (event: IBattleEvent, battle: IBattleData) => {
   const attacker = event.actor === 'player' ? battle.player : battle.enemy
+  // Burn ticks and regeneration affect the side opposite to `actor`.
+  const affected = event.actor === 'player' ? battle.enemy : battle.player
+  if (event.kind === 'burn') {
+    return `${affected.name} ติดเผาไหม้ เสีย ${event.damage} HP`
+  }
+  if (event.kind === 'regen') {
+    return `${affected.name} ฟื้นฟู +${event.damage} HP`
+  }
   const notes = [
     event.effectiveness === 'strong' && 'ได้เปรียบธาตุ!',
     event.effectiveness === 'weak' && 'เสียเปรียบธาตุ',
     event.isCritical && 'คริติคอล!',
   ].filter(Boolean)
-  return `${attacker.name} ใช้ ${event.moveName} ${event.damage} ดาเมจ${
-    notes.length ? ` (${notes.join(' ')})` : ''
-  }`
+  if (event.absorbed) {
+    notes.push(`โล่ดูด ${event.absorbed}`)
+  }
+  const verb = event.kind === 'double' ? 'โจมตีซ้ำ' : `ใช้ ${event.moveName}`
+  return `${attacker.name} ${verb} ${event.damage} ดาเมจ${notes.length ? ` (${notes.join(' ')})` : ''}`
 }
 
 // HP of one side after the first `shownEvents` events have played.
@@ -223,6 +238,14 @@ const serverMessageLabel: Record<string, string> = {
   'No season reward to claim': 'ไม่มีรางวัลซีซันให้รับ',
   'Not enough fights to earn a season reward': 'สู้ไม่ถึงเกณฑ์รับรางวัลซีซัน',
   'Battle not found': 'ไม่พบการต่อสู้',
+  'Not enough raid tokens': 'Raid Token ไม่พอ',
+  'Not enough boss tokens': 'Boss Token ไม่พอ',
+  'Daily raid limit reached': 'สู้บอสครบจำนวนของวันนี้แล้ว',
+  'Your monster is not strong enough for this difficulty': 'ร่างของมอนยังไม่ถึงเกณฑ์ของระดับนี้',
+  'Clear the previous difficulty first': 'ต้องชนะระดับก่อนหน้าก่อน',
+  'Clear this difficulty first': 'ต้องชนะระดับที่ดรอปเกรดนี้ก่อนถึงจะแลกได้',
+  'Boss not found': 'ไม่พบบอส',
+  'Exchange not found': 'ไม่พบรายการแลก',
   'Equipment not found': 'ไม่พบอุปกรณ์',
   'Take the equipment off first': 'ถอดอุปกรณ์ก่อน',
   'Equipment bag is full': 'กระเป๋าอุปกรณ์เต็ม',
@@ -436,3 +459,43 @@ export const getDefenseBlocker = (
 
 export const formatRatingChange = (before: number, after: number) =>
   `${before} → ${after} (${after >= before ? '+' : ''}${after - before})`
+
+export const describeSetEffect = (effect: IFighterEffects) =>
+  [
+    effect.burnTurns && `สกิลทำให้ศัตรูติดเผาไหม้ ${effect.burnTurns} เทิร์น`,
+    effect.shieldPct && `เริ่มสู้ด้วยโล่ ${toPercent(effect.shieldPct)} ของ HP`,
+    effect.regenPct && `ฟื้น HP ${toPercent(effect.regenPct)} ทุกเทิร์น`,
+    effect.doubleStrikeChance && `โจมตีซ้ำ ${toPercent(effect.doubleStrikeChance)}`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
+export const describePctBonus = (pct: Partial<IBattleStats>) =>
+  (Object.keys(statLabel) as StatKey[])
+    .filter((key) => (pct[key] ?? 0) > 0)
+    .map((key) => `${statLabel[key]} +${toPercent(pct[key] ?? 0)}`)
+    .join(' · ')
+
+// Mirrors the server's raid checks so the button explains itself.
+export const getRaidBlocker = (
+  monster: IMonsterData | null,
+  difficulty: { unlocked: boolean },
+  attemptsLeft: number
+): string | null => {
+  if (!monster || monster.diedAt) {
+    return 'ต้องมีมอนที่มีชีวิต'
+  }
+  if (monster.isSick) {
+    return 'ป่วยอยู่ สู้ไม่ได้'
+  }
+  if (monster.expeditionAreaId) {
+    return 'มอนออกสำรวจอยู่'
+  }
+  if (!difficulty.unlocked) {
+    return 'ยังไม่ปลดล็อก (ต้องถึงร่างที่กำหนด และชนะระดับก่อนหน้า)'
+  }
+  if (attemptsLeft <= 0) {
+    return 'สู้บอสครบจำนวนของวันนี้แล้ว'
+  }
+  return null
+}

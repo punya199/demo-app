@@ -2,6 +2,7 @@ import { Button, Card, Popconfirm, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { EnhanceModal } from './EnhanceModal'
 import {
+  describeSetEffect,
   describeStats,
   getEquipBlocker,
   gradeColor,
@@ -57,6 +58,11 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
         <div className="text-center text-sm text-slate-600 dark:text-slate-300">
           ค่าพลังรวมอุปกรณ์: HP {data.stats.hp} · ATK {data.stats.atk} · DEF {data.stats.def} · SPD{' '}
           {data.stats.spd}
+        </div>
+      )}
+      {describeSetEffect(data.activeEffects) && (
+        <div className="text-center text-xs text-emerald-600">
+          เอฟเฟกต์เซ็ต: {describeSetEffect(data.activeEffects)}
         </div>
       )}
       {data.setBonuses.length > 0 && (

@@ -2,6 +2,8 @@ import { Collapse, Spin, Tag } from 'antd'
 import { ReactNode } from 'react'
 import {
   describeConditions,
+  describePctBonus,
+  describeSetEffect,
   elementLabel,
   formatAge,
   gradeLabel,
@@ -71,8 +73,19 @@ const hatchedStages = [
 ] as const
 
 const buildSections = (wiki: IWikiData) => {
-  const { care, stamina, online, evolution, battle, adventure, idle, equipment, pvp, economy } =
-    wiki
+  const {
+    care,
+    stamina,
+    online,
+    evolution,
+    battle,
+    adventure,
+    idle,
+    equipment,
+    raid,
+    pvp,
+    economy,
+  } = wiki
   const slotRows = Object.entries(equipment.slots).map(([slot, main]) => [
     slotLabel[slot as keyof typeof slotLabel],
     `${main.stat.toUpperCase()} (ฐาน ${main.base})`,
@@ -456,6 +469,54 @@ const buildSections = (wiki: IWikiData) => {
       ),
     },
     {
+      key: 'raid',
+      label: '👹 บอสและชุดเซ็ต',
+      children: (
+        <>
+          <Heading>Boss Raid (เดี่ยว)</Heading>
+          <List
+            items={[
+              `สู้ได้วันละ ${raid.dailyAttempts} ครั้ง (รวมทุกบอส) ใช้ stamina ${stamina.battleCost} ชนะต้องภายใน ${battle.maxRounds} รอบ`,
+              'ไม่ใช้ตารางธาตุ ความยากมาจากค่าพลังล้วน ๆ ทุกสายชนะได้ทุกบอส ธาตุของบอสเป็นแค่ลายเรื่อง',
+              'ต้องถึงร่างที่กำหนดของแต่ละระดับ และชนะระดับก่อนหน้าของบอสตัวเดียวกันก่อน',
+              `ชนะ: ได้ชิ้นเซ็ตของบอส 1 ชิ้น (ช่องสุ่ม ช่องละเท่ากัน) เกรดตามระดับ + 🎫 Boss Token ${raid.bossTokensPerWin} + 🎖️ Raid Token (ชนะครั้งแรกของแต่ละบอส/ระดับได้ ${times(raid.firstClearMultiplier)})`,
+              'กระเป๋าอุปกรณ์เต็มจะสู้ไม่ได้ (ไม่เสียโควตา) แพ้ไม่ได้อะไรและเสียโควตาของวัน',
+              'ผลการสู้บอสไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ',
+            ]}
+          />
+          <Table
+            head={['ระดับ', 'ต้อง', 'เกรดที่ดรอป', '🎖️ ต่อชัยชนะ', 'แลกชิ้น 🎫']}
+            rows={raid.difficulties.map((difficulty) => [
+              difficulty.difficulty,
+              stageLabel[difficulty.minStage],
+              gradeLabel[difficulty.grade],
+              difficulty.raidTokens,
+              raid.exchangeCost[difficulty.grade] ?? '-',
+            ])}
+          />
+          <p className="mt-1 text-xs">
+            แลกชิ้นเซ็ตด้วย Boss Token ได้เฉพาะเกรดที่คุณเคยชนะระดับที่ดรอปมาแล้ว
+          </p>
+          <Heading>ชุดเซ็ต</Heading>
+          <List
+            items={[
+              `โบนัสเปอร์เซ็นต์ของเซ็ตคูณ ${raid.setEnhanceMultiplier} เมื่อทุกชิ้นของเซ็ตที่สวมตีบวกถึง +${raid.setEnhanceThreshold} ขึ้นไป (เอฟเฟกต์ 4 ชิ้นไม่เปลี่ยน)`,
+              'ผสมเซ็ตได้ เช่น 2 ชิ้นของเซ็ตหนึ่ง + 2 ชิ้นของอีกเซ็ต ได้โบนัส 2 ชิ้นของทั้งสองเซ็ต',
+              'ชิ้นเซ็ตมีค่ารองตายตัว และค่าหลักสูงกว่าชิ้นธรรมดาเกรดเดียวกัน เอฟเฟกต์ติดไปกับทีมป้องกัน PvP ด้วย',
+            ]}
+          />
+          <Table
+            head={['เซ็ต', '2 ชิ้น', '4 ชิ้น']}
+            rows={Object.values(equipment.sets).map((set) => [
+              set.name,
+              describePctBonus(set.bonuses.find((bonus) => bonus.pieces === 2)?.pct ?? {}),
+              describeSetEffect(set.bonuses.find((bonus) => bonus.pieces === 4)?.effect ?? {}),
+            ])}
+          />
+        </>
+      ),
+    },
+    {
       key: 'pvp',
       label: '🏟️ สนามประลอง (PvP)',
       children: (
@@ -500,7 +561,7 @@ const buildSections = (wiki: IWikiData) => {
                 : tier.maxRank === 1
                   ? 'อันดับ 1'
                   : `อันดับ ${(pvp.seasonRewards[index - 1]?.maxRank ?? 0) + 1}–${tier.maxRank}`,
-              `🪙 ${tier.coin} + 💎 ${tier.gem}`,
+              `🪙 ${tier.coin} + 💎 ${tier.gem} + 🎖️ ${tier.raidToken}`,
             ])}
           />
         </>

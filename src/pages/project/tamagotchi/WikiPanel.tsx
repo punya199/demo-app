@@ -71,7 +71,8 @@ const hatchedStages = [
 ] as const
 
 const buildSections = (wiki: IWikiData) => {
-  const { care, stamina, online, evolution, battle, adventure, idle, equipment, economy } = wiki
+  const { care, stamina, online, evolution, battle, adventure, idle, equipment, pvp, economy } =
+    wiki
   const slotRows = Object.entries(equipment.slots).map(([slot, main]) => [
     slotLabel[slot as keyof typeof slotLabel],
     `${main.stat.toUpperCase()} (ฐาน ${main.base})`,
@@ -161,7 +162,7 @@ const buildSections = (wiki: IWikiData) => {
           <Heading>Stamina</Heading>
           <List
             items={[
-              `0–${stamina.max} ลดลงตามเวลา: ปิดเกมหมดใน ${formatAge(stamina.drainFullMinutesOffline)} · เปิดเกมไว้หมดใน ${formatAge(stamina.drainFullMinutesOnline)}`,
+              `0–${stamina.max} ฟื้นเองทุกนาที ${stamina.recoveryPerMinute} ต่อนาที (เต็มจากศูนย์ใน ${formatAge(Math.ceil(stamina.max / stamina.recoveryPerMinute))}) เปิดเกมไว้ฟื้นเร็วขึ้น ${times(stamina.recoveryOnlineMultiplier)}`,
               `สู้ 1 ครั้งใช้ ${stamina.battleCost}`,
               `Stamina หมด (0): ยังสู้ได้ แต่ค่าพลังต่อสู้ทุกค่า ${times(stamina.noStaminaStatMultiplier)}`,
               `เติมเต็มด้วย 💎 ${stamina.refillGemPrice}`,
@@ -449,6 +450,57 @@ const buildSections = (wiki: IWikiData) => {
                   : 'ระดับลด 1 หรือแตก',
               `🪙 ${step.coin}`,
               `🪨 ${step.stones}`,
+            ])}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'pvp',
+      label: '🏟️ สนามประลอง (PvP)',
+      children: (
+        <>
+          <Heading>วิธีเล่น</Heading>
+          <List
+            items={[
+              `ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้ ตั้ง "ทีมป้องกัน" ไว้ก่อน (ระบบจำค่าพลังรวมอุปกรณ์ของมอนตอนนั้น stamina เต็ม) ถึงจะท้าคนอื่นได้ เปลี่ยนทีมได้ทุก ${pvp.defenseCooldownMinutes} นาที`,
+              `ท้าได้วันละ ${pvp.dailyAttempts} ครั้ง ระบบเสนอ ${pvp.opponentCount} คนที่เป็นร่างเดียวกัน เรตติ้งห่างไม่เกิน ${pvp.ratingWindow} คนเดิมท้าได้ไม่เกิน ${pvp.maxFightsPerOpponentPerDay} ครั้งต่อวัน`,
+              `ท้าด้วยค่าพลังสดของมอนคุณ (stamina หมดค่าพลังลดครึ่ง) ใช้ stamina ${stamina.battleCost} ผลไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ`,
+              `ชนะได้ 🪙 ${pvp.winCoin} แพ้ได้ 🪙 ${pvp.lossCoin}`,
+              'ผู้ที่ถูกท้าก็ได้/เสียเรตติ้งแม้ไม่ได้ออนไลน์ และดูการต่อสู้ย้อนหลังได้ในประวัติ',
+              'ชื่อที่คนอื่นเห็นคือชื่อสนามที่คุณตั้งเอง ไม่แสดงชื่อผู้ใช้',
+            ]}
+          />
+          <Heading>เรตติ้ง (ELO)</Heading>
+          <List
+            items={[
+              `เริ่ม ${pvp.startRating} ผู้ท้าเปลี่ยนสูงสุด ${pvp.kAttacker / 2} แต้ม/ครั้งในแมตช์สูสี ผู้ป้องกันเปลี่ยนสูงสุด ${pvp.kDefender / 2}`,
+              `ชนะคนเรตติ้งสูงกว่าได้แต้มมากกว่า ซีซันละเดือน (รีเซ็ตเที่ยงคืนเวลาไทยวันที่ 1) เริ่มซีซันใหม่ด้วยครึ่งหนึ่งของส่วนต่างจาก ${pvp.startRating} (${percent(pvp.seasonResetKeep)})`,
+              `ไม่มีผู้เล่นพอ ระบบเติมคู่ต่อสู้ NPC ให้ (เรตติ้งคงที่ ไม่เปลี่ยน)`,
+            ]}
+          />
+          <Table
+            head={['NPC', 'ร่าง', 'เรตติ้ง']}
+            rows={pvp.npcs.map((npc) => [
+              `${npc.emoji} ${npc.name}`,
+              stageLabel[npc.stage],
+              npc.rating,
+            ])}
+          />
+          <Heading>รางวัลซีซัน</Heading>
+          <p className="mb-1 text-xs">
+            รับได้หลังซีซันจบ ต้องสู้อย่างน้อย {pvp.seasonMinFights} ครั้ง
+            จัดอันดับในกลุ่มที่สู้ถึงเกณฑ์
+          </p>
+          <Table
+            head={['อันดับ', 'รางวัล']}
+            rows={pvp.seasonRewards.map((tier, index) => [
+              tier.maxRank === null
+                ? 'ผู้เข้าร่วม'
+                : tier.maxRank === 1
+                  ? 'อันดับ 1'
+                  : `อันดับ ${(pvp.seasonRewards[index - 1]?.maxRank ?? 0) + 1}–${tier.maxRank}`,
+              `🪙 ${tier.coin} + 💎 ${tier.gem}`,
             ])}
           />
         </>

@@ -1,4 +1,5 @@
 import {
+  IPvpStatus,
   EnhanceFailure,
   EnumEquipmentGrade,
   EnumEquipmentSlot,
@@ -213,6 +214,15 @@ const serverMessageLabel: Record<string, string> = {
   'Stamina is already full': 'Stamina เต็มอยู่แล้ว',
   'Mini-game is not ready yet': 'มินิเกมยังไม่พร้อม รออีกสักครู่',
   'Invalid mini-game score': 'คะแนนมินิเกมไม่ถูกต้อง',
+  'Your monster is too young for the arena': 'ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้',
+  'Set your defense team first': 'ตั้งทีมป้องกันก่อน',
+  'Daily PvP limit reached': 'ท้าครบจำนวนของวันนี้แล้ว',
+  'Opponent is not available': 'ท้าคู่ต่อสู้คนนี้ไม่ได้แล้ว ลองรีเฟรชรายชื่อ',
+  'Defense team was changed recently': 'เพิ่งเปลี่ยนทีมป้องกัน รอสักครู่',
+  'Season has not ended yet': 'ซีซันยังไม่จบ',
+  'No season reward to claim': 'ไม่มีรางวัลซีซันให้รับ',
+  'Not enough fights to earn a season reward': 'สู้ไม่ถึงเกณฑ์รับรางวัลซีซัน',
+  'Battle not found': 'ไม่พบการต่อสู้',
   'Equipment not found': 'ไม่พบอุปกรณ์',
   'Take the equipment off first': 'ถอดอุปกรณ์ก่อน',
   'Equipment bag is full': 'กระเป๋าอุปกรณ์เต็ม',
@@ -378,3 +388,51 @@ export const getEnhanceBlocker = (
 }
 
 export const toPercent = (fraction: number) => `${Math.round(fraction * 1000) / 10}%`
+
+const PVP_STAGES = [EnumMonsterStage.ADULT, EnumMonsterStage.PERFECT, EnumMonsterStage.ULTIMATE]
+
+// Mirrors the server's arena checks so the button explains itself.
+export const getPvpBlocker = (
+  monster: IMonsterData | null,
+  status: IPvpStatus | undefined
+): string | null => {
+  if (!monster || monster.diedAt) {
+    return 'ต้องมีมอนที่มีชีวิต'
+  }
+  if (!PVP_STAGES.includes(monster.stage)) {
+    return 'ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้'
+  }
+  if (monster.isSick) {
+    return 'ป่วยอยู่ สู้ไม่ได้'
+  }
+  if (monster.expeditionAreaId) {
+    return 'มอนออกสำรวจอยู่'
+  }
+  if (!status?.defense) {
+    return 'ตั้งทีมป้องกันก่อน'
+  }
+  if (status.attemptsLeft <= 0) {
+    return 'ท้าครบจำนวนของวันนี้แล้ว'
+  }
+  return null
+}
+
+export const getDefenseBlocker = (
+  monster: IMonsterData | null,
+  status: IPvpStatus | undefined,
+  now: Date
+): string | null => {
+  if (!monster || monster.diedAt || !PVP_STAGES.includes(monster.stage)) {
+    return 'ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้'
+  }
+  if (status?.defense && new Date(status.defense.readyAt) > now) {
+    const minutesLeft = Math.ceil(
+      (new Date(status.defense.readyAt).getTime() - now.getTime()) / 60_000
+    )
+    return `เปลี่ยนทีมป้องกันได้อีกครั้งใน ${minutesLeft} นาที`
+  }
+  return null
+}
+
+export const formatRatingChange = (before: number, after: number) =>
+  `${before} → ${after} (${after >= before ? '+' : ''}${after - before})`

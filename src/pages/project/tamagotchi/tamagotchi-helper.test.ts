@@ -9,6 +9,9 @@ import {
   getEvolutionCountdown,
   getMinigameBlocker,
   describeStats,
+  formatRatingChange,
+  getDefenseBlocker,
+  getPvpBlocker,
   getAutoBattleDelayMs,
   getEnhanceBlocker,
   getEquipBlocker,
@@ -363,5 +366,50 @@ describe('getEnhanceBlocker', () => {
     expect(getEnhanceBlocker(preview, { ...funds, stones: 1 }, false)).toBe('หินตีบวกไม่พอ')
     expect(getEnhanceBlocker(preview, funds, true)).toBe('ไม่มีใบกันแตก')
     expect(getEnhanceBlocker({ maxed: true, item }, funds, false)).toBe('ตีบวกสูงสุดแล้ว')
+  })
+})
+
+describe('getPvpBlocker', () => {
+  const status = (overrides = {}) =>
+    ({
+      season: '2026-05',
+      resetsAt: '',
+      rating: 1000,
+      wins: 0,
+      losses: 0,
+      rank: null,
+      attemptsLeft: 10,
+      defense: { displayName: 'x', fighter: {}, stage: 'adult', setAt: '', readyAt: '' },
+      claimableSeasons: [],
+      ...overrides,
+    }) as never
+
+  it('mirrors the server order of checks', () => {
+    expect(getPvpBlocker(monster(), status())).toBeNull()
+    expect(getPvpBlocker(null, status())).toBe('ต้องมีมอนที่มีชีวิต')
+    expect(getPvpBlocker(monster({ stage: EnumMonsterStage.BABY_2 }), status())).toBe(
+      'ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้'
+    )
+    expect(getPvpBlocker(monster({ isSick: true }), status())).toBe('ป่วยอยู่ สู้ไม่ได้')
+    expect(getPvpBlocker(monster({ expeditionAreaId: 'meadow' }), status())).toBe('มอนออกสำรวจอยู่')
+    expect(getPvpBlocker(monster(), status({ defense: null }))).toBe('ตั้งทีมป้องกันก่อน')
+    expect(getPvpBlocker(monster(), status({ attemptsLeft: 0 }))).toBe('ท้าครบจำนวนของวันนี้แล้ว')
+  })
+
+  it('explains the defense cooldown and ineligible forms', () => {
+    const now = new Date('2026-01-01T00:10:00Z')
+    const cooling = status({ defense: { readyAt: '2026-01-01T00:30:00Z' } })
+    expect(getDefenseBlocker(monster(), cooling, now)).toBe(
+      'เปลี่ยนทีมป้องกันได้อีกครั้งใน 20 นาที'
+    )
+    expect(getDefenseBlocker(monster(), status(), now)).toBeNull()
+    expect(getDefenseBlocker(monster({ stage: EnumMonsterStage.EGG }), status(), now)).toBe(
+      'ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้'
+    )
+  })
+
+  it('formats a rating change with its sign', () => {
+    expect(formatRatingChange(1000, 1016)).toBe('1000 → 1016 (+16)')
+    expect(formatRatingChange(1000, 992)).toBe('1000 → 992 (-8)')
   })
 })

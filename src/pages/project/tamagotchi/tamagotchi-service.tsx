@@ -6,6 +6,11 @@ import {
   IAdventureArea,
   IBattleData,
   IDexEntry,
+  IEnhanceOutcome,
+  IEnhancePreview,
+  IEquipmentData,
+  IEquipmentItem,
+  EnumEquipmentSlot,
   IExpeditionData,
   IExpeditionSummary,
   IInventoryItem,
@@ -40,6 +45,7 @@ interface IInventoryResponse {
 }
 
 const INVENTORY_KEY = ['inventory']
+const EQUIPMENT_KEY = ['equipment']
 const MY_MONSTER_KEY = ['monster', 'me']
 const WALLET_KEY = ['wallet']
 
@@ -141,6 +147,8 @@ export const useApplyBattleResult = () => {
     queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
     queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
     queryClient.invalidateQueries({ queryKey: ['adventure'] })
+    // A win may have dropped a piece of equipment.
+    queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
   }
 }
 
@@ -336,6 +344,128 @@ export const useClaimExpedition = () => {
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+    },
+  })
+}
+
+export const useGetEquipment = () => {
+  return useQuery({
+    queryKey: EQUIPMENT_KEY,
+    queryFn: async () => {
+      const { data } = await apiClient.get<IEquipmentData>(`/equipment`)
+      return data
+    },
+  })
+}
+
+// Equip, unequip and dismantle all answer with the refreshed equipment screen data.
+const useEquipmentMutation = <TInput,>(request: (input: TInput) => Promise<IEquipmentData>) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: request,
+    onSuccess: (data) => {
+      queryClient.setQueryData<IEquipmentData>(EQUIPMENT_KEY, data)
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
+    },
+  })
+}
+
+export const useEquip = () =>
+  useEquipmentMutation(async (equipmentId: string) => {
+    const { data } = await apiClient.post<IEquipmentData>(`/equipment/equip`, { equipmentId })
+    return data
+  })
+
+export const useUnequip = () =>
+  useEquipmentMutation(async (slot: EnumEquipmentSlot) => {
+    const { data } = await apiClient.post<IEquipmentData>(`/equipment/unequip`, { slot })
+    return data
+  })
+
+export const useDismantle = () =>
+  useEquipmentMutation(async (equipmentId: string) => {
+    const { data } = await apiClient.post<IEquipmentData>(`/equipment/dismantle`, { equipmentId })
+    return data
+  })
+
+export const useGetEnhancePreview = (equipmentId: string | null) => {
+  return useQuery({
+    queryKey: ['equipment', 'preview', equipmentId],
+    enabled: !!equipmentId,
+    // The rate changes with every attempt (pity), so never serve a cached one.
+    gcTime: 0,
+    queryFn: async () => {
+      const { data } = await apiClient.get<IEnhancePreview>(
+        `/equipment/${equipmentId}/enhance-preview`
+      )
+      return data
+    },
+  })
+}
+
+export const useEnhance = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { equipmentId: string; useProtect: boolean }) => {
+      const { data } = await apiClient.post<{
+        result: IEnhanceOutcome
+        wallet: IWallet
+        equipment: IEquipmentData
+        inventory: IInventoryItem[]
+      }>(`/equipment/enhance`, input)
+      return data
+    },
+    onSuccess: ({ wallet, equipment, inventory }) => {
+      queryClient.setQueryData<IEquipmentData>(EQUIPMENT_KEY, equipment)
+      queryClient.setQueryData<IWallet>(WALLET_KEY, wallet)
+      queryClient.setQueryData<IInventoryResponse>(INVENTORY_KEY, { items: inventory })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
+    },
+  })
+}
+
+export const useBuyEquipmentBox = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiClient.post<{ wallet: IWallet; item: IEquipmentItem }>(
+        `/shop/buy-box`
+      )
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+      queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+    },
+  })
+}
+
+export const useBuyMaterial = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (itemId: string) => {
+      const { data } = await apiClient.post<IInventoryResponse & { wallet: IWallet }>(
+        `/shop/buy-material`,
+        { itemId }
+      )
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<IInventoryResponse>(INVENTORY_KEY, { items: data.items })
+      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
     },
   })
 }

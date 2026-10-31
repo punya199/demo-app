@@ -8,6 +8,7 @@ import { appPath } from '../../../config/app-paths'
 import { useGetMeSuspense } from '../../../service'
 import { AdventurePanel } from './AdventurePanel'
 import { DexPanel } from './DexPanel'
+import { EquipmentPanel } from './EquipmentPanel'
 import { ExpeditionPanel } from './ExpeditionPanel'
 import { MinigameModal } from './MinigameModal'
 import { PetSprite } from './PetSprite'
@@ -401,6 +402,11 @@ const GameTabs = () => {
             children: <AdventurePanel monster={monster} onError={showError} />,
           },
           { key: 'quests', label: 'ภารกิจ', children: <QuestPanel onError={showError} /> },
+          {
+            key: 'equipment',
+            label: 'อุปกรณ์',
+            children: <EquipmentPanel monster={monster} coin={coin} onError={showError} />,
+          },
           {
             key: 'shop',
             label: 'ร้านค้า',

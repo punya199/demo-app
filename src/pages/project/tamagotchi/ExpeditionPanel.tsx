@@ -5,6 +5,7 @@ import {
   useClaimExpedition,
   useGetExpedition,
   useGetShopItems,
+  useGetWiki,
   useStartExpedition,
 } from './tamagotchi-service'
 
@@ -17,6 +18,7 @@ export const ExpeditionPanel = (props: IExpeditionPanelProps) => {
   const { monster, onError } = props
   const { data, isLoading } = useGetExpedition()
   const { data: shop } = useGetShopItems()
+  const { data: wiki } = useGetWiki()
   const { mutate: start, isPending: isStarting } = useStartExpedition()
   const { mutate: claim, isPending: isClaiming } = useClaimExpedition()
 
@@ -27,7 +29,9 @@ export const ExpeditionPanel = (props: IExpeditionPanelProps) => {
   const area = data.areas.find((candidate) => candidate.id === monster?.expeditionAreaId)
   const itemLabel = (itemId: string) => {
     const item = shop?.items.find((candidate) => candidate.id === itemId)
-    return item ? `${item.emoji} ${item.name}` : itemId
+    const material = wiki?.equipment.materials.find((candidate) => candidate.id === itemId)
+    const found = item ?? material
+    return found ? `${found.emoji} ${found.name}` : itemId
   }
 
   const showSummary = (summary: { minutes: number; coins: number; items: string[] }) =>
@@ -37,8 +41,15 @@ export const ExpeditionPanel = (props: IExpeditionPanelProps) => {
         <div>
           <div>สำรวจไป {formatAge(summary.minutes)}</div>
           <div>🪙 เหรียญ +{summary.coins}</div>
-          {summary.items.map((itemId, index) => (
-            <div key={index}>{itemLabel(itemId)} +1</div>
+          {Object.entries(
+            summary.items.reduce<Record<string, number>>(
+              (counts, itemId) => ({ ...counts, [itemId]: (counts[itemId] ?? 0) + 1 }),
+              {}
+            )
+          ).map(([itemId, count]) => (
+            <div key={itemId}>
+              {itemLabel(itemId)} +{count}
+            </div>
           ))}
         </div>
       ),

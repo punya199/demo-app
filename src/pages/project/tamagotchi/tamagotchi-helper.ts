@@ -1,4 +1,9 @@
 import {
+  EnhanceFailure,
+  EnumEquipmentGrade,
+  EnumEquipmentSlot,
+  IEnhancePreview,
+  StatKey,
   BattleSide,
   EnumMonsterAction,
   EnumMonsterDeathCause,
@@ -208,6 +213,14 @@ const serverMessageLabel: Record<string, string> = {
   'Stamina is already full': 'Stamina เต็มอยู่แล้ว',
   'Mini-game is not ready yet': 'มินิเกมยังไม่พร้อม รออีกสักครู่',
   'Invalid mini-game score': 'คะแนนมินิเกมไม่ถูกต้อง',
+  'Equipment not found': 'ไม่พบอุปกรณ์',
+  'Take the equipment off first': 'ถอดอุปกรณ์ก่อน',
+  'Equipment bag is full': 'กระเป๋าอุปกรณ์เต็ม',
+  'Not enough enhance stones': 'หินตีบวกไม่พอ',
+  'You do not have a protect scroll': 'ไม่มีใบกันแตก',
+  'A protect scroll is not needed at this level': 'ระดับนี้ไม่ต้องใช้ใบกันแตก',
+  'Equipment is already at the maximum level': 'ตีบวกสูงสุดแล้ว',
+  'Material not found': 'ไม่พบวัตถุดิบ',
   'Monster is on an expedition': 'มอนออกสำรวจอยู่',
   'Monster is already on an expedition': 'มอนออกสำรวจอยู่แล้ว',
   'Monster is too unwell to explore': 'มอนป่วยหรือหิว ออกสำรวจไม่ได้',
@@ -302,3 +315,66 @@ export const minigameBarPosition = (elapsedMs: number, periodMs: number) => {
 
 export const isInZone = (position: number, zone: { start: number; width: number }) =>
   position >= zone.start && position <= zone.start + zone.width
+
+export const slotLabel: Record<EnumEquipmentSlot, string> = {
+  [EnumEquipmentSlot.WEAPON]: '⚔️ อาวุธ',
+  [EnumEquipmentSlot.ARMOR]: '🛡️ เกราะ',
+  [EnumEquipmentSlot.HELMET]: '⛑️ หมวก',
+  [EnumEquipmentSlot.ACCESSORY]: '💍 เครื่องประดับ',
+}
+
+export const gradeLabel: Record<EnumEquipmentGrade, string> = {
+  [EnumEquipmentGrade.COMMON]: 'ธรรมดา',
+  [EnumEquipmentGrade.RARE]: 'หายาก',
+  [EnumEquipmentGrade.EPIC]: 'มหากาพย์',
+  [EnumEquipmentGrade.LEGENDARY]: 'ตำนาน',
+}
+
+export const gradeColor: Record<EnumEquipmentGrade, string> = {
+  [EnumEquipmentGrade.COMMON]: 'default',
+  [EnumEquipmentGrade.RARE]: 'blue',
+  [EnumEquipmentGrade.EPIC]: 'purple',
+  [EnumEquipmentGrade.LEGENDARY]: 'gold',
+}
+
+export const statLabel: Record<StatKey, string> = { hp: 'HP', atk: 'ATK', def: 'DEF', spd: 'SPD' }
+
+export const enhanceFailureLabel: Record<EnhanceFailure, string> = {
+  material: 'ล้มเหลว: เสียหินกับเหรียญ ระดับเท่าเดิม',
+  drop: 'ล้มเหลว: ระดับลด 1',
+  drop_or_break: 'ล้มเหลว: ระดับลด 1 หรืออาจแตก',
+}
+
+// "+3 ATK · +2 HP", skipping stats that are zero.
+export const describeStats = (stats: Partial<Record<StatKey, number>>) =>
+  (Object.keys(statLabel) as StatKey[])
+    .filter((key) => (stats[key] ?? 0) > 0)
+    .map((key) => `+${stats[key]} ${statLabel[key]}`)
+    .join(' · ')
+
+// Gear can't change while the monster is away (the server refuses).
+export const getEquipBlocker = (monster: IMonsterData | null): string | null =>
+  monster?.expeditionAreaId ? 'มอนออกสำรวจอยู่' : null
+
+// Mirrors the server's enhance checks so the button explains itself.
+export const getEnhanceBlocker = (
+  preview: IEnhancePreview,
+  funds: { coin: number; stones: number; scrolls: number },
+  useProtect: boolean
+): string | null => {
+  if (preview.maxed) {
+    return 'ตีบวกสูงสุดแล้ว'
+  }
+  if (funds.coin < preview.cost.coin) {
+    return 'เหรียญไม่พอ'
+  }
+  if (funds.stones < preview.cost.stones) {
+    return 'หินตีบวกไม่พอ'
+  }
+  if (useProtect && funds.scrolls < 1) {
+    return 'ไม่มีใบกันแตก'
+  }
+  return null
+}
+
+export const toPercent = (fraction: number) => `${Math.round(fraction * 1000) / 10}%`

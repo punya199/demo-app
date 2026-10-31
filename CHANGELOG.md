@@ -1,3 +1,10 @@
+# [1.20.0](https://github.com/punya199/demo-app/compare/v1.19.0...v1.20.0) (2026-10-31)
+
+
+### New
+
+* add PvP arena tab, leaderboard and stamina recovery text (phase 4) ([126c029](https://github.com/punya199/demo-app/commit/126c0292aee5fcbd1c22d408fc1cec3df9aaebee))
+
 # [1.19.0](https://github.com/punya199/demo-app/compare/v1.18.0...v1.19.0) (2026-10-31)
 
 

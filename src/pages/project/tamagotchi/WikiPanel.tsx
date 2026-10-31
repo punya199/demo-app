@@ -83,6 +83,8 @@ const buildSections = (wiki: IWikiData) => {
     idle,
     equipment,
     raid,
+    worldBoss,
+    social,
     pvp,
     economy,
   } = wiki
@@ -512,6 +514,74 @@ const buildSections = (wiki: IWikiData) => {
               describePctBonus(set.bonuses.find((bonus) => bonus.pieces === 2)?.pct ?? {}),
               describeSetEffect(set.bonuses.find((bonus) => bonus.pieces === 4)?.effect ?? {}),
             ])}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'world-boss',
+      label: '🌩️ บอสโลก',
+      children: (
+        <>
+          <Heading>วิธีเล่น</Heading>
+          <List
+            items={[
+              `ทุกคนช่วยกันตีบอสตัวเดียวกัน ${worldBoss.bosses.map((boss) => `${boss.emoji} ${boss.name} (HP ${boss.hp})`).join(' · ')} สัปดาห์ละหนึ่งตัว (นับจันทร์ 00:00 ถึงอาทิตย์ เวลาไทย) ถ้าไม่แตกก็ยังได้รางวัลตามส่วนร่วม`,
+              `ต้องเป็นร่างโตขึ้นไป ตีได้วันละ ${worldBoss.dailyHits} ครั้ง ครั้งละไม่เกิน ${worldBoss.rounds} รอบ (หรือจนมอนล้ม) ใช้ stamina ${stamina.battleCost}`,
+              'ดาเมจที่ทำได้ลด HP รวมของบอสทันที ใช้ค่าพลังสดของมอนรวมอุปกรณ์และเอฟเฟกต์เซ็ต ไม่ใช้ตารางธาตุ มอนที่ HP/เกราะดีอยู่ได้นานกว่าและทำดาเมจรวมมากกว่า',
+              'ผลไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ',
+              `ผู้ตีครั้งสุดท้ายที่ทำให้บอสแตกได้ชิ้นชุดสายฟ้าเร็ว (${gradeLabel[worldBoss.killingBlowGrade]}) การันตี`,
+            ]}
+          />
+          <Heading>รางวัล (รับเองหลังสัปดาห์จบหรือบอสแตก)</Heading>
+          <List
+            items={[
+              `ทุกคนที่ตีอย่างน้อย 1 ครั้ง: ต่อการตี 1 ครั้งได้ 🪙 ${worldBoss.perHit.coin} + 🎖️ ${worldBoss.perHit.raidToken}`,
+              `บอสแตกก่อนสัปดาห์จบ: ทุกคนที่ร่วมได้เพิ่ม 🪙 ${worldBoss.defeatedBonus.coin} + 🎖️ ${worldBoss.defeatedBonus.raidToken}`,
+              'รางวัลตามอันดับดาเมจ (ด้านล่าง) ชิ้นเซ็ตสุ่มด้วยค่าที่คงที่ต่อผู้เล่นต่อสัปดาห์ รับซ้ำหรือรับหลังเคลียร์กระเป๋าก็ได้ผลเดิม',
+              'กระเป๋าอุปกรณ์เต็มรับไม่ได้ถ้ามีชิ้นเซ็ตในรางวัล (ไม่เสียสิทธิ์) แลกชิ้นด้วย 🎫 ได้เฉพาะเกรดหายากและมหากาพย์ หลังเคยรับรางวัลบอสนี้',
+            ]}
+          />
+          <Table
+            head={['อันดับดาเมจ', '🎖️', '🎫', 'โอกาสได้ชิ้นเซ็ต']}
+            rows={worldBoss.rankRewards.map((tier, index) => [
+              tier.maxRank === null
+                ? 'ที่เหลือ'
+                : tier.maxRank === 1
+                  ? 'อันดับ 1'
+                  : `อันดับ ${(worldBoss.rankRewards[index - 1]?.maxRank ?? 0) + 1}–${tier.maxRank}`,
+              tier.raidToken,
+              tier.bossToken,
+              tier.pieceChance > 0
+                ? `${percent(tier.pieceChance)} (${gradeLabel[tier.pieceGrade]})`
+                : '-',
+            ])}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'social',
+      label: '🤝 เพื่อนและเช่าตัว',
+      children: (
+        <>
+          <Heading>เพื่อน</Heading>
+          <List
+            items={[
+              'เพิ่มเพื่อนด้วยรหัสเพื่อนที่เจ้าตัวแจกให้เท่านั้น ไม่ค้นหาจากชื่อผู้ใช้หรืออีเมล คนอื่นเห็นเฉพาะชื่อที่ตั้งเอง (ชื่อเดียวกับในสนามประลองและอันดับบอสโลก)',
+              `มีเพื่อนได้ ${social.friendLimit} คน (รวมคำขอที่ส่งไปแล้วรออยู่) แต่ละคนมีคำขอค้างได้ไม่เกิน ${social.requestLimit} คำขอ ถ้าสองคนขอพร้อมกัน จะกลายเป็นเพื่อนกัน`,
+              `เยี่ยมมอนเพื่อนดูได้อย่างเดียว ทักทายวันละ ${social.greetsPerDayPerFriend} ครั้งต่อเพื่อน (+${social.pointsGreet} แต้มมิตรภาพ)`,
+              `ส่งของขวัญได้วันละ ${social.giftsPerDay} ชิ้น เป็นไอเทมจากกระเป๋าของคุณเอง ไม่ส่งเหรียญหรือเพชร (+${social.pointsGift} แต้ม)`,
+            ]}
+          />
+          <Heading>ตัวซัพพอร์ตและเช่าตัว</Heading>
+          <List
+            items={[
+              `ตั้งมอนของคุณเป็นตัวซัพพอร์ตให้เพื่อนเช่า (ร่างโตขึ้นไป เปลี่ยนได้ทุก ${social.supportCooldownMinutes} นาที) ระบบจำค่าพลังรวมอุปกรณ์ตอนตั้งไว้`,
+              'เช่าได้เฉพาะตัวของเพื่อน ใช้ตีบอสโลกพร้อมกัน ตัวเช่าต่อสู้เอง (AI) ไม่ได้ EXP หรือรางวัล ใช้ในสนามประลอง (PvP) ไม่ได้',
+              `ผู้เช่าจ่ายเจ้าของ 🪙 ${social.rentalFee} ต่อครั้ง เจ้าของรับได้สูงสุด 🪙 ${social.rentalOwnerDailyCap} ต่อวัน เกินแล้วเช่าได้ฟรี (ผู้เช่าไม่ต้องเสียส่วนที่เจ้าของรับไม่ได้) และได้ +${social.pointsRental} แต้มมิตรภาพ`,
+              'ดาเมจของตัวเช่าลด HP รวมของบอสจริง แต่ไม่นับในอันดับดาเมจของผู้เช่า',
+            ]}
           />
         </>
       ),

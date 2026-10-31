@@ -1,3 +1,10 @@
+# [1.19.0](https://github.com/punya199/demo-app/compare/v1.18.0...v1.19.0) (2026-10-31)
+
+
+### New
+
+* add monster equipment, enhancing and shop box UI (phase 3) ([7490cbc](https://github.com/punya199/demo-app/commit/7490cbc54839dff2564ce6e462ca1f2f5418cbed))
+
 # [1.18.0](https://github.com/punya199/demo-app/compare/v1.17.0...v1.18.0) (2026-10-31)
 
 

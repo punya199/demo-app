@@ -11,11 +11,14 @@ interface IBattleModalProps {
   onClose: () => void
   // Close by itself this long after the replay ends (auto-battle); omit to wait for the player.
   autoCloseMs?: number
+  // Replaces the result line once the replay ends (PvP shows rating instead of rewards).
+  summary?: string
+  title?: string
 }
 
 // Replays the server's battle events one by one; the result is already decided.
 export const BattleModal = (props: IBattleModalProps) => {
-  const { battle, onClose, autoCloseMs } = props
+  const { battle, onClose, autoCloseMs, summary, title } = props
   const [shown, setShown] = useState(0)
   const total = battle?.events.length ?? 0
   const isFinished = shown >= total
@@ -77,7 +80,7 @@ export const BattleModal = (props: IBattleModalProps) => {
   return (
     <Modal
       open
-      title="การต่อสู้"
+      title={title ?? 'การต่อสู้'}
       onCancel={isFinished ? onClose : undefined}
       closable={isFinished}
       maskClosable={false}
@@ -97,7 +100,9 @@ export const BattleModal = (props: IBattleModalProps) => {
         {fighterCard('enemy')}
       </div>
       <div className="mt-4 min-h-12 rounded-lg bg-slate-100 p-3 text-center text-sm dark:bg-slate-800">
-        {isFinished ? (
+        {isFinished && summary !== undefined ? (
+          <span className="font-semibold">{summary}</span>
+        ) : isFinished ? (
           battle.won ? (
             <span className="font-semibold text-green-600">
               ชนะ! ได้ {battle.reward} 🪙{battle.gemReward > 0 && ` + ${battle.gemReward} 💎`}

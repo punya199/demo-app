@@ -4,7 +4,7 @@
 
 > มอนสเตอร์ ชื่อ ธาตุ ศัพท์ และภาพในเกมออกแบบเองทั้งหมด ใช้แนวเกม V-Pet เป็นแรงบันดาลใจเท่านั้น
 
-แผนละเอียดแต่ละเฟส: [phase-1.md](./phase-1.md) (เสร็จแล้ว) · [phase-2.md](./phase-2.md) (เสร็จแล้ว: 2a, 2b, 2c) · [phase-3.md](./phase-3.md) (เสร็จแล้ว: 3a, 3b)
+แผนละเอียดแต่ละเฟส: [phase-1.md](./phase-1.md) (เสร็จแล้ว) · [phase-2.md](./phase-2.md) (เสร็จแล้ว: 2a, 2b, 2c) · [phase-3.md](./phase-3.md) (เสร็จแล้ว: 3a, 3b) · [phase-4.md](./phase-4.md) (เสร็จแล้ว: 4a, 4b)
 
 ## หลักการออกแบบ
 
@@ -141,7 +141,7 @@
 | 2b ✅ | คลังไอเทม + daily quest | `inventory`, `quest` (ในโมดูล `monster`) | – |
 | 2c ✅ | โหมด Idle (สำรวจออฟไลน์, ต่อสู้อัตโนมัติออนไลน์) | `expedition` (ในโมดูล `monster`) | – |
 | 3 ✅ | อุปกรณ์ 4 ช่อง + ตีบวก (มี `setId` ตั้งแต่ตอนนี้) | `equipment`, `enhance` (ในโมดูล `monster`) | – |
-| 4 | Async PvP | ladder, ELO | – |
+| 4 ✅ | Async PvP (ทีมป้องกัน snapshot, ELO, ซีซันรายเดือน, NPC) | `pvp` (ในโมดูล `monster`) | – |
 | 5 | World Boss + ชุดเซ็ต + ระบบเพื่อน + เช่าตัว | `raid`, `friend` | – |
 | 6 | Realtime PvP | WebSocket gateway | ✓ |
 | 7 | Party Boss Raid | lobby, room state | ✓ |

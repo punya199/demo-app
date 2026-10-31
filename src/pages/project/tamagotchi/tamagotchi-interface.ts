@@ -276,6 +276,93 @@ export interface IExpeditionSummary {
   items: string[]
 }
 
+export interface IPvpOpponent {
+  id: string
+  displayName: string
+  emoji: string
+  name: string
+  element: EnumMonsterLine
+  stats: IBattleStats
+  rating: number
+  isNpc: boolean
+}
+
+export interface ISeasonRewardTier {
+  maxRank: number | null
+  coin: number
+  gem: number
+}
+
+export interface IPvpStatus {
+  season: string
+  resetsAt: string
+  rating: number
+  wins: number
+  losses: number
+  rank: number | null
+  attemptsLeft: number
+  defense: {
+    displayName: string
+    fighter: IFighter
+    stage: EnumMonsterStage
+    setAt: string
+    readyAt: string
+  } | null
+  claimableSeasons: {
+    season: string
+    rank: number
+    rating: number
+    reward: ISeasonRewardTier | null
+  }[]
+}
+
+export interface IPvpBattleResponse {
+  monster: IMonsterData
+  battle: {
+    won: boolean
+    rounds: number
+    events: IBattleEvent[]
+    player: IFighter
+    enemy: IFighter
+    reward: number
+  }
+  rating: { before: number; after: number }
+  attemptsLeft: number
+  wallet: IWallet
+}
+
+export interface IPvpHistoryEntry {
+  id: string
+  season: string
+  role: 'attacker' | 'defender'
+  won: boolean
+  opponentName: string
+  opponentEmoji: string
+  ratingBefore: number
+  ratingAfter: number | null
+  createdAt: string
+}
+
+export interface IPvpReplay {
+  role: 'attacker' | 'defender'
+  attackerWon: boolean
+  rounds: number
+  events: IBattleEvent[]
+  attacker: IFighter
+  defender: IFighter
+}
+
+export interface IPvpLeaderboardEntry {
+  rank: number
+  displayName: string
+  emoji: string | null
+  name: string | null
+  rating: number
+  wins: number
+  losses: number
+  isMe: boolean
+}
+
 export interface IDexEntry {
   id: string
   line: EnumMonsterLine
@@ -327,8 +414,8 @@ export interface IWikiData {
   online: { graceMinutes: number; evolutionMultiplier: number }
   stamina: {
     max: number
-    drainFullMinutesOffline: number
-    drainFullMinutesOnline: number
+    recoveryPerMinute: number
+    recoveryOnlineMultiplier: number
     battleCost: number
     noStaminaStatMultiplier: number
     minigameRounds: number
@@ -422,6 +509,23 @@ export interface IWikiData {
         stones: number
       }[]
     }
+  }
+  pvp: {
+    stages: EnumMonsterStage[]
+    startRating: number
+    kAttacker: number
+    kDefender: number
+    dailyAttempts: number
+    winCoin: number
+    lossCoin: number
+    defenseCooldownMinutes: number
+    opponentCount: number
+    maxFightsPerOpponentPerDay: number
+    ratingWindow: number
+    seasonMinFights: number
+    seasonResetKeep: number
+    seasonRewards: ISeasonRewardTier[]
+    npcs: { stage: EnumMonsterStage; name: string; emoji: string; rating: number }[]
   }
   economy: {
     shopItems: IShopItem[]

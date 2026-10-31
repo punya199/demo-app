@@ -12,6 +12,7 @@ import { EquipmentPanel } from './EquipmentPanel'
 import { ExpeditionPanel } from './ExpeditionPanel'
 import { MinigameModal } from './MinigameModal'
 import { PetSprite } from './PetSprite'
+import { PvpPanel } from './PvpPanel'
 import { QuestPanel } from './QuestPanel'
 import { ShopPanel } from './ShopPanel'
 import { WikiPanel } from './WikiPanel'
@@ -402,6 +403,11 @@ const GameTabs = () => {
             children: <AdventurePanel monster={monster} onError={showError} />,
           },
           { key: 'quests', label: 'ภารกิจ', children: <QuestPanel onError={showError} /> },
+          {
+            key: 'pvp',
+            label: 'สนามประลอง',
+            children: <PvpPanel monster={monster} onError={showError} />,
+          },
           {
             key: 'equipment',
             label: 'อุปกรณ์',

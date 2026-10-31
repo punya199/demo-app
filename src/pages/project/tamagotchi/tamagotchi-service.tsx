@@ -15,6 +15,12 @@ import {
   IExpeditionSummary,
   IInventoryItem,
   IMonsterData,
+  IPvpBattleResponse,
+  IPvpHistoryEntry,
+  IPvpLeaderboardEntry,
+  IPvpOpponent,
+  IPvpReplay,
+  IPvpStatus,
   IQuestsData,
   IShopItem,
   IWallet,
@@ -466,6 +472,122 @@ export const useBuyMaterial = () => {
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+    },
+  })
+}
+
+const PVP_KEY = ['pvp']
+
+export const useGetPvpStatus = () => {
+  return useQuery({
+    queryKey: PVP_KEY,
+    queryFn: async () => {
+      const { data } = await apiClient.get<IPvpStatus>(`/pvp`)
+      return data
+    },
+  })
+}
+
+export const useSetPvpDefense = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (displayName?: string) => {
+      const { data } = await apiClient.post<IPvpStatus>(`/pvp/defense`, { displayName })
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<IPvpStatus>(PVP_KEY, data)
+      queryClient.invalidateQueries({ queryKey: ['pvp', 'opponents'] })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: PVP_KEY })
+    },
+  })
+}
+
+export const useGetPvpOpponents = (enabled: boolean) => {
+  return useQuery({
+    queryKey: ['pvp', 'opponents'],
+    enabled,
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ opponents: IPvpOpponent[] }>(`/pvp/opponents`)
+      return data
+    },
+  })
+}
+
+// Like the adventure battle: nothing is written to the cache until the replay has been watched
+// (useApplyPvpResult), so the rating and coins don't spoil the ending.
+export const usePvpBattle = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (opponentId: string) => {
+      const { data } = await apiClient.post<IPvpBattleResponse>(`/pvp/battle`, { opponentId })
+      return data
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+      queryClient.invalidateQueries({ queryKey: PVP_KEY })
+    },
+  })
+}
+
+export const useApplyPvpResult = () => {
+  const queryClient = useQueryClient()
+  return (data: IPvpBattleResponse) => {
+    queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+    queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+    queryClient.invalidateQueries({ queryKey: PVP_KEY })
+    queryClient.invalidateQueries({ queryKey: ['pvp', 'history'] })
+    queryClient.invalidateQueries({ queryKey: ['quests'] })
+  }
+}
+
+export const useGetPvpHistory = () => {
+  return useQuery({
+    queryKey: ['pvp', 'history'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ battles: IPvpHistoryEntry[] }>(`/pvp/history`)
+      return data
+    },
+  })
+}
+
+export const useGetPvpReplay = () => {
+  return useMutation({
+    mutationFn: async (battleId: string) => {
+      const { data } = await apiClient.get<IPvpReplay>(`/pvp/history/${battleId}/replay`)
+      return data
+    },
+  })
+}
+
+export const useGetPvpLeaderboard = (season?: string) => {
+  return useQuery({
+    queryKey: ['pvp', 'leaderboard', season ?? 'current'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ season: string; entries: IPvpLeaderboardEntry[] }>(
+        `/pvp/leaderboard`,
+        { params: season ? { season } : undefined }
+      )
+      return data
+    },
+  })
+}
+
+export const useClaimPvpSeason = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (season: string) => {
+      const { data } = await apiClient.post<{ wallet: IWallet }>(`/pvp/season/claim`, { season })
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+      queryClient.invalidateQueries({ queryKey: PVP_KEY })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: PVP_KEY })
     },
   })
 }

@@ -1,3 +1,10 @@
+# [1.21.0](https://github.com/punya199/demo-app/compare/v1.20.0...v1.21.0) (2026-10-31)
+
+
+### New
+
+* add Boss Raid tab, set effects in replays and raid tokens (phase 5a) ([4811e1b](https://github.com/punya199/demo-app/commit/4811e1bfde091d37b027519b755b4edb6be69aa1))
+
 # [1.20.0](https://github.com/punya199/demo-app/compare/v1.19.0...v1.20.0) (2026-10-31)
 
 

@@ -1,3 +1,11 @@
+# [1.22.0](https://github.com/punya199/demo-app/compare/v1.21.0...v1.22.0) (2026-10-31)
+
+
+### New
+
+* add friends tab, support unit and rental on the World Boss page (phase 5c) ([92d2bca](https://github.com/punya199/demo-app/commit/92d2bca2f5ce44189107b2e4b9cd3d7d2e48f574))
+* add World Boss tab and guide section (phase 5b) ([34e2f8a](https://github.com/punya199/demo-app/commit/34e2f8a5be7ab151672cd2623d5b5784336efd25))
+
 # [1.21.0](https://github.com/punya199/demo-app/compare/v1.20.0...v1.21.0) (2026-10-31)
 
 

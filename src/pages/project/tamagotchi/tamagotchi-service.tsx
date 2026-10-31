@@ -6,7 +6,11 @@ import {
   IAdventureArea,
   IBattleData,
   IDexEntry,
+  IExpeditionData,
+  IExpeditionSummary,
+  IInventoryItem,
   IMonsterData,
+  IQuestsData,
   IShopItem,
   IWallet,
   IWikiData,
@@ -31,6 +35,11 @@ interface IMonsterWithWalletResponse {
   wallet: IWallet
 }
 
+interface IInventoryResponse {
+  items: IInventoryItem[]
+}
+
+const INVENTORY_KEY = ['inventory']
 const MY_MONSTER_KEY = ['monster', 'me']
 const WALLET_KEY = ['wallet']
 
@@ -116,8 +125,8 @@ export const useGetAdventure = () => {
 export const useAdventureBattle = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (stageId: string) => {
-      const { data } = await apiClient.post<IBattleResponse>(`/adventure/battle`, { stageId })
+    mutationFn: async (input: { stageId: string; auto?: boolean }) => {
+      const { data } = await apiClient.post<IBattleResponse>(`/adventure/battle`, input)
       return data
     },
     onError: () => {
@@ -149,16 +158,77 @@ export const useBuyShopItem = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (itemId: string) => {
-      const { data } = await apiClient.post<IMonsterWithWalletResponse>(`/shop/buy`, { itemId })
+      const { data } = await apiClient.post<IInventoryResponse & { wallet: IWallet }>(`/shop/buy`, {
+        itemId,
+      })
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<IInventoryResponse>(INVENTORY_KEY, { items: data.items })
+      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+    },
+  })
+}
+
+export const useGetInventory = () => {
+  return useQuery({
+    queryKey: INVENTORY_KEY,
+    queryFn: async () => {
+      const { data } = await apiClient.get<IInventoryResponse>(`/inventory`)
+      return data
+    },
+  })
+}
+
+export const useUseInventoryItem = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (itemId: string) => {
+      const { data } = await apiClient.post<IInventoryResponse & { monster: IMonsterData }>(
+        `/inventory/use`,
+        { itemId }
+      )
       return data
     },
     onSuccess: (data) => {
       queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
-      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+      queryClient.setQueryData<IInventoryResponse>(INVENTORY_KEY, { items: data.items })
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
-      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
+    },
+  })
+}
+
+export const useGetQuests = () => {
+  return useQuery({
+    queryKey: ['quests'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IQuestsData>(`/quests`)
+      return data
+    },
+  })
+}
+
+export const useClaimQuest = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (questId: string) => {
+      const { data } = await apiClient.post<IQuestsData & { wallet: IWallet }>(`/quests/claim`, {
+        questId,
+      })
+      return data
+    },
+    onSuccess: ({ wallet, ...quests }) => {
+      queryClient.setQueryData<IQuestsData>(['quests'], quests)
+      queryClient.setQueryData<IWallet>(WALLET_KEY, wallet)
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['quests'] })
     },
   })
 }
@@ -218,5 +288,54 @@ export const useGetWiki = () => {
       return data
     },
     staleTime: Infinity,
+  })
+}
+
+export const useGetExpedition = () => {
+  return useQuery({
+    queryKey: ['expedition'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IExpeditionData>(`/expedition`)
+      return data
+    },
+  })
+}
+
+export const useStartExpedition = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (areaId: string) => {
+      const { data } = await apiClient.post<IGetMyMonsterResponse>(`/expedition/start`, {
+        areaId,
+      })
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(MY_MONSTER_KEY, data)
+      queryClient.invalidateQueries({ queryKey: ['quests'] })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+    },
+  })
+}
+
+export const useClaimExpedition = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiClient.post<
+        IMonsterWithWalletResponse & { summary: IExpeditionSummary }
+      >(`/expedition/claim`)
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+    },
   })
 }

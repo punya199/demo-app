@@ -83,6 +83,13 @@ export interface IMonsterData {
   bornAt: string
   trainReadyAt: string | null
   minigameReadyAt: string | null
+  autoBattleReadyAt: string | null
+  // Set while out on an expedition; `expeditionReturned` = back home, waiting to be collected.
+  expeditionAreaId: string | null
+  expeditionMinutes: number
+  expeditionReturned: boolean
+  expeditionPendingCoins: number
+  expeditionPendingDrops: number
   evolution: IEvolutionInfo
   diedAt: string | null
   deathCause: EnumMonsterDeathCause | null
@@ -135,6 +142,8 @@ export interface IAdventureStage {
   reward: number
   firstClearReward: number
   firstClearGems: number
+  // Coins one auto-battle win pays; null for bosses, which can't be auto-battled.
+  autoReward: number | null
   clearCount: number
   unlocked: boolean
 }
@@ -153,6 +162,49 @@ export interface IShopItem {
   emoji: string
   description: string
   price: number
+}
+
+export interface IInventoryItem {
+  itemId: string
+  quantity: number
+}
+
+export interface IQuest {
+  id: string
+  name: string
+  emoji: string
+  target: number
+  coinReward: number
+  progress: number
+  claimed: boolean
+}
+
+export interface IQuestsData {
+  date: string
+  resetsAt: string
+  quests: IQuest[]
+}
+
+export interface IExpeditionArea {
+  id: string
+  name: string
+  emoji: string
+  unlocked: boolean
+  baseRatePerHour: number
+  // What this monster earns here per hour; null without a hatched monster.
+  ratePerHour: number | null
+}
+
+export interface IExpeditionData {
+  maxMinutes: number
+  areas: IExpeditionArea[]
+}
+
+export interface IExpeditionSummary {
+  areaId: string
+  minutes: number
+  coins: number
+  items: string[]
 }
 
 export interface IDexEntry {
@@ -251,5 +303,26 @@ export interface IWikiData {
       }[]
     }[]
   }
-  economy: { shopItems: IShopItem[]; dexDiscoveryGems: number }
+  idle: {
+    expeditionMaxMinutes: number
+    expeditionDrainMultiplier: number
+    expeditionDropEveryMinutes: number
+    expeditionPowerMultiplierMin: number
+    expeditionPowerMultiplierMax: number
+    expeditionAreas: {
+      id: string
+      name: string
+      emoji: string
+      baseRatePerHour: number
+      autoBattleRewards: { name: string; coins: number }[]
+    }[]
+    autoBattleCooldownSeconds: number
+    autoBattleStaminaCost: number
+    autoBattleDailyCoinCap: number
+  }
+  economy: {
+    shopItems: IShopItem[]
+    dailyQuests: Pick<IQuest, 'id' | 'name' | 'emoji' | 'coinReward'>[]
+    dexDiscoveryGems: number
+  }
 }

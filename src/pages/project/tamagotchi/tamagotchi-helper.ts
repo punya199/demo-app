@@ -134,22 +134,42 @@ export const getBattleBlocker = (monster: IMonsterData | null): string | null =>
   if (monster.isSick) {
     return 'ป่วยอยู่ สู้ไม่ได้'
   }
+  if (monster.expeditionAreaId) {
+    return 'มอนออกสำรวจอยู่'
+  }
   return null
 }
 
-export const getShopBlocker = (
+// Mirrors startExpedition's checks so the button explains itself.
+export const getExpeditionBlocker = (
   monster: IMonsterData | null,
-  price: number,
-  coin: number
+  isAreaUnlocked: boolean
 ): string | null => {
   if (!monster || monster.diedAt || monster.stage === EnumMonsterStage.EGG) {
     return 'ต้องมีมอนที่ฟักแล้ว'
   }
-  if (coin < price) {
-    return 'เหรียญไม่พอ'
+  if (monster.expeditionAreaId) {
+    return 'มอนออกสำรวจอยู่แล้ว'
   }
-  return null
+  if (monster.isSick || toHearts(monster.fullness) === 0) {
+    return 'มอนป่วยหรือหิว ดูแลก่อนออกสำรวจ'
+  }
+  return isAreaUnlocked ? null : 'ชนะบอสพื้นที่ก่อนหน้าก่อน'
 }
+
+// Milliseconds until the next auto-battle may start (0 = now).
+export const getAutoBattleDelayMs = (monster: IMonsterData | null, now: number) =>
+  monster?.autoBattleReadyAt ? Math.max(0, new Date(monster.autoBattleReadyAt).getTime() - now) : 0
+
+// Buying fills the bag, so it needs no monster - only enough coins.
+export const getShopBlocker = (price: number, coin: number): string | null =>
+  coin < price ? 'เหรียญไม่พอ' : null
+
+// Using an item from the bag needs a hatched, living monster.
+export const getUseItemBlocker = (monster: IMonsterData | null): string | null =>
+  !monster || monster.diedAt || monster.stage === EnumMonsterStage.EGG
+    ? 'ต้องมีมอนที่ฟักแล้ว'
+    : null
 
 export const describeBattleEvent = (event: IBattleEvent, battle: IBattleData) => {
   const attacker = event.actor === 'player' ? battle.player : battle.enemy
@@ -188,6 +208,17 @@ const serverMessageLabel: Record<string, string> = {
   'Stamina is already full': 'Stamina เต็มอยู่แล้ว',
   'Mini-game is not ready yet': 'มินิเกมยังไม่พร้อม รออีกสักครู่',
   'Invalid mini-game score': 'คะแนนมินิเกมไม่ถูกต้อง',
+  'Monster is on an expedition': 'มอนออกสำรวจอยู่',
+  'Monster is already on an expedition': 'มอนออกสำรวจอยู่แล้ว',
+  'Monster is too unwell to explore': 'มอนป่วยหรือหิว ออกสำรวจไม่ได้',
+  'Monster is not on an expedition': 'มอนไม่ได้ออกสำรวจ',
+  'Area is locked': 'พื้นที่นี้ยังไม่ปลดล็อก',
+  'Auto-battle is not ready yet': 'ต่อสู้อัตโนมัติยังไม่พร้อม รออีกสักครู่',
+  'Daily auto-battle reward limit reached': 'ครบเพดานรางวัลต่อสู้อัตโนมัติของวันนี้แล้ว',
+  'Clear this stage once before auto-battling it': 'ต้องชนะด่านนี้ด้วยตัวเองก่อน',
+  'Auto-battle is not available on boss stages': 'บอสต่อสู้อัตโนมัติไม่ได้',
+  'You do not have this item': 'ไม่มีไอเทมนี้ในกระเป๋า',
+  'Quest is not complete or was already claimed': 'ภารกิจยังไม่สำเร็จ หรือรับรางวัลไปแล้ว',
 }
 
 export const toThaiErrorMessage = (serverMessage: unknown) =>

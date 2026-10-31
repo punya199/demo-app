@@ -69,7 +69,7 @@ const hatchedStages = [
 ] as const
 
 const buildSections = (wiki: IWikiData) => {
-  const { care, stamina, online, evolution, battle, adventure, economy } = wiki
+  const { care, stamina, online, evolution, battle, adventure, idle, economy } = wiki
   const speciesName = (id: string) => {
     const species = evolution.species.find((entry) => entry.id === id)
     return species ? `${species.emoji} ${species.name}` : id
@@ -85,7 +85,7 @@ const buildSections = (wiki: IWikiData) => {
             'เลือกไข่ 1 ใน 3 ธาตุ แล้วรอไข่ฟัก',
             'ดูแลให้อิ่ม แข็งแรง สะอาด และหายป่วย เวลาในเกมเดินต่อแม้ปิดแอป',
             'ครบเวลาแต่ละร่าง มอนจะวิวัฒนาการ ร่างที่ได้ขึ้นกับการเลี้ยง การฝึก และการชนะ',
-            'พามอนไปสู้ในโหมดผจญภัย เก็บเหรียญและเพชรไว้ซื้อของและเติม stamina',
+            'พามอนไปสู้ในโหมดผจญภัย ทำภารกิจประจำวัน เก็บเหรียญและเพชรไว้ซื้อของและเติม stamina',
             `เปิดเกมค้างไว้ = ออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)} และ stamina ลดช้าลง`,
             `มอนมีอายุขัย ${formatAge(care.lifespanMinutes)} นับจากฟัก ตายแล้วได้ไข่ใบใหม่ ความคืบหน้าผจญภัย เหรียญ เพชร และ Dex ยังอยู่`,
           ]}
@@ -334,6 +334,51 @@ const buildSections = (wiki: IWikiData) => {
       ),
     },
     {
+      key: 'idle',
+      label: '💤 โหมด Idle',
+      children: (
+        <>
+          <Heading>ส่งมอนออกสำรวจ (ออฟไลน์)</Heading>
+          <List
+            items={[
+              `กดส่งสำรวจแล้วปิดแอปได้ เก็บเหรียญตามเวลาจริงสูงสุด ${formatAge(idle.expeditionMaxMinutes)} แล้วต้องกลับมากดรับ`,
+              `ระหว่างสำรวจ ความอิ่มและความแข็งแรงลดช้าลง ${times(idle.expeditionDrainMultiplier)} และอึไม่เพิ่ม`,
+              'ถ้ามอนป่วยหรือความอิ่มเป็น 0 จะกลับบ้านเองและหยุดเก็บ ส่งสำรวจตอนป่วยหรือหิวไม่ได้',
+              `ทุก ${formatAge(idle.expeditionDropEveryMinutes)} ได้ไอเทมสะสม 1 ชิ้น (เนื้อชั้นดีหรือโปรตีนเชค)`,
+              `เหรียญต่อชั่วโมงขึ้นกับพื้นที่และค่าพลังของมอน (${times(idle.expeditionPowerMultiplierMin)}–${times(idle.expeditionPowerMultiplierMax)} เทียบร่างที่แนะนำ) ล็อกอัตราไว้ตอนออกเดินทาง`,
+              'มอนที่ตายระหว่างสำรวจจะเสียรางวัลที่ยังไม่ได้รับ ระหว่างสำรวจสู้ในผจญภัยไม่ได้',
+              'ยังไม่มี EXP และวัตถุดิบ จะมาพร้อมระบบอุปกรณ์',
+            ]}
+          />
+          <Table
+            head={['พื้นที่', 'เหรียญ/ชม. (ร่างที่แนะนำ)']}
+            rows={idle.expeditionAreas.map((area) => [
+              `${area.emoji} ${area.name}`,
+              `🪙 ${area.baseRatePerHour}`,
+            ])}
+          />
+          <Heading>ต่อสู้อัตโนมัติ (ออนไลน์)</Heading>
+          <List
+            items={[
+              'เปิดหน้าผจญภัยค้างไว้ มอนสู้ด่านที่ชนะแล้ว (ไม่ใช่บอส) วนไปเรื่อย ๆ ปิดหน้าหรือสลับแท็บแล้วหยุด',
+              `สู้ได้ทุก ${idle.autoBattleCooldownSeconds} วินาที ใช้ stamina ครั้งละ ${idle.autoBattleStaminaCost} จ่ายเหรียญตามตารางด้านล่าง`,
+              `เพดานรางวัลต่อสู้อัตโนมัติ 🪙 ${idle.autoBattleDailyCoinCap} ต่อวัน (รีเซ็ตเที่ยงคืนเวลาไทย)`,
+              'ต่อชั่วโมงได้มากกว่าการสำรวจเล็กน้อย เป็นแรงจูงใจให้เปิดเกมค้างไว้',
+            ]}
+          />
+          <Table
+            head={['ด่าน', 'เหรียญต่อการชนะ']}
+            rows={idle.expeditionAreas.flatMap((area) =>
+              area.autoBattleRewards.map((reward) => [
+                `${area.emoji} ${reward.name}`,
+                `🪙 ${reward.coins}`,
+              ])
+            )}
+          />
+        </>
+      ),
+    },
+    {
       key: 'economy',
       label: '💰 เหรียญ เพชร และร้านค้า',
       children: (
@@ -341,7 +386,7 @@ const buildSections = (wiki: IWikiData) => {
           <Table
             head={['', 'ได้จาก', 'ใช้ทำอะไร']}
             rows={[
-              ['🪙 เหรียญ', 'ชนะด่านผจญภัย', 'ซื้อของในร้านค้า'],
+              ['🪙 เหรียญ', 'ชนะด่านผจญภัย · ภารกิจประจำวัน', 'ซื้อของในร้านค้า'],
               [
                 '💎 เพชร',
                 `ชนะบอสครั้งแรก · ค้นพบร่างใหม่ใน Dex (+${economy.dexDiscoveryGems})`,
@@ -349,13 +394,21 @@ const buildSections = (wiki: IWikiData) => {
               ],
             ]}
           />
-          <Heading>ร้านค้า (ใช้กับมอนทันที)</Heading>
+          <Heading>ร้านค้า (ซื้อเก็บในกระเป๋า แล้วกดใช้กับมอนทีหลัง)</Heading>
           <Table
             head={['ไอเทม', 'ราคา', 'ผล']}
             rows={economy.shopItems.map((item) => [
               `${item.emoji} ${item.name}`,
               `🪙 ${item.price}`,
               item.description,
+            ])}
+          />
+          <Heading>ภารกิจประจำวัน (รีเซ็ตเที่ยงคืนเวลาไทย)</Heading>
+          <Table
+            head={['ภารกิจ', 'รางวัล']}
+            rows={economy.dailyQuests.map((quest) => [
+              `${quest.emoji} ${quest.name}`,
+              `🪙 ${quest.coinReward}`,
             ])}
           />
         </>

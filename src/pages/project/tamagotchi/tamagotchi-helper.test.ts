@@ -8,7 +8,10 @@ import {
   getBattleBlocker,
   getEvolutionCountdown,
   getMinigameBlocker,
+  getAutoBattleDelayMs,
+  getExpeditionBlocker,
   getShopBlocker,
+  getUseItemBlocker,
   hpAfter,
   isInZone,
   minigameBarPosition,
@@ -48,6 +51,12 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   bornAt: NOW.toISOString(),
   trainReadyAt: null,
   minigameReadyAt: null,
+  autoBattleReadyAt: null,
+  expeditionAreaId: null,
+  expeditionMinutes: 0,
+  expeditionReturned: false,
+  expeditionPendingCoins: 0,
+  expeditionPendingDrops: 0,
   evolution: {
     durationMinutes: 360,
     progressMinutes: 60,
@@ -132,10 +141,18 @@ describe('getBattleBlocker', () => {
 })
 
 describe('getShopBlocker', () => {
-  it('needs a hatched monster and enough coins', () => {
-    expect(getShopBlocker(monster(), 15, 15)).toBeNull()
-    expect(getShopBlocker(monster(), 15, 14)).toBe('เหรียญไม่พอ')
-    expect(getShopBlocker(monster({ stage: EnumMonsterStage.EGG }), 15, 99)).toBe(
+  it('needs enough coins but no monster', () => {
+    expect(getShopBlocker(15, 15)).toBeNull()
+    expect(getShopBlocker(15, 14)).toBe('เหรียญไม่พอ')
+  })
+})
+
+describe('getUseItemBlocker', () => {
+  it('needs a hatched, living monster', () => {
+    expect(getUseItemBlocker(monster())).toBeNull()
+    expect(getUseItemBlocker(null)).toBe('ต้องมีมอนที่ฟักแล้ว')
+    expect(getUseItemBlocker(monster({ stage: EnumMonsterStage.EGG }))).toBe('ต้องมีมอนที่ฟักแล้ว')
+    expect(getUseItemBlocker(monster({ diedAt: '2026-01-01T00:00:00Z' }))).toBe(
       'ต้องมีมอนที่ฟักแล้ว'
     )
   })
@@ -268,5 +285,42 @@ describe('mini-game helpers', () => {
       'เล่นได้อีกครั้งใน 2 นาที'
     )
     expect(getMinigameBlocker(monster(), NOW)).toBeNull()
+  })
+})
+
+describe('getBattleBlocker', () => {
+  it('blocks a monster that is out on an expedition', () => {
+    expect(getBattleBlocker(monster({ expeditionAreaId: 'meadow' }))).toBe('มอนออกสำรวจอยู่')
+  })
+})
+
+describe('getExpeditionBlocker', () => {
+  it('needs a healthy, fed monster at home and an unlocked area', () => {
+    expect(getExpeditionBlocker(monster(), true)).toBeNull()
+    expect(getExpeditionBlocker(monster(), false)).toBe('ชนะบอสพื้นที่ก่อนหน้าก่อน')
+    expect(getExpeditionBlocker(monster({ isSick: true }), true)).toBe(
+      'มอนป่วยหรือหิว ดูแลก่อนออกสำรวจ'
+    )
+    expect(getExpeditionBlocker(monster({ fullness: 0 }), true)).toBe(
+      'มอนป่วยหรือหิว ดูแลก่อนออกสำรวจ'
+    )
+    expect(getExpeditionBlocker(monster({ expeditionAreaId: 'meadow' }), true)).toBe(
+      'มอนออกสำรวจอยู่แล้ว'
+    )
+    expect(getExpeditionBlocker(null, true)).toBe('ต้องมีมอนที่ฟักแล้ว')
+  })
+})
+
+describe('getAutoBattleDelayMs', () => {
+  it('waits for the cooldown and never goes negative', () => {
+    const now = new Date('2026-01-01T00:00:30Z').getTime()
+    expect(getAutoBattleDelayMs(monster({ autoBattleReadyAt: '2026-01-01T00:01:00Z' }), now)).toBe(
+      30_000
+    )
+    expect(getAutoBattleDelayMs(monster({ autoBattleReadyAt: '2026-01-01T00:00:00Z' }), now)).toBe(
+      0
+    )
+    expect(getAutoBattleDelayMs(monster(), now)).toBe(0)
+    expect(getAutoBattleDelayMs(null, now)).toBe(0)
   })
 })

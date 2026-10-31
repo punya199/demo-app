@@ -8,8 +8,10 @@ import { appPath } from '../../../config/app-paths'
 import { useGetMeSuspense } from '../../../service'
 import { AdventurePanel } from './AdventurePanel'
 import { DexPanel } from './DexPanel'
+import { ExpeditionPanel } from './ExpeditionPanel'
 import { MinigameModal } from './MinigameModal'
 import { PetSprite } from './PetSprite'
+import { QuestPanel } from './QuestPanel'
 import { ShopPanel } from './ShopPanel'
 import { WikiPanel } from './WikiPanel'
 import {
@@ -389,10 +391,16 @@ const GameTabs = () => {
             ),
           },
           {
+            key: 'expedition',
+            label: 'สำรวจ',
+            children: <ExpeditionPanel monster={monster} onError={showError} />,
+          },
+          {
             key: 'adventure',
             label: 'ผจญภัย',
             children: <AdventurePanel monster={monster} onError={showError} />,
           },
+          { key: 'quests', label: 'ภารกิจ', children: <QuestPanel onError={showError} /> },
           {
             key: 'shop',
             label: 'ร้านค้า',

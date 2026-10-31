@@ -1,4 +1,6 @@
 import {
+  IWorldBossReward,
+  IWorldBossStatus,
   IBattleStats,
   IFighterEffects,
   IPvpStatus,
@@ -245,6 +247,13 @@ const serverMessageLabel: Record<string, string> = {
   'Clear the previous difficulty first': 'ต้องชนะระดับก่อนหน้าก่อน',
   'Clear this difficulty first': 'ต้องชนะระดับที่ดรอปเกรดนี้ก่อนถึงจะแลกได้',
   'Boss not found': 'ไม่พบบอส',
+  'Your monster is too young for the world boss': 'ต้องเป็นร่างโตขึ้นไปถึงตีบอสโลกได้',
+  'Daily world boss limit reached': 'ตีบอสโลกครบจำนวนของวันนี้แล้ว',
+  'World boss is not active': 'บอสโลกตัวนี้ถูกล้มหรือหมดเวลาแล้ว',
+  'World boss has not ended yet': 'สัปดาห์นี้ยังไม่จบ',
+  'World boss week not found': 'ไม่พบบอสโลกสัปดาห์นี้',
+  'No world boss reward to claim': 'ไม่มีรางวัลบอสโลกให้รับ',
+  'Take part in this world boss first': 'ต้องเคยรับรางวัลบอสโลกตัวนี้ก่อนถึงแลกได้',
   'Exchange not found': 'ไม่พบรายการแลก',
   'Equipment not found': 'ไม่พบอุปกรณ์',
   'Take the equipment off first': 'ถอดอุปกรณ์ก่อน',
@@ -498,4 +507,51 @@ export const getRaidBlocker = (
     return 'สู้บอสครบจำนวนของวันนี้แล้ว'
   }
   return null
+}
+
+// Mirrors the server's world boss checks so the button explains itself.
+export const getWorldBossBlocker = (
+  monster: IMonsterData | null,
+  status: IWorldBossStatus | undefined
+): string | null => {
+  if (!monster || monster.diedAt) {
+    return 'ต้องมีมอนที่มีชีวิต'
+  }
+  if (!PVP_STAGES.includes(monster.stage)) {
+    return 'ต้องเป็นร่างโตขึ้นไปถึงตีบอสโลกได้'
+  }
+  if (monster.isSick) {
+    return 'ป่วยอยู่ สู้ไม่ได้'
+  }
+  if (monster.expeditionAreaId) {
+    return 'มอนออกสำรวจอยู่'
+  }
+  if (status?.boss.isDefeated) {
+    return 'บอสตัวนี้ถูกล้มแล้ว รอบอสสัปดาห์หน้า'
+  }
+  if (status && status.hitsLeft <= 0) {
+    return 'ตีครบจำนวนของวันนี้แล้ว'
+  }
+  return null
+}
+
+export const describeWorldBossReward = (reward: IWorldBossReward, bossTokenName = '🎫') =>
+  [
+    `🪙 ${reward.coin}`,
+    reward.raidToken > 0 && `🎖️ ${reward.raidToken}`,
+    reward.bossToken > 0 && `${bossTokenName} ${reward.bossToken}`,
+    reward.pieceGrade && `ชิ้นเซ็ต (${gradeLabel[reward.pieceGrade]})`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
+// Time left until `endsAt`, in days/hours/minutes ("2 วัน 3 ชม.").
+export const formatTimeLeft = (endsAt: string, now: Date) => {
+  const minutes = Math.max(0, Math.floor((new Date(endsAt).getTime() - now.getTime()) / 60_000))
+  const days = Math.floor(minutes / 1440)
+  const hours = Math.floor((minutes % 1440) / 60)
+  if (days > 0) {
+    return `${days} วัน ${hours} ชม.`
+  }
+  return hours > 0 ? `${hours} ชม. ${minutes % 60} นาที` : `${minutes} นาที`
 }

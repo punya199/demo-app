@@ -12,6 +12,7 @@ import { EquipmentPanel } from './EquipmentPanel'
 import { ExpeditionPanel } from './ExpeditionPanel'
 import { MinigameModal } from './MinigameModal'
 import { PetSprite } from './PetSprite'
+import { WorldBossPanel } from './WorldBossPanel'
 import { RaidPanel } from './RaidPanel'
 import { PvpPanel } from './PvpPanel'
 import { QuestPanel } from './QuestPanel'
@@ -405,6 +406,11 @@ const GameTabs = () => {
             children: <AdventurePanel monster={monster} onError={showError} />,
           },
           { key: 'quests', label: 'ภารกิจ', children: <QuestPanel onError={showError} /> },
+          {
+            key: 'world-boss',
+            label: 'บอสโลก',
+            children: <WorldBossPanel monster={monster} onError={showError} />,
+          },
           {
             key: 'raid',
             label: 'บอส',

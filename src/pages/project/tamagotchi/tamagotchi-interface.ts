@@ -290,6 +290,67 @@ export interface IExpeditionSummary {
   items: string[]
 }
 
+export interface IWorldBossReward {
+  coin: number
+  raidToken: number
+  bossToken: number
+  pieceGrade: EnumEquipmentGrade | null
+}
+
+export interface IWorldBossStatus {
+  week: string
+  endsAt: string
+  boss: {
+    id: string
+    name: string
+    emoji: string
+    setId: string
+    hp: number
+    maxHp: number
+    isDefeated: boolean
+  }
+  hitsLeft: number
+  participants: number
+  myDamage: number
+  myHits: number
+  myRank: number | null
+  // Finished weeks (or fallen bosses) with a reward waiting to be claimed.
+  claimable: {
+    week: string
+    bossName: string
+    rank: number
+    defeated: boolean
+    reward: IWorldBossReward
+  }[]
+}
+
+export interface IWorldBossAttackResponse {
+  monster: IMonsterData
+  battle: {
+    rounds: number
+    events: IBattleEvent[]
+    player: IFighter
+    // The boss as it was going in, with the HP the whole server had left.
+    enemy: IFighter
+    damage: number
+    survived: boolean
+  }
+  damage: number
+  bossHp: number
+  maxHp: number
+  isKillingBlow: boolean
+  hitsLeft: number
+}
+
+export interface IWorldBossRankingEntry {
+  rank: number
+  displayName: string
+  emoji: string | null
+  damage: number
+  hits: number
+  isMe: boolean
+}
+
 export interface IRaidDifficultyInfo {
   difficulty: 'normal' | 'hard' | 'nightmare'
   minStage: EnumMonsterStage
@@ -579,6 +640,21 @@ export interface IWikiData {
         stones: number
       }[]
     }
+  }
+  worldBoss: {
+    dailyHits: number
+    rounds: number
+    bosses: { id: string; name: string; emoji: string; setId: string; hp: number }[]
+    perHit: { coin: number; raidToken: number }
+    defeatedBonus: { coin: number; raidToken: number }
+    killingBlowGrade: EnumEquipmentGrade
+    rankRewards: {
+      maxRank: number | null
+      raidToken: number
+      bossToken: number
+      pieceChance: number
+      pieceGrade: EnumEquipmentGrade
+    }[]
   }
   raid: {
     dailyAttempts: number

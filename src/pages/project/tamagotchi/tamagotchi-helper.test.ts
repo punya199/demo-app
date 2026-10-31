@@ -9,6 +9,9 @@ import {
   getEvolutionCountdown,
   getMinigameBlocker,
   describePctBonus,
+  describeWorldBossReward,
+  formatTimeLeft,
+  getWorldBossBlocker,
   describeSetEffect,
   describeStats,
   formatRatingChange,
@@ -28,6 +31,7 @@ import {
   toThaiErrorMessage,
 } from './tamagotchi-helper'
 import {
+  EnumEquipmentGrade,
   EnumMonsterAction,
   EnumMonsterLine,
   EnumMonsterStage,
@@ -473,5 +477,63 @@ describe('getRaidBlocker', () => {
   it('names the currency in the shop blocker', () => {
     expect(getShopBlocker(6, 5, 'Raid Token')).toBe('Raid Tokenไม่พอ')
     expect(getShopBlocker(6, 6, 'Raid Token')).toBeNull()
+  })
+})
+
+describe('getWorldBossBlocker', () => {
+  const status = (overrides = {}) =>
+    ({
+      week: '2026-W19',
+      endsAt: '2026-05-10T17:00:00Z',
+      boss: {
+        id: 'storm_golem',
+        name: 'x',
+        emoji: 'x',
+        setId: 's',
+        hp: 100,
+        maxHp: 100,
+        isDefeated: false,
+      },
+      hitsLeft: 3,
+      participants: 0,
+      myDamage: 0,
+      myHits: 0,
+      myRank: null,
+      claimable: [],
+      ...overrides,
+    }) as never
+
+  it('mirrors the server order of checks', () => {
+    expect(getWorldBossBlocker(monster(), status())).toBeNull()
+    expect(getWorldBossBlocker(null, status())).toBe('ต้องมีมอนที่มีชีวิต')
+    expect(getWorldBossBlocker(monster({ stage: EnumMonsterStage.BABY_2 }), status())).toBe(
+      'ต้องเป็นร่างโตขึ้นไปถึงตีบอสโลกได้'
+    )
+    expect(getWorldBossBlocker(monster({ isSick: true }), status())).toBe('ป่วยอยู่ สู้ไม่ได้')
+    expect(getWorldBossBlocker(monster({ expeditionAreaId: 'meadow' }), status())).toBe(
+      'มอนออกสำรวจอยู่'
+    )
+    expect(
+      getWorldBossBlocker(monster(), status({ boss: { isDefeated: true, hp: 0, maxHp: 100 } }))
+    ).toBe('บอสตัวนี้ถูกล้มแล้ว รอบอสสัปดาห์หน้า')
+    expect(getWorldBossBlocker(monster(), status({ hitsLeft: 0 }))).toBe('ตีครบจำนวนของวันนี้แล้ว')
+  })
+
+  it('describes a reward and the time left', () => {
+    expect(
+      describeWorldBossReward({ coin: 100, raidToken: 3, bossToken: 0, pieceGrade: null })
+    ).toBe('🪙 100 · 🎖️ 3')
+    expect(
+      describeWorldBossReward({
+        coin: 50,
+        raidToken: 0,
+        bossToken: 2,
+        pieceGrade: EnumEquipmentGrade.EPIC,
+      })
+    ).toBe('🪙 50 · 🎫 2 · ชิ้นเซ็ต (มหากาพย์)')
+    const now = new Date('2026-05-04T00:00:00Z')
+    expect(formatTimeLeft('2026-05-06T03:00:00Z', now)).toBe('2 วัน 3 ชม.')
+    expect(formatTimeLeft('2026-05-04T05:30:00Z', now)).toBe('5 ชม. 30 นาที')
+    expect(formatTimeLeft('2026-05-03T00:00:00Z', now)).toBe('0 นาที')
   })
 })

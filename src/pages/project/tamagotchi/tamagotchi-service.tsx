@@ -18,6 +18,10 @@ import {
   IPvpBattleResponse,
   IRaidBattleResponse,
   IRaidData,
+  IWorldBossAttackResponse,
+  IWorldBossRankingEntry,
+  IWorldBossReward,
+  IWorldBossStatus,
   IPvpHistoryEntry,
   IPvpLeaderboardEntry,
   IPvpOpponent,
@@ -648,6 +652,99 @@ export const useExchangeRaid = () => {
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ['raid'] })
+    },
+  })
+}
+
+const WORLD_BOSS_KEY = ['world-boss']
+
+export const useGetWorldBoss = () => {
+  return useQuery({
+    queryKey: WORLD_BOSS_KEY,
+    queryFn: async () => {
+      const { data } = await apiClient.get<IWorldBossStatus>(`/world-boss`)
+      return data
+    },
+    // Other players keep hitting the boss, so keep its HP reasonably fresh while the tab is open.
+    refetchInterval: REFETCH_INTERVAL_MS,
+  })
+}
+
+// Like the other fights, nothing is cached until the replay has been watched.
+export const useWorldBossAttack = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiClient.post<IWorldBossAttackResponse>(`/world-boss/attack`)
+      return data
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+      queryClient.invalidateQueries({ queryKey: WORLD_BOSS_KEY })
+    },
+  })
+}
+
+export const useApplyWorldBossResult = () => {
+  const queryClient = useQueryClient()
+  return (data: IWorldBossAttackResponse) => {
+    queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+    queryClient.invalidateQueries({ queryKey: WORLD_BOSS_KEY })
+    queryClient.invalidateQueries({ queryKey: ['quests'] })
+  }
+}
+
+export const useGetWorldBossRanking = (week?: string) => {
+  return useQuery({
+    queryKey: ['world-boss', 'ranking', week ?? 'current'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ week: string; entries: IWorldBossRankingEntry[] }>(
+        `/world-boss/ranking`,
+        { params: week ? { week } : undefined }
+      )
+      return data
+    },
+  })
+}
+
+export const useClaimWorldBoss = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (week: string) => {
+      const { data } = await apiClient.post<{
+        week: string
+        rank: number
+        reward: IWorldBossReward
+        drop: IEquipmentItem | null
+        wallet: IWallet
+      }>(`/world-boss/claim`, { week })
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+      queryClient.invalidateQueries({ queryKey: WORLD_BOSS_KEY })
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
+      queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: WORLD_BOSS_KEY })
+    },
+  })
+}
+
+export const useExchangeWorldBoss = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { bossId: string; slot: string; grade: string }) => {
+      const { data } = await apiClient.post<IInventoryResponse & { item: IEquipmentItem }>(
+        `/world-boss/exchange`,
+        input
+      )
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<IInventoryResponse>(INVENTORY_KEY, { items: data.items })
+      queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
     },
   })
 }

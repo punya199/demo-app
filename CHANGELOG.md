@@ -1,3 +1,10 @@
+# [1.18.0](https://github.com/punya199/demo-app/compare/v1.17.0...v1.18.0) (2026-10-31)
+
+
+### New
+
+* add monster inventory, quests, expedition and auto-battle UI (phase 2b/2c) ([c627fa2](https://github.com/punya199/demo-app/commit/c627fa2825190b4d6aed83ed51f4254671deddf5))
+
 # [1.17.0](https://github.com/punya199/demo-app/compare/v1.16.0...v1.17.0) (2026-10-30)
 
 

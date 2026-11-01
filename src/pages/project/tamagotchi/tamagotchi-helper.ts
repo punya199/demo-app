@@ -24,6 +24,7 @@ import {
   ILoadout,
   EnumCostumeSlot,
   IEquipmentItem,
+  ISetProgress,
   IMergeForm,
   IMonsterData,
   IGetMyMonsterResponse,
@@ -557,6 +558,8 @@ export const describeSetEffect = (effect: IFighterEffects) =>
     effect.shieldPct && `เริ่มสู้ด้วยโล่ ${toPercent(effect.shieldPct)} ของ HP`,
     effect.regenPct && `ฟื้น HP ${toPercent(effect.regenPct)} ทุกเทิร์น`,
     effect.doubleStrikeChance && `โจมตีซ้ำ ${toPercent(effect.doubleStrikeChance)}`,
+    effect.critChance && `อัตราคริติคอล +${toPercent(effect.critChance)}`,
+    effect.critDamage && `ดาเมจคริติคอล +${toPercent(effect.critDamage)}`,
   ]
     .filter(Boolean)
     .join(' · ')
@@ -899,3 +902,19 @@ export const getCostumeBuyBlocker = (
   }
   return null
 }
+
+// 'ชุดเพลิงกัลป์ 2/4': how many pieces of the set the shown pet wears out of the full set.
+export const setPieceLabel = (set: ISetProgress) => `${set.name} ${set.worn}/${set.pieceCount}`
+
+// Green once the whole set is worn, muted before that.
+export const isSetComplete = (set: ISetProgress) => set.worn >= set.pieceCount
+
+// One bonus tier in words: its stat bonus and/or special effect.
+export const describeSetTier = (tier: ISetProgress['tiers'][number]) =>
+  [tier.pct && describePctBonus(tier.pct), tier.effect && describeSetEffect(tier.effect)]
+    .filter(Boolean)
+    .join(' · ')
+
+// Whether a bonus tier is on for this many worn pieces.
+export const isSetTierActive = (set: ISetProgress, tier: ISetProgress['tiers'][number]) =>
+  set.worn >= tier.pieces

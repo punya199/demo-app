@@ -4,12 +4,14 @@ import {
   describeStats,
   gradeColor,
   gradeLabel,
+  isSetComplete,
+  setPieceLabel,
   statLabel,
 } from './tamagotchi-helper'
-import { IEquipmentItem } from './tamagotchi-interface'
+import { IEquipmentItem, ISetProgress } from './tamagotchi-interface'
 
-export const ItemLine = (props: { item: IEquipmentItem }) => {
-  const { item } = props
+export const ItemLine = (props: { item: IEquipmentItem; set?: ISetProgress }) => {
+  const { item, set } = props
   return (
     <div className="min-w-0 flex-1">
       <div className="font-medium text-slate-900 dark:text-slate-100">
@@ -20,6 +22,15 @@ export const ItemLine = (props: { item: IEquipmentItem }) => {
         {statLabel[item.mainStat]} {item.mainValue}
         {describeStats(item.subStats) && ` · ${describeStats(item.subStats)}`}
       </div>
+      {set && (
+        <div
+          className={`text-xs ${
+            isSetComplete(set) ? 'text-emerald-600' : 'text-slate-500 dark:text-slate-400'
+          }`}
+        >
+          {setPieceLabel(set)}
+        </div>
+      )}
     </div>
   )
 }

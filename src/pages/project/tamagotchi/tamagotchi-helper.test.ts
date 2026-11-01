@@ -29,6 +29,10 @@ import {
   getMergeBlocker,
   getRespecCost,
   sumPassiveEffects,
+  describeSetTier,
+  isSetComplete,
+  isSetTierActive,
+  setPieceLabel,
   describeStats,
   describeCostumePrice,
   getCostumeBuyBlocker,
@@ -61,6 +65,7 @@ import {
   ICostumeState,
   EnumCostumeSlot,
   IEquipmentItem,
+  ISetProgress,
   IMergeForm,
   IEvolutionRuleInfo,
   IPassiveNode,
@@ -853,5 +858,49 @@ describe('costumes', () => {
       getCostumeBuyBlocker(costume({ endsAt: '2026-05-01T00:00:00Z' }), state(), 999, 99, NOW)
     ).toBe('หมดเวลาจำหน่ายแล้ว')
     expect(getCostumeBuyBlocker(costume({}), state(), 150, 0, NOW)).toBeNull()
+  })
+})
+
+describe('set progress labels', () => {
+  const set = (worn: number): ISetProgress => ({
+    setId: 'blazing',
+    name: 'ชุดเพลิงกัลป์',
+    pieceCount: 4,
+    worn,
+    isEnhanced: false,
+    tiers: [
+      { pieces: 2, pct: { atk: 0.15 }, effect: null },
+      { pieces: 4, pct: null, effect: { burnTurns: 3 } },
+    ],
+  })
+
+  it('writes worn/full next to the set name', () => {
+    expect(setPieceLabel(set(2))).toBe('ชุดเพลิงกัลป์ 2/4')
+  })
+
+  it('is green (complete) only when every piece of the set is worn', () => {
+    expect(isSetComplete(set(0))).toBe(false)
+    expect(isSetComplete(set(3))).toBe(false)
+    expect(isSetComplete(set(4))).toBe(true)
+  })
+
+  it('turns a tier on from its piece count', () => {
+    const [two, four] = set(2).tiers
+    expect(isSetTierActive(set(1), two)).toBe(false)
+    expect(isSetTierActive(set(2), two)).toBe(true)
+    expect(isSetTierActive(set(3), four)).toBe(false)
+    expect(isSetTierActive(set(4), four)).toBe(true)
+  })
+
+  it('describes a tier by its stat bonus and its effect', () => {
+    const [two, four] = set(4).tiers
+    expect(describeSetTier(two)).toBe('ATK +15%')
+    expect(describeSetTier(four)).toBe('สกิลทำให้ศัตรูติดเผาไหม้ 3 เทิร์น')
+  })
+
+  it('also words crit effects', () => {
+    expect(describeSetEffect({ critChance: 0.1, critDamage: 0.2 })).toBe(
+      'อัตราคริติคอล +10% · ดาเมจคริติคอล +20%'
+    )
   })
 })

@@ -167,7 +167,10 @@ export const ShopPanel = (props: IShopPanelProps) => {
       >
         {opened && (
           <div className="flex flex-col gap-2">
-            <ItemLine item={opened} />
+            <ItemLine
+              item={opened}
+              set={equipmentData?.sets.find((set) => set.setId === opened.setId)}
+            />
             <CompareLine
               item={opened}
               worn={equipmentData?.items.find(

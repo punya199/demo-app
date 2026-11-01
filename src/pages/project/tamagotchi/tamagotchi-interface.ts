@@ -225,6 +225,20 @@ export interface IFighterEffects {
   shieldPct?: number
   regenPct?: number
   doubleStrikeChance?: number
+  critChance?: number
+  critDamage?: number
+}
+
+// One equipment set with how many of its pieces the shown pet wears (GET /equipment).
+export interface ISetProgress {
+  setId: string
+  name: string
+  // The full set: its largest bonus tier.
+  pieceCount: number
+  worn: number
+  // Every worn piece is at the enhance threshold or higher: percent bonuses are multiplied.
+  isEnhanced: boolean
+  tiers: { pieces: number; pct: Partial<IBattleStats> | null; effect: IFighterEffects | null }[]
 }
 
 export interface IEquipmentData {
@@ -236,6 +250,8 @@ export interface IEquipmentData {
   // Battle effects of the worn four-piece sets.
   activeEffects: IFighterEffects
   setBonuses: { setId: string; name: string; pieces: number }[]
+  sets: ISetProgress[]
+  enhance: { threshold: number; multiplier: number }
   // The living monster's battle stats with the worn gear and passives; null without a hatched monster.
   stats: IBattleStats | null
   // Its crit rate (%), crit damage (% multiplier) and evasion (%) with gear and passives.

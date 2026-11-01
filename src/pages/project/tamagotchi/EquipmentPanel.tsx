@@ -2,7 +2,16 @@ import { Button, Card, Popconfirm, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { EnhanceModal } from './EnhanceModal'
 import { CompareLine, ItemLine } from './EquipmentParts'
-import { describeSetEffect, getEquipBlocker, isWornBy, slotLabel } from './tamagotchi-helper'
+import {
+  describeSetEffect,
+  describeSetTier,
+  getEquipBlocker,
+  isSetComplete,
+  isSetTierActive,
+  isWornBy,
+  setPieceLabel,
+  slotLabel,
+} from './tamagotchi-helper'
 import { EnumEquipmentSlot, IEquipmentItem, IMonsterData } from './tamagotchi-interface'
 import { useDismantle, useEquip, useGetEquipment, useUnequip } from './tamagotchi-service'
 
@@ -31,6 +40,8 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
   const bag = data.items.filter((item) => !isWorn(item))
   const petOf = (item: IEquipmentItem) => data.pets.find((pet) => pet.id === item.monsterId)
   const pet = data.pets.find((row) => row.id === data.monsterId)
+  const setOf = (item: IEquipmentItem) => data.sets.find((set) => set.setId === item.setId)
+  const wornSets = data.sets.filter((set) => set.worn > 0)
 
   return (
     <div className="flex w-full flex-col gap-3">
@@ -50,10 +61,41 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
           เอฟเฟกต์เซ็ต: {describeSetEffect(data.activeEffects)}
         </div>
       )}
-      {data.setBonuses.length > 0 && (
-        <div className="text-center text-xs text-emerald-600">
-          โบนัสเซ็ต: {data.setBonuses.map((set) => `${set.name} (${set.pieces} ชิ้น)`).join(' · ')}
-        </div>
+      {wornSets.length > 0 && (
+        <Card size="small" title="โบนัสเซ็ต" className="dark:border-slate-700 dark:bg-slate-900">
+          <div className="flex flex-col gap-3">
+            {wornSets.map((set) => (
+              <div key={set.setId} className="flex flex-col gap-1">
+                <div
+                  className={`text-sm font-medium ${isSetComplete(set) ? 'text-emerald-600' : ''}`}
+                >
+                  {setPieceLabel(set)}
+                </div>
+                {set.tiers.map((tier) => (
+                  <div
+                    key={tier.pieces}
+                    className={`text-xs ${
+                      isSetTierActive(set, tier)
+                        ? 'text-emerald-600'
+                        : 'text-slate-500 dark:text-slate-400'
+                    }`}
+                  >
+                    {isSetTierActive(set, tier) ? '✔' : '○'} {tier.pieces} ชิ้น:{' '}
+                    {describeSetTier(tier)}
+                  </div>
+                ))}
+                <div
+                  className={`text-xs ${
+                    set.isEnhanced ? 'text-emerald-600' : 'text-slate-500 dark:text-slate-400'
+                  }`}
+                >
+                  ตีบวกทุกชิ้นที่ใส่ถึง +{data.enhance.threshold} ขึ้นไป โบนัสเปอร์เซ็นต์คูณ ×
+                  {data.enhance.multiplier} · {set.isEnhanced ? 'ถึงแล้ว ✔' : 'ยังไม่ถึง'}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
       )}
       <div className="grid grid-cols-1 gap-2">
         {Object.values(EnumEquipmentSlot).map((slot) => {
@@ -64,7 +106,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
                 <span className="w-24 text-sm">{slotLabel[slot]}</span>
                 {item ? (
                   <>
-                    <ItemLine item={item} />
+                    <ItemLine item={item} set={setOf(item)} />
                     <Button size="small" onClick={() => setEnhancing(item)}>
                       ตีบวก
                     </Button>
@@ -102,7 +144,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
         <Card key={item.id} size="small" className="dark:border-slate-700 dark:bg-slate-900">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-slate-500">{slotLabel[item.slot]}</span>
-            <ItemLine item={item} />
+            <ItemLine item={item} set={setOf(item)} />
             {petOf(item) && (
               <Tag color="purple">
                 ใส่อยู่กับ {petOf(item)!.emoji} {petOf(item)!.name}

@@ -22,6 +22,7 @@ import {
   IEquipmentItem,
   IMergeForm,
   IMonsterData,
+  IGetMyMonsterResponse,
   IPassiveNode,
   IPotentialStat,
   PassiveEffectKey,
@@ -789,3 +790,20 @@ export const potentialPercent = (stat: IPotentialStat) =>
 
 export const signed = (value: number) =>
   `${value >= 0 ? '+' : '−'}${Math.abs(Math.round(value * 10) / 10)}`
+
+// Endpoints that answer with a single monster (hatch, action, expedition...) must not wipe the
+// other living pets from the cached list: replace the monster in place, or append a new one
+// (a fresh egg) and make it the selected one.
+export const foldSelectedMonster = (
+  old: IGetMyMonsterResponse | undefined,
+  monster: IMonsterData
+): IGetMyMonsterResponse => {
+  const monsters = old?.monsters ?? []
+  return {
+    maxMonsters: old?.maxMonsters ?? 4,
+    monster,
+    monsters: monsters.some((row) => row.id === monster.id)
+      ? monsters.map((row) => (row.id === monster.id ? monster : row))
+      : [...monsters, monster],
+  }
+}

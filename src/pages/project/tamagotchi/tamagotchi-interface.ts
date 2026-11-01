@@ -883,3 +883,12 @@ export interface IPassiveState {
   }
   respec: { refunded: number; freeLeft: number; gemPrice: number }
 }
+
+// GET /monster/me
+export interface IGetMyMonsterResponse {
+  // The selected monster, which every other tab plays with.
+  monster: IMonsterData | null
+  // Every living monster (up to maxMonsters), selected one included.
+  monsters: IMonsterData[]
+  maxMonsters: number
+}

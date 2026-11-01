@@ -20,6 +20,7 @@ import {
   canDeallocatePassive,
   describePassiveEffect,
   describeReset,
+  foldSelectedMonster,
   elementLabel,
   lineOptions,
   potentialPercent,
@@ -732,5 +733,29 @@ describe('elements', () => {
       EnumMonsterLine.DARK,
       EnumMonsterLine.SHADOW,
     ])
+  })
+})
+
+describe('foldSelectedMonster', () => {
+  const pet = (id: string, over: Partial<IMonsterData> = {}) => monster({ id, ...over })
+  const cached = (...pets: IMonsterData[]) => ({ monster: pets[0], monsters: pets, maxMonsters: 4 })
+
+  it('keeps the old pets when a new egg is hatched, and selects the new one', () => {
+    const old = cached(pet('a'), pet('b'))
+    const next = foldSelectedMonster(old, pet('c'))
+    expect(next.monsters.map((row) => row.id)).toEqual(['a', 'b', 'c'])
+    expect(next.monster?.id).toBe('c')
+  })
+
+  it('replaces a pet in place when it is updated, without duplicating it', () => {
+    const old = cached(pet('a'), pet('b'))
+    const next = foldSelectedMonster(old, pet('b', { poops: 3 }))
+    expect(next.monsters).toHaveLength(2)
+    expect(next.monsters[1].poops).toBe(3)
+    expect(next.monster?.id).toBe('b')
+  })
+
+  it('starts a list when nothing was cached yet', () => {
+    expect(foldSelectedMonster(undefined, pet('a')).monsters.map((row) => row.id)).toEqual(['a'])
   })
 })

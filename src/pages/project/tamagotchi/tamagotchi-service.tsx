@@ -1,5 +1,6 @@
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../../../utils/api-client'
+import { foldSelectedMonster } from './tamagotchi-helper'
 import {
   EnumMonsterAction,
   EnumMonsterLine,
@@ -20,6 +21,7 @@ import {
   IExpeditionData,
   IExpeditionSummary,
   IInventoryItem,
+  IGetMyMonsterResponse,
   IMonsterData,
   IPvpBattleResponse,
   IRaidBattleResponse,
@@ -38,14 +40,6 @@ import {
   IWallet,
   IWikiData,
 } from './tamagotchi-interface'
-
-interface IGetMyMonsterResponse {
-  // The selected monster, which every other tab plays with.
-  monster: IMonsterData | null
-  // Every living monster (up to maxMonsters), selected one included.
-  monsters: IMonsterData[]
-  maxMonsters: number
-}
 
 interface IGetMonsterHistoryResponse {
   monsters: IMonsterData[]
@@ -74,13 +68,9 @@ const WALLET_KEY = ['wallet']
 // Other endpoints return only the selected monster; fold it into the cached list so the care
 // tab's slots don't lose the rest until the next poll.
 const setSelectedMonster = (queryClient: QueryClient, monster: IMonsterData) => {
-  queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, (old) => ({
-    maxMonsters: old?.maxMonsters ?? 4,
-    monster,
-    monsters: (old?.monsters ?? []).some((row) => row.id === monster.id)
-      ? old!.monsters.map((row) => (row.id === monster.id ? monster : row))
-      : [...(old?.monsters ?? []), monster],
-  }))
+  queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, (old) =>
+    foldSelectedMonster(old, monster)
+  )
 }
 
 // The server advances the monster's clock on every read, so polling keeps hearts and poops fresh.
@@ -113,11 +103,13 @@ export const useHatchMonster = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (line: EnumMonsterLine) => {
-      const { data } = await apiClient.post<IGetMyMonsterResponse>(`/monster/hatch`, { line })
+      const { data } = await apiClient.post<{ monster: IMonsterData }>(`/monster/hatch`, { line })
       return data
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(MY_MONSTER_KEY, data)
+      // The reply is only the new egg: fold it into the cached list so the other pets stay.
+      setSelectedMonster(queryClient, data.monster)
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
       queryClient.invalidateQueries({ queryKey: ['monster', 'history'] })
       // A rare egg is paid for in Raid Tokens.
       queryClient.invalidateQueries({ queryKey: WALLET_KEY })

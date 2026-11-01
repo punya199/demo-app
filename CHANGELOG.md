@@ -1,3 +1,14 @@
+# [1.23.0](https://github.com/punya199/demo-app/compare/v1.22.0...v1.23.0) (2026-11-01)
+
+
+### New
+
+* add Earth and Lightning eggs, element labels and the five-element chart ([22f4081](https://github.com/punya199/demo-app/commit/22f4081babd97920b9b5cdd8ece76ed556b2aa07))
+* add monster slots, battle status, gear compare and box reveal; remove stamina ([536d201](https://github.com/punya199/demo-app/commit/536d201962ef2ce77430ba59fab6729022f010de))
+* add passive tree tab, ultimate merge dialog and in-place enhance of worn gear ([1e648b0](https://github.com/punya199/demo-app/commit/1e648b06044d71b19683daa8524d27eacc6b8d55))
+* add rare spiritual eggs, element labels and merge group rules ([8e64f2f](https://github.com/punya199/demo-app/commit/8e64f2f7240405e4b8d5aa679fed7a072949ce26))
+* show stat ranges, grade, crit rate, crit damage and evasion on the care page ([dc1871c](https://github.com/punya199/demo-app/commit/dc1871cad8e6107394f09db8bf62067a47c5591b))
+
 # [1.22.0](https://github.com/punya199/demo-app/compare/v1.21.0...v1.22.0) (2026-10-31)
 
 

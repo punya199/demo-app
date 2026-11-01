@@ -1,3 +1,10 @@
+# [1.26.0](https://github.com/punya199/demo-app/compare/v1.25.0...v1.26.0) (2026-11-01)
+
+
+### New
+
+* show equipment special options and add item rank spec ([b7d6977](https://github.com/punya199/demo-app/commit/b7d6977cca5342f268da77481e67260081511adc))
+
 # [1.25.0](https://github.com/punya199/demo-app/compare/v1.24.1...v1.25.0) (2026-11-01)
 
 

@@ -1,3 +1,10 @@
+## [1.24.1](https://github.com/punya199/demo-app/compare/v1.24.0...v1.24.1) (2026-11-01)
+
+
+### Fix
+
+* keep pet slot order stable when selecting a pet ([6341e09](https://github.com/punya199/demo-app/commit/6341e09b10ed5cb8b594764db4eda4e5991fe2fc))
+
 # [1.24.0](https://github.com/punya199/demo-app/compare/v1.23.0...v1.24.0) (2026-11-01)
 
 

@@ -210,6 +210,8 @@ export interface IEquipmentItem {
   enhanceLevel: number
   pity: number
   equipped: boolean
+  // The pet wearing it (null in the bag).
+  monsterId: string | null
 }
 
 export interface IFighterEffects {
@@ -222,6 +224,9 @@ export interface IFighterEffects {
 export interface IEquipmentData {
   capacity: number
   items: IEquipmentItem[]
+  // The pet this screen is about (the selected one) and every living pet, to name who wears what.
+  monsterId: string | null
+  pets: { id: string; name: string; emoji: string }[]
   // Battle effects of the worn four-piece sets.
   activeEffects: IFighterEffects
   setBonuses: { setId: string; name: string; pieces: number }[]

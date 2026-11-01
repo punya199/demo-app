@@ -30,6 +30,7 @@ import {
   getRespecCost,
   sumPassiveEffects,
   describeStats,
+  isWornBy,
   formatRatingChange,
   getDefenseBlocker,
   getPvpBlocker,
@@ -757,5 +758,16 @@ describe('foldSelectedMonster', () => {
 
   it('starts a list when nothing was cached yet', () => {
     expect(foldSelectedMonster(undefined, pet('a')).monsters.map((row) => row.id)).toEqual(['a'])
+  })
+})
+
+describe('isWornBy', () => {
+  const piece = (over: Partial<IEquipmentItem>) =>
+    ({ equipped: true, monsterId: 'a', ...over }) as IEquipmentItem
+
+  it('only counts a piece as worn for the pet that wears it', () => {
+    expect(isWornBy(piece({}), 'a')).toBe(true)
+    expect(isWornBy(piece({}), 'b')).toBe(false)
+    expect(isWornBy(piece({ equipped: false, monsterId: null }), 'a')).toBe(false)
   })
 })

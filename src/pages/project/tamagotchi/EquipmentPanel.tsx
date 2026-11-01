@@ -1,8 +1,8 @@
-import { Button, Card, Popconfirm, Spin, Tooltip } from 'antd'
+import { Button, Card, Popconfirm, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { EnhanceModal } from './EnhanceModal'
 import { CompareLine, ItemLine } from './EquipmentParts'
-import { describeSetEffect, getEquipBlocker, slotLabel } from './tamagotchi-helper'
+import { describeSetEffect, getEquipBlocker, isWornBy, slotLabel } from './tamagotchi-helper'
 import { EnumEquipmentSlot, IEquipmentItem, IMonsterData } from './tamagotchi-interface'
 import { useDismantle, useEquip, useGetEquipment, useUnequip } from './tamagotchi-service'
 
@@ -26,11 +26,19 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
 
   const blocker = getEquipBlocker(monster)
   const isBusy = isEquipping || isUnequipping || isDismantling
-  const worn = new Map(data.items.filter((item) => item.equipped).map((item) => [item.slot, item]))
-  const bag = data.items.filter((item) => !item.equipped)
+  const isWorn = (item: IEquipmentItem) => isWornBy(item, data.monsterId)
+  const worn = new Map(data.items.filter(isWorn).map((item) => [item.slot, item]))
+  const bag = data.items.filter((item) => !isWorn(item))
+  const petOf = (item: IEquipmentItem) => data.pets.find((pet) => pet.id === item.monsterId)
+  const pet = data.pets.find((row) => row.id === data.monsterId)
 
   return (
     <div className="flex w-full flex-col gap-3">
+      {pet && (
+        <div className="text-center text-sm text-slate-600 dark:text-slate-300">
+          อุปกรณ์ของ {pet.emoji} {pet.name} (เปลี่ยนตัวที่หน้าเลี้ยง แต่ละตัวมีชุดของตัวเอง)
+        </div>
+      )}
       {data.stats && (
         <div className="text-center text-sm text-slate-600 dark:text-slate-300">
           ค่าพลังรวมอุปกรณ์: HP {data.stats.hp} · ATK {data.stats.atk} · DEF {data.stats.def} · SPD{' '}
@@ -95,15 +103,29 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-slate-500">{slotLabel[item.slot]}</span>
             <ItemLine item={item} />
+            {petOf(item) && (
+              <Tag color="purple">
+                ใส่อยู่กับ {petOf(item)!.emoji} {petOf(item)!.name}
+              </Tag>
+            )}
             <Tooltip title={blocker}>
-              <Button
-                size="small"
-                type="primary"
-                disabled={!!blocker || isBusy}
-                onClick={() => equip(item.id, { onError })}
+              <Popconfirm
+                title="ย้ายมาใส่ตัวนี้?"
+                description={`${petOf(item)?.name ?? 'ตัวเดิม'} จะเสียชิ้นนี้ไป`}
+                okText="ย้าย"
+                cancelText="ยกเลิก"
+                disabled={!petOf(item)}
+                onConfirm={() => equip(item.id, { onError })}
               >
-                สวม
-              </Button>
+                <Button
+                  size="small"
+                  type="primary"
+                  disabled={!!blocker || isBusy}
+                  onClick={() => !petOf(item) && equip(item.id, { onError })}
+                >
+                  สวม
+                </Button>
+              </Popconfirm>
             </Tooltip>
             <Button size="small" onClick={() => setEnhancing(item)}>
               ตีบวก
@@ -115,7 +137,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
               cancelText="ยกเลิก"
               onConfirm={() => dismantle(item.id, { onError })}
             >
-              <Button size="small" danger disabled={isBusy}>
+              <Button size="small" danger disabled={isBusy || !!petOf(item)}>
                 แยก
               </Button>
             </Popconfirm>

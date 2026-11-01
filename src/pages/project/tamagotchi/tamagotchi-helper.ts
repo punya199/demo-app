@@ -807,3 +807,7 @@ export const foldSelectedMonster = (
       : [...monsters, monster],
   }
 }
+
+// A piece counts as worn on the gear screen only for the pet that screen is about.
+export const isWornBy = (item: IEquipmentItem, monsterId: string | null) =>
+  item.equipped && item.monsterId === monsterId

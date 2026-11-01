@@ -1,7 +1,7 @@
 import { Button, Card, Modal, Spin, Tooltip } from 'antd'
 import { useState } from 'react'
 import { CompareLine, ItemLine } from './EquipmentParts'
-import { gradeLabel, getShopBlocker, getUseItemBlocker } from './tamagotchi-helper'
+import { gradeLabel, getShopBlocker, getUseItemBlocker, isWornBy } from './tamagotchi-helper'
 import { IEquipmentItem, IMonsterData } from './tamagotchi-interface'
 import {
   useBuyEquipmentBox,
@@ -170,7 +170,9 @@ export const ShopPanel = (props: IShopPanelProps) => {
             <ItemLine item={opened} />
             <CompareLine
               item={opened}
-              worn={equipmentData?.items.find((it) => it.equipped && it.slot === opened.slot)}
+              worn={equipmentData?.items.find(
+                (it) => isWornBy(it, equipmentData.monsterId) && it.slot === opened.slot
+              )}
             />
             <p className="text-xs text-slate-500">เก็บไว้ในกระเป๋าอุปกรณ์แล้ว</p>
           </div>

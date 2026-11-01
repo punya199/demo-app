@@ -23,6 +23,7 @@ import {
   IMergeForm,
   IMonsterData,
   IPassiveNode,
+  IPotentialStat,
   PassiveEffectKey,
 } from './tamagotchi-interface'
 
@@ -214,6 +215,9 @@ export const describeBattleEvent = (event: IBattleEvent, battle: IBattleData) =>
   }
   if (event.kind === 'regen') {
     return `${affected.name} ฟื้นฟู +${event.damage} HP`
+  }
+  if (event.isDodged) {
+    return `${affected.name} หลบการโจมตีของ ${attacker.name} ได้`
   }
   const notes = [
     event.effectiveness === 'strong' && 'ได้เปรียบธาตุ!',
@@ -733,3 +737,10 @@ export const getMergeBlocker = (
   }
   return (wallet?.gem ?? 0) < cost.gem ? 'เพชรไม่พอ' : null
 }
+
+// Where a rolled value sits inside its range, 0-100 (a fixed stat sits at 0).
+export const potentialPercent = (stat: IPotentialStat) =>
+  stat.max === stat.min ? 0 : Math.round(((stat.value - stat.min) / (stat.max - stat.min)) * 100)
+
+export const signed = (value: number) =>
+  `${value >= 0 ? '+' : '−'}${Math.abs(Math.round(value * 10) / 10)}`

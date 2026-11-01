@@ -13,6 +13,7 @@ import { ExpeditionPanel } from './ExpeditionPanel'
 import { MergeModal } from './MergeModal'
 import { PassivePanel } from './PassivePanel'
 import { PetSprite } from './PetSprite'
+import { StatusPanel } from './StatusPanel'
 import { FriendsPanel } from './FriendsPanel'
 import { WorldBossPanel } from './WorldBossPanel'
 import { RaidPanel } from './RaidPanel'
@@ -35,7 +36,6 @@ import {
 } from './tamagotchi-helper'
 import { EnumMonsterStage, IMonsterData } from './tamagotchi-interface'
 import {
-  useGetEquipment,
   useGetMonsterHistory,
   useGetMyMonster,
   useGetWallet,
@@ -180,43 +180,6 @@ const EvolutionPanel = (props: { monster: IMonsterData; fetchedAt: number; now: 
   )
 }
 
-const STAT_ROWS = [
-  ['hp', 'HP'],
-  ['atk', 'ATK'],
-  ['def', 'DEF'],
-  ['spd', 'SPD'],
-] as const
-
-// Fighting stats: from care alone, and with the worn gear (what the server fights with).
-const BattleStatus = (props: { monster: IMonsterData }) => {
-  const { monster } = props
-  const { data: equipment } = useGetEquipment()
-  const base = monster.battleStats
-  if (!base) {
-    return null
-  }
-  const total = equipment?.stats ?? base
-  return (
-    <div className="rounded-lg bg-white/60 p-2 text-sm dark:bg-slate-700/60">
-      <div className="mb-1 text-xs text-slate-500 dark:text-slate-400">
-        สถานะต่อสู้ (รวมอุปกรณ์และต้นไม้)
-      </div>
-      <div className="grid grid-cols-4 gap-2 text-center">
-        {STAT_ROWS.map(([key, label]) => {
-          const bonus = total[key] - base[key]
-          return (
-            <div key={key}>
-              <div className="text-xs text-slate-500 dark:text-slate-400">{label}</div>
-              <div className="font-semibold text-slate-900 dark:text-slate-100">{total[key]}</div>
-              {bonus > 0 && <div className="text-xs text-emerald-600">+{bonus}</div>}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
 // One slot per monster the player can raise at once; tapping a slot selects it.
 const MonsterSlots = (props: {
   monsters: IMonsterData[]
@@ -288,7 +251,7 @@ const MonsterScreen = (props: { monster: IMonsterData; fetchedAt: number }) => {
         </div>
         {!isEgg && (
           <div className="mt-3 flex flex-col gap-2 text-sm">
-            <BattleStatus monster={monster} />
+            <StatusPanel monster={monster} />
             <Hearts label="ความอิ่ม" value={monster.fullness} />
             <Hearts label="ความแข็งแรง" value={monster.strength} />
             <StatRow label="น้ำหนัก" value={`${monster.weight} g`} />

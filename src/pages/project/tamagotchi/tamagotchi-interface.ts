@@ -67,6 +67,25 @@ export interface IWallet {
 
 // Mirrors the backend's monster view (demo-app-backend src/modules/monster/monster.service.ts).
 // All game rules run on the server - these values are only displayed.
+// min / max / rolled value of one stat. HP/ATK/DEF/SPD are the form's own numbers; the extra stats
+// are in percent (crit damage as a percent multiplier).
+export interface IPotentialStat {
+  min: number
+  max: number
+  value: number
+}
+
+export type PotentialStatKey = 'hp' | 'atk' | 'def' | 'spd' | 'critRate' | 'critDamage' | 'evasion'
+
+export interface IPotentialView {
+  // A monster from before potential existed: no grade, old fixed stats.
+  isLegacy: boolean
+  grade: string | null
+  // Average roll in percent of the range.
+  average: number | null
+  stats: Record<PotentialStatKey, IPotentialStat>
+}
+
 export interface IMonsterData {
   id: string
   line: EnumMonsterLine
@@ -87,6 +106,7 @@ export interface IMonsterData {
   bornAt: string
   // Fighting stats from care (hunger, strength, weight) before gear; null for an egg.
   battleStats: IBattleStats | null
+  potentialView: IPotentialView
   trainReadyAt: string | null
   autoBattleReadyAt: string | null
   // Set while out on an expedition; `expeditionReturned` = back home, waiting to be collected.
@@ -130,6 +150,8 @@ export interface IBattleEvent {
   // extra hit of a double strike. `absorbed` is damage a set shield soaked up (part of `damage`).
   kind?: 'burn' | 'regen' | 'double'
   absorbed?: number
+  // The target dodged the hit (damage is 0).
+  isDodged?: boolean
   // Team fights: which member of the player's side attacked, or was hit when the enemy attacks.
   member?: number
 }
@@ -198,8 +220,10 @@ export interface IEquipmentData {
   // Battle effects of the worn four-piece sets.
   activeEffects: IFighterEffects
   setBonuses: { setId: string; name: string; pieces: number }[]
-  // The living monster's battle stats with the worn gear; null without a hatched monster.
+  // The living monster's battle stats with the worn gear and passives; null without a hatched monster.
   stats: IBattleStats | null
+  // Its crit rate (%), crit damage (% multiplier) and evasion (%) with gear and passives.
+  combat: { critRate: number; critDamage: number; evasion: number } | null
 }
 
 export type EnhanceFailure = 'material' | 'drop' | 'drop_or_break'
@@ -628,6 +652,16 @@ export interface IWikiData {
     powerMultiplier: number
     lifespanMinutes: number
     forms: IMergeForm[]
+  }
+  potential: {
+    statSpread: number
+    critRateBonusMax: number
+    critDamageBonusMax: number
+    evasionMax: number
+    critRateCap: number
+    critDamageCap: number
+    evasionCap: number
+    grades: { grade: string; minAverage: number }[]
   }
   battle: {
     atkBonusPerStrengthHeart: number

@@ -79,6 +79,7 @@ const buildSections = (wiki: IWikiData) => {
     online,
     evolution,
     merge,
+    potential,
     battle,
     adventure,
     idle,
@@ -262,6 +263,25 @@ const buildSections = (wiki: IWikiData) => {
               form.lines.map((line) => elementLabel[line]).join(' + '),
               statsText(form.stats),
             ])}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'potential',
+      label: '🎲 ค่าสุ่มมอน',
+      children: (
+        <>
+          <List
+            items={[
+              'มอนแต่ละตัวสุ่มค่าพลัง 7 ค่าตอนไข่ฟัก และคงที่ตลอดชีวิต หน้าเลี้ยงแสดงต่ำสุด สูงสุด และตำแหน่งที่ได้ของทุกค่า',
+              `HP ATK DEF SPD: สุ่ม ${times(1 - potential.statSpread)} ถึง ${times(1 + potential.statSpread)} ของค่าร่างนั้น (ค่ากลางเท่ากับค่าเดิม)`,
+              `คริติคอล: ${percent(battle.criticalChance)} ถึง ${percent(battle.criticalChance + potential.critRateBonusMax)} · ดาเมจคริติคอล: ${times(battle.criticalMultiplier)} ถึง ${times(battle.criticalMultiplier + potential.critDamageBonusMax)} · หลบหลีก: 0% ถึง ${percent(potential.evasionMax)}`,
+              `ค่าที่ได้จากอุปกรณ์และต้นไม้บวกทับ แต่ไม่เกินเพดาน: คริติคอล ${percent(potential.critRateCap)} ดาเมจคริติคอล ${times(potential.critDamageCap)} หลบหลีก ${percent(potential.evasionCap)}`,
+              'เกรดรวมมาจากค่าเฉลี่ยของ 7 ค่า: ' +
+                potential.grades.map((g) => `${g.grade} ≥ ${percent(g.minAverage)}`).join(' · '),
+              'รวมร่าง: ได้ค่าสุ่มที่ดีกว่าของพ่อแม่ในแต่ละค่า มอนรุ่นเก่าไม่มีค่าสุ่มและค่าพลังเหมือนเดิม',
+            ]}
           />
         </>
       ),

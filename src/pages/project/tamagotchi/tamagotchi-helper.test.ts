@@ -20,6 +20,8 @@ import {
   canDeallocatePassive,
   describePassiveEffect,
   describeReset,
+  potentialPercent,
+  signed,
   findMergeForm,
   getMergeBlocker,
   getRespecCost,
@@ -76,6 +78,7 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   bornAt: NOW.toISOString(),
   trainReadyAt: null,
   battleStats: null,
+  potentialView: { isLegacy: true, grade: null, average: null, stats: {} as never },
   autoBattleReadyAt: null,
   expeditionAreaId: null,
   expeditionMinutes: 0,
@@ -678,5 +681,27 @@ describe('merge helpers', () => {
     expect(getMergeBlocker(a, b, { coin: 1999, gem: 50 }, cost)).toBe('เหรียญไม่พอ')
     expect(getMergeBlocker(a, b, { coin: 5000, gem: 19 }, cost)).toBe('เพชรไม่พอ')
     expect(getMergeBlocker(a, b, rich, cost)).toBeNull()
+  })
+})
+
+describe('potential helpers', () => {
+  it('places a rolled value inside its range, and a fixed stat at 0', () => {
+    expect(potentialPercent({ min: 100, max: 120, value: 115 })).toBe(75)
+    expect(potentialPercent({ min: 5, max: 5, value: 5 })).toBe(0)
+  })
+
+  it('signs the breakdown numbers', () => {
+    expect(signed(3)).toBe('+3')
+    expect(signed(-2.5)).toBe('−2.5')
+    expect(signed(0)).toBe('+0')
+  })
+
+  it('describes a dodged hit', () => {
+    const battle = {
+      player: { name: 'A' },
+      enemy: { name: 'B' },
+    } as IBattleData
+    const event = { actor: 'player', isDodged: true, damage: 0 } as IBattleEvent
+    expect(describeBattleEvent(event, battle)).toBe('B หลบการโจมตีของ A ได้')
   })
 })

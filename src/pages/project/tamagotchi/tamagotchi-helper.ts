@@ -31,6 +31,8 @@ import {
   IPassiveNode,
   IPotentialStat,
   PassiveEffectKey,
+  ISpecialOption,
+  SpecialKey,
 } from './tamagotchi-interface'
 
 // Display helpers only. Whether an action is allowed is decided by the server; getActionBlocker
@@ -537,6 +539,17 @@ export const describeStats = (stats: Partial<Record<StatKey, number>>) =>
     .filter((key) => (stats[key] ?? 0) > 0)
     .map((key) => `+${stats[key]} ${statLabel[key]}`)
     .join(' · ')
+
+export const specialLabel: Record<SpecialKey, string> = {
+  slowHunger: 'หิวช้าลง',
+  staminaSaver: 'ใช้ stamina น้อยลง',
+  treasureNose: 'ดรอปอุปกรณ์เพิ่ม',
+  tidyPet: 'อึน้อยลง',
+}
+
+// "หิวช้าลง 12% · อึน้อยลง 20%", or '' for a piece without a special option.
+export const describeSpecials = (options: ISpecialOption[] | undefined) =>
+  (options ?? []).map(({ key, value }) => `${specialLabel[key]} ${value}%`).join(' · ')
 
 // What swapping the worn piece (or an empty slot) for `item` changes, per stat, skipping stats
 // that stay the same. A positive diff means the candidate is stronger.

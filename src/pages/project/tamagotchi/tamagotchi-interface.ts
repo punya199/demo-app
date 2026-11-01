@@ -203,6 +203,13 @@ export enum EnumEquipmentGrade {
 
 export type StatKey = keyof IBattleStats
 
+// Care perk on a piece, worn by the pet only (value in percent).
+export type SpecialKey = 'slowHunger' | 'staminaSaver' | 'treasureNose' | 'tidyPet'
+export interface ISpecialOption {
+  key: SpecialKey
+  value: number
+}
+
 export interface IEquipmentItem {
   id: string
   templateId: string
@@ -215,6 +222,7 @@ export interface IEquipmentItem {
   // Main stat including the enhance level.
   mainValue: number
   subStats: Partial<Record<StatKey, number>>
+  specialOptions: ISpecialOption[]
   stats: IBattleStats
   enhanceLevel: number
   pity: number

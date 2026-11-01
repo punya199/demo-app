@@ -1,6 +1,7 @@
 import { Tag } from 'antd'
 import {
   compareEquipment,
+  describeSpecials,
   describeStats,
   gradeColor,
   gradeLabel,
@@ -22,6 +23,11 @@ export const ItemLine = (props: { item: IEquipmentItem; set?: ISetProgress }) =>
         {statLabel[item.mainStat]} {item.mainValue}
         {describeStats(item.subStats) && ` · ${describeStats(item.subStats)}`}
       </div>
+      {describeSpecials(item.specialOptions) && (
+        <div className="text-xs text-violet-600 dark:text-violet-400">
+          ✨ {describeSpecials(item.specialOptions)}
+        </div>
+      )}
       {set && (
         <div
           className={`text-xs ${

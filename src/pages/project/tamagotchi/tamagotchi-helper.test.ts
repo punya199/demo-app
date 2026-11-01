@@ -42,6 +42,7 @@ import {
   isSetComplete,
   isSetTierActive,
   setPieceLabel,
+  describeSpecials,
   describeStats,
   describeCostumePrice,
   getCostumeBuyBlocker,
@@ -363,6 +364,19 @@ describe('describeStats', () => {
   it('lists only the non-zero stats', () => {
     expect(describeStats({ hp: 0, atk: 3, def: 0, spd: 2 })).toBe('+3 ATK · +2 SPD')
     expect(describeStats({})).toBe('')
+  })
+})
+
+describe('describeSpecials', () => {
+  it('lists the options with their percent, empty without any', () => {
+    expect(
+      describeSpecials([
+        { key: 'slowHunger', value: 12 },
+        { key: 'tidyPet', value: 20 },
+      ])
+    ).toBe('หิวช้าลง 12% · อึน้อยลง 20%')
+    expect(describeSpecials([])).toBe('')
+    expect(describeSpecials(undefined)).toBe('')
   })
 })
 

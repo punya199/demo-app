@@ -20,7 +20,10 @@ import {
   IEvolutionInfo,
   IEvolutionRuleInfo,
   IEquipmentItem,
+  IMergeForm,
   IMonsterData,
+  IPassiveNode,
+  PassiveEffectKey,
 } from './tamagotchi-interface'
 
 // Display helpers only. Whether an action is allowed is decided by the server; getActionBlocker
@@ -35,12 +38,14 @@ export const stageLabel: Record<EnumMonsterStage, string> = {
   [EnumMonsterStage.ADULT]: 'ร่างโต',
   [EnumMonsterStage.PERFECT]: 'ร่างสมบูรณ์',
   [EnumMonsterStage.ULTIMATE]: 'ร่างสูงสุด',
+  [EnumMonsterStage.FUSED]: 'ร่างผสาน',
 }
 
 export const deathCauseLabel: Record<EnumMonsterDeathCause, string> = {
   [EnumMonsterDeathCause.OLD_AGE]: 'จากไปอย่างสงบตามอายุขัย',
   [EnumMonsterDeathCause.SICKNESS]: 'ป่วยหนักโดยไม่ได้รับการรักษา',
   [EnumMonsterDeathCause.STARVATION]: 'หิวจนทนไม่ไหว',
+  [EnumMonsterDeathCause.MERGED]: 'รวมร่างเป็นมอนตัวใหม่แล้ว',
 }
 
 interface ILineOption {
@@ -237,6 +242,10 @@ export const hpAfter = (
 }
 
 const serverMessageLabel: Record<string, string> = {
+  'Only monsters in their final form can be merged': 'รวมร่างได้เฉพาะมอนร่างสูงสุด',
+  'Pick two different monsters': 'เลือกมอนสองตัวที่ต่างกัน',
+  'The base must be one of the two monsters': 'ตัวหลักต้องเป็นหนึ่งในสองตัวที่เลือก',
+  'Monster not found': 'ไม่พบมอนตัวนี้',
   'Monster is sick': 'มอนป่วยอยู่ ฝึกไม่ได้',
   'Monster is still resting from training': 'มอนยังพักจากการฝึกอยู่',
   'Monster is not sick': 'มอนไม่ได้ป่วย',
@@ -439,6 +448,8 @@ export const getEnhanceBlocker = (
 export const toPercent = (fraction: number) => `${Math.round(fraction * 1000) / 10}%`
 
 const PVP_STAGES = [EnumMonsterStage.ADULT, EnumMonsterStage.PERFECT, EnumMonsterStage.ULTIMATE]
+// The World Boss takes every grown form, fused ones included (the arena does not).
+const WORLD_BOSS_STAGES = [...PVP_STAGES, EnumMonsterStage.FUSED]
 
 // Mirrors the server's arena checks so the button explains itself.
 export const getPvpBlocker = (
@@ -534,7 +545,7 @@ export const getWorldBossBlocker = (
   if (!monster || monster.diedAt) {
     return 'ต้องมีมอนที่มีชีวิต'
   }
-  if (!PVP_STAGES.includes(monster.stage)) {
+  if (!WORLD_BOSS_STAGES.includes(monster.stage)) {
     return 'ต้องเป็นร่างโตขึ้นไปถึงตีบอสโลกได้'
   }
   if (monster.isSick) {
@@ -596,4 +607,129 @@ export const getGiftBlocker = (giftsLeft: number, ownedItems: number): string | 
     return 'ส่งของขวัญครบจำนวนของวันนี้แล้ว'
   }
   return ownedItems <= 0 ? 'ไม่มีไอเทมในกระเป๋าให้ส่ง' : null
+}
+
+export const PASSIVE_HUB = 'hub'
+
+export const passiveEffectLabel: Record<PassiveEffectKey, string> = {
+  atk: 'ATK',
+  hp: 'HP',
+  def: 'DEF',
+  spd: 'SPD',
+  crit: 'โอกาสคริติคอล',
+  critdmg: 'ดาเมจคริติคอล',
+  shield: 'โล่เริ่มต้น (% ของ HP)',
+  regen: 'ฟื้น HP ต่อเทิร์น (%)',
+  dbl: 'โอกาสโจมตีซ้ำ',
+  burn: 'เทิร์นเผาไหม้ของท่าพิเศษ',
+  hunger: 'ความอิ่มลดช้าลง',
+  expCoin: 'เหรียญจากการสำรวจ',
+  drop: 'โอกาสดรอปอุปกรณ์',
+}
+
+// "+3% ATK", "−20% HP", "เทิร์นเผาไหม้ของท่าพิเศษ +1".
+export const describePassiveEffect = (key: PassiveEffectKey, value: number) => {
+  const sign = value > 0 ? '+' : '−'
+  const amount = Math.abs(value)
+  // These labels already carry their unit.
+  if (key === 'burn' || key === 'shield' || key === 'regen') {
+    return `${passiveEffectLabel[key]} ${sign}${amount}`
+  }
+  return `${sign}${amount}% ${passiveEffectLabel[key]}`
+}
+
+// Mirrors the server's passive rules (passive-data.ts) so a click can explain itself; the server
+// still decides.
+export const canAllocatePassive = (nodes: IPassiveNode[], owned: string[], nodeId: string) => {
+  const node = nodes.find((entry) => entry.id === nodeId)
+  return (
+    !!node &&
+    !owned.includes(nodeId) &&
+    node.adj.some((id) => id === PASSIVE_HUB || owned.includes(id))
+  )
+}
+
+export const canDeallocatePassive = (nodes: IPassiveNode[], owned: string[], nodeId: string) => {
+  if (!owned.includes(nodeId)) {
+    return false
+  }
+  const rest = new Set(owned.filter((id) => id !== nodeId))
+  const seen = new Set([PASSIVE_HUB])
+  const stack = [PASSIVE_HUB]
+  while (stack.length) {
+    const node = nodes.find((entry) => entry.id === stack.pop())
+    for (const id of node?.adj ?? []) {
+      if (rest.has(id) && !seen.has(id)) {
+        seen.add(id)
+        stack.push(id)
+      }
+    }
+  }
+  return [...rest].every((id) => seen.has(id))
+}
+
+// Total of every effect over the owned nodes, in the order of passiveEffectLabel.
+export const sumPassiveEffects = (nodes: IPassiveNode[], owned: string[]) => {
+  const totals: Partial<Record<PassiveEffectKey, number>> = {}
+  for (const node of nodes) {
+    if (owned.includes(node.id)) {
+      for (const [key, value] of Object.entries(node.fx) as [PassiveEffectKey, number][]) {
+        totals[key] = Math.round(((totals[key] ?? 0) + value) * 10) / 10
+      }
+    }
+  }
+  return (Object.keys(passiveEffectLabel) as PassiveEffectKey[])
+    .filter((key) => totals[key])
+    .map((key) => ({ key, value: totals[key]! }))
+}
+
+// Gems needed to take back `count` points when `refunded` were already taken back.
+export const getRespecCost = (
+  respec: { refunded: number; freeLeft: number; gemPrice: number },
+  count: number
+) => Math.max(0, count - respec.freeLeft) * respec.gemPrice
+
+// Mirrors the server's merge checks for one parent, so the picker explains itself.
+export const getMergeParentBlocker = (monster: IMonsterData): string | null => {
+  if (monster.diedAt) {
+    return 'ตายไปแล้ว'
+  }
+  if (monster.stage !== EnumMonsterStage.ULTIMATE) {
+    return 'ต้องเป็นร่างสูงสุด (ยังไม่ใช่ร่างสุดท้าย)'
+  }
+  if (monster.isSick) {
+    return 'ป่วยอยู่'
+  }
+  return monster.expeditionAreaId ? 'ออกสำรวจอยู่' : null
+}
+
+// The form two parents make, whichever order they are picked in.
+export const findMergeForm = (
+  forms: IMergeForm[],
+  first: EnumMonsterLine,
+  second: EnumMonsterLine
+) =>
+  forms.find(
+    (form) =>
+      (form.lines[0] === first && form.lines[1] === second) ||
+      (form.lines[0] === second && form.lines[1] === first)
+  )
+
+export const getMergeBlocker = (
+  first: IMonsterData | undefined,
+  second: IMonsterData | undefined,
+  wallet: { coin: number; gem: number } | undefined,
+  cost: { coin: number; gem: number }
+): string | null => {
+  if (!first || !second) {
+    return 'เลือกมอนสองตัว'
+  }
+  const parentBlocker = getMergeParentBlocker(first) ?? getMergeParentBlocker(second)
+  if (parentBlocker) {
+    return parentBlocker
+  }
+  if ((wallet?.coin ?? 0) < cost.coin) {
+    return 'เหรียญไม่พอ'
+  }
+  return (wallet?.gem ?? 0) < cost.gem ? 'เพชรไม่พอ' : null
 }

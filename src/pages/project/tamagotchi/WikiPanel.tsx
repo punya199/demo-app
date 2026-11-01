@@ -70,6 +70,7 @@ const hatchedStages = [
   EnumMonsterStage.ADULT,
   EnumMonsterStage.PERFECT,
   EnumMonsterStage.ULTIMATE,
+  EnumMonsterStage.FUSED,
 ] as const
 
 const buildSections = (wiki: IWikiData) => {
@@ -77,11 +78,13 @@ const buildSections = (wiki: IWikiData) => {
     care,
     online,
     evolution,
+    merge,
     battle,
     adventure,
     idle,
     equipment,
     raid,
+    passive,
     worldBoss,
     social,
     pvp,
@@ -108,7 +111,7 @@ const buildSections = (wiki: IWikiData) => {
             'ครบเวลาแต่ละร่าง มอนจะวิวัฒนาการ ร่างที่ได้ขึ้นกับการเลี้ยง การฝึก และการชนะ',
             'พามอนไปสู้ในโหมดผจญภัย ทำภารกิจประจำวัน เก็บเหรียญและเพชรไว้ซื้อของ',
             `เปิดเกมค้างไว้ = ออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)} `,
-            `มอนมีอายุขัย ${formatAge(care.lifespanMinutes)} นับจากฟัก ตายแล้วได้ไข่ใบใหม่ ความคืบหน้าผจญภัย เหรียญ เพชร และ Dex ยังอยู่`,
+            `มอนมีอายุขัย ${formatAge(care.lifespanMinutes)} นับจากฟัก (ร่างผสาน ${formatAge(care.fusedLifespanMinutes)}) ตายแล้วได้ไข่ใบใหม่ ความคืบหน้าผจญภัย เหรียญ เพชร และ Dex ยังอยู่`,
           ]}
         />
       ),
@@ -214,7 +217,10 @@ const buildSections = (wiki: IWikiData) => {
               <Heading>{elementLabel[option.line]}</Heading>
               <div className="flex flex-col gap-2">
                 {evolution.species
-                  .filter((species) => species.line === option.line)
+                  .filter(
+                    (species) =>
+                      species.line === option.line && species.stage !== EnumMonsterStage.FUSED
+                  )
                   .map((species) => (
                     <div
                       key={species.id}
@@ -239,6 +245,24 @@ const buildSections = (wiki: IWikiData) => {
               </div>
             </div>
           ))}
+          <Heading>ร่างผสาน (รวมร่าง)</Heading>
+          <List
+            items={[
+              `รวมมอนของคุณสองตัวที่เป็นร่างสูงสุด (สายหลักหรือสายแตกก็ได้ ต้องไม่ป่วยและไม่ได้ออกสำรวจ) เป็นร่างผสานหนึ่งตัว จ่าย 🪙 ${merge.coinCost} และ 💎 ${merge.gemCost}`,
+              `ค่าพลัง = ร่างสูงสุด ${times(merge.powerMultiplier)} ปรับตามสายของพ่อแม่ทั้งสอง ธาตุและสกิลมาจากตัวหลักที่คุณเลือก`,
+              `เริ่มชีวิตใหม่: อายุเริ่มนับ 0 อายุขัย ${formatAge(merge.lifespanMinutes)} ชนะ/แพ้เริ่มใหม่ ความอิ่มและความแข็งแรงเฉลี่ยจากพ่อแม่`,
+              'ร่างผสานไม่วิวัฒนาการต่อและรวมซ้ำไม่ได้ เข้าสนามประลองไม่ได้ ตีบอสโลกและ Raid ได้ พ่อแม่หายไปถาวร (ย้อนกลับไม่ได้) ส่วนอุปกรณ์และต้นไม้เป็นของบัญชี ไม่หาย',
+              'แต่ละร่างผสานเป็นรายการใหม่ใน Dex (ได้เพชรและแต้มต้นไม้เหมือนร่างอื่น)',
+            ]}
+          />
+          <Table
+            head={['ร่าง', 'พ่อแม่', 'ค่าพลัง']}
+            rows={merge.forms.map((form) => [
+              `${form.emoji} ${form.name}`,
+              form.lines.map((line) => elementLabel[line]).join(' + '),
+              statsText(form.stats),
+            ])}
+          />
         </>
       ),
     },
@@ -367,6 +391,30 @@ const buildSections = (wiki: IWikiData) => {
                 `🪙 ${reward.coins}`,
               ])
             )}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'passive',
+      label: '🌳 ต้นไม้ความสามารถ',
+      children: (
+        <>
+          <Heading>ต้นไม้ของผู้ฝึก</Heading>
+          <List
+            items={[
+              'ผูกกับบัญชี ไม่หายเมื่อมอนตาย ใช้ได้ทุกโหมดรวมถึง PvP',
+              'เริ่มจากจุดกลาง เลือกได้เฉพาะโหนดที่ติดกับโหนดที่มีอยู่ ถอนได้เฉพาะโหนดที่ไม่ตัดสายอื่นขาด',
+              'โหนดคีย์สโตนแลกกัน: ค่าหนึ่งเพิ่มมาก อีกค่าลดลง',
+              `แต้มได้จาก Dex ร่างละ 1, เคลียร์เรดครั้งแรกบอสละระดับ 1, ล้มบอสโลก 1 และจบซีซัน PvP ที่ผ่านเกณฑ์ (${passive.pvpSeasonPoints
+                .map(
+                  (tier) =>
+                    `${tier.maxRank ? `อันดับ ≤ ${tier.maxRank}` : 'ที่เหลือ'}: ${tier.points}`
+                )
+                .join(' · ')}) รวมสูงสุด ${passive.maxPoints} แต้ม`,
+              `ถอนแต้มคืนได้ ${passive.freeRefunds} แต้มแรกฟรี หลังจากนั้นแต้มละ 💎 ${passive.respecGemPrice}`,
+              `โหนดเหรียญสำรวจและโอกาสดรอปอุปกรณ์รวมกันได้ไม่เกิน +${passive.economyCap}% อย่างละ`,
+            ]}
           />
         </>
       ),

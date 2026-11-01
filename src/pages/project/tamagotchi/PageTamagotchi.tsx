@@ -10,6 +10,8 @@ import { AdventurePanel } from './AdventurePanel'
 import { DexPanel } from './DexPanel'
 import { EquipmentPanel } from './EquipmentPanel'
 import { ExpeditionPanel } from './ExpeditionPanel'
+import { MergeModal } from './MergeModal'
+import { PassivePanel } from './PassivePanel'
 import { PetSprite } from './PetSprite'
 import { FriendsPanel } from './FriendsPanel'
 import { WorldBossPanel } from './WorldBossPanel'
@@ -37,6 +39,7 @@ import {
   useGetMonsterHistory,
   useGetMyMonster,
   useGetWallet,
+  useGetWiki,
   useHatchMonster,
   useMonsterAction,
   useSelectMonster,
@@ -196,7 +199,7 @@ const BattleStatus = (props: { monster: IMonsterData }) => {
   return (
     <div className="rounded-lg bg-white/60 p-2 text-sm dark:bg-slate-700/60">
       <div className="mb-1 text-xs text-slate-500 dark:text-slate-400">
-        สถานะต่อสู้ (รวมอุปกรณ์ที่สวมอยู่)
+        สถานะต่อสู้ (รวมอุปกรณ์และต้นไม้)
       </div>
       <div className="grid grid-cols-4 gap-2 text-center">
         {STAT_ROWS.map(([key, label]) => {
@@ -355,7 +358,10 @@ const HallOfFame = () => {
 const TamagotchiGame = () => {
   const { data, isLoading, dataUpdatedAt } = useGetMyMonster()
   const queryClient = useQueryClient()
+  const { data: wallet } = useGetWallet()
+  const { data: wiki } = useGetWiki()
   const [isChoosingEgg, setIsChoosingEgg] = useState(false)
+  const [isMerging, setIsMerging] = useState(false)
   const monster = data?.monster ?? null
   const monsters = data?.monsters ?? []
   const diedAt = monster?.diedAt
@@ -391,6 +397,19 @@ const TamagotchiGame = () => {
         max={data?.maxMonsters ?? 4}
         onNewEgg={() => setIsChoosingEgg(true)}
       />
+      {monsters.length >= 2 && wiki && (
+        <>
+          <Button onClick={() => setIsMerging(true)}>🧬 รวมร่างมอนสูงสุด</Button>
+          <MergeModal
+            open={isMerging}
+            onClose={() => setIsMerging(false)}
+            monsters={monsters}
+            wallet={wallet}
+            merge={wiki.merge}
+            onError={showError}
+          />
+        </>
+      )}
       {isChoosingEgg ? (
         <>
           <EggPicker />
@@ -476,6 +495,7 @@ const GameTabs = () => {
             label: 'อุปกรณ์',
             children: <EquipmentPanel monster={monster} coin={coin} onError={showError} />,
           },
+          { key: 'passive', label: 'ต้นไม้', children: <PassivePanel onError={showError} /> },
           {
             key: 'shop',
             label: 'ร้านค้า',

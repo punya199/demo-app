@@ -10,6 +10,7 @@ import {
   IEnhancePreview,
   IEquipmentData,
   IEquipmentItem,
+  IPassiveState,
   IFriendsData,
   IFriendVisit,
   IProfile,
@@ -135,6 +136,23 @@ export const useMonsterAction = () => {
     onError: () => {
       // The monster may have changed (fallen asleep, died) since the last poll.
       queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+    },
+  })
+}
+
+export const useMergeMonsters = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { firstId: string; secondId: string; baseId: string }) => {
+      const { data } = await apiClient.post<{ monster: IMonsterData; wallet: IWallet }>(
+        `/monster/merge`,
+        input
+      )
+      return data
+    },
+    // The parents are gone and the new monster is selected, so every tab's data may have changed.
+    onSettled: () => {
+      queryClient.invalidateQueries()
     },
   })
 }
@@ -907,3 +925,51 @@ export const useGetRentable = () => {
     },
   })
 }
+
+const PASSIVE_KEY = ['passive']
+
+export const useGetPassive = () => {
+  return useQuery({
+    queryKey: PASSIVE_KEY,
+    queryFn: async () => {
+      const { data } = await apiClient.get<IPassiveState>(`/passive`)
+      return data
+    },
+  })
+}
+
+// Allocate, deallocate and respec all answer with the refreshed tree. Gems (respec) and the
+// battle stats shown on the care and equipment screens change with it.
+const usePassiveMutation = <TInput,>(request: (input: TInput) => Promise<IPassiveState>) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: request,
+    onSuccess: (data) => {
+      queryClient.setQueryData<IPassiveState>(PASSIVE_KEY, data)
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+      queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: PASSIVE_KEY })
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+    },
+  })
+}
+
+export const usePassiveAllocate = () =>
+  usePassiveMutation(async (nodeId: string) => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/allocate`, { nodeId })
+    return data
+  })
+
+export const usePassiveDeallocate = () =>
+  usePassiveMutation(async (nodeId: string) => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/deallocate`, { nodeId })
+    return data
+  })
+
+export const usePassiveRespec = () =>
+  usePassiveMutation(async () => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/respec`)
+    return data
+  })

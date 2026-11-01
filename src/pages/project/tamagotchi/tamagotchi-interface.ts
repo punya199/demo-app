@@ -11,12 +11,16 @@ export enum EnumMonsterStage {
   ADULT = 'adult',
   PERFECT = 'perfect',
   ULTIMATE = 'ultimate',
+  // Two merged Ultimates: the final form.
+  FUSED = 'fused',
 }
 
 export enum EnumMonsterDeathCause {
   OLD_AGE = 'old_age',
   SICKNESS = 'sickness',
   STARVATION = 'starvation',
+  // Consumed as a parent of a merge.
+  MERGED = 'merged',
 }
 
 export enum EnumMonsterAction {
@@ -576,6 +580,15 @@ export interface IWikiSpecies {
   evolutions: { to: string; maxCareMistakes?: number; minTrainCount?: number; minWins?: number }[]
 }
 
+export interface IMergeForm {
+  id: string
+  // The two parent lines this form is made from (the same twice for an awakened form).
+  lines: [EnumMonsterLine, EnumMonsterLine]
+  name: string
+  emoji: string
+  stats: IBattleStats
+}
+
 interface IStageRates {
   fullnessMinutes: number
   strengthMinutes: number
@@ -598,6 +611,7 @@ export interface IWikiData {
     deathAfterSickMinutes: number
     deathAfterHungryMinutes: number
     lifespanMinutes: number
+    fusedLifespanMinutes: number
     feedWeightGain: number
     vitaminWeightGain: number
     trainWeightLoss: number
@@ -607,6 +621,13 @@ export interface IWikiData {
   evolution: {
     stageDurationMinutes: Record<EnumMonsterStage, number | null>
     species: IWikiSpecies[]
+  }
+  merge: {
+    coinCost: number
+    gemCost: number
+    powerMultiplier: number
+    lifespanMinutes: number
+    forms: IMergeForm[]
   }
   battle: {
     atkBonusPerStrengthHeart: number
@@ -713,6 +734,13 @@ export interface IWikiData {
     rentalFee: number
     rentalOwnerDailyCap: number
   }
+  passive: {
+    maxPoints: number
+    freeRefunds: number
+    respecGemPrice: number
+    economyCap: number
+    pvpSeasonPoints: { maxRank: number | null; points: number }[]
+  }
   worldBoss: {
     hits: number
     resetHours: number
@@ -767,4 +795,48 @@ export interface IWikiData {
     dailyQuests: Pick<IQuest, 'id' | 'name' | 'emoji' | 'coinReward'>[]
     dexDiscoveryGems: number
   }
+}
+
+export type PassiveEffectKey =
+  | 'atk'
+  | 'hp'
+  | 'def'
+  | 'spd'
+  | 'crit'
+  | 'critdmg'
+  | 'shield'
+  | 'regen'
+  | 'dbl'
+  | 'burn'
+  | 'hunger'
+  | 'expCoin'
+  | 'drop'
+
+export interface IPassiveNode {
+  id: string
+  name: string
+  kind: 'small' | 'notable' | 'key'
+  arm: 'flame' | 'tide' | 'leaf' | 'bridge'
+  fx: Partial<Record<PassiveEffectKey, number>>
+  x: number
+  y: number
+  adj: string[]
+}
+
+// GET /passive: the whole graph (drawn as is), what the player owns and what they can still do.
+export interface IPassiveState {
+  nodes: IPassiveNode[]
+  allocated: string[]
+  points: {
+    earned: number
+    used: number
+    left: number
+    sources: {
+      dexSpecies: number
+      raidFirstClears: number
+      worldBossDefeats: number
+      pvpSeasons: number
+    }
+  }
+  respec: { refunded: number; freeLeft: number; gemPrice: number }
 }

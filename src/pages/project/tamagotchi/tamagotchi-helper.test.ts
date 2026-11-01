@@ -16,7 +16,14 @@ import {
   getWorldBossBlocker,
   describeSetEffect,
   compareEquipment,
+  canAllocatePassive,
+  canDeallocatePassive,
+  describePassiveEffect,
   describeReset,
+  findMergeForm,
+  getMergeBlocker,
+  getRespecCost,
+  sumPassiveEffects,
   describeStats,
   formatRatingChange,
   getDefenseBlocker,
@@ -41,7 +48,9 @@ import {
   IBattleEvent,
   IBattleStats,
   IEquipmentItem,
+  IMergeForm,
   IEvolutionRuleInfo,
+  IPassiveNode,
   IMonsterData,
 } from './tamagotchi-interface'
 
@@ -599,5 +608,75 @@ describe('describeReset', () => {
     expect(describeReset('2026-01-01T11:00:00Z', new Date('2026-01-01T08:45:00Z'))).toBe(
       'รีเซ็ตใน 2 ชม. 15 นาที (18:00 น.)'
     )
+  })
+})
+
+describe('passive tree helpers', () => {
+  const node = (id: string, adj: string[], fx: IPassiveNode['fx'] = {}) =>
+    ({ id, adj, fx }) as IPassiveNode
+  const nodes = [
+    node('hub', ['a']),
+    node('a', ['hub', 'b'], { atk: 3 }),
+    node('b', ['a'], { atk: 3, hp: -20 }),
+  ]
+
+  it('allocates only next to the hub or an owned node', () => {
+    expect(canAllocatePassive(nodes, [], 'a')).toBe(true)
+    expect(canAllocatePassive(nodes, [], 'b')).toBe(false)
+    expect(canAllocatePassive(nodes, ['a'], 'b')).toBe(true)
+    expect(canAllocatePassive(nodes, ['a'], 'a')).toBe(false)
+  })
+
+  it('drops only a node that keeps the rest connected', () => {
+    expect(canDeallocatePassive(nodes, ['a', 'b'], 'b')).toBe(true)
+    expect(canDeallocatePassive(nodes, ['a', 'b'], 'a')).toBe(false)
+  })
+
+  it('sums and describes effects', () => {
+    expect(sumPassiveEffects(nodes, ['a', 'b'])).toEqual([
+      { key: 'atk', value: 6 },
+      { key: 'hp', value: -20 },
+    ])
+    expect(describePassiveEffect('hp', -20)).toBe('−20% HP')
+    expect(describePassiveEffect('burn', 1)).toBe('เทิร์นเผาไหม้ของท่าพิเศษ +1')
+  })
+
+  it('charges gems only past the free refunds', () => {
+    const respec = { refunded: 8, freeLeft: 2, gemPrice: 1 }
+    expect(getRespecCost(respec, 2)).toBe(0)
+    expect(getRespecCost(respec, 5)).toBe(3)
+  })
+})
+
+describe('merge helpers', () => {
+  const cost = { coin: 2000, gem: 20 }
+  const rich = { coin: 5000, gem: 50 }
+  const ultimate = (over: Partial<IMonsterData> = {}) =>
+    monster({ stage: EnumMonsterStage.ULTIMATE, ...over })
+
+  it('finds the form for a pair of lines in either order', () => {
+    const forms = [
+      { id: 'a', lines: [EnumMonsterLine.FLAME, EnumMonsterLine.TIDE] },
+      { id: 'b', lines: [EnumMonsterLine.LEAF, EnumMonsterLine.LEAF] },
+    ] as IMergeForm[]
+    expect(findMergeForm(forms, EnumMonsterLine.TIDE, EnumMonsterLine.FLAME)?.id).toBe('a')
+    expect(findMergeForm(forms, EnumMonsterLine.LEAF, EnumMonsterLine.LEAF)?.id).toBe('b')
+    expect(findMergeForm(forms, EnumMonsterLine.LEAF, EnumMonsterLine.TIDE)).toBeUndefined()
+  })
+
+  it('explains what blocks a merge, in the order the server checks', () => {
+    const a = ultimate({ id: 'a' })
+    const b = ultimate({ id: 'b' })
+    expect(getMergeBlocker(a, undefined, rich, cost)).toBe('เลือกมอนสองตัว')
+    expect(getMergeBlocker(a, monster({ stage: EnumMonsterStage.PERFECT }), rich, cost)).toBe(
+      'ต้องเป็นร่างสูงสุด (ยังไม่ใช่ร่างสุดท้าย)'
+    )
+    expect(getMergeBlocker(a, ultimate({ isSick: true }), rich, cost)).toBe('ป่วยอยู่')
+    expect(getMergeBlocker(a, ultimate({ expeditionAreaId: 'meadow' }), rich, cost)).toBe(
+      'ออกสำรวจอยู่'
+    )
+    expect(getMergeBlocker(a, b, { coin: 1999, gem: 50 }, cost)).toBe('เหรียญไม่พอ')
+    expect(getMergeBlocker(a, b, { coin: 5000, gem: 19 }, cost)).toBe('เพชรไม่พอ')
+    expect(getMergeBlocker(a, b, rich, cost)).toBeNull()
   })
 })

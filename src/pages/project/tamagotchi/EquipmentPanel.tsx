@@ -57,6 +57,9 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
                 {item ? (
                   <>
                     <ItemLine item={item} />
+                    <Button size="small" onClick={() => setEnhancing(item)}>
+                      ตีบวก
+                    </Button>
                     <Tooltip title={blocker}>
                       <Button
                         size="small"

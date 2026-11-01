@@ -1,3 +1,17 @@
+# [1.24.0](https://github.com/punya199/demo-app/compare/v1.23.0...v1.24.0) (2026-11-01)
+
+
+### Fix
+
+* keep the other living pets in the cache when a single-pet response arrives ([5c24c66](https://github.com/punya199/demo-app/commit/5c24c6690f87654232756e88607a09429ff8f38c))
+
+### New
+
+* add costume shop tab and costume layers on pets ([2de230c](https://github.com/punya199/demo-app/commit/2de230cb89a82e9d0ece25bbc2b576428e39906f))
+* rename pets from the care screen ([a6ec2e6](https://github.com/punya199/demo-app/commit/a6ec2e62ae4c0c7a5a6c06198cf60401d8dd9d50))
+* show and equip gear per pet ([a51ab15](https://github.com/punya199/demo-app/commit/a51ab15e44eb5b9f09407608a431ae14392f13e7))
+* show set piece counts and set bonus details on gear ([464ed28](https://github.com/punya199/demo-app/commit/464ed2883e11fd062b3b70613089670851670bb1))
+
 # [1.23.0](https://github.com/punya199/demo-app/compare/v1.22.0...v1.23.0) (2026-11-01)
 
 

@@ -1,9 +1,11 @@
-import { Button, Card, Popconfirm, Spin, Tag, Tooltip } from 'antd'
+import { Button, Card, Checkbox, Popconfirm, Segmented, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { EnhanceModal } from './EnhanceModal'
 import { CompareLine, ItemLine } from './EquipmentParts'
 import {
+  BagFilterSlot,
   describeSetEffect,
+  filterBag,
   describeSetTier,
   getEquipBlocker,
   isSetComplete,
@@ -28,6 +30,8 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
   const { mutate: unequip, isPending: isUnequipping } = useUnequip()
   const { mutate: dismantle, isPending: isDismantling } = useDismantle()
   const [enhancing, setEnhancing] = useState<IEquipmentItem | null>(null)
+  const [bagSlot, setBagSlot] = useState<BagFilterSlot>('all')
+  const [freeOnly, setFreeOnly] = useState(false)
 
   if (isLoading || !data) {
     return <Spin />
@@ -38,6 +42,8 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
   const isWorn = (item: IEquipmentItem) => isWornBy(item, data.monsterId)
   const worn = new Map(data.items.filter(isWorn).map((item) => [item.slot, item]))
   const bag = data.items.filter((item) => !isWorn(item))
+  const shownBag = filterBag(bag, { slot: bagSlot, freeOnly })
+  const countIn = (slot: BagFilterSlot) => filterBag(bag, { slot, freeOnly }).length
   const petOf = (item: IEquipmentItem) => data.pets.find((pet) => pet.id === item.monsterId)
   const pet = data.pets.find((row) => row.id === data.monsterId)
   const setOf = (item: IEquipmentItem) => data.sets.find((set) => set.setId === item.setId)
@@ -47,7 +53,8 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
     <div className="flex w-full flex-col gap-3">
       {pet && (
         <div className="text-center text-sm text-slate-600 dark:text-slate-300">
-          อุปกรณ์ของ {pet.emoji} {pet.name} (เปลี่ยนตัวที่หน้าเลี้ยง แต่ละตัวมีชุดของตัวเอง)
+          อุปกรณ์ของ {pet.emoji} {pet.name} (เปลี่ยนตัวที่แถบด้านบน แต่ละตัวมีชุดของตัวเอง
+          ชิ้นหนึ่งใส่ได้ทีละตัว)
         </div>
       )}
       {data.stats && (
@@ -103,7 +110,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
           return (
             <Card key={slot} size="small" className="dark:border-slate-700 dark:bg-slate-900">
               <div className="flex items-center gap-3">
-                <span className="w-24 text-sm">{slotLabel[slot]}</span>
+                <span className="w-28 shrink-0 text-sm">{slotLabel[slot]}</span>
                 {item ? (
                   <>
                     <ItemLine item={item} set={setOf(item)} />
@@ -121,7 +128,14 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
                     </Tooltip>
                   </>
                 ) : (
-                  <span className="flex-1 text-sm text-slate-400">ว่าง</span>
+                  <Button
+                    type="link"
+                    size="small"
+                    className="!px-0"
+                    onClick={() => setBagSlot(slot)}
+                  >
+                    ว่าง · เลือกจากกระเป๋า
+                  </Button>
                 )}
               </div>
             </Card>
@@ -135,12 +149,30 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
           {data.items.length}/{data.capacity}
         </span>
       </div>
-      {bag.length === 0 && (
+      <div className="overflow-x-auto">
+        <Segmented<BagFilterSlot>
+          value={bagSlot}
+          onChange={setBagSlot}
+          options={[
+            { value: 'all', label: `ทั้งหมด (${countIn('all')})` },
+            ...Object.values(EnumEquipmentSlot).map((slot) => ({
+              value: slot,
+              label: `${slotLabel[slot]} (${countIn(slot)})`,
+            })),
+          ]}
+        />
+      </div>
+      <Checkbox checked={freeOnly} onChange={(event) => setFreeOnly(event.target.checked)}>
+        เฉพาะชิ้นที่ยังไม่มีใครใส่
+      </Checkbox>
+      {shownBag.length === 0 && (
         <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-          ยังไม่มีอุปกรณ์ในกระเป๋า ซื้อกล่องสุ่มที่ร้านค้า หรือสู้ในผจญภัยเพื่อลุ้นดรอป
+          {bag.length === 0
+            ? 'ยังไม่มีอุปกรณ์ในกระเป๋า ซื้อกล่องสุ่มที่ร้านค้า หรือสู้ในผจญภัยเพื่อลุ้นดรอป'
+            : 'ไม่มีอุปกรณ์ประเภทนี้'}
         </p>
       )}
-      {bag.map((item) => (
+      {shownBag.map((item) => (
         <Card key={item.id} size="small" className="dark:border-slate-700 dark:bg-slate-900">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-slate-500">{slotLabel[item.slot]}</span>
@@ -150,25 +182,34 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
                 ใส่อยู่กับ {petOf(item)!.emoji} {petOf(item)!.name}
               </Tag>
             )}
-            <Tooltip title={blocker}>
-              <Popconfirm
-                title="ย้ายมาใส่ตัวนี้?"
-                description={`${petOf(item)?.name ?? 'ตัวเดิม'} จะเสียชิ้นนี้ไป`}
-                okText="ย้าย"
-                cancelText="ยกเลิก"
-                disabled={!petOf(item)}
-                onConfirm={() => equip(item.id, { onError })}
-              >
+            {petOf(item) ? (
+              // One pet at a time: a piece another pet wears only moves on an explicit confirm.
+              <Tooltip title={blocker}>
+                <Popconfirm
+                  title="ย้ายมาใส่ตัวนี้?"
+                  description={`ถอดจาก ${petOf(item)!.name} แล้วใส่ให้ ${pet?.name ?? 'ตัวนี้'}`}
+                  okText="ย้าย"
+                  cancelText="ยกเลิก"
+                  disabled={!!blocker || isBusy}
+                  onConfirm={() => equip({ equipmentId: item.id, move: true }, { onError })}
+                >
+                  <Button size="small" disabled={!!blocker || isBusy}>
+                    ย้ายมาใส่ตัวนี้
+                  </Button>
+                </Popconfirm>
+              </Tooltip>
+            ) : (
+              <Tooltip title={blocker}>
                 <Button
                   size="small"
                   type="primary"
                   disabled={!!blocker || isBusy}
-                  onClick={() => !petOf(item) && equip(item.id, { onError })}
+                  onClick={() => equip({ equipmentId: item.id }, { onError })}
                 >
                   สวม
                 </Button>
-              </Popconfirm>
-            </Tooltip>
+              </Tooltip>
+            )}
             <Button size="small" onClick={() => setEnhancing(item)}>
               ตีบวก
             </Button>

@@ -76,7 +76,7 @@ const setSelectedMonster = (queryClient: QueryClient, monster: IMonsterData) => 
 }
 
 // The server advances the monster's clock on every read, so polling keeps hearts and poops fresh.
-// Each poll also marks the player online (evolution x2, ); TanStack Query
+// Each poll also marks the player online (evolution x2, stamina regains x2); TanStack Query
 // pauses the interval while the tab is in the background, which is what "online" should mean.
 const REFETCH_INTERVAL_MS = 60 * 1000
 
@@ -412,9 +412,11 @@ const useEquipmentMutation = <TInput,>(request: (input: TInput) => Promise<IEqui
   })
 }
 
+// `move` takes a piece another pet is wearing and puts it on the selected one; without it the
+// server refuses a piece that is already worn.
 export const useEquip = () =>
-  useEquipmentMutation(async (equipmentId: string) => {
-    const { data } = await apiClient.post<IEquipmentData>(`/equipment/equip`, { equipmentId })
+  useEquipmentMutation(async (input: { equipmentId: string; move?: boolean }) => {
+    const { data } = await apiClient.post<IEquipmentData>(`/equipment/equip`, input)
     return data
   })
 
@@ -1023,3 +1025,57 @@ export const useEquipCostume = () =>
 export const useUnequipCostume = () =>
   useCostumeMutation<{ slot: EnumCostumeSlot; monsterId?: string }>('unequip')
 export const useSetShowCostume = () => useCostumeMutation<{ show: boolean }>('privacy')
+
+export const usePlayMinigame = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { hits: number; monsterId: string }) => {
+      const { data } = await apiClient.post<{ monster: IMonsterData; reward: number }>(
+        `/monster/minigame`,
+        input
+      )
+      return data
+    },
+    onSuccess: (data) => {
+      setSelectedMonster(queryClient, data.monster)
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+    },
+  })
+}
+
+export const useRefillStamina = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (monsterId: string) => {
+      const { data } = await apiClient.post<{ monster: IMonsterData; wallet: IWallet }>(
+        `/monster/stamina/refill`,
+        { monsterId }
+      )
+      return data
+    },
+    onSuccess: (data) => {
+      setSelectedMonster(queryClient, data.monster)
+      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+    },
+  })
+}
+
+// The forms one monster has been, egg first (for its evolution tree).
+export const useGetEvolutionPath = (monsterId: string | null) => {
+  return useQuery({
+    queryKey: ['monster', 'evolution-path', monsterId],
+    enabled: !!monsterId,
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ monsterId: string; path: string[] }>(
+        `/monster/${monsterId}/evolution-path`
+      )
+      return data
+    },
+  })
+}

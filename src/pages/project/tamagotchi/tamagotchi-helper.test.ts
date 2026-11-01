@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
+  filterBag,
+  getAdventureBlocker,
+  getMinigameBlocker,
+  getStaminaRefillBlocker,
+  isInZone,
+  minigameBarPosition,
+  staminaFullInMinutes,
+} from './tamagotchi-helper'
+import {
   describeBattleEvent,
   describeConditions,
   describeMissingConditions,
@@ -55,6 +64,7 @@ import {
 } from './tamagotchi-helper'
 import {
   EnumEquipmentGrade,
+  EnumEquipmentSlot,
   EnumMonsterAction,
   EnumMonsterLine,
   EnumMonsterStage,
@@ -86,6 +96,7 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   emoji: '🦎',
   fullness: 4,
   strength: 4,
+  stamina: 100,
   weight: 20,
   poops: 1,
   isSick: false,
@@ -99,6 +110,7 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   battleStats: null,
   potentialView: { isLegacy: true, grade: null, average: null, stats: {} as never },
   autoBattleReadyAt: null,
+  minigameReadyAt: null,
   expeditionAreaId: null,
   expeditionMinutes: 0,
   expeditionReturned: false,
@@ -902,5 +914,82 @@ describe('set progress labels', () => {
     expect(describeSetEffect({ critChance: 0.1, critDamage: 0.2 })).toBe(
       'อัตราคริติคอล +10% · ดาเมจคริติคอล +20%'
     )
+  })
+})
+
+describe('adventure stamina helpers', () => {
+  it('adds the stamina gate on top of the normal battle checks', () => {
+    expect(getAdventureBlocker(monster({ stamina: 10 }), 10)).toBeNull()
+    expect(getAdventureBlocker(monster({ stamina: 9.9 }), 10)).toBe(
+      'Stamina ไม่พอ รอฟื้นหรือเติมก่อน'
+    )
+    expect(getAdventureBlocker(monster({ isSick: true, stamina: 0 }), 10)).toBe(
+      'ป่วยอยู่ สู้ไม่ได้'
+    )
+  })
+
+  it('works out when stamina is full again', () => {
+    expect(staminaFullInMinutes(100, 100, 10)).toBe(0)
+    expect(staminaFullInMinutes(70, 100, 10)).toBe(180)
+    expect(staminaFullInMinutes(99.5, 100, 10)).toBe(3)
+  })
+
+  it('blocks the mini-game during its cooldown', () => {
+    const readyAt = new Date(NOW.getTime() + 90_000).toISOString()
+    expect(getMinigameBlocker(monster({ minigameReadyAt: readyAt }), NOW)).toBe(
+      'เล่นได้อีกครั้งใน 2 นาที'
+    )
+    expect(getMinigameBlocker(monster(), NOW)).toBeNull()
+    expect(getMinigameBlocker(monster({ stage: EnumMonsterStage.EGG }), NOW)).toBe(
+      'ต้องมีมอนที่ฟักแล้ว'
+    )
+  })
+
+  it('only allows a gem refill that can happen', () => {
+    expect(getStaminaRefillBlocker(monster({ stamina: 100 }), 100, 99, 5)).toBe(
+      'Stamina เต็มอยู่แล้ว'
+    )
+    expect(getStaminaRefillBlocker(monster({ stamina: 40 }), 100, 4, 5)).toBe('เพชรไม่พอ')
+    expect(getStaminaRefillBlocker(monster({ stamina: 40 }), 100, 5, 5)).toBeNull()
+  })
+
+  it('sweeps the mini-game bar and checks the zone inclusively', () => {
+    expect(minigameBarPosition(250, 1000)).toBe(50)
+    expect(minigameBarPosition(500, 1000)).toBe(100)
+    expect(minigameBarPosition(750, 1000)).toBe(50)
+    expect(isInZone(40, { start: 40, width: 20 })).toBe(true)
+    expect(isInZone(60.1, { start: 40, width: 20 })).toBe(false)
+  })
+})
+
+describe('filterBag', () => {
+  const item = (over: Partial<IEquipmentItem>) =>
+    ({
+      id: 'x',
+      slot: EnumEquipmentSlot.WEAPON,
+      grade: EnumEquipmentGrade.COMMON,
+      enhanceLevel: 0,
+      equipped: false,
+      monsterId: null,
+      ...over,
+    }) as IEquipmentItem
+  const bag = [
+    item({ id: 'sword', grade: EnumEquipmentGrade.RARE, enhanceLevel: 1 }),
+    item({ id: 'axe', grade: EnumEquipmentGrade.RARE, enhanceLevel: 5 }),
+    item({ id: 'helm', slot: EnumEquipmentSlot.HELMET, grade: EnumEquipmentGrade.EPIC }),
+    item({ id: 'worn', grade: EnumEquipmentGrade.LEGENDARY, equipped: true, monsterId: 'pet-2' }),
+  ]
+
+  it('keeps one slot type, best grade then highest level first', () => {
+    expect(
+      filterBag(bag, { slot: EnumEquipmentSlot.WEAPON, freeOnly: false }).map((i) => i.id)
+    ).toEqual(['worn', 'axe', 'sword'])
+    expect(filterBag(bag, { slot: 'all', freeOnly: false })).toHaveLength(4)
+  })
+
+  it('can hide pieces another pet is wearing', () => {
+    expect(
+      filterBag(bag, { slot: EnumEquipmentSlot.WEAPON, freeOnly: true }).map((i) => i.id)
+    ).toEqual(['axe', 'sword'])
   })
 })

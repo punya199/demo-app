@@ -216,6 +216,73 @@ export const getBattleBlocker = (monster: IMonsterData | null): string | null =>
   return null
 }
 
+// Adventure fights also need stamina (other battle modes don't): mirrors assertCanAdventure.
+export const getAdventureBlocker = (
+  monster: IMonsterData | null,
+  staminaCost: number
+): string | null =>
+  getBattleBlocker(monster) ??
+  (monster && monster.stamina < staminaCost ? 'Stamina ไม่พอ รอฟื้นหรือเติมก่อน' : null)
+
+// Minutes until stamina is full again at the given regen rate (per hour); 0 when already full.
+export const staminaFullInMinutes = (stamina: number, max: number, regenPerHour: number) =>
+  Math.max(0, Math.ceil(((max - stamina) / regenPerHour) * 60))
+
+export const getMinigameBlocker = (monster: IMonsterData | null, now: Date): string | null => {
+  if (!monster || monster.diedAt || monster.stage === EnumMonsterStage.EGG) {
+    return 'ต้องมีมอนที่ฟักแล้ว'
+  }
+  if (monster.minigameReadyAt && new Date(monster.minigameReadyAt) > now) {
+    const minutesLeft = Math.ceil(
+      (new Date(monster.minigameReadyAt).getTime() - now.getTime()) / 60_000
+    )
+    return `เล่นได้อีกครั้งใน ${formatAge(minutesLeft)}`
+  }
+  return null
+}
+
+export const getStaminaRefillBlocker = (
+  monster: IMonsterData | null,
+  max: number,
+  gem: number,
+  price: number
+): string | null => {
+  if (!monster || monster.diedAt || monster.stage === EnumMonsterStage.EGG) {
+    return 'ต้องมีมอนที่ฟักแล้ว'
+  }
+  if (monster.stamina >= max) {
+    return 'Stamina เต็มอยู่แล้ว'
+  }
+  return gem < price ? 'เพชรไม่พอ' : null
+}
+
+// Mini-game bar: position 0-100 sweeping back and forth once per `periodMs`.
+export const minigameBarPosition = (elapsedMs: number, periodMs: number) => {
+  const phase = (elapsedMs % periodMs) / periodMs
+  return phase < 0.5 ? phase * 200 : (1 - phase) * 200
+}
+
+export const isInZone = (position: number, zone: { start: number; width: number }) =>
+  position >= zone.start && position <= zone.start + zone.width
+
+export type BagFilterSlot = EnumEquipmentSlot | 'all'
+
+// The bag as the gear screen lists it: one slot type (or all), optionally only pieces nobody
+// wears, highest grade first then highest level.
+export const filterBag = (
+  items: IEquipmentItem[],
+  filter: { slot: BagFilterSlot; freeOnly: boolean }
+) => {
+  const gradeOrder = Object.values(EnumEquipmentGrade)
+  return items
+    .filter((item) => filter.slot === 'all' || item.slot === filter.slot)
+    .filter((item) => !filter.freeOnly || !item.equipped)
+    .sort(
+      (a, b) =>
+        gradeOrder.indexOf(b.grade) - gradeOrder.indexOf(a.grade) || b.enhanceLevel - a.enhanceLevel
+    )
+}
+
 // Mirrors startExpedition's checks so the button explains itself.
 export const getExpeditionBlocker = (
   monster: IMonsterData | null,
@@ -348,6 +415,9 @@ const serverMessageLabel: Record<string, string> = {
   'Take part in this world boss first': 'ต้องเคยรับรางวัลบอสโลกตัวนี้ก่อนถึงแลกได้',
   'Exchange not found': 'ไม่พบรายการแลก',
   'Equipment not found': 'ไม่พบอุปกรณ์',
+  'Equipment is worn by another monster': 'ชิ้นนี้ตัวอื่นใส่อยู่ ถอดหรือย้ายมาก่อน',
+  'Not enough stamina': 'Stamina ไม่พอ รอฟื้นหรือเติมก่อน',
+  'Stamina is already full': 'Stamina เต็มอยู่แล้ว',
   'Take the equipment off first': 'ถอดอุปกรณ์ก่อน',
   'Equipment bag is full': 'กระเป๋าอุปกรณ์เต็ม',
   'Not enough enhance stones': 'หินตีบวกไม่พอ',

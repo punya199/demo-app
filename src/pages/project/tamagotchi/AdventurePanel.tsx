@@ -1,18 +1,21 @@
 import { Button, Card, Spin, Tag, Tooltip } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import { BattleModal } from './BattleModal'
+import { StaminaCard } from './StaminaCard'
 import {
   elementLabel,
+  getAdventureBlocker,
   getAutoBattleDelayMs,
-  getBattleBlocker,
   stageLabel,
 } from './tamagotchi-helper'
-import { IMonsterData } from './tamagotchi-interface'
+import { EnumMonsterStage, IMonsterData } from './tamagotchi-interface'
 import {
   IBattleResponse,
   useAdventureBattle,
   useApplyBattleResult,
   useGetAdventure,
+  useGetWallet,
+  useGetWiki,
 } from './tamagotchi-service'
 
 interface IAdventurePanelProps {
@@ -28,7 +31,9 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
   const [replay, setReplay] = useState<IBattleResponse | null>(null)
   // Stage being auto-battled; the loop runs while this page is open and visible.
   const [autoStageId, setAutoStageId] = useState<string | null>(null)
-  const blocker = getBattleBlocker(monster)
+  const { data: wiki } = useGetWiki()
+  const { data: wallet } = useGetWallet()
+  const blocker = getAdventureBlocker(monster, wiki?.stamina.adventureCost ?? 0)
   const autoReadyAt = monster?.autoBattleReadyAt
 
   const closeReplay = useCallback(() => {
@@ -78,8 +83,17 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
 
   return (
     <div className="flex w-full flex-col gap-4">
+      {monster && wiki && !monster.diedAt && monster.stage !== EnumMonsterStage.EGG && (
+        <StaminaCard
+          monster={monster}
+          rules={wiki.stamina}
+          gem={wallet?.gem ?? 0}
+          onError={onError}
+        />
+      )}
       <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-        ชนะครั้งแรกได้เหรียญ x2 · บอสครั้งแรกได้เพชร
+        สู้แต่ละครั้งใช้ stamina {wiki?.stamina.adventureCost} · ชนะครั้งแรกได้เหรียญ x2 ·
+        บอสครั้งแรกได้เพชร
         <br />
         ด่านที่ชนะแล้ว (ไม่ใช่บอส) ตั้งต่อสู้อัตโนมัติได้ ต้องเปิดหน้านี้ค้างไว้
       </p>

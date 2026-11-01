@@ -105,6 +105,8 @@ export interface IMonsterData {
   emoji: string
   fullness: number
   strength: number
+  // Adventure stamina (0-100): regained over time, spent by adventure fights.
+  stamina: number
   weight: number
   poops: number
   isSick: boolean
@@ -119,6 +121,7 @@ export interface IMonsterData {
   potentialView: IPotentialView
   trainReadyAt: string | null
   autoBattleReadyAt: string | null
+  minigameReadyAt: string | null
   // Set while out on an expedition; `expeditionReturned` = back home, waiting to be collected.
   expeditionAreaId: string | null
   expeditionMinutes: number
@@ -663,6 +666,17 @@ interface IStageRates {
 type HatchedStage = Exclude<EnumMonsterStage, EnumMonsterStage.EGG>
 
 // GET /monster/wiki: the game's rule constants and data, used by the in-game guide.
+export interface IWikiStamina {
+  max: number
+  adventureCost: number
+  regenPerHour: number
+  onlineRegenMultiplier: number
+  minigameRounds: number
+  minigameRewards: number[]
+  minigameCooldownMinutes: number
+  refillGemPrice: number
+}
+
 export interface IWikiData {
   care: {
     maxHearts: number
@@ -682,7 +696,8 @@ export interface IWikiData {
     trainWeightLoss: number
     trainCooldownMinutes: number
   }
-  online: { graceMinutes: number; evolutionMultiplier: number }
+  online: { graceMinutes: number; evolutionMultiplier: number; staminaRegenMultiplier: number }
+  stamina: IWikiStamina
   evolution: {
     stageDurationMinutes: Record<EnumMonsterStage, number | null>
     species: IWikiSpecies[]

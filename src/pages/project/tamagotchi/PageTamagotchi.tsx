@@ -1,8 +1,8 @@
 import { ArrowLeftOutlined } from '@ant-design/icons'
-import { Button, Card, message, Progress, Spin, Tabs, Tag, Tooltip } from 'antd'
+import { Button, Card, message, Progress, Spin, Tag, Tooltip } from 'antd'
 import { useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { appPath } from '../../../config/app-paths'
 import { useGetMeSuspense } from '../../../service'
@@ -10,6 +10,7 @@ import { AdventurePanel } from './AdventurePanel'
 import { CostumePanel } from './CostumePanel'
 import { DexPanel } from './DexPanel'
 import { EquipmentPanel } from './EquipmentPanel'
+import { EvolutionTreeModal } from './EvolutionTreeModal'
 import { ExpeditionPanel } from './ExpeditionPanel'
 import { MergeModal } from './MergeModal'
 import { PassivePanel } from './PassivePanel'
@@ -23,10 +24,12 @@ import { PvpPanel } from './PvpPanel'
 import { QuestPanel } from './QuestPanel'
 import { ShopPanel } from './ShopPanel'
 import { WikiPanel } from './WikiPanel'
+import { GAME_MENU, GameMenuKey, parseMenuHash } from './game-menu'
 import {
   actionOptions,
   deathCauseLabel,
   describeMissingConditions,
+  elementLabel,
   formatAge,
   getActionBlocker,
   getEvolutionCountdown,
@@ -37,7 +40,7 @@ import {
   toHearts,
   toThaiErrorMessage,
 } from './tamagotchi-helper'
-import { EnumMonsterStage, IMonsterData } from './tamagotchi-interface'
+import { EnumMonsterStage, IMonsterData, IWikiSpecies } from './tamagotchi-interface'
 import {
   useGetMonsterHistory,
   useGetMyMonster,
@@ -202,8 +205,9 @@ const MonsterSlots = (props: {
   selectedId: string | undefined
   max: number
   onNewEgg: () => void
+  onSelected: () => void
 }) => {
-  const { monsters, selectedId, max, onNewEgg } = props
+  const { monsters, selectedId, max, onNewEgg, onSelected } = props
   const { mutate: select, isPending } = useSelectMonster()
   return (
     <div className="grid grid-cols-4 gap-2">
@@ -230,7 +234,11 @@ const MonsterSlots = (props: {
             type={monster.id === selectedId ? 'primary' : 'default'}
             disabled={isPending}
             className="!h-auto !py-2"
-            onClick={() => monster.id !== selectedId && select(monster.id, { onError: showError })}
+            onClick={() =>
+              monster.id === selectedId
+                ? onSelected()
+                : select(monster.id, { onError: showError, onSuccess: onSelected })
+            }
           >
             <span className="flex flex-col items-center leading-tight">
               <span className="text-xl">{monster.isSick ? '🤒' : monster.emoji}</span>
@@ -243,9 +251,14 @@ const MonsterSlots = (props: {
   )
 }
 
-const MonsterScreen = (props: { monster: IMonsterData; fetchedAt: number }) => {
-  const { monster, fetchedAt } = props
+const MonsterScreen = (props: {
+  monster: IMonsterData
+  fetchedAt: number
+  species: IWikiSpecies[] | undefined
+}) => {
+  const { monster, fetchedAt, species } = props
   const now = useNow(5000)
+  const [isTreeOpen, setIsTreeOpen] = useState(false)
   const { mutate: act, isPending } = useMonsterAction()
   const isEgg = monster.stage === EnumMonsterStage.EGG
 
@@ -274,6 +287,19 @@ const MonsterScreen = (props: { monster: IMonsterData; fetchedAt: number }) => {
         </div>
         <div className="mt-3">
           <EvolutionPanel monster={monster} fetchedAt={fetchedAt} now={now} />
+          {species && (
+            <>
+              <Button size="small" className="mt-2" onClick={() => setIsTreeOpen(true)}>
+                🌳 สายวิวัฒนาการ
+              </Button>
+              <EvolutionTreeModal
+                open={isTreeOpen}
+                monster={monster}
+                species={species}
+                onClose={() => setIsTreeOpen(false)}
+              />
+            </>
+          )}
         </div>
         {!isEgg && (
           <div className="mt-3 flex flex-col gap-2 text-sm">
@@ -346,12 +372,15 @@ const HallOfFame = () => {
   )
 }
 
-const TamagotchiGame = () => {
+const TamagotchiGame = (props: {
+  isChoosingEgg: boolean
+  setIsChoosingEgg: (value: boolean) => void
+}) => {
+  const { isChoosingEgg, setIsChoosingEgg } = props
   const { data, isLoading, dataUpdatedAt } = useGetMyMonster()
   const queryClient = useQueryClient()
   const { data: wallet } = useGetWallet()
   const { data: wiki } = useGetWiki()
-  const [isChoosingEgg, setIsChoosingEgg] = useState(false)
   const [isMerging, setIsMerging] = useState(false)
   const monster = data?.monster ?? null
   // Fixed slot order (oldest first), whichever pet is selected.
@@ -363,7 +392,7 @@ const TamagotchiGame = () => {
   // A new egg was hatched: back from the picker to the care screen.
   useEffect(() => {
     setIsChoosingEgg(false)
-  }, [monsters.length])
+  }, [monsters.length, setIsChoosingEgg])
 
   // The server only records a death when it ticks the monster, which can happen after the
   // history was fetched - refresh it so the Hall of Fame includes the monster that just died.
@@ -385,12 +414,6 @@ const TamagotchiGame = () => {
   }
   return (
     <div className="flex w-full flex-col gap-4">
-      <MonsterSlots
-        monsters={monsters}
-        selectedId={monster.id}
-        max={data?.maxMonsters ?? 4}
-        onNewEgg={() => setIsChoosingEgg(true)}
-      />
       {monsters.length >= 2 && wiki && (
         <>
           <Button onClick={() => setIsMerging(true)}>🧬 รวมร่างมอนสูงสุด</Button>
@@ -410,17 +433,147 @@ const TamagotchiGame = () => {
           <Button onClick={() => setIsChoosingEgg(false)}>ยกเลิก</Button>
         </>
       ) : (
-        <MonsterScreen key={monster.id} monster={monster} fetchedAt={dataUpdatedAt} />
+        <MonsterScreen
+          key={monster.id}
+          monster={monster}
+          fetchedAt={dataUpdatedAt}
+          species={wiki?.evolution.species}
+        />
       )}
     </div>
   )
 }
 
-const GameTabs = () => {
+// The selected pet, shown above every screen: who the actions and fights apply to.
+const ActivePetBar = (props: {
+  monster: IMonsterData | null
+  monsters: IMonsterData[]
+  max: number
+  onNewEgg: () => void
+}) => {
+  const { monster, monsters, max, onNewEgg } = props
+  const [isPicking, setIsPicking] = useState(false)
+  const isEgg = monster?.stage === EnumMonsterStage.EGG
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white/95 p-2 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/95">
+      <div className="flex items-center gap-2">
+        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-lime-100 text-2xl dark:bg-lime-200">
+          {monster ? (monster.isSick ? '🤒' : monster.emoji) : '🥚'}
+        </div>
+        <div className="min-w-0 flex-1">
+          {monster ? (
+            <>
+              <div className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {monster.displayName}
+                <span className="ml-1 text-xs font-normal text-slate-500 dark:text-slate-400">
+                  {stageLabel[monster.stage]} · {elementLabel[monster.line]}
+                </span>
+              </div>
+              {!isEgg && !monster.diedAt && (
+                <div className="flex flex-wrap gap-x-2 text-xs text-slate-500 dark:text-slate-400">
+                  <span>
+                    อิ่ม {toHearts(monster.fullness)}/{MAX_HEARTS}
+                  </span>
+                  <span>
+                    แรง {toHearts(monster.strength)}/{MAX_HEARTS}
+                  </span>
+                  <span>⚡ {Math.floor(monster.stamina)}</span>
+                  {monster.isSick && <span className="text-red-500">ป่วย</span>}
+                  {monster.expeditionAreaId && <span className="text-sky-600">ออกสำรวจ</span>}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-sm text-slate-500 dark:text-slate-400">ยังไม่มีมอน</div>
+          )}
+        </div>
+        {monsters.length > 0 && (
+          <Button
+            size="small"
+            onClick={() => setIsPicking((value) => !value)}
+            aria-expanded={isPicking}
+          >
+            เปลี่ยน {isPicking ? '▴' : '▾'}
+          </Button>
+        )}
+      </div>
+      {isPicking && (
+        <div className="mt-2">
+          <MonsterSlots
+            monsters={monsters}
+            selectedId={monster?.id}
+            max={max}
+            onNewEgg={() => {
+              setIsPicking(false)
+              onNewEgg()
+            }}
+            onSelected={() => setIsPicking(false)}
+          />
+        </div>
+      )}
+    </div>
+  )
+}
+
+const GameMenu = (props: { active: GameMenuKey; onSelect: (key: GameMenuKey) => void }) => (
+  <nav aria-label="เมนูเกม" className="flex flex-col gap-2">
+    {GAME_MENU.map((group) => (
+      <div key={group.title}>
+        <div className="mb-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+          {group.title}
+        </div>
+        <div className="grid grid-cols-5 gap-1.5 lg:grid-cols-3">
+          {group.items.map((item) => {
+            const isActive = item.key === props.active
+            return (
+              <button
+                key={item.key}
+                type="button"
+                aria-current={isActive ? 'page' : undefined}
+                onClick={() => props.onSelect(item.key)}
+                className={`flex min-h-14 flex-col items-center justify-center rounded-lg border px-1 py-1.5 text-center text-[11px] leading-tight transition-colors focus-visible:outline-2 focus-visible:outline-amber-500 ${
+                  isActive
+                    ? 'border-amber-500 bg-amber-50 font-semibold text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                    : 'border-slate-200 bg-white text-slate-700 hover:border-amber-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200'
+                }`}
+              >
+                <span className="text-lg">{item.emoji}</span>
+                {item.label}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    ))}
+  </nav>
+)
+
+// Which screen is open lives in the URL hash, so a reload or a shared link keeps it.
+const useMenuFromHash = () => {
+  const [menu, setMenu] = useState<GameMenuKey>(() => parseMenuHash(window.location.hash))
+  useEffect(() => {
+    const onHashChange = () => setMenu(parseMenuHash(window.location.hash))
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+  const select = (key: GameMenuKey) => {
+    window.history.replaceState(null, '', `#${key}`)
+    setMenu(key)
+  }
+  return [menu, select] as const
+}
+
+const GameShell = () => {
   const queryClient = useQueryClient()
   const { data: monsterData } = useGetMyMonster()
   const { data: wallet } = useGetWallet()
+  const [menu, setMenu] = useMenuFromHash()
+  const [isChoosingEgg, setIsChoosingEgg] = useState(false)
   const monster = monsterData?.monster ?? null
+  const monsters = [...(monsterData?.monsters ?? [])].sort(
+    (a, b) => new Date(a.bornAt).getTime() - new Date(b.bornAt).getTime()
+  )
   const coin = wallet?.coin ?? 0
   const speciesId = monster?.speciesId
 
@@ -432,78 +585,56 @@ const GameTabs = () => {
     }
   }, [speciesId, queryClient])
 
+  const panels: Record<GameMenuKey, ReactNode> = {
+    care: (
+      <div className="flex flex-col items-center gap-8">
+        <TamagotchiGame isChoosingEgg={isChoosingEgg} setIsChoosingEgg={setIsChoosingEgg} />
+        <HallOfFame />
+      </div>
+    ),
+    equipment: <EquipmentPanel monster={monster} coin={coin} onError={showError} />,
+    passive: <PassivePanel onError={showError} />,
+    costume: <CostumePanel monster={monster} onError={showError} />,
+    shop: <ShopPanel monster={monster} coin={coin} onError={showError} />,
+    adventure: <AdventurePanel monster={monster} onError={showError} />,
+    expedition: <ExpeditionPanel monster={monster} onError={showError} />,
+    raid: <RaidPanel monster={monster} onError={showError} />,
+    'world-boss': <WorldBossPanel monster={monster} onError={showError} />,
+    pvp: <PvpPanel monster={monster} onError={showError} />,
+    quests: <QuestPanel onError={showError} />,
+    friends: <FriendsPanel monster={monster} onError={showError} />,
+    dex: <DexPanel />,
+    wiki: <WikiPanel />,
+  }
+
   return (
-    <div className="flex w-full flex-col gap-2">
-      <div className="flex justify-end gap-4 font-semibold">
+    <div className="flex w-full flex-col gap-3">
+      <div className="flex justify-end gap-4 text-sm font-semibold">
         <span className="text-amber-600 dark:text-amber-400">🪙 {coin}</span>
         <span className="text-sky-600 dark:text-sky-400">💎 {wallet?.gem ?? 0}</span>
         <span className="text-purple-600 dark:text-purple-400">🎖️ {wallet?.raidToken ?? 0}</span>
       </div>
-      <Tabs
-        centered
-        destroyOnHidden
-        items={[
-          {
-            key: 'care',
-            label: 'เลี้ยง',
-            children: (
-              <div className="flex flex-col items-center gap-8">
-                <TamagotchiGame />
-                <HallOfFame />
-              </div>
-            ),
-          },
-          {
-            key: 'expedition',
-            label: 'สำรวจ',
-            children: <ExpeditionPanel monster={monster} onError={showError} />,
-          },
-          {
-            key: 'adventure',
-            label: 'ผจญภัย',
-            children: <AdventurePanel monster={monster} onError={showError} />,
-          },
-          { key: 'quests', label: 'ภารกิจ', children: <QuestPanel onError={showError} /> },
-          {
-            key: 'friends',
-            label: 'เพื่อน',
-            children: <FriendsPanel monster={monster} onError={showError} />,
-          },
-          {
-            key: 'world-boss',
-            label: 'บอสโลก',
-            children: <WorldBossPanel monster={monster} onError={showError} />,
-          },
-          {
-            key: 'raid',
-            label: 'บอส',
-            children: <RaidPanel monster={monster} onError={showError} />,
-          },
-          {
-            key: 'pvp',
-            label: 'สนามประลอง',
-            children: <PvpPanel monster={monster} onError={showError} />,
-          },
-          {
-            key: 'equipment',
-            label: 'อุปกรณ์',
-            children: <EquipmentPanel monster={monster} coin={coin} onError={showError} />,
-          },
-          { key: 'passive', label: 'ต้นไม้', children: <PassivePanel onError={showError} /> },
-          {
-            key: 'shop',
-            label: 'ร้านค้า',
-            children: <ShopPanel monster={monster} coin={coin} onError={showError} />,
-          },
-          {
-            key: 'costume',
-            label: 'ชุดแต่งตัว',
-            children: <CostumePanel monster={monster} onError={showError} />,
-          },
-          { key: 'dex', label: 'Dex', children: <DexPanel /> },
-          { key: 'wiki', label: 'คู่มือ', children: <WikiPanel /> },
-        ]}
-      />
+      {/* Phone: pet bar (sticky), menu and screen stack in one column. Wide screens: the pet bar
+          and menu stay put in a side column next to the screen. */}
+      <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start">
+        <aside className="contents lg:sticky lg:top-4 lg:flex lg:flex-col lg:gap-4">
+          <div className="sticky top-0 z-20 lg:static">
+            <ActivePetBar
+              monster={monster}
+              monsters={monsters}
+              max={monsterData?.maxMonsters ?? 4}
+              onNewEgg={() => {
+                setIsChoosingEgg(true)
+                setMenu('care')
+              }}
+            />
+          </div>
+          <GameMenu active={menu} onSelect={setMenu} />
+        </aside>
+        <section className="min-w-0" aria-live="polite">
+          {panels[menu]}
+        </section>
+      </div>
     </div>
   )
 }
@@ -517,8 +648,8 @@ const PageTamagotchi = () => {
   }
 
   return (
-    <div className="flex min-h-full flex-col items-center gap-6 px-6 py-16">
-      <div className="relative flex w-full max-w-sm items-center justify-center">
+    <div className="mx-auto flex min-h-full w-full max-w-6xl flex-col gap-4 px-4 py-8 sm:px-6 sm:py-12">
+      <div className="relative flex w-full items-center justify-center">
         <Link
           to={appPath.games()}
           className="absolute left-0 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
@@ -526,11 +657,9 @@ const PageTamagotchi = () => {
         >
           <ArrowLeftOutlined className="text-lg" />
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">มอนสเตอร์</h1>
+        <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">มอนสเตอร์</h1>
       </div>
-      <div className="flex w-full max-w-sm flex-col items-center">
-        <GameTabs />
-      </div>
+      <GameShell />
     </div>
   )
 }

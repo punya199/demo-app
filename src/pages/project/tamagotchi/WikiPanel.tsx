@@ -1,5 +1,7 @@
 import { Collapse, Spin, Tag } from 'antd'
-import { ReactNode } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
+import { buildEvolutionTree } from './evolution-tree'
+import { EvolutionTree } from './EvolutionTree'
 import {
   describeConditions,
   describePctBonus,
@@ -11,7 +13,13 @@ import {
   slotLabel,
   stageLabel,
 } from './tamagotchi-helper'
-import { EnumMonsterLine, EnumMonsterStage, IBattleStats, IWikiData } from './tamagotchi-interface'
+import {
+  EnumMonsterLine,
+  EnumMonsterStage,
+  IBattleStats,
+  IWikiData,
+  IWikiSpecies,
+} from './tamagotchi-interface'
 import { useGetWiki } from './tamagotchi-service'
 
 // The in-game guide. Every number comes from GET /monster/wiki (the server's rule constants), so
@@ -73,6 +81,92 @@ const hatchedStages = [
   EnumMonsterStage.FUSED,
 ] as const
 
+// The guide's evolution trees: pick a line, tap a form for its stats and branch conditions.
+const WikiEvolutionTrees = (props: { species: IWikiSpecies[] }) => {
+  const { species } = props
+  const [line, setLine] = useState<EnumMonsterLine>(EnumMonsterLine.FLAME)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const layout = useMemo(() => buildEvolutionTree(species, line), [species, line])
+  const byId = new Map(species.map((entry) => [entry.id, entry]))
+  const selected = selectedId ? byId.get(selectedId) : undefined
+  const name = (id: string) => {
+    const entry = byId.get(id)
+    return entry ? `${entry.emoji} ${entry.name}` : id
+  }
+  // A rule with no conditions is the fallback branch: taken when no earlier one matches.
+  const conditions = (rule: IWikiSpecies['evolutions'][number]) =>
+    rule.maxCareMistakes === undefined &&
+    rule.minTrainCount === undefined &&
+    rule.minWins === undefined
+      ? 'ถ้าไม่ผ่านทางอื่น'
+      : describeConditions(rule)
+  const incoming = selected
+    ? species.flatMap((from) =>
+        from.evolutions.filter((rule) => rule.to === selected.id).map((rule) => ({ from, rule }))
+      )
+    : []
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-1.5">
+        {lineOptions.map((option) => (
+          <button
+            key={option.line}
+            type="button"
+            onClick={() => {
+              setLine(option.line)
+              setSelectedId(null)
+            }}
+            className={`rounded-full border px-3 py-0.5 text-xs ${
+              option.line === line
+                ? 'border-amber-500 bg-amber-50 font-semibold text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                : 'border-slate-300 dark:border-slate-600'
+            }`}
+          >
+            {elementLabel[option.line]}
+          </button>
+        ))}
+      </div>
+      <EvolutionTree layout={layout} selectedId={selectedId} onSelect={setSelectedId} />
+      {selected ? (
+        <div className="rounded-lg border border-slate-200 p-2 text-xs dark:border-slate-700">
+          <div className="text-sm font-medium">
+            {selected.emoji} {selected.name} <Tag>{stageLabel[selected.stage]}</Tag>
+          </div>
+          {selected.stage !== EnumMonsterStage.EGG && (
+            <div className="text-slate-500 dark:text-slate-400">
+              {statsText(selected.stats)} · สกิล {selected.skill.name} (
+              {times(selected.skill.power)}) · น้ำหนักขั้นต่ำ {selected.minWeight} g
+            </div>
+          )}
+          {incoming.length > 0 && (
+            <div className="mt-1">
+              มาจาก:{' '}
+              {incoming
+                .map(({ from, rule }) => `${name(from.id)} (${conditions(rule)})`)
+                .join(' · ')}
+            </div>
+          )}
+          <div className="mt-1">
+            ไปต่อ:{' '}
+            {selected.evolutions.length === 0
+              ? selected.stage === EnumMonsterStage.ULTIMATE
+                ? 'ร่างสุดท้าย (นำไปรวมร่างได้)'
+                : 'ทางตัน · ไปร่างสูงสุดไม่ได้'
+              : selected.evolutions
+                  .map((rule) => `${name(rule.to)} (${conditions(rule)})`)
+                  .join(' · ')}
+          </div>
+        </div>
+      ) : (
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          กดที่ร่างเพื่อดูค่าพลัง สกิล และเงื่อนไขของแต่ละทาง
+        </p>
+      )}
+    </div>
+  )
+}
+
 const buildSections = (wiki: IWikiData) => {
   const {
     care,
@@ -96,10 +190,6 @@ const buildSections = (wiki: IWikiData) => {
     slotLabel[slot as keyof typeof slotLabel],
     `${main.stat.toUpperCase()} (ฐาน ${main.base})`,
   ])
-  const speciesName = (id: string) => {
-    const species = evolution.species.find((entry) => entry.id === id)
-    return species ? `${species.emoji} ${species.name}` : id
-  }
 
   return [
     {
@@ -183,9 +273,33 @@ const buildSections = (wiki: IWikiData) => {
           <List
             items={[
               `เปิดหน้าเกมไว้บนจอ หน้าเกมจะเช็กกับเซิร์ฟเวอร์ทุก 1 นาที แต่ละนาทีที่อยู่ภายใน ${online.graceMinutes} นาทีหลังการเช็กล่าสุดนับเป็นออนไลน์`,
-              `ระหว่างออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)}`,
+              `ระหว่างออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)} และ stamina ฟื้นเร็วขึ้น ${times(online.staminaRegenMultiplier)}`,
               'ความหิว ความแข็งแรง อึ และอายุ เดินตามเวลาจริงเสมอ ไม่ว่าออนไลน์หรือไม่',
             ]}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'stamina',
+      label: '🔋 Stamina (ผจญภัย)',
+      children: (
+        <>
+          <List
+            items={[
+              `มอนแต่ละตัวมี stamina ของตัวเอง 0–${wiki.stamina.max} ใช้กับการผจญภัยเท่านั้น (สู้เองและสู้อัตโนมัติ) ครั้งละ ${wiki.stamina.adventureCost}`,
+              `stamina ไม่พอ ${wiki.stamina.adventureCost} สู้ผจญภัยไม่ได้ · บอส บอสโลก สนามประลอง และการสำรวจ ไม่ใช้ stamina`,
+              `ฟื้นเอง +${wiki.stamina.regenPerHour} ต่อชั่วโมง (เต็มใน ${formatAge(Math.ceil((wiki.stamina.max / wiki.stamina.regenPerHour) * 60))}) · เปิดเกมไว้ฟื้นเร็วขึ้น ${times(wiki.stamina.onlineRegenMultiplier)}`,
+              `มินิเกม: หยุดแถบให้ตรงโซนเขียว ${wiki.stamina.minigameRounds} รอบ เล่นได้ทุก ${formatAge(wiki.stamina.minigameCooldownMinutes)}`,
+              `เติมเต็มทันทีด้วย 💎 ${wiki.stamina.refillGemPrice}`,
+            ]}
+          />
+          <Table
+            head={['มินิเกมโดน', 'ได้ stamina']}
+            rows={wiki.stamina.minigameRewards.map((reward, hits) => [
+              `${hits}/${wiki.stamina.minigameRounds}`,
+              `+${reward}`,
+            ])}
           />
         </>
       ),
@@ -215,39 +329,8 @@ const buildSections = (wiki: IWikiData) => {
               'ร่างสมบูรณ์จะดูเงื่อนไขครั้งเดียว ถ้าไม่ผ่านจะอยู่ร่างเดิมไปจนครบอายุ',
             ]}
           />
-          {lineOptions.map((option) => (
-            <div key={option.line}>
-              <Heading>{elementLabel[option.line]}</Heading>
-              <div className="flex flex-col gap-2">
-                {evolution.species
-                  .filter(
-                    (species) =>
-                      species.line === option.line && species.stage !== EnumMonsterStage.FUSED
-                  )
-                  .map((species) => (
-                    <div
-                      key={species.id}
-                      className="rounded-lg border border-slate-200 p-2 text-xs dark:border-slate-700"
-                    >
-                      <div className="text-sm font-medium">
-                        {species.emoji} {species.name} <Tag>{stageLabel[species.stage]}</Tag>
-                      </div>
-                      {species.stage !== EnumMonsterStage.EGG && (
-                        <div className="text-slate-500 dark:text-slate-400">
-                          {statsText(species.stats)} · สกิล {species.skill.name} (
-                          {times(species.skill.power)}) · น้ำหนักขั้นต่ำ {species.minWeight} g
-                        </div>
-                      )}
-                      {species.evolutions.map((rule) => (
-                        <div key={rule.to}>
-                          → {speciesName(rule.to)}: {describeConditions(rule)}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-              </div>
-            </div>
-          ))}
+          <Heading>ต้นไม้วิวัฒนาการ</Heading>
+          <WikiEvolutionTrees species={evolution.species} />
           <Heading>ร่างผสาน (รวมร่าง)</Heading>
           <List
             items={[

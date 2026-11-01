@@ -1,12 +1,14 @@
 import { Alert, Button, Card, Collapse, Input, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { BattleModal } from './BattleModal'
+import { PetAvatar } from './PetAvatar'
 import { PvpLeaderboard } from './PvpLeaderboard'
 import {
   elementLabel,
   formatRatingChange,
   getDefenseBlocker,
   getPvpBlocker,
+  petLabel,
   stageLabel,
 } from './tamagotchi-helper'
 import {
@@ -142,7 +144,8 @@ export const PvpPanel = (props: IPvpPanelProps) => {
             <span className="text-3xl">{status.defense.fighter.emoji}</span>
             <div className="flex-1 text-sm">
               <div className="font-medium">
-                {status.defense.displayName} · {status.defense.fighter.name}
+                {status.defense.displayName} ·{' '}
+                {petLabel(status.defense.fighter.name, status.defense.fighter.nickname)}
               </div>
               <div className="text-xs text-slate-500">
                 {stageLabel[status.defense.stage]} · HP {status.defense.fighter.stats.hp} · ATK{' '}
@@ -185,14 +188,19 @@ export const PvpPanel = (props: IPvpPanelProps) => {
       {opponents?.opponents.map((opponent) => (
         <Card key={opponent.id} size="small" className="dark:border-slate-700 dark:bg-slate-900">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">{opponent.emoji}</span>
+            <PetAvatar
+              emoji={opponent.emoji}
+              costume={opponent.costume}
+              scale={0.4}
+              label={opponent.displayName}
+            />
             <div className="flex-1 text-sm">
               <div className="font-medium text-slate-900 dark:text-slate-100">
                 {opponent.displayName} {opponent.isNpc && <Tag>NPC</Tag>}
               </div>
               <div className="text-xs text-slate-500">
-                {elementLabel[opponent.element]} · HP {opponent.stats.hp} · ATK {opponent.stats.atk}{' '}
-                · เรตติ้ง {opponent.rating}
+                {petLabel(opponent.name, opponent.nickname)} · {elementLabel[opponent.element]} · HP{' '}
+                {opponent.stats.hp} · ATK {opponent.stats.atk} · เรตติ้ง {opponent.rating}
               </div>
             </div>
             <Tooltip title={blocker}>

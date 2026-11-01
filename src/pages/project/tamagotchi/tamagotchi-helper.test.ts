@@ -20,6 +20,7 @@ import {
   canDeallocatePassive,
   describePassiveEffect,
   describeReset,
+  foldSelectedMonster,
   elementLabel,
   lineOptions,
   potentialPercent,
@@ -28,7 +29,16 @@ import {
   getMergeBlocker,
   getRespecCost,
   sumPassiveEffects,
+  describeSetTier,
+  isSetComplete,
+  isSetTierActive,
+  setPieceLabel,
   describeStats,
+  describeCostumePrice,
+  getCostumeBuyBlocker,
+  resolveLoadout,
+  petLabel,
+  isWornBy,
   formatRatingChange,
   getDefenseBlocker,
   getPvpBlocker,
@@ -51,7 +61,11 @@ import {
   IBattleData,
   IBattleEvent,
   IBattleStats,
+  ICostume,
+  ICostumeState,
+  EnumCostumeSlot,
   IEquipmentItem,
+  ISetProgress,
   IMergeForm,
   IEvolutionRuleInfo,
   IPassiveNode,
@@ -66,6 +80,9 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   speciesId: 'flame_adultGood',
   stage: EnumMonsterStage.ADULT,
   name: 'เพลิงจอมซน',
+  nickname: null,
+  displayName: 'เพลิงจอมซน',
+  costume: {},
   emoji: '🦎',
   fullness: 4,
   strength: 4,
@@ -732,5 +749,158 @@ describe('elements', () => {
       EnumMonsterLine.DARK,
       EnumMonsterLine.SHADOW,
     ])
+  })
+})
+
+describe('foldSelectedMonster', () => {
+  const pet = (id: string, over: Partial<IMonsterData> = {}) => monster({ id, ...over })
+  const cached = (...pets: IMonsterData[]) => ({ monster: pets[0], monsters: pets, maxMonsters: 4 })
+
+  it('keeps the old pets when a new egg is hatched, and selects the new one', () => {
+    const old = cached(pet('a'), pet('b'))
+    const next = foldSelectedMonster(old, pet('c'))
+    expect(next.monsters.map((row) => row.id)).toEqual(['a', 'b', 'c'])
+    expect(next.monster?.id).toBe('c')
+  })
+
+  it('replaces a pet in place when it is updated, without duplicating it', () => {
+    const old = cached(pet('a'), pet('b'))
+    const next = foldSelectedMonster(old, pet('b', { poops: 3 }))
+    expect(next.monsters).toHaveLength(2)
+    expect(next.monsters[1].poops).toBe(3)
+    expect(next.monster?.id).toBe('b')
+  })
+
+  it('starts a list when nothing was cached yet', () => {
+    expect(foldSelectedMonster(undefined, pet('a')).monsters.map((row) => row.id)).toEqual(['a'])
+  })
+})
+
+describe('isWornBy', () => {
+  const piece = (over: Partial<IEquipmentItem>) =>
+    ({ equipped: true, monsterId: 'a', ...over }) as IEquipmentItem
+
+  it('only counts a piece as worn for the pet that wears it', () => {
+    expect(isWornBy(piece({}), 'a')).toBe(true)
+    expect(isWornBy(piece({}), 'b')).toBe(false)
+    expect(isWornBy(piece({ equipped: false, monsterId: null }), 'a')).toBe(false)
+  })
+})
+
+describe('petLabel', () => {
+  it('puts the nickname first and keeps the species name', () => {
+    expect(petLabel('Sun King', 'Mochi')).toBe('Mochi (Sun King)')
+    expect(petLabel('Sun King', null)).toBe('Sun King')
+  })
+})
+
+describe('costumes', () => {
+  const costume = (over: Partial<ICostume>): ICostume => ({
+    id: 'cap',
+    slot: EnumCostumeSlot.HAT,
+    name: 'หมวก',
+    emoji: '🧢',
+    rarity: EnumEquipmentGrade.COMMON,
+    theme: null,
+    price: { currency: 'coin', amount: 150 },
+    ...over,
+  })
+  const state = (owned: string[] = []): ICostumeState => ({
+    catalog: [],
+    owned,
+    themes: [],
+    selectedId: null,
+    pets: [],
+    showCostume: true,
+  })
+  const NOW = new Date('2026-06-01T00:00:00Z')
+
+  it('resolves a loadout against the catalog and skips unknown or misplaced ids', () => {
+    const hat = costume({})
+    const face = costume({ id: 'shades', slot: EnumCostumeSlot.FACE, emoji: '🕶️' })
+    const layers = resolveLoadout({ hat: 'cap', face: 'cap', back: 'nope' }, [hat, face])
+    expect(layers).toEqual({ hat })
+    expect(resolveLoadout(null, [hat])).toEqual({})
+    expect(resolveLoadout({ hat: 'cap' }, undefined)).toEqual({})
+  })
+
+  it('writes each price source in Thai', () => {
+    expect(describeCostumePrice(costume({}))).toBe('🪙 150')
+    expect(describeCostumePrice(costume({ price: { currency: 'gem', amount: 40 } }))).toBe('💎 40')
+    expect(describeCostumePrice(costume({ price: { currency: 'season', amount: 0 } }))).toBe(
+      'รางวัลซีซัน PvP'
+    )
+    expect(describeCostumePrice(costume({ price: { currency: 'coin', amount: 0 } }))).toBe('ฟรี')
+  })
+
+  it('explains why a costume cannot be bought', () => {
+    expect(getCostumeBuyBlocker(costume({}), state(['cap']), 999, 0, NOW)).toBe('มีแล้ว')
+    expect(getCostumeBuyBlocker(costume({}), state(), 100, 0, NOW)).toBe('เหรียญไม่พอ')
+    expect(
+      getCostumeBuyBlocker(
+        costume({ price: { currency: 'gem', amount: 40 } }),
+        state(),
+        999,
+        10,
+        NOW
+      )
+    ).toBe('เพชรไม่พอ')
+    expect(
+      getCostumeBuyBlocker(
+        costume({ price: { currency: 'season', amount: 0 } }),
+        state(),
+        999,
+        99,
+        NOW
+      )
+    ).toMatch(/ซีซัน/)
+    expect(
+      getCostumeBuyBlocker(costume({ endsAt: '2026-05-01T00:00:00Z' }), state(), 999, 99, NOW)
+    ).toBe('หมดเวลาจำหน่ายแล้ว')
+    expect(getCostumeBuyBlocker(costume({}), state(), 150, 0, NOW)).toBeNull()
+  })
+})
+
+describe('set progress labels', () => {
+  const set = (worn: number): ISetProgress => ({
+    setId: 'blazing',
+    name: 'ชุดเพลิงกัลป์',
+    pieceCount: 4,
+    worn,
+    isEnhanced: false,
+    tiers: [
+      { pieces: 2, pct: { atk: 0.15 }, effect: null },
+      { pieces: 4, pct: null, effect: { burnTurns: 3 } },
+    ],
+  })
+
+  it('writes worn/full next to the set name', () => {
+    expect(setPieceLabel(set(2))).toBe('ชุดเพลิงกัลป์ 2/4')
+  })
+
+  it('is green (complete) only when every piece of the set is worn', () => {
+    expect(isSetComplete(set(0))).toBe(false)
+    expect(isSetComplete(set(3))).toBe(false)
+    expect(isSetComplete(set(4))).toBe(true)
+  })
+
+  it('turns a tier on from its piece count', () => {
+    const [two, four] = set(2).tiers
+    expect(isSetTierActive(set(1), two)).toBe(false)
+    expect(isSetTierActive(set(2), two)).toBe(true)
+    expect(isSetTierActive(set(3), four)).toBe(false)
+    expect(isSetTierActive(set(4), four)).toBe(true)
+  })
+
+  it('describes a tier by its stat bonus and its effect', () => {
+    const [two, four] = set(4).tiers
+    expect(describeSetTier(two)).toBe('ATK +15%')
+    expect(describeSetTier(four)).toBe('สกิลทำให้ศัตรูติดเผาไหม้ 3 เทิร์น')
+  })
+
+  it('also words crit effects', () => {
+    expect(describeSetEffect({ critChance: 0.1, critDamage: 0.2 })).toBe(
+      'อัตราคริติคอล +10% · ดาเมจคริติคอล +20%'
+    )
   })
 })

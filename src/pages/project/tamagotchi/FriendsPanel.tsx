@@ -1,9 +1,11 @@
 import { Alert, Button, Card, Input, Modal, Popconfirm, Select, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
+import { PetAvatar } from './PetAvatar'
 import {
   formatFriendCode,
   getGiftBlocker,
   getSupportBlocker,
+  petLabel,
   stageLabel,
   statLabel,
 } from './tamagotchi-helper'
@@ -98,7 +100,7 @@ const SupportCard = (props: {
             <span className="text-3xl">{unit.emoji}</span>
             <div className="flex-1">
               <div className="font-medium">
-                {unit.name} <Tag>{stageLabel[unit.stage]}</Tag>
+                {petLabel(unit.name, unit.nickname)} <Tag>{stageLabel[unit.stage]}</Tag>
               </div>
               <div className="text-xs text-slate-500">
                 {(Object.keys(statLabel) as StatKey[])
@@ -142,10 +144,14 @@ const VisitModal = (props: { visit: IFriendVisit | null; onClose: () => void }) 
       {visit && !monster && <p>เพื่อนยังไม่มีมอนที่มีชีวิต</p>}
       {visit && monster && (
         <div className="flex items-center gap-4">
-          <span className="text-6xl">{monster.emoji}</span>
+          <PetAvatar
+            emoji={monster.emoji}
+            costume={monster.costume}
+            label={petLabel(monster.name, monster.nickname)}
+          />
           <div className="text-sm">
             <div className="font-semibold">
-              {monster.name} <Tag>{stageLabel[monster.stage]}</Tag>
+              {petLabel(monster.name, monster.nickname)} <Tag>{stageLabel[monster.stage]}</Tag>
               {monster.isSick && <Tag color="red">ป่วย</Tag>}
               {monster.isExploring && <Tag color="blue">ออกสำรวจ</Tag>}
             </div>
@@ -191,7 +197,12 @@ const FriendRow = (props: {
   return (
     <Card size="small" className="dark:border-slate-700 dark:bg-slate-900">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-3xl">{friend.monster?.emoji ?? '❔'}</span>
+        <PetAvatar
+          emoji={friend.monster?.emoji ?? '❔'}
+          costume={friend.monster?.costume}
+          scale={0.4}
+          label={friend.displayName}
+        />
         <div className="min-w-0 flex-1 text-sm">
           <div className="truncate font-medium text-slate-900 dark:text-slate-100">
             {friend.displayName}{' '}

@@ -97,6 +97,11 @@ export interface IMonsterData {
   speciesId: string
   stage: EnumMonsterStage
   name: string
+  // The owner's name for it (null = none), and what to show: nickname or species name.
+  nickname: string | null
+  displayName: string
+  // What it wears: slot -> costume id.
+  costume: ILoadout
   emoji: string
   fullness: number
   strength: number
@@ -134,6 +139,7 @@ export interface IBattleStats {
 
 export interface IFighter {
   name: string
+  nickname?: string
   emoji: string
   element: EnumMonsterLine
   stats: IBattleStats
@@ -210,6 +216,8 @@ export interface IEquipmentItem {
   enhanceLevel: number
   pity: number
   equipped: boolean
+  // The pet wearing it (null in the bag).
+  monsterId: string | null
 }
 
 export interface IFighterEffects {
@@ -217,14 +225,33 @@ export interface IFighterEffects {
   shieldPct?: number
   regenPct?: number
   doubleStrikeChance?: number
+  critChance?: number
+  critDamage?: number
+}
+
+// One equipment set with how many of its pieces the shown pet wears (GET /equipment).
+export interface ISetProgress {
+  setId: string
+  name: string
+  // The full set: its largest bonus tier.
+  pieceCount: number
+  worn: number
+  // Every worn piece is at the enhance threshold or higher: percent bonuses are multiplied.
+  isEnhanced: boolean
+  tiers: { pieces: number; pct: Partial<IBattleStats> | null; effect: IFighterEffects | null }[]
 }
 
 export interface IEquipmentData {
   capacity: number
   items: IEquipmentItem[]
+  // The pet this screen is about (the selected one) and every living pet, to name who wears what.
+  monsterId: string | null
+  pets: { id: string; name: string; emoji: string }[]
   // Battle effects of the worn four-piece sets.
   activeEffects: IFighterEffects
   setBonuses: { setId: string; name: string; pieces: number }[]
+  sets: ISetProgress[]
+  enhance: { threshold: number; multiplier: number }
   // The living monster's battle stats with the worn gear and passives; null without a hatched monster.
   stats: IBattleStats | null
   // Its crit rate (%), crit damage (% multiplier) and evasion (%) with gear and passives.
@@ -335,7 +362,7 @@ export interface IProfile {
 export interface IFriend {
   relationId: string
   displayName: string
-  monster: { emoji: string; stage: EnumMonsterStage } | null
+  monster: { emoji: string; stage: EnumMonsterStage; costume: ILoadout | null } | null
   points: number
   hasSupport: boolean
   canGreet: boolean
@@ -360,6 +387,8 @@ export interface IFriendVisit {
   monster: {
     emoji: string
     name: string
+    nickname: string | null
+    costume: ILoadout | null
     stage: EnumMonsterStage
     ageMinutes: number
     isSick: boolean
@@ -374,6 +403,7 @@ export interface ISupportUnit {
   supportId: string
   emoji: string
   name: string
+  nickname: string | null
   stage: EnumMonsterStage
   stats: IBattleStats
   effects: IFighterEffects | null
@@ -383,6 +413,7 @@ export interface ISupportUnit {
 
 export interface IRentableUnit extends ISupportUnit {
   ownerName: string
+  costume: ILoadout | null
 }
 
 export interface IWorldBossReward {
@@ -448,6 +479,7 @@ export interface IWorldBossRankingEntry {
   rank: number
   displayName: string
   emoji: string | null
+  costume: ILoadout | null
   damage: number
   hits: number
   isMe: boolean
@@ -505,6 +537,8 @@ export interface IPvpOpponent {
   displayName: string
   emoji: string
   name: string
+  nickname: string | null
+  costume: ILoadout | null
   element: EnumMonsterLine
   stats: IBattleStats
   rating: number
@@ -582,6 +616,8 @@ export interface IPvpLeaderboardEntry {
   displayName: string
   emoji: string | null
   name: string | null
+  nickname: string | null
+  costume: ILoadout | null
   rating: number
   wins: number
   losses: number
@@ -882,4 +918,47 @@ export interface IPassiveState {
     }
   }
   respec: { refunded: number; freeLeft: number; gemPrice: number }
+}
+
+// GET /monster/me
+export interface IGetMyMonsterResponse {
+  // The selected monster, which every other tab plays with.
+  monster: IMonsterData | null
+  // Every living monster (up to maxMonsters), selected one included.
+  monsters: IMonsterData[]
+  maxMonsters: number
+}
+
+export enum EnumCostumeSlot {
+  HAT = 'hat',
+  FACE = 'face',
+  BACK = 'back',
+  AURA = 'aura',
+  BACKDROP = 'backdrop',
+}
+
+// What a pet wears: slot -> costume id (ids from the server's catalog).
+export type ILoadout = Partial<Record<EnumCostumeSlot, string>>
+
+export interface ICostume {
+  id: string
+  slot: EnumCostumeSlot
+  name: string
+  emoji?: string
+  color?: string
+  gradient?: string
+  rarity: EnumEquipmentGrade
+  theme: string | null
+  price: { currency: 'coin' | 'gem' | 'boss_token' | 'season'; amount: number; bossId?: string }
+  endsAt?: string
+}
+
+// GET /costume
+export interface ICostumeState {
+  catalog: ICostume[]
+  owned: string[]
+  themes: { theme: string; total: number; owned: number; isComplete: boolean }[]
+  selectedId: string | null
+  pets: { id: string; costume: ILoadout }[]
+  showCostume: boolean
 }

@@ -7,12 +7,14 @@ import { Link, Navigate } from 'react-router-dom'
 import { appPath } from '../../../config/app-paths'
 import { useGetMeSuspense } from '../../../service'
 import { AdventurePanel } from './AdventurePanel'
+import { CostumePanel } from './CostumePanel'
 import { DexPanel } from './DexPanel'
 import { EquipmentPanel } from './EquipmentPanel'
 import { ExpeditionPanel } from './ExpeditionPanel'
 import { MergeModal } from './MergeModal'
 import { PassivePanel } from './PassivePanel'
 import { PetSprite } from './PetSprite'
+import { RenamePet } from './RenamePet'
 import { StatusPanel } from './StatusPanel'
 import { FriendsPanel } from './FriendsPanel'
 import { WorldBossPanel } from './WorldBossPanel'
@@ -30,6 +32,7 @@ import {
   getEvolutionCountdown,
   lineOptions,
   MAX_HEARTS,
+  petLabel,
   stageLabel,
   toHearts,
   toThaiErrorMessage,
@@ -124,7 +127,7 @@ const Memorial = (props: { monster: IMonsterData; onNewEgg: () => void }) => {
     <Card className="w-full text-center dark:border-slate-700 dark:bg-slate-900">
       <div className="text-6xl">🪦</div>
       <div className="mt-3 text-lg font-semibold text-slate-900 dark:text-slate-100">
-        {monster.emoji} {monster.name}
+        {monster.emoji} {petLabel(monster.name, monster.nickname)}
       </div>
       <div className="mt-1 text-slate-500 dark:text-slate-400">
         {monster.deathCause && deathCauseLabel[monster.deathCause]} · อายุ{' '}
@@ -231,7 +234,7 @@ const MonsterSlots = (props: {
           >
             <span className="flex flex-col items-center leading-tight">
               <span className="text-xl">{monster.isSick ? '🤒' : monster.emoji}</span>
-              <span className="w-full truncate text-xs">{monster.name}</span>
+              <span className="w-full truncate text-xs">{monster.displayName}</span>
             </span>
           </Button>
         )
@@ -250,11 +253,21 @@ const MonsterScreen = (props: { monster: IMonsterData; fetchedAt: number }) => {
     <div className="flex w-full flex-col gap-4">
       <div className="rounded-[2rem] border-4 border-slate-300 bg-slate-100 p-4 shadow-lg dark:border-slate-600 dark:bg-slate-800">
         <div className="mb-2 flex items-center justify-between">
-          <span className="font-semibold text-slate-900 dark:text-slate-100">{monster.name}</span>
+          <span className="flex min-w-0 items-center gap-1">
+            <span className="truncate font-semibold text-slate-900 dark:text-slate-100">
+              {petLabel(monster.name, monster.nickname)}
+            </span>
+            <RenamePet monster={monster} onError={showError} />
+          </span>
           <Tag color="blue">{stageLabel[monster.stage]}</Tag>
         </div>
         <div className="rounded-2xl bg-lime-100 p-4 dark:bg-lime-200">
-          <PetSprite emoji={monster.emoji} isSick={monster.isSick} isEgg={isEgg} />
+          <PetSprite
+            emoji={monster.emoji}
+            isSick={monster.isSick}
+            isEgg={isEgg}
+            costume={monster.costume}
+          />
           <div className="h-7 text-center text-xl" aria-label={`อึ ${monster.poops} กอง`}>
             {'💩'.repeat(monster.poops)}
           </div>
@@ -318,7 +331,9 @@ const HallOfFame = () => {
           >
             <span className="text-2xl">{monster.emoji}</span>
             <div className="flex-1">
-              <div className="font-medium text-slate-900 dark:text-slate-100">{monster.name}</div>
+              <div className="font-medium text-slate-900 dark:text-slate-100">
+                {petLabel(monster.name, monster.nickname)}
+              </div>
               <div className="text-xs text-slate-500 dark:text-slate-400">
                 {stageLabel[monster.stage]} · อายุ {formatAge(monster.ageMinutes)}
                 {monster.deathCause && ` · ${deathCauseLabel[monster.deathCause]}`}
@@ -476,6 +491,11 @@ const GameTabs = () => {
             key: 'shop',
             label: 'ร้านค้า',
             children: <ShopPanel monster={monster} coin={coin} onError={showError} />,
+          },
+          {
+            key: 'costume',
+            label: 'ชุดแต่งตัว',
+            children: <CostumePanel monster={monster} onError={showError} />,
           },
           { key: 'dex', label: 'Dex', children: <DexPanel /> },
           { key: 'wiki', label: 'คู่มือ', children: <WikiPanel /> },

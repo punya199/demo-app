@@ -1,3 +1,4 @@
+import { PetAvatar } from './PetAvatar'
 import { ResetCountdown } from './ResetCountdown'
 import { Alert, Button, Card, Collapse, Progress, Select, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
@@ -7,6 +8,7 @@ import {
   formatTimeLeft,
   getWorldBossBlocker,
   gradeLabel,
+  petLabel,
   slotLabel,
 } from './tamagotchi-helper'
 import {
@@ -78,7 +80,12 @@ const RankingList = () => {
           }`}
         >
           <span className="w-8 text-right font-semibold">#{entry.rank}</span>
-          <span className="text-xl">{entry.emoji ?? '👤'}</span>
+          <PetAvatar
+            emoji={entry.emoji ?? '👤'}
+            costume={entry.costume}
+            scale={0.3}
+            label={entry.displayName}
+          />
           <span className="flex-1 truncate">{entry.displayName}</span>
           <Tag>{entry.damage}</Tag>
           <span className="w-12 text-right text-xs text-slate-500">{entry.hits} ครั้ง</span>
@@ -180,7 +187,17 @@ export const WorldBossPanel = (props: IWorldBossPanelProps) => {
               onChange={setSupportId}
               options={rentable.units.map((unit) => ({
                 value: unit.supportId,
-                label: `${unit.emoji} ${unit.name} (${unit.ownerName}) ATK ${unit.stats.atk}`,
+                label: (
+                  <span className="flex items-center gap-2">
+                    <PetAvatar
+                      emoji={unit.emoji}
+                      costume={unit.costume}
+                      scale={0.3}
+                      label={unit.ownerName}
+                    />
+                    {`${petLabel(unit.name, unit.nickname)} (${unit.ownerName}) ATK ${unit.stats.atk}`}
+                  </span>
+                ),
               }))}
             />
             <span className="text-xs text-slate-500">

@@ -1,10 +1,13 @@
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../../../utils/api-client'
+import { foldSelectedMonster } from './tamagotchi-helper'
 import {
   EnumMonsterAction,
   EnumMonsterLine,
   IAdventureArea,
   IBattleData,
+  ICostumeState,
+  EnumCostumeSlot,
   IDexEntry,
   IEnhanceOutcome,
   IEnhancePreview,
@@ -20,6 +23,7 @@ import {
   IExpeditionData,
   IExpeditionSummary,
   IInventoryItem,
+  IGetMyMonsterResponse,
   IMonsterData,
   IPvpBattleResponse,
   IRaidBattleResponse,
@@ -38,14 +42,6 @@ import {
   IWallet,
   IWikiData,
 } from './tamagotchi-interface'
-
-interface IGetMyMonsterResponse {
-  // The selected monster, which every other tab plays with.
-  monster: IMonsterData | null
-  // Every living monster (up to maxMonsters), selected one included.
-  monsters: IMonsterData[]
-  maxMonsters: number
-}
 
 interface IGetMonsterHistoryResponse {
   monsters: IMonsterData[]
@@ -74,13 +70,9 @@ const WALLET_KEY = ['wallet']
 // Other endpoints return only the selected monster; fold it into the cached list so the care
 // tab's slots don't lose the rest until the next poll.
 const setSelectedMonster = (queryClient: QueryClient, monster: IMonsterData) => {
-  queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, (old) => ({
-    maxMonsters: old?.maxMonsters ?? 4,
-    monster,
-    monsters: (old?.monsters ?? []).some((row) => row.id === monster.id)
-      ? old!.monsters.map((row) => (row.id === monster.id ? monster : row))
-      : [...(old?.monsters ?? []), monster],
-  }))
+  queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, (old) =>
+    foldSelectedMonster(old, monster)
+  )
 }
 
 // The server advances the monster's clock on every read, so polling keeps hearts and poops fresh.
@@ -113,11 +105,13 @@ export const useHatchMonster = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (line: EnumMonsterLine) => {
-      const { data } = await apiClient.post<IGetMyMonsterResponse>(`/monster/hatch`, { line })
+      const { data } = await apiClient.post<{ monster: IMonsterData }>(`/monster/hatch`, { line })
       return data
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(MY_MONSTER_KEY, data)
+      // The reply is only the new egg: fold it into the cached list so the other pets stay.
+      setSelectedMonster(queryClient, data.monster)
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
       queryClient.invalidateQueries({ queryKey: ['monster', 'history'] })
       // A rare egg is paid for in Raid Tokens.
       queryClient.invalidateQueries({ queryKey: WALLET_KEY })
@@ -155,6 +149,19 @@ export const useMergeMonsters = () => {
     // The parents are gone and the new monster is selected, so every tab's data may have changed.
     onSettled: () => {
       queryClient.invalidateQueries()
+    },
+  })
+}
+
+export const useRenameMonster = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { monsterId: string; name: string }) => {
+      const { data } = await apiClient.post<{ monster: IMonsterData }>(`/monster/rename`, input)
+      return data
+    },
+    onSuccess: (data) => {
+      setSelectedMonster(queryClient, data.monster)
     },
   })
 }
@@ -975,3 +982,44 @@ export const usePassiveRespec = () =>
     const { data } = await apiClient.post<IPassiveState>(`/passive/respec`)
     return data
   })
+
+const COSTUME_KEY = ['costume']
+
+// The catalog never changes within a session; what the player owns and wears does.
+export const useGetCostumes = () => {
+  return useQuery({
+    queryKey: COSTUME_KEY,
+    queryFn: async () => {
+      const { data } = await apiClient.get<ICostumeState>(`/costume`)
+      return data
+    },
+  })
+}
+
+// Every costume write answers with the fresh state, so the shop and every pet view stay in step.
+const useCostumeMutation = <T,>(path: string) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: T) => {
+      const { data } = await apiClient.post<ICostumeState>(`/costume/${path}`, input)
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<ICostumeState>(COSTUME_KEY, data)
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: COSTUME_KEY })
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+    },
+  })
+}
+
+export const useBuyCostume = () => useCostumeMutation<{ costumeId: string }>('buy')
+export const useEquipCostume = () =>
+  useCostumeMutation<{ costumeId: string; monsterId?: string }>('equip')
+export const useUnequipCostume = () =>
+  useCostumeMutation<{ slot: EnumCostumeSlot; monsterId?: string }>('unequip')
+export const useSetShowCostume = () => useCostumeMutation<{ show: boolean }>('privacy')

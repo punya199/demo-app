@@ -1,8 +1,17 @@
-import { Button, Card, Popconfirm, Spin, Tooltip } from 'antd'
+import { Button, Card, Popconfirm, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { EnhanceModal } from './EnhanceModal'
 import { CompareLine, ItemLine } from './EquipmentParts'
-import { describeSetEffect, getEquipBlocker, slotLabel } from './tamagotchi-helper'
+import {
+  describeSetEffect,
+  describeSetTier,
+  getEquipBlocker,
+  isSetComplete,
+  isSetTierActive,
+  isWornBy,
+  setPieceLabel,
+  slotLabel,
+} from './tamagotchi-helper'
 import { EnumEquipmentSlot, IEquipmentItem, IMonsterData } from './tamagotchi-interface'
 import { useDismantle, useEquip, useGetEquipment, useUnequip } from './tamagotchi-service'
 
@@ -26,11 +35,21 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
 
   const blocker = getEquipBlocker(monster)
   const isBusy = isEquipping || isUnequipping || isDismantling
-  const worn = new Map(data.items.filter((item) => item.equipped).map((item) => [item.slot, item]))
-  const bag = data.items.filter((item) => !item.equipped)
+  const isWorn = (item: IEquipmentItem) => isWornBy(item, data.monsterId)
+  const worn = new Map(data.items.filter(isWorn).map((item) => [item.slot, item]))
+  const bag = data.items.filter((item) => !isWorn(item))
+  const petOf = (item: IEquipmentItem) => data.pets.find((pet) => pet.id === item.monsterId)
+  const pet = data.pets.find((row) => row.id === data.monsterId)
+  const setOf = (item: IEquipmentItem) => data.sets.find((set) => set.setId === item.setId)
+  const wornSets = data.sets.filter((set) => set.worn > 0)
 
   return (
     <div className="flex w-full flex-col gap-3">
+      {pet && (
+        <div className="text-center text-sm text-slate-600 dark:text-slate-300">
+          อุปกรณ์ของ {pet.emoji} {pet.name} (เปลี่ยนตัวที่หน้าเลี้ยง แต่ละตัวมีชุดของตัวเอง)
+        </div>
+      )}
       {data.stats && (
         <div className="text-center text-sm text-slate-600 dark:text-slate-300">
           ค่าพลังรวมอุปกรณ์: HP {data.stats.hp} · ATK {data.stats.atk} · DEF {data.stats.def} · SPD{' '}
@@ -42,10 +61,41 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
           เอฟเฟกต์เซ็ต: {describeSetEffect(data.activeEffects)}
         </div>
       )}
-      {data.setBonuses.length > 0 && (
-        <div className="text-center text-xs text-emerald-600">
-          โบนัสเซ็ต: {data.setBonuses.map((set) => `${set.name} (${set.pieces} ชิ้น)`).join(' · ')}
-        </div>
+      {wornSets.length > 0 && (
+        <Card size="small" title="โบนัสเซ็ต" className="dark:border-slate-700 dark:bg-slate-900">
+          <div className="flex flex-col gap-3">
+            {wornSets.map((set) => (
+              <div key={set.setId} className="flex flex-col gap-1">
+                <div
+                  className={`text-sm font-medium ${isSetComplete(set) ? 'text-emerald-600' : ''}`}
+                >
+                  {setPieceLabel(set)}
+                </div>
+                {set.tiers.map((tier) => (
+                  <div
+                    key={tier.pieces}
+                    className={`text-xs ${
+                      isSetTierActive(set, tier)
+                        ? 'text-emerald-600'
+                        : 'text-slate-500 dark:text-slate-400'
+                    }`}
+                  >
+                    {isSetTierActive(set, tier) ? '✔' : '○'} {tier.pieces} ชิ้น:{' '}
+                    {describeSetTier(tier)}
+                  </div>
+                ))}
+                <div
+                  className={`text-xs ${
+                    set.isEnhanced ? 'text-emerald-600' : 'text-slate-500 dark:text-slate-400'
+                  }`}
+                >
+                  ตีบวกทุกชิ้นที่ใส่ถึง +{data.enhance.threshold} ขึ้นไป โบนัสเปอร์เซ็นต์คูณ ×
+                  {data.enhance.multiplier} · {set.isEnhanced ? 'ถึงแล้ว ✔' : 'ยังไม่ถึง'}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
       )}
       <div className="grid grid-cols-1 gap-2">
         {Object.values(EnumEquipmentSlot).map((slot) => {
@@ -56,7 +106,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
                 <span className="w-24 text-sm">{slotLabel[slot]}</span>
                 {item ? (
                   <>
-                    <ItemLine item={item} />
+                    <ItemLine item={item} set={setOf(item)} />
                     <Button size="small" onClick={() => setEnhancing(item)}>
                       ตีบวก
                     </Button>
@@ -94,16 +144,30 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
         <Card key={item.id} size="small" className="dark:border-slate-700 dark:bg-slate-900">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-slate-500">{slotLabel[item.slot]}</span>
-            <ItemLine item={item} />
+            <ItemLine item={item} set={setOf(item)} />
+            {petOf(item) && (
+              <Tag color="purple">
+                ใส่อยู่กับ {petOf(item)!.emoji} {petOf(item)!.name}
+              </Tag>
+            )}
             <Tooltip title={blocker}>
-              <Button
-                size="small"
-                type="primary"
-                disabled={!!blocker || isBusy}
-                onClick={() => equip(item.id, { onError })}
+              <Popconfirm
+                title="ย้ายมาใส่ตัวนี้?"
+                description={`${petOf(item)?.name ?? 'ตัวเดิม'} จะเสียชิ้นนี้ไป`}
+                okText="ย้าย"
+                cancelText="ยกเลิก"
+                disabled={!petOf(item)}
+                onConfirm={() => equip(item.id, { onError })}
               >
-                สวม
-              </Button>
+                <Button
+                  size="small"
+                  type="primary"
+                  disabled={!!blocker || isBusy}
+                  onClick={() => !petOf(item) && equip(item.id, { onError })}
+                >
+                  สวม
+                </Button>
+              </Popconfirm>
             </Tooltip>
             <Button size="small" onClick={() => setEnhancing(item)}>
               ตีบวก
@@ -115,7 +179,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
               cancelText="ยกเลิก"
               onConfirm={() => dismantle(item.id, { onError })}
             >
-              <Button size="small" danger disabled={isBusy}>
+              <Button size="small" danger disabled={isBusy || !!petOf(item)}>
                 แยก
               </Button>
             </Popconfirm>

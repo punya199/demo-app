@@ -19,9 +19,15 @@ import {
   IBattleEvent,
   IEvolutionInfo,
   IEvolutionRuleInfo,
+  ICostume,
+  ICostumeState,
+  ILoadout,
+  EnumCostumeSlot,
   IEquipmentItem,
+  ISetProgress,
   IMergeForm,
   IMonsterData,
+  IGetMyMonsterResponse,
   IPassiveNode,
   IPotentialStat,
   PassiveEffectKey,
@@ -350,6 +356,10 @@ const serverMessageLabel: Record<string, string> = {
   'Equipment is already at the maximum level': 'ตีบวกสูงสุดแล้ว',
   'Material not found': 'ไม่พบวัตถุดิบ',
   'Monster is on an expedition': 'มอนออกสำรวจอยู่',
+  'Pet name must be 1-16 characters': 'ชื่อต้องยาว 1-16 ตัวอักษร',
+  'Pet name has characters that are not allowed':
+    'ชื่อใช้ได้เฉพาะภาษาไทย อังกฤษ ตัวเลข ช่องว่าง และ - _ .',
+  'Pet was renamed recently': 'เพิ่งเปลี่ยนชื่อ รออีกสักครู่ (เปลี่ยนได้ทุก 10 นาที)',
   'Monster is already on an expedition': 'มอนออกสำรวจอยู่แล้ว',
   'Monster is too unwell to explore': 'มอนป่วยหรือหิว ออกสำรวจไม่ได้',
   'Monster is not on an expedition': 'มอนไม่ได้ออกสำรวจ',
@@ -548,6 +558,8 @@ export const describeSetEffect = (effect: IFighterEffects) =>
     effect.shieldPct && `เริ่มสู้ด้วยโล่ ${toPercent(effect.shieldPct)} ของ HP`,
     effect.regenPct && `ฟื้น HP ${toPercent(effect.regenPct)} ทุกเทิร์น`,
     effect.doubleStrikeChance && `โจมตีซ้ำ ${toPercent(effect.doubleStrikeChance)}`,
+    effect.critChance && `อัตราคริติคอล +${toPercent(effect.critChance)}`,
+    effect.critDamage && `ดาเมจคริติคอล +${toPercent(effect.critDamage)}`,
   ]
     .filter(Boolean)
     .join(' · ')
@@ -789,3 +801,120 @@ export const potentialPercent = (stat: IPotentialStat) =>
 
 export const signed = (value: number) =>
   `${value >= 0 ? '+' : '−'}${Math.abs(Math.round(value * 10) / 10)}`
+
+// Endpoints that answer with a single monster (hatch, action, expedition...) must not wipe the
+// other living pets from the cached list: replace the monster in place, or append a new one
+// (a fresh egg) and make it the selected one.
+export const foldSelectedMonster = (
+  old: IGetMyMonsterResponse | undefined,
+  monster: IMonsterData
+): IGetMyMonsterResponse => {
+  const monsters = old?.monsters ?? []
+  return {
+    maxMonsters: old?.maxMonsters ?? 4,
+    monster,
+    monsters: monsters.some((row) => row.id === monster.id)
+      ? monsters.map((row) => (row.id === monster.id ? monster : row))
+      : [...monsters, monster],
+  }
+}
+
+// A piece counts as worn on the gear screen only for the pet that screen is about.
+export const isWornBy = (item: IEquipmentItem, monsterId: string | null) =>
+  item.equipped && item.monsterId === monsterId
+
+// Species name with the owner's nickname in front when the pet has one.
+export const petLabel = (speciesName: string, nickname?: string | null) =>
+  nickname ? `${nickname} (${speciesName})` : speciesName
+
+export const costumeSlotLabel: Record<EnumCostumeSlot, string> = {
+  [EnumCostumeSlot.HAT]: 'หมวก',
+  [EnumCostumeSlot.FACE]: 'หน้า',
+  [EnumCostumeSlot.BACK]: 'หลัง',
+  [EnumCostumeSlot.AURA]: 'ออร่า',
+  [EnumCostumeSlot.BACKDROP]: 'ฉากหลัง',
+}
+
+export const costumeThemeLabel: Record<string, string> = {
+  casual: 'ลำลอง',
+  spring: 'ฤดูใบไม้ผลิ',
+  winter: 'ฤดูหนาว',
+  festival: 'เทศกาล',
+  knight: 'อัศวิน',
+  sea: 'ทะเล',
+  spirit: 'วิญญาณ',
+  element: 'ธาตุ',
+  royal: 'ราชวงศ์',
+}
+
+// The costumes a loadout names, by slot, looked up in the catalog; ids the catalog does not know
+// are skipped, so a stale or odd id can never break the drawing.
+export const resolveLoadout = (
+  loadout: ILoadout | null | undefined,
+  catalog: ICostume[] | undefined
+): Partial<Record<EnumCostumeSlot, ICostume>> => {
+  const layers: Partial<Record<EnumCostumeSlot, ICostume>> = {}
+  for (const slot of Object.values(EnumCostumeSlot)) {
+    const costume = catalog?.find((row) => row.id === loadout?.[slot])
+    if (costume && costume.slot === slot) {
+      layers[slot] = costume
+    }
+  }
+  return layers
+}
+
+export const describeCostumePrice = (costume: ICostume) => {
+  const { currency, amount } = costume.price
+  if (currency === 'season') {
+    return 'รางวัลซีซัน PvP'
+  }
+  if (currency === 'boss_token') {
+    return `🎫 ${amount} เหรียญบอส`
+  }
+  if (amount === 0) {
+    return 'ฟรี'
+  }
+  return `${currency === 'gem' ? '💎' : '🪙'} ${amount}`
+}
+
+// Mirrors the server's buy checks so the button explains itself. The server decides.
+export const getCostumeBuyBlocker = (
+  costume: ICostume,
+  state: ICostumeState,
+  coin: number,
+  gem: number,
+  now: Date
+): string | null => {
+  if (state.owned.includes(costume.id)) {
+    return 'มีแล้ว'
+  }
+  if (costume.price.currency === 'season') {
+    return 'ซื้อไม่ได้ เป็นรางวัลซีซัน'
+  }
+  if (costume.endsAt && now.getTime() >= new Date(costume.endsAt).getTime()) {
+    return 'หมดเวลาจำหน่ายแล้ว'
+  }
+  if (costume.price.currency === 'coin' && coin < costume.price.amount) {
+    return 'เหรียญไม่พอ'
+  }
+  if (costume.price.currency === 'gem' && gem < costume.price.amount) {
+    return 'เพชรไม่พอ'
+  }
+  return null
+}
+
+// 'ชุดเพลิงกัลป์ 2/4': how many pieces of the set the shown pet wears out of the full set.
+export const setPieceLabel = (set: ISetProgress) => `${set.name} ${set.worn}/${set.pieceCount}`
+
+// Green once the whole set is worn, muted before that.
+export const isSetComplete = (set: ISetProgress) => set.worn >= set.pieceCount
+
+// One bonus tier in words: its stat bonus and/or special effect.
+export const describeSetTier = (tier: ISetProgress['tiers'][number]) =>
+  [tier.pct && describePctBonus(tier.pct), tier.effect && describeSetEffect(tier.effect)]
+    .filter(Boolean)
+    .join(' · ')
+
+// Whether a bonus tier is on for this many worn pieces.
+export const isSetTierActive = (set: ISetProgress, tier: ISetProgress['tiers'][number]) =>
+  set.worn >= tier.pieces

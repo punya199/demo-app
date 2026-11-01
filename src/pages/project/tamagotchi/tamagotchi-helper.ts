@@ -19,6 +19,7 @@ import {
   IBattleEvent,
   IEvolutionInfo,
   IEvolutionRuleInfo,
+  IEquipmentItem,
   IMonsterData,
 } from './tamagotchi-interface'
 
@@ -82,6 +83,18 @@ export const actionOptions: IActionOption[] = [
 // Hearts are stored as fractions; any partly-filled heart still shows as a full one.
 export const toHearts = (value: number) =>
   Math.min(MAX_HEARTS, Math.max(0, Math.ceil(Math.round(value * 1000) / 1000)))
+
+// "รีเซ็ตใน 2 ชม. 15 นาที (18:00 น.)": time left to `resetsAt` plus its clock time in Thailand.
+export const describeReset = (resetsAt: string, now: Date) => {
+  const at = new Date(resetsAt)
+  const clock = at.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Bangkok',
+  })
+  return `รีเซ็ตใน ${formatAge(Math.ceil((at.getTime() - now.getTime()) / 60_000))} (${clock} น.)`
+}
 
 export const formatAge = (ageMinutes: number) => {
   const rounded = Math.max(0, Math.round(ageMinutes))
@@ -234,7 +247,6 @@ const serverMessageLabel: Record<string, string> = {
   'Stage is locked': 'ด่านนี้ยังไม่ปลดล็อก',
   'Not enough coins': 'เหรียญไม่พอ',
   'Not enough gems': 'เพชรไม่พอ',
-  'Stamina is already full': 'Stamina เต็มอยู่แล้ว',
   'Mini-game is not ready yet': 'มินิเกมยังไม่พร้อม รออีกสักครู่',
   'Invalid mini-game score': 'คะแนนมินิเกมไม่ถูกต้อง',
   'Your monster is too young for the arena': 'ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้',
@@ -248,7 +260,7 @@ const serverMessageLabel: Record<string, string> = {
   'Battle not found': 'ไม่พบการต่อสู้',
   'Not enough raid tokens': 'Raid Token ไม่พอ',
   'Not enough boss tokens': 'Boss Token ไม่พอ',
-  'Daily raid limit reached': 'สู้บอสครบจำนวนของวันนี้แล้ว',
+  'Raid attempts used up until the next reset': 'สู้บอสครบจำนวนแล้ว รอรีเซ็ต',
   'Your monster is not strong enough for this difficulty': 'ร่างของมอนยังไม่ถึงเกณฑ์ของระดับนี้',
   'Clear the previous difficulty first': 'ต้องชนะระดับก่อนหน้าก่อน',
   'Clear this difficulty first': 'ต้องชนะระดับที่ดรอปเกรดนี้ก่อนถึงจะแลกได้',
@@ -268,7 +280,7 @@ const serverMessageLabel: Record<string, string> = {
   'Support unit was changed recently': 'เพิ่งเปลี่ยนตัวซัพพอร์ต รอสักครู่',
   'Support unit is not available': 'ใช้ตัวซัพพอร์ตนี้ไม่ได้',
   'Your monster is too young for the world boss': 'ต้องเป็นร่างโตขึ้นไปถึงตีบอสโลกได้',
-  'Daily world boss limit reached': 'ตีบอสโลกครบจำนวนของวันนี้แล้ว',
+  'World boss hits used up until the next reset': 'ตีบอสโลกครบจำนวนแล้ว รอรีเซ็ต',
   'World boss is not active': 'บอสโลกตัวนี้ถูกล้มหรือหมดเวลาแล้ว',
   'World boss has not ended yet': 'สัปดาห์นี้ยังไม่จบ',
   'World boss week not found': 'ไม่พบบอสโลกสัปดาห์นี้',
@@ -356,28 +368,6 @@ export const describeConditions = (rule: {
   return parts.length ? parts.join(' · ') : 'ไม่มีเงื่อนไข'
 }
 
-export const getMinigameBlocker = (monster: IMonsterData, now: Date): string | null => {
-  if (monster.diedAt || monster.stage === EnumMonsterStage.EGG) {
-    return 'ต้องมีมอนที่ฟักแล้ว'
-  }
-  if (monster.minigameReadyAt && new Date(monster.minigameReadyAt) > now) {
-    const minutesLeft = Math.ceil(
-      (new Date(monster.minigameReadyAt).getTime() - now.getTime()) / 60_000
-    )
-    return `เล่นได้อีกครั้งใน ${formatAge(minutesLeft)}`
-  }
-  return null
-}
-
-// Mini-game bar: position 0-100 sweeping back and forth once per `periodMs`.
-export const minigameBarPosition = (elapsedMs: number, periodMs: number) => {
-  const phase = (elapsedMs % periodMs) / periodMs
-  return phase < 0.5 ? phase * 200 : (1 - phase) * 200
-}
-
-export const isInZone = (position: number, zone: { start: number; width: number }) =>
-  position >= zone.start && position <= zone.start + zone.width
-
 export const slotLabel: Record<EnumEquipmentSlot, string> = {
   [EnumEquipmentSlot.WEAPON]: '⚔️ อาวุธ',
   [EnumEquipmentSlot.ARMOR]: '🛡️ เกราะ',
@@ -413,6 +403,13 @@ export const describeStats = (stats: Partial<Record<StatKey, number>>) =>
     .filter((key) => (stats[key] ?? 0) > 0)
     .map((key) => `+${stats[key]} ${statLabel[key]}`)
     .join(' · ')
+
+// What swapping the worn piece (or an empty slot) for `item` changes, per stat, skipping stats
+// that stay the same. A positive diff means the candidate is stronger.
+export const compareEquipment = (item: IEquipmentItem, worn: IEquipmentItem | undefined) =>
+  (Object.keys(statLabel) as StatKey[])
+    .map((key) => ({ key, diff: item.stats[key] - (worn?.stats[key] ?? 0) }))
+    .filter(({ diff }) => diff !== 0)
 
 // Gear can't change while the monster is away (the server refuses).
 export const getEquipBlocker = (monster: IMonsterData | null): string | null =>
@@ -524,7 +521,7 @@ export const getRaidBlocker = (
     return 'ยังไม่ปลดล็อก (ต้องถึงร่างที่กำหนด และชนะระดับก่อนหน้า)'
   }
   if (attemptsLeft <= 0) {
-    return 'สู้บอสครบจำนวนของวันนี้แล้ว'
+    return 'สู้บอสครบจำนวนแล้ว รอรีเซ็ต'
   }
   return null
 }
@@ -550,7 +547,7 @@ export const getWorldBossBlocker = (
     return 'บอสตัวนี้ถูกล้มแล้ว รอบอสสัปดาห์หน้า'
   }
   if (status && status.hitsLeft <= 0) {
-    return 'ตีครบจำนวนของวันนี้แล้ว'
+    return 'ตีครบจำนวนแล้ว รอรีเซ็ต'
   }
   return null
 }

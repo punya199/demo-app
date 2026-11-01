@@ -39,7 +39,7 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
   }, [replay, applyBattleResult])
 
   // One fight at a time: wait out the server's cooldown, fight, replay, repeat. Any refusal
-  // (stamina, daily cap, hidden tab...) stops the loop.
+  // (daily cap, hidden tab...) stops the loop.
   useEffect(() => {
     if (!autoStageId || replay || isPending) {
       return
@@ -79,7 +79,7 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
   return (
     <div className="flex w-full flex-col gap-4">
       <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-        สู้แต่ละครั้งใช้ stamina 10 · ชนะครั้งแรกได้เหรียญ x2 · บอสครั้งแรกได้เพชร
+        ชนะครั้งแรกได้เหรียญ x2 · บอสครั้งแรกได้เพชร
         <br />
         ด่านที่ชนะแล้ว (ไม่ใช่บอส) ตั้งต่อสู้อัตโนมัติได้ ต้องเปิดหน้านี้ค้างไว้
       </p>

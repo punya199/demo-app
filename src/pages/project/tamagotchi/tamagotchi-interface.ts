@@ -74,7 +74,6 @@ export interface IMonsterData {
   strength: number
   weight: number
   poops: number
-  stamina: number
   isSick: boolean
   careMistakes: number
   trainCount: number
@@ -82,8 +81,9 @@ export interface IMonsterData {
   losses: number
   ageMinutes: number
   bornAt: string
+  // Fighting stats from care (hunger, strength, weight) before gear; null for an egg.
+  battleStats: IBattleStats | null
   trainReadyAt: string | null
-  minigameReadyAt: string | null
   autoBattleReadyAt: string | null
   // Set while out on an expedition; `expeditionReturned` = back home, waiting to be collected.
   expeditionAreaId: string | null
@@ -372,6 +372,8 @@ export interface IWorldBossStatus {
     isDefeated: boolean
   }
   hitsLeft: number
+  // When the hit allowance refills.
+  resetsAt: string
   participants: number
   myDamage: number
   myHits: number
@@ -405,6 +407,8 @@ export interface IWorldBossAttackResponse {
   maxHp: number
   isKillingBlow: boolean
   hitsLeft: number
+  // When the hit allowance refills.
+  resetsAt: string
 }
 
 export interface IWorldBossRankingEntry {
@@ -440,6 +444,8 @@ export interface IRaidBossInfo {
 
 export interface IRaidData {
   attemptsLeft: number
+  // When the attempts refill.
+  resetsAt: string
   bosses: IRaidBossInfo[]
 }
 
@@ -457,6 +463,7 @@ export interface IRaidBattleResponse {
   bossTokens: number
   drop: IEquipmentItem | null
   attemptsLeft: number
+  resetsAt: string
   wallet: IWallet
 }
 
@@ -597,17 +604,6 @@ export interface IWikiData {
     trainCooldownMinutes: number
   }
   online: { graceMinutes: number; evolutionMultiplier: number }
-  stamina: {
-    max: number
-    recoveryPerMinute: number
-    recoveryOnlineMultiplier: number
-    battleCost: number
-    noStaminaStatMultiplier: number
-    minigameRounds: number
-    minigameRewards: number[]
-    minigameCooldownMinutes: number
-    refillGemPrice: number
-  }
   evolution: {
     stageDurationMinutes: Record<EnumMonsterStage, number | null>
     species: IWikiSpecies[]
@@ -658,7 +654,6 @@ export interface IWikiData {
       autoBattleRewards: { name: string; coins: number }[]
     }[]
     autoBattleCooldownSeconds: number
-    autoBattleStaminaCost: number
     autoBattleDailyCoinCap: number
   }
   equipment: {
@@ -719,7 +714,8 @@ export interface IWikiData {
     rentalOwnerDailyCap: number
   }
   worldBoss: {
-    dailyHits: number
+    hits: number
+    resetHours: number
     rounds: number
     bosses: { id: string; name: string; emoji: string; setId: string; hp: number }[]
     perHit: { coin: number; raidToken: number }
@@ -734,7 +730,8 @@ export interface IWikiData {
     }[]
   }
   raid: {
-    dailyAttempts: number
+    attempts: number
+    resetHours: number
     bossTokensPerWin: number
     firstClearMultiplier: number
     exchangeCost: Partial<Record<EnumEquipmentGrade, number>>

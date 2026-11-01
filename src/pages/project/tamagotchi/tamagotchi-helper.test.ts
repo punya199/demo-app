@@ -7,7 +7,6 @@ import {
   getActionBlocker,
   getBattleBlocker,
   getEvolutionCountdown,
-  getMinigameBlocker,
   describePctBonus,
   describeWorldBossReward,
   formatFriendCode,
@@ -16,6 +15,8 @@ import {
   formatTimeLeft,
   getWorldBossBlocker,
   describeSetEffect,
+  compareEquipment,
+  describeReset,
   describeStats,
   formatRatingChange,
   getDefenseBlocker,
@@ -28,8 +29,6 @@ import {
   getShopBlocker,
   getUseItemBlocker,
   hpAfter,
-  isInZone,
-  minigameBarPosition,
   toHearts,
   toThaiErrorMessage,
 } from './tamagotchi-helper'
@@ -40,6 +39,8 @@ import {
   EnumMonsterStage,
   IBattleData,
   IBattleEvent,
+  IBattleStats,
+  IEquipmentItem,
   IEvolutionRuleInfo,
   IMonsterData,
 } from './tamagotchi-interface'
@@ -57,7 +58,6 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   strength: 4,
   weight: 20,
   poops: 1,
-  stamina: 100,
   isSick: false,
   careMistakes: 0,
   trainCount: 0,
@@ -66,7 +66,7 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   ageMinutes: 0,
   bornAt: NOW.toISOString(),
   trainReadyAt: null,
-  minigameReadyAt: null,
+  battleStats: null,
   autoBattleReadyAt: null,
   expeditionAreaId: null,
   expeditionMinutes: 0,
@@ -151,8 +151,8 @@ describe('getBattleBlocker', () => {
     expect(getBattleBlocker(monster({ isSick: true }))).toBe('ป่วยอยู่ สู้ไม่ได้')
   })
 
-  it('still allows fighting with no strength or stamina (stats are halved instead)', () => {
-    expect(getBattleBlocker(monster({ strength: 0, stamina: 0 }))).toBeNull()
+  it('still allows fighting with no strength', () => {
+    expect(getBattleBlocker(monster({ strength: 0 }))).toBeNull()
   })
 })
 
@@ -276,31 +276,6 @@ describe('evolution conditions', () => {
     expect(
       describeMissingConditions(rule, monster({ careMistakes: 2, trainCount: 10, wins: 1 }))
     ).toEqual(['ดูแลพลาดเกินแล้ว (ได้ไม่เกิน 1 ครั้ง)', 'ชนะอีก 4 ครั้ง'])
-  })
-})
-
-describe('mini-game helpers', () => {
-  it('sweeps the bar 0 -> 100 -> 0 once per period', () => {
-    expect(minigameBarPosition(0, 1000)).toBe(0)
-    expect(minigameBarPosition(250, 1000)).toBe(50)
-    expect(minigameBarPosition(500, 1000)).toBe(100)
-    expect(minigameBarPosition(750, 1000)).toBe(50)
-    expect(minigameBarPosition(1000, 1000)).toBe(0)
-  })
-
-  it('checks the zone inclusively', () => {
-    const zone = { start: 40, width: 20 }
-    expect(isInZone(40, zone)).toBe(true)
-    expect(isInZone(60, zone)).toBe(true)
-    expect(isInZone(39.9, zone)).toBe(false)
-  })
-
-  it('blocks the mini-game during its cooldown', () => {
-    const readyAt = new Date(NOW.getTime() + 90_000).toISOString()
-    expect(getMinigameBlocker(monster({ minigameReadyAt: readyAt }), NOW)).toBe(
-      'เล่นได้อีกครั้งใน 2 นาที'
-    )
-    expect(getMinigameBlocker(monster(), NOW)).toBeNull()
   })
 })
 
@@ -474,7 +449,7 @@ describe('getRaidBlocker', () => {
     expect(getRaidBlocker(monster({ isSick: true }), open, 3)).toBe('ป่วยอยู่ สู้ไม่ได้')
     expect(getRaidBlocker(monster({ expeditionAreaId: 'meadow' }), open, 3)).toBe('มอนออกสำรวจอยู่')
     expect(getRaidBlocker(monster(), { unlocked: false }, 3)).toContain('ยังไม่ปลดล็อก')
-    expect(getRaidBlocker(monster(), open, 0)).toBe('สู้บอสครบจำนวนของวันนี้แล้ว')
+    expect(getRaidBlocker(monster(), open, 0)).toBe('สู้บอสครบจำนวนแล้ว รอรีเซ็ต')
   })
 
   it('names the currency in the shop blocker', () => {
@@ -519,7 +494,7 @@ describe('getWorldBossBlocker', () => {
     expect(
       getWorldBossBlocker(monster(), status({ boss: { isDefeated: true, hp: 0, maxHp: 100 } }))
     ).toBe('บอสตัวนี้ถูกล้มแล้ว รอบอสสัปดาห์หน้า')
-    expect(getWorldBossBlocker(monster(), status({ hitsLeft: 0 }))).toBe('ตีครบจำนวนของวันนี้แล้ว')
+    expect(getWorldBossBlocker(monster(), status({ hitsLeft: 0 }))).toBe('ตีครบจำนวนแล้ว รอรีเซ็ต')
   })
 
   it('describes a reward and the time left', () => {
@@ -599,5 +574,30 @@ describe('team replays with a rented ally', () => {
     // the boss's bar follows everyone who hit it
     const hitsOnBoss = [event({ member: 0, targetHp: 900 }), event({ member: 1, targetHp: 850 })]
     expect(hpAfter(hitsOnBoss, 2, 'enemy', 1000)).toBe(850)
+  })
+})
+
+describe('compareEquipment', () => {
+  const piece = (stats: Partial<IBattleStats>) =>
+    ({ stats: { hp: 0, atk: 0, def: 0, spd: 0, ...stats } }) as IEquipmentItem
+
+  it('lists what rises and falls against the worn piece, skipping unchanged stats', () => {
+    expect(compareEquipment(piece({ atk: 8, hp: 5 }), piece({ atk: 5, def: 2, hp: 5 }))).toEqual([
+      { key: 'atk', diff: 3 },
+      { key: 'def', diff: -2 },
+    ])
+  })
+
+  it('treats an empty slot as zero stats', () => {
+    expect(compareEquipment(piece({ spd: 4 }), undefined)).toEqual([{ key: 'spd', diff: 4 }])
+  })
+})
+
+describe('describeReset', () => {
+  it('shows the time left and the Thai clock time of the reset', () => {
+    // 11:00Z is 18:00 in Thailand
+    expect(describeReset('2026-01-01T11:00:00Z', new Date('2026-01-01T08:45:00Z'))).toBe(
+      'รีเซ็ตใน 2 ชม. 15 นาที (18:00 น.)'
+    )
   })
 })

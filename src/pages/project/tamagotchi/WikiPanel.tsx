@@ -75,7 +75,6 @@ const hatchedStages = [
 const buildSections = (wiki: IWikiData) => {
   const {
     care,
-    stamina,
     online,
     evolution,
     battle,
@@ -104,11 +103,11 @@ const buildSections = (wiki: IWikiData) => {
       children: (
         <List
           items={[
-            'เลือกไข่ 1 ใน 3 ธาตุ แล้วรอไข่ฟัก',
+            'เลือกไข่ 1 ใน 3 ธาตุ แล้วรอไข่ฟัก เลี้ยงพร้อมกันได้ 4 ตัว (กดช่องด้านบนเพื่อเลือกตัวที่จะเล่นด้วยในโหมดอื่น ๆ)',
             'ดูแลให้อิ่ม แข็งแรง สะอาด และหายป่วย เวลาในเกมเดินต่อแม้ปิดแอป',
             'ครบเวลาแต่ละร่าง มอนจะวิวัฒนาการ ร่างที่ได้ขึ้นกับการเลี้ยง การฝึก และการชนะ',
-            'พามอนไปสู้ในโหมดผจญภัย ทำภารกิจประจำวัน เก็บเหรียญและเพชรไว้ซื้อของและเติม stamina',
-            `เปิดเกมค้างไว้ = ออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)} และ stamina ลดช้าลง`,
+            'พามอนไปสู้ในโหมดผจญภัย ทำภารกิจประจำวัน เก็บเหรียญและเพชรไว้ซื้อของ',
+            `เปิดเกมค้างไว้ = ออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)} `,
             `มอนมีอายุขัย ${formatAge(care.lifespanMinutes)} นับจากฟัก ตายแล้วได้ไข่ใบใหม่ ความคืบหน้าผจญภัย เหรียญ เพชร และ Dex ยังอยู่`,
           ]}
         />
@@ -170,37 +169,15 @@ const buildSections = (wiki: IWikiData) => {
       ),
     },
     {
-      key: 'stamina',
-      label: '⚡ Stamina และออนไลน์',
+      key: 'online',
+      label: '⚡ ออนไลน์',
       children: (
         <>
-          <Heading>Stamina</Heading>
-          <List
-            items={[
-              `0–${stamina.max} ฟื้นเองทุกนาที ${stamina.recoveryPerMinute} ต่อนาที (เต็มจากศูนย์ใน ${formatAge(Math.ceil(stamina.max / stamina.recoveryPerMinute))}) เปิดเกมไว้ฟื้นเร็วขึ้น ${times(stamina.recoveryOnlineMultiplier)}`,
-              `สู้ 1 ครั้งใช้ ${stamina.battleCost}`,
-              `Stamina หมด (0): ยังสู้ได้ แต่ค่าพลังต่อสู้ทุกค่า ${times(stamina.noStaminaStatMultiplier)}`,
-              `เติมเต็มด้วย 💎 ${stamina.refillGemPrice}`,
-            ]}
-          />
-          <Heading>มินิเกม</Heading>
-          <List
-            items={[
-              `หยุดแถบให้ตรงโซนเขียว ${stamina.minigameRounds} รอบ เล่นได้ทุก ${formatAge(stamina.minigameCooldownMinutes)}`,
-            ]}
-          />
-          <Table
-            head={['โดน', 'ได้ stamina']}
-            rows={stamina.minigameRewards.map((reward, hits) => [
-              `${hits}/${stamina.minigameRounds}`,
-              `+${reward}`,
-            ])}
-          />
           <Heading>ออนไลน์</Heading>
           <List
             items={[
               `เปิดหน้าเกมไว้บนจอ หน้าเกมจะเช็กกับเซิร์ฟเวอร์ทุก 1 นาที แต่ละนาทีที่อยู่ภายใน ${online.graceMinutes} นาทีหลังการเช็กล่าสุดนับเป็นออนไลน์`,
-              `ระหว่างออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)} และ stamina ลดช้าลงครึ่งหนึ่ง`,
+              `ระหว่างออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)}`,
               'ความหิว ความแข็งแรง อึ และอายุ เดินตามเวลาจริงเสมอ ไม่ว่าออนไลน์หรือไม่',
             ]}
           />
@@ -277,7 +254,6 @@ const buildSections = (wiki: IWikiData) => {
               `ATK +${percent(battle.atkBonusPerStrengthHeart)} ต่อหัวใจความแข็งแรง`,
               `หิว (ความอิ่ม 0): ATK ${times(battle.hungryAtkMultiplier)}`,
               `น้ำหนักเกิน ${battle.overweightRatio} เท่าของขั้นต่ำ: SPD ${times(battle.overweightSpdMultiplier)}`,
-              `Stamina 0: ทุกค่า ${times(stamina.noStaminaStatMultiplier)}`,
             ]}
           />
           <Heading>ลำดับการต่อสู้</Heading>
@@ -315,12 +291,7 @@ const buildSections = (wiki: IWikiData) => {
             })}
           />
           <Heading>ค่าใช้จ่าย</Heading>
-          <List
-            items={[
-              `สู้ 1 ครั้ง: stamina −${stamina.battleCost}, น้ำหนัก −${battle.weightLoss}`,
-              'ป่วยอยู่สู้ไม่ได้',
-            ]}
-          />
+          <List items={[`สู้ 1 ครั้ง: น้ำหนัก −${battle.weightLoss}`, 'ป่วยอยู่สู้ไม่ได้']} />
         </>
       ),
     },
@@ -383,7 +354,7 @@ const buildSections = (wiki: IWikiData) => {
           <List
             items={[
               'เปิดหน้าผจญภัยค้างไว้ มอนสู้ด่านที่ชนะแล้ว (ไม่ใช่บอส) วนไปเรื่อย ๆ ปิดหน้าหรือสลับแท็บแล้วหยุด',
-              `สู้ได้ทุก ${idle.autoBattleCooldownSeconds} วินาที ใช้ stamina ครั้งละ ${idle.autoBattleStaminaCost} จ่ายเหรียญตามตารางด้านล่าง`,
+              `สู้ได้ทุก ${idle.autoBattleCooldownSeconds} วินาที จ่ายเหรียญตามตารางด้านล่าง`,
               `เพดานรางวัลต่อสู้อัตโนมัติ 🪙 ${idle.autoBattleDailyCoinCap} ต่อวัน (รีเซ็ตเที่ยงคืนเวลาไทย)`,
               'ต่อชั่วโมงได้มากกว่าการสำรวจเล็กน้อย เป็นแรงจูงใจให้เปิดเกมค้างไว้',
             ]}
@@ -478,11 +449,11 @@ const buildSections = (wiki: IWikiData) => {
           <Heading>Boss Raid (เดี่ยว)</Heading>
           <List
             items={[
-              `สู้ได้วันละ ${raid.dailyAttempts} ครั้ง (รวมทุกบอส) ใช้ stamina ${stamina.battleCost} ชนะต้องภายใน ${battle.maxRounds} รอบ`,
+              `สู้ได้ ${raid.attempts} ครั้ง (รวมทุกบอส) รีเซ็ตทุก ${raid.resetHours} ชม. (นับจากเที่ยงคืน) ชนะต้องภายใน ${battle.maxRounds} รอบ`,
               'ไม่ใช้ตารางธาตุ ความยากมาจากค่าพลังล้วน ๆ ทุกสายชนะได้ทุกบอส ธาตุของบอสเป็นแค่ลายเรื่อง',
               'ต้องถึงร่างที่กำหนดของแต่ละระดับ และชนะระดับก่อนหน้าของบอสตัวเดียวกันก่อน',
               `ชนะ: ได้ชิ้นเซ็ตของบอส 1 ชิ้น (ช่องสุ่ม ช่องละเท่ากัน) เกรดตามระดับ + 🎫 Boss Token ${raid.bossTokensPerWin} + 🎖️ Raid Token (ชนะครั้งแรกของแต่ละบอส/ระดับได้ ${times(raid.firstClearMultiplier)})`,
-              'กระเป๋าอุปกรณ์เต็มจะสู้ไม่ได้ (ไม่เสียโควตา) แพ้ไม่ได้อะไรและเสียโควตาของวัน',
+              'กระเป๋าอุปกรณ์เต็มจะสู้ไม่ได้ (ไม่เสียโควตา) แพ้ไม่ได้อะไรและเสียโควตา',
               'ผลการสู้บอสไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ',
             ]}
           />
@@ -527,7 +498,7 @@ const buildSections = (wiki: IWikiData) => {
           <List
             items={[
               `ทุกคนช่วยกันตีบอสตัวเดียวกัน ${worldBoss.bosses.map((boss) => `${boss.emoji} ${boss.name} (HP ${boss.hp})`).join(' · ')} สัปดาห์ละหนึ่งตัว (นับจันทร์ 00:00 ถึงอาทิตย์ เวลาไทย) ถ้าไม่แตกก็ยังได้รางวัลตามส่วนร่วม`,
-              `ต้องเป็นร่างโตขึ้นไป ตีได้วันละ ${worldBoss.dailyHits} ครั้ง ครั้งละไม่เกิน ${worldBoss.rounds} รอบ (หรือจนมอนล้ม) ใช้ stamina ${stamina.battleCost}`,
+              `ต้องเป็นร่างโตขึ้นไป ตีได้ ${worldBoss.hits} ครั้ง รีเซ็ตทุก ${worldBoss.resetHours} ชม. (นับจากเที่ยงคืน) ครั้งละไม่เกิน ${worldBoss.rounds} รอบ (หรือจนมอนล้ม)`,
               'ดาเมจที่ทำได้ลด HP รวมของบอสทันที ใช้ค่าพลังสดของมอนรวมอุปกรณ์และเอฟเฟกต์เซ็ต ไม่ใช้ตารางธาตุ มอนที่ HP/เกราะดีอยู่ได้นานกว่าและทำดาเมจรวมมากกว่า',
               'ผลไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ',
               `ผู้ตีครั้งสุดท้ายที่ทำให้บอสแตกได้ชิ้นชุดสายฟ้าเร็ว (${gradeLabel[worldBoss.killingBlowGrade]}) การันตี`,
@@ -594,9 +565,9 @@ const buildSections = (wiki: IWikiData) => {
           <Heading>วิธีเล่น</Heading>
           <List
             items={[
-              `ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้ ตั้ง "ทีมป้องกัน" ไว้ก่อน (ระบบจำค่าพลังรวมอุปกรณ์ของมอนตอนนั้น stamina เต็ม) ถึงจะท้าคนอื่นได้ เปลี่ยนทีมได้ทุก ${pvp.defenseCooldownMinutes} นาที`,
+              `ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้ ตั้ง "ทีมป้องกัน" ไว้ก่อน (ระบบจำค่าพลังรวมอุปกรณ์ของมอนตอนนั้น) ถึงจะท้าคนอื่นได้ เปลี่ยนทีมได้ทุก ${pvp.defenseCooldownMinutes} นาที`,
               `ท้าได้วันละ ${pvp.dailyAttempts} ครั้ง ระบบเสนอ ${pvp.opponentCount} คนที่เป็นร่างเดียวกัน เรตติ้งห่างไม่เกิน ${pvp.ratingWindow} คนเดิมท้าได้ไม่เกิน ${pvp.maxFightsPerOpponentPerDay} ครั้งต่อวัน`,
-              `ท้าด้วยค่าพลังสดของมอนคุณ (stamina หมดค่าพลังลดครึ่ง) ใช้ stamina ${stamina.battleCost} ผลไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ`,
+              `ท้าด้วยค่าพลังสดของมอนคุณ ผลไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ`,
               `ชนะได้ 🪙 ${pvp.winCoin} แพ้ได้ 🪙 ${pvp.lossCoin}`,
               'ผู้ที่ถูกท้าก็ได้/เสียเรตติ้งแม้ไม่ได้ออนไลน์ และดูการต่อสู้ย้อนหลังได้ในประวัติ',
               'ชื่อที่คนอื่นเห็นคือชื่อสนามที่คุณตั้งเอง ไม่แสดงชื่อผู้ใช้',
@@ -649,7 +620,7 @@ const buildSections = (wiki: IWikiData) => {
               [
                 '💎 เพชร',
                 `ชนะบอสครั้งแรก · ค้นพบร่างใหม่ใน Dex (+${economy.dexDiscoveryGems})`,
-                `เติม stamina เต็ม (💎 ${stamina.refillGemPrice})`,
+                'ซื้อวัตถุดิบตีบวกบางชนิด',
               ],
             ]}
           />

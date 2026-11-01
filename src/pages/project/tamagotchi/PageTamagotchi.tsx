@@ -10,7 +10,6 @@ import { AdventurePanel } from './AdventurePanel'
 import { DexPanel } from './DexPanel'
 import { EquipmentPanel } from './EquipmentPanel'
 import { ExpeditionPanel } from './ExpeditionPanel'
-import { MinigameModal } from './MinigameModal'
 import { PetSprite } from './PetSprite'
 import { FriendsPanel } from './FriendsPanel'
 import { WorldBossPanel } from './WorldBossPanel'
@@ -26,7 +25,6 @@ import {
   formatAge,
   getActionBlocker,
   getEvolutionCountdown,
-  getMinigameBlocker,
   lineOptions,
   MAX_HEARTS,
   stageLabel,
@@ -35,16 +33,14 @@ import {
 } from './tamagotchi-helper'
 import { EnumMonsterStage, IMonsterData } from './tamagotchi-interface'
 import {
+  useGetEquipment,
   useGetMonsterHistory,
   useGetMyMonster,
   useGetWallet,
   useHatchMonster,
   useMonsterAction,
-  useRefillStamina,
+  useSelectMonster,
 } from './tamagotchi-service'
-
-// Must match STAMINA_REFILL_GEM_PRICE on the server (also shown in the guide).
-const STAMINA_REFILL_GEM_PRICE = 5
 
 const showError = (error: unknown) => {
   message.error(
@@ -181,51 +177,86 @@ const EvolutionPanel = (props: { monster: IMonsterData; fetchedAt: number; now: 
   )
 }
 
-const StaminaPanel = (props: { monster: IMonsterData; gem: number; now: Date }) => {
-  const { monster, gem, now } = props
-  const [isMinigameOpen, setIsMinigameOpen] = useState(false)
-  const { mutate: refill, isPending: isRefilling } = useRefillStamina()
-  const stamina = Math.round(monster.stamina)
-  const minigameBlocker = getMinigameBlocker(monster, now)
-  const refillBlocker =
-    stamina >= 100 ? 'Stamina เต็มอยู่แล้ว' : gem < STAMINA_REFILL_GEM_PRICE ? 'เพชรไม่พอ' : null
+const STAT_ROWS = [
+  ['hp', 'HP'],
+  ['atk', 'ATK'],
+  ['def', 'DEF'],
+  ['spd', 'SPD'],
+] as const
 
+// Fighting stats: from care alone, and with the worn gear (what the server fights with).
+const BattleStatus = (props: { monster: IMonsterData }) => {
+  const { monster } = props
+  const { data: equipment } = useGetEquipment()
+  const base = monster.battleStats
+  if (!base) {
+    return null
+  }
+  const total = equipment?.stats ?? base
   return (
-    <div className="text-sm">
-      <div className="flex items-center justify-between">
-        <span className="text-slate-600 dark:text-slate-300">Stamina</span>
-        <span className="font-medium text-slate-900 dark:text-slate-100">{stamina}/100</span>
+    <div className="rounded-lg bg-white/60 p-2 text-sm dark:bg-slate-700/60">
+      <div className="mb-1 text-xs text-slate-500 dark:text-slate-400">
+        สถานะต่อสู้ (รวมอุปกรณ์ที่สวมอยู่)
       </div>
-      <Progress
-        percent={stamina}
-        showInfo={false}
-        size="small"
-        strokeColor={stamina === 0 ? '#ef4444' : '#f59e0b'}
-      />
-      {stamina === 0 && (
-        <div className="text-xs text-red-500">Stamina หมด: พลังต่อสู้ลดลงครึ่งหนึ่ง</div>
-      )}
-      <div className="mt-1 flex gap-2">
-        <Tooltip title={minigameBlocker}>
-          <Button size="small" disabled={!!minigameBlocker} onClick={() => setIsMinigameOpen(true)}>
-            🎯 มินิเกม
-          </Button>
-        </Tooltip>
-        <Tooltip title={refillBlocker}>
+      <div className="grid grid-cols-4 gap-2 text-center">
+        {STAT_ROWS.map(([key, label]) => {
+          const bonus = total[key] - base[key]
+          return (
+            <div key={key}>
+              <div className="text-xs text-slate-500 dark:text-slate-400">{label}</div>
+              <div className="font-semibold text-slate-900 dark:text-slate-100">{total[key]}</div>
+              {bonus > 0 && <div className="text-xs text-emerald-600">+{bonus}</div>}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// One slot per monster the player can raise at once; tapping a slot selects it.
+const MonsterSlots = (props: {
+  monsters: IMonsterData[]
+  selectedId: string | undefined
+  max: number
+  onNewEgg: () => void
+}) => {
+  const { monsters, selectedId, max, onNewEgg } = props
+  const { mutate: select, isPending } = useSelectMonster()
+  return (
+    <div className="grid grid-cols-4 gap-2">
+      {Array.from({ length: max }, (_, index) => {
+        const monster = monsters[index]
+        if (!monster) {
+          return (
+            <Button
+              key={`empty-${index}`}
+              className="!h-auto !py-2"
+              onClick={onNewEgg}
+              aria-label="รับไข่ใบใหม่"
+            >
+              <span className="flex flex-col items-center leading-tight">
+                <span className="text-xl">➕</span>
+                <span className="text-xs">ไข่ใหม่</span>
+              </span>
+            </Button>
+          )
+        }
+        return (
           <Button
-            size="small"
-            disabled={!!refillBlocker || isRefilling}
-            onClick={() => refill(undefined, { onError: showError })}
+            key={monster.id}
+            type={monster.id === selectedId ? 'primary' : 'default'}
+            disabled={isPending}
+            className="!h-auto !py-2"
+            onClick={() => monster.id !== selectedId && select(monster.id, { onError: showError })}
           >
-            💎 {STAMINA_REFILL_GEM_PRICE} เติมเต็ม
+            <span className="flex flex-col items-center leading-tight">
+              <span className="text-xl">{monster.isSick ? '🤒' : monster.emoji}</span>
+              <span className="w-full truncate text-xs">{monster.name}</span>
+            </span>
           </Button>
-        </Tooltip>
-      </div>
-      <MinigameModal
-        open={isMinigameOpen}
-        onClose={() => setIsMinigameOpen(false)}
-        onError={showError}
-      />
+        )
+      })}
     </div>
   )
 }
@@ -233,7 +264,6 @@ const StaminaPanel = (props: { monster: IMonsterData; gem: number; now: Date }) 
 const MonsterScreen = (props: { monster: IMonsterData; fetchedAt: number }) => {
   const { monster, fetchedAt } = props
   const now = useNow(5000)
-  const { data: wallet } = useGetWallet()
   const { mutate: act, isPending } = useMonsterAction()
   const isEgg = monster.stage === EnumMonsterStage.EGG
 
@@ -245,12 +275,7 @@ const MonsterScreen = (props: { monster: IMonsterData; fetchedAt: number }) => {
           <Tag color="blue">{stageLabel[monster.stage]}</Tag>
         </div>
         <div className="rounded-2xl bg-lime-100 p-4 dark:bg-lime-200">
-          <PetSprite
-            emoji={monster.emoji}
-            isExhausted={!isEgg && monster.stamina <= 0}
-            isSick={monster.isSick}
-            isEgg={isEgg}
-          />
+          <PetSprite emoji={monster.emoji} isSick={monster.isSick} isEgg={isEgg} />
           <div className="h-7 text-center text-xl" aria-label={`อึ ${monster.poops} กอง`}>
             {'💩'.repeat(monster.poops)}
           </div>
@@ -259,10 +284,10 @@ const MonsterScreen = (props: { monster: IMonsterData; fetchedAt: number }) => {
           <EvolutionPanel monster={monster} fetchedAt={fetchedAt} now={now} />
         </div>
         {!isEgg && (
-          <div className="mt-3 flex flex-col gap-1 text-sm">
+          <div className="mt-3 flex flex-col gap-2 text-sm">
+            <BattleStatus monster={monster} />
             <Hearts label="ความอิ่ม" value={monster.fullness} />
             <Hearts label="ความแข็งแรง" value={monster.strength} />
-            <StaminaPanel monster={monster} gem={wallet?.gem ?? 0} now={now} />
             <StatRow label="น้ำหนัก" value={`${monster.weight} g`} />
             <StatRow label="อายุ" value={formatAge(monster.ageMinutes)} />
             <StatRow label="ฝึกในร่างนี้" value={`${monster.trainCount} ครั้ง`} />
@@ -280,7 +305,9 @@ const MonsterScreen = (props: { monster: IMonsterData; fetchedAt: number }) => {
               <Button
                 size="large"
                 disabled={!!blocker || isPending}
-                onClick={() => act(option.action, { onError: showError })}
+                onClick={() =>
+                  act({ type: option.action, monsterId: monster.id }, { onError: showError })
+                }
                 className="!h-auto !px-1 !py-2"
               >
                 <span className="flex flex-col items-center leading-tight">
@@ -330,13 +357,13 @@ const TamagotchiGame = () => {
   const queryClient = useQueryClient()
   const [isChoosingEgg, setIsChoosingEgg] = useState(false)
   const monster = data?.monster ?? null
+  const monsters = data?.monsters ?? []
   const diedAt = monster?.diedAt
 
+  // A new egg was hatched: back from the picker to the care screen.
   useEffect(() => {
-    if (monster && !monster.diedAt) {
-      setIsChoosingEgg(false)
-    }
-  }, [monster])
+    setIsChoosingEgg(false)
+  }, [monsters.length])
 
   // The server only records a death when it ticks the monster, which can happen after the
   // history was fetched - refresh it so the Hall of Fame includes the monster that just died.
@@ -350,13 +377,30 @@ const TamagotchiGame = () => {
     return <Spin size="large" />
   }
 
-  if (!monster || isChoosingEgg) {
+  if (!monster || (isChoosingEgg && monsters.length === 0)) {
     return <EggPicker />
   }
   if (monster.diedAt) {
     return <Memorial monster={monster} onNewEgg={() => setIsChoosingEgg(true)} />
   }
-  return <MonsterScreen monster={monster} fetchedAt={dataUpdatedAt} />
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <MonsterSlots
+        monsters={monsters}
+        selectedId={monster.id}
+        max={data?.maxMonsters ?? 4}
+        onNewEgg={() => setIsChoosingEgg(true)}
+      />
+      {isChoosingEgg ? (
+        <>
+          <EggPicker />
+          <Button onClick={() => setIsChoosingEgg(false)}>ยกเลิก</Button>
+        </>
+      ) : (
+        <MonsterScreen key={monster.id} monster={monster} fetchedAt={dataUpdatedAt} />
+      )}
+    </div>
+  )
 }
 
 const GameTabs = () => {

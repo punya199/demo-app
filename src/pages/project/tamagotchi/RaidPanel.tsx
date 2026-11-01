@@ -1,3 +1,4 @@
+import { ResetCountdown } from './ResetCountdown'
 import { Button, Card, Select, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { BattleModal } from './BattleModal'
@@ -190,8 +191,10 @@ export const RaidPanel = (props: IRaidPanelProps) => {
   return (
     <div className="flex w-full flex-col gap-3">
       <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-        สู้บอสเดี่ยววันละ {data.attemptsLeft} ครั้งที่เหลือ · ชนะได้ชิ้นเซ็ตการันตี 1 ชิ้น
-        ไม่ใช้ตารางธาตุ ทุกสายชนะได้ทุกบอส
+        สู้บอสเดี่ยวได้อีก {data.attemptsLeft} ครั้ง · ชนะได้ชิ้นเซ็ตการันตี 1 ชิ้น ไม่ใช้ตารางธาตุ
+        ทุกสายชนะได้ทุกบอส
+        <br />
+        🕒 <ResetCountdown resetsAt={data.resetsAt} />
       </p>
       {data.bosses.map((boss) => (
         <BossCard

@@ -1,3 +1,4 @@
+import { ResetCountdown } from './ResetCountdown'
 import { Alert, Button, Card, Collapse, Progress, Select, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { BattleModal } from './BattleModal'
@@ -147,7 +148,10 @@ export const WorldBossPanel = (props: IWorldBossPanelProps) => {
             </div>
             <div className="text-xs text-slate-500">
               {status.myRank ? `อันดับ #${status.myRank}` : 'ยังไม่ได้ตี'} · ตีได้อีก{' '}
-              {status.hitsLeft} ครั้งวันนี้
+              {status.hitsLeft} ครั้ง
+            </div>
+            <div className="text-xs text-slate-500">
+              🕒 <ResetCountdown resetsAt={status.resetsAt} />
             </div>
           </div>
           <Tooltip title={blocker}>

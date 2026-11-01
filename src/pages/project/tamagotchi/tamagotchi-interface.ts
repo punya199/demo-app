@@ -2,6 +2,11 @@ export enum EnumMonsterLine {
   FLAME = 'flame',
   TIDE = 'tide',
   LEAF = 'leaf',
+  EARTH = 'earth',
+  LIGHTNING = 'lightning',
+  HOLY = 'holy',
+  DARK = 'dark',
+  SHADOW = 'shadow',
 }
 
 export enum EnumMonsterStage {
@@ -11,12 +16,16 @@ export enum EnumMonsterStage {
   ADULT = 'adult',
   PERFECT = 'perfect',
   ULTIMATE = 'ultimate',
+  // Two merged Ultimates: the final form.
+  FUSED = 'fused',
 }
 
 export enum EnumMonsterDeathCause {
   OLD_AGE = 'old_age',
   SICKNESS = 'sickness',
   STARVATION = 'starvation',
+  // Consumed as a parent of a merge.
+  MERGED = 'merged',
 }
 
 export enum EnumMonsterAction {
@@ -63,6 +72,25 @@ export interface IWallet {
 
 // Mirrors the backend's monster view (demo-app-backend src/modules/monster/monster.service.ts).
 // All game rules run on the server - these values are only displayed.
+// min / max / rolled value of one stat. HP/ATK/DEF/SPD are the form's own numbers; the extra stats
+// are in percent (crit damage as a percent multiplier).
+export interface IPotentialStat {
+  min: number
+  max: number
+  value: number
+}
+
+export type PotentialStatKey = 'hp' | 'atk' | 'def' | 'spd' | 'critRate' | 'critDamage' | 'evasion'
+
+export interface IPotentialView {
+  // A monster from before potential existed: no grade, old fixed stats.
+  isLegacy: boolean
+  grade: string | null
+  // Average roll in percent of the range.
+  average: number | null
+  stats: Record<PotentialStatKey, IPotentialStat>
+}
+
 export interface IMonsterData {
   id: string
   line: EnumMonsterLine
@@ -74,7 +102,6 @@ export interface IMonsterData {
   strength: number
   weight: number
   poops: number
-  stamina: number
   isSick: boolean
   careMistakes: number
   trainCount: number
@@ -82,8 +109,10 @@ export interface IMonsterData {
   losses: number
   ageMinutes: number
   bornAt: string
+  // Fighting stats from care (hunger, strength, weight) before gear; null for an egg.
+  battleStats: IBattleStats | null
+  potentialView: IPotentialView
   trainReadyAt: string | null
-  minigameReadyAt: string | null
   autoBattleReadyAt: string | null
   // Set while out on an expedition; `expeditionReturned` = back home, waiting to be collected.
   expeditionAreaId: string | null
@@ -126,6 +155,8 @@ export interface IBattleEvent {
   // extra hit of a double strike. `absorbed` is damage a set shield soaked up (part of `damage`).
   kind?: 'burn' | 'regen' | 'double'
   absorbed?: number
+  // The target dodged the hit (damage is 0).
+  isDodged?: boolean
   // Team fights: which member of the player's side attacked, or was hit when the enemy attacks.
   member?: number
 }
@@ -194,8 +225,10 @@ export interface IEquipmentData {
   // Battle effects of the worn four-piece sets.
   activeEffects: IFighterEffects
   setBonuses: { setId: string; name: string; pieces: number }[]
-  // The living monster's battle stats with the worn gear; null without a hatched monster.
+  // The living monster's battle stats with the worn gear and passives; null without a hatched monster.
   stats: IBattleStats | null
+  // Its crit rate (%), crit damage (% multiplier) and evasion (%) with gear and passives.
+  combat: { critRate: number; critDamage: number; evasion: number } | null
 }
 
 export type EnhanceFailure = 'material' | 'drop' | 'drop_or_break'
@@ -372,6 +405,8 @@ export interface IWorldBossStatus {
     isDefeated: boolean
   }
   hitsLeft: number
+  // When the hit allowance refills.
+  resetsAt: string
   participants: number
   myDamage: number
   myHits: number
@@ -405,6 +440,8 @@ export interface IWorldBossAttackResponse {
   maxHp: number
   isKillingBlow: boolean
   hitsLeft: number
+  // When the hit allowance refills.
+  resetsAt: string
 }
 
 export interface IWorldBossRankingEntry {
@@ -440,6 +477,8 @@ export interface IRaidBossInfo {
 
 export interface IRaidData {
   attemptsLeft: number
+  // When the attempts refill.
+  resetsAt: string
   bosses: IRaidBossInfo[]
 }
 
@@ -457,6 +496,7 @@ export interface IRaidBattleResponse {
   bossTokens: number
   drop: IEquipmentItem | null
   attemptsLeft: number
+  resetsAt: string
   wallet: IWallet
 }
 
@@ -569,6 +609,15 @@ export interface IWikiSpecies {
   evolutions: { to: string; maxCareMistakes?: number; minTrainCount?: number; minWins?: number }[]
 }
 
+export interface IMergeForm {
+  id: string
+  // The two parent lines this form is made from (the same twice for an awakened form).
+  lines: [EnumMonsterLine, EnumMonsterLine]
+  name: string
+  emoji: string
+  stats: IBattleStats
+}
+
 interface IStageRates {
   fullnessMinutes: number
   strengthMinutes: number
@@ -591,26 +640,37 @@ export interface IWikiData {
     deathAfterSickMinutes: number
     deathAfterHungryMinutes: number
     lifespanMinutes: number
+    fusedLifespanMinutes: number
     feedWeightGain: number
     vitaminWeightGain: number
     trainWeightLoss: number
     trainCooldownMinutes: number
   }
   online: { graceMinutes: number; evolutionMultiplier: number }
-  stamina: {
-    max: number
-    recoveryPerMinute: number
-    recoveryOnlineMultiplier: number
-    battleCost: number
-    noStaminaStatMultiplier: number
-    minigameRounds: number
-    minigameRewards: number[]
-    minigameCooldownMinutes: number
-    refillGemPrice: number
-  }
   evolution: {
     stageDurationMinutes: Record<EnumMonsterStage, number | null>
     species: IWikiSpecies[]
+  }
+  merge: {
+    coinCost: number
+    gemCost: number
+    powerMultiplier: number
+    // Spiritual elements only merge with each other, natural ones with natural ones.
+    spiritualLines: EnumMonsterLine[]
+    lifespanMinutes: number
+    forms: IMergeForm[]
+  }
+  // Spiritual eggs are rare: hatching one costs Raid Tokens.
+  rareEgg: { lines: EnumMonsterLine[]; raidTokenPrice: number }
+  potential: {
+    statSpread: number
+    critRateBonusMax: number
+    critDamageBonusMax: number
+    evasionMax: number
+    critRateCap: number
+    critDamageCap: number
+    evasionCap: number
+    grades: { grade: string; minAverage: number }[]
   }
   battle: {
     atkBonusPerStrengthHeart: number
@@ -626,7 +686,7 @@ export interface IWikiData {
     defenseFactor: number
     damageVariance: number
     weightLoss: number
-    beats: Record<EnumMonsterLine, EnumMonsterLine>
+    beats: Record<EnumMonsterLine, EnumMonsterLine[]>
   }
   adventure: {
     firstClearMultiplier: number
@@ -658,7 +718,6 @@ export interface IWikiData {
       autoBattleRewards: { name: string; coins: number }[]
     }[]
     autoBattleCooldownSeconds: number
-    autoBattleStaminaCost: number
     autoBattleDailyCoinCap: number
   }
   equipment: {
@@ -718,8 +777,16 @@ export interface IWikiData {
     rentalFee: number
     rentalOwnerDailyCap: number
   }
+  passive: {
+    maxPoints: number
+    freeRefunds: number
+    respecGemPrice: number
+    economyCap: number
+    pvpSeasonPoints: { maxRank: number | null; points: number }[]
+  }
   worldBoss: {
-    dailyHits: number
+    hits: number
+    resetHours: number
     rounds: number
     bosses: { id: string; name: string; emoji: string; setId: string; hp: number }[]
     perHit: { coin: number; raidToken: number }
@@ -734,7 +801,8 @@ export interface IWikiData {
     }[]
   }
   raid: {
-    dailyAttempts: number
+    attempts: number
+    resetHours: number
     bossTokensPerWin: number
     firstClearMultiplier: number
     exchangeCost: Partial<Record<EnumEquipmentGrade, number>>
@@ -770,4 +838,48 @@ export interface IWikiData {
     dailyQuests: Pick<IQuest, 'id' | 'name' | 'emoji' | 'coinReward'>[]
     dexDiscoveryGems: number
   }
+}
+
+export type PassiveEffectKey =
+  | 'atk'
+  | 'hp'
+  | 'def'
+  | 'spd'
+  | 'crit'
+  | 'critdmg'
+  | 'shield'
+  | 'regen'
+  | 'dbl'
+  | 'burn'
+  | 'hunger'
+  | 'expCoin'
+  | 'drop'
+
+export interface IPassiveNode {
+  id: string
+  name: string
+  kind: 'small' | 'notable' | 'key'
+  arm: 'flame' | 'tide' | 'leaf' | 'bridge'
+  fx: Partial<Record<PassiveEffectKey, number>>
+  x: number
+  y: number
+  adj: string[]
+}
+
+// GET /passive: the whole graph (drawn as is), what the player owns and what they can still do.
+export interface IPassiveState {
+  nodes: IPassiveNode[]
+  allocated: string[]
+  points: {
+    earned: number
+    used: number
+    left: number
+    sources: {
+      dexSpecies: number
+      raidFirstClears: number
+      worldBossDefeats: number
+      pvpSeasons: number
+    }
+  }
+  respec: { refunded: number; freeLeft: number; gemPrice: number }
 }

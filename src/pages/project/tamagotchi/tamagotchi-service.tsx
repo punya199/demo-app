@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../../../utils/api-client'
 import {
   EnumMonsterAction,
@@ -10,6 +10,7 @@ import {
   IEnhancePreview,
   IEquipmentData,
   IEquipmentItem,
+  IPassiveState,
   IFriendsData,
   IFriendVisit,
   IProfile,
@@ -39,7 +40,11 @@ import {
 } from './tamagotchi-interface'
 
 interface IGetMyMonsterResponse {
+  // The selected monster, which every other tab plays with.
   monster: IMonsterData | null
+  // Every living monster (up to maxMonsters), selected one included.
+  monsters: IMonsterData[]
+  maxMonsters: number
 }
 
 interface IGetMonsterHistoryResponse {
@@ -66,8 +71,20 @@ const EQUIPMENT_KEY = ['equipment']
 const MY_MONSTER_KEY = ['monster', 'me']
 const WALLET_KEY = ['wallet']
 
+// Other endpoints return only the selected monster; fold it into the cached list so the care
+// tab's slots don't lose the rest until the next poll.
+const setSelectedMonster = (queryClient: QueryClient, monster: IMonsterData) => {
+  queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, (old) => ({
+    maxMonsters: old?.maxMonsters ?? 4,
+    monster,
+    monsters: (old?.monsters ?? []).some((row) => row.id === monster.id)
+      ? old!.monsters.map((row) => (row.id === monster.id ? monster : row))
+      : [...(old?.monsters ?? []), monster],
+  }))
+}
+
 // The server advances the monster's clock on every read, so polling keeps hearts and poops fresh.
-// Each poll also marks the player online (evolution x2, slower stamina drain); TanStack Query
+// Each poll also marks the player online (evolution x2, ); TanStack Query
 // pauses the interval while the tab is in the background, which is what "online" should mean.
 const REFETCH_INTERVAL_MS = 60 * 1000
 
@@ -102,6 +119,8 @@ export const useHatchMonster = () => {
     onSuccess: (data) => {
       queryClient.setQueryData(MY_MONSTER_KEY, data)
       queryClient.invalidateQueries({ queryKey: ['monster', 'history'] })
+      // A rare egg is paid for in Raid Tokens.
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
     },
   })
 }
@@ -109,16 +128,49 @@ export const useHatchMonster = () => {
 export const useMonsterAction = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (type: EnumMonsterAction) => {
-      const { data } = await apiClient.post<IGetMyMonsterResponse>(`/monster/action`, { type })
+    mutationFn: async (input: { type: EnumMonsterAction; monsterId?: string }) => {
+      const { data } = await apiClient.post<{ monster: IMonsterData }>(`/monster/action`, input)
       return data
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(MY_MONSTER_KEY, data)
+      setSelectedMonster(queryClient, data.monster)
     },
     onError: () => {
       // The monster may have changed (fallen asleep, died) since the last poll.
       queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+    },
+  })
+}
+
+export const useMergeMonsters = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { firstId: string; secondId: string; baseId: string }) => {
+      const { data } = await apiClient.post<{ monster: IMonsterData; wallet: IWallet }>(
+        `/monster/merge`,
+        input
+      )
+      return data
+    },
+    // The parents are gone and the new monster is selected, so every tab's data may have changed.
+    onSettled: () => {
+      queryClient.invalidateQueries()
+    },
+  })
+}
+
+export const useSelectMonster = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (monsterId: string) => {
+      const { data } = await apiClient.post<{ monster: IMonsterData }>(`/monster/select`, {
+        monsterId,
+      })
+      return data
+    },
+    onSuccess: () => {
+      // Every other tab now plays with this monster.
+      queryClient.invalidateQueries()
     },
   })
 }
@@ -161,7 +213,7 @@ export const useAdventureBattle = () => {
 export const useApplyBattleResult = () => {
   const queryClient = useQueryClient()
   return (data: IBattleResponse) => {
-    queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+    setSelectedMonster(queryClient, data.monster)
     queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
     queryClient.invalidateQueries({ queryKey: ['adventure'] })
     // A win may have dropped a piece of equipment.
@@ -219,7 +271,7 @@ export const useUseInventoryItem = () => {
       return data
     },
     onSuccess: (data) => {
-      queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+      setSelectedMonster(queryClient, data.monster)
       queryClient.setQueryData<IInventoryResponse>(INVENTORY_KEY, { items: data.items })
     },
     onError: () => {
@@ -268,43 +320,6 @@ export const useGetMonsterDex = () => {
   })
 }
 
-export const usePlayMinigame = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: async (hits: number) => {
-      const { data } = await apiClient.post<{ monster: IMonsterData; reward: number }>(
-        `/monster/minigame`,
-        { hits }
-      )
-      return data
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
-    },
-    onError: () => {
-      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
-    },
-  })
-}
-
-export const useRefillStamina = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: async () => {
-      const { data } = await apiClient.post<IMonsterWithWalletResponse>(`/monster/stamina/refill`)
-      return data
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
-      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
-    },
-    onError: () => {
-      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
-      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
-    },
-  })
-}
-
 export const useGetWiki = () => {
   return useQuery({
     queryKey: ['monster', 'wiki'],
@@ -330,13 +345,13 @@ export const useStartExpedition = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (areaId: string) => {
-      const { data } = await apiClient.post<IGetMyMonsterResponse>(`/expedition/start`, {
+      const { data } = await apiClient.post<{ monster: IMonsterData }>(`/expedition/start`, {
         areaId,
       })
       return data
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(MY_MONSTER_KEY, data)
+      setSelectedMonster(queryClient, data.monster)
       queryClient.invalidateQueries({ queryKey: ['quests'] })
     },
     onError: () => {
@@ -355,7 +370,7 @@ export const useClaimExpedition = () => {
       return data
     },
     onSuccess: (data) => {
-      queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+      setSelectedMonster(queryClient, data.monster)
       queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
       queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
     },
@@ -546,7 +561,7 @@ export const usePvpBattle = () => {
 export const useApplyPvpResult = () => {
   const queryClient = useQueryClient()
   return (data: IPvpBattleResponse) => {
-    queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+    setSelectedMonster(queryClient, data.monster)
     queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
     queryClient.invalidateQueries({ queryKey: PVP_KEY })
     queryClient.invalidateQueries({ queryKey: ['pvp', 'history'] })
@@ -631,7 +646,7 @@ export const useRaidBattle = () => {
 export const useApplyRaidResult = () => {
   const queryClient = useQueryClient()
   return (data: IRaidBattleResponse) => {
-    queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+    setSelectedMonster(queryClient, data.monster)
     queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
     queryClient.invalidateQueries({ queryKey: ['raid'] })
     queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
@@ -698,7 +713,7 @@ export const useWorldBossAttack = () => {
 export const useApplyWorldBossResult = () => {
   const queryClient = useQueryClient()
   return (data: IWorldBossAttackResponse) => {
-    queryClient.setQueryData<IGetMyMonsterResponse>(MY_MONSTER_KEY, { monster: data.monster })
+    setSelectedMonster(queryClient, data.monster)
     queryClient.invalidateQueries({ queryKey: WORLD_BOSS_KEY })
     queryClient.invalidateQueries({ queryKey: ['quests'] })
     if (data.ally) {
@@ -912,3 +927,51 @@ export const useGetRentable = () => {
     },
   })
 }
+
+const PASSIVE_KEY = ['passive']
+
+export const useGetPassive = () => {
+  return useQuery({
+    queryKey: PASSIVE_KEY,
+    queryFn: async () => {
+      const { data } = await apiClient.get<IPassiveState>(`/passive`)
+      return data
+    },
+  })
+}
+
+// Allocate, deallocate and respec all answer with the refreshed tree. Gems (respec) and the
+// battle stats shown on the care and equipment screens change with it.
+const usePassiveMutation = <TInput,>(request: (input: TInput) => Promise<IPassiveState>) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: request,
+    onSuccess: (data) => {
+      queryClient.setQueryData<IPassiveState>(PASSIVE_KEY, data)
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+      queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: PASSIVE_KEY })
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+    },
+  })
+}
+
+export const usePassiveAllocate = () =>
+  usePassiveMutation(async (nodeId: string) => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/allocate`, { nodeId })
+    return data
+  })
+
+export const usePassiveDeallocate = () =>
+  usePassiveMutation(async (nodeId: string) => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/deallocate`, { nodeId })
+    return data
+  })
+
+export const usePassiveRespec = () =>
+  usePassiveMutation(async () => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/respec`)
+    return data
+  })

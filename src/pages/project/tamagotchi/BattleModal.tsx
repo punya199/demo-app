@@ -122,7 +122,7 @@ export const BattleModal = (props: IBattleModalProps) => {
           ) : (
             <span className="font-semibold text-red-500">
               แพ้...{' '}
-              {battle.rounds >= 20 ? 'หมดเวลา' : 'ลองดูแลให้แข็งแรงหรือเติม stamina แล้วมาใหม่'}
+              {battle.rounds >= 20 ? 'หมดเวลา' : 'ลองดูแลให้แข็งแรงหรืออัปเกรดอุปกรณ์แล้วมาใหม่'}
             </span>
           )
         ) : lastEvent ? (

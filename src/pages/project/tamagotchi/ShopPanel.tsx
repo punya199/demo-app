@@ -1,10 +1,13 @@
-import { Button, Card, Spin, Tooltip } from 'antd'
+import { Button, Card, Modal, Spin, Tooltip } from 'antd'
+import { useState } from 'react'
+import { CompareLine, ItemLine } from './EquipmentParts'
 import { gradeLabel, getShopBlocker, getUseItemBlocker } from './tamagotchi-helper'
-import { IMonsterData } from './tamagotchi-interface'
+import { IEquipmentItem, IMonsterData } from './tamagotchi-interface'
 import {
   useBuyEquipmentBox,
   useBuyMaterial,
   useBuyShopItem,
+  useGetEquipment,
   useGetInventory,
   useGetShopItems,
   useGetWallet,
@@ -28,6 +31,8 @@ export const ShopPanel = (props: IShopPanelProps) => {
   const { data: wallet } = useGetWallet()
   const { mutate: buyBox, isPending: isBuyingBox } = useBuyEquipmentBox()
   const { mutate: buyMaterial, isPending: isBuyingMaterial } = useBuyMaterial()
+  const { data: equipmentData } = useGetEquipment()
+  const [opened, setOpened] = useState<IEquipmentItem | null>(null)
 
   if (isLoading) {
     return <Spin />
@@ -105,7 +110,9 @@ export const ShopPanel = (props: IShopPanelProps) => {
               <Tooltip title={getShopBlocker(equipment.boxPrice, coin)}>
                 <Button
                   disabled={!!getShopBlocker(equipment.boxPrice, coin) || isBuyingBox}
-                  onClick={() => buyBox(undefined, { onError })}
+                  onClick={() =>
+                    buyBox(undefined, { onError, onSuccess: ({ item }) => setOpened(item) })
+                  }
                 >
                   ซื้อ 🪙 {equipment.boxPrice}
                 </Button>
@@ -152,6 +159,23 @@ export const ShopPanel = (props: IShopPanelProps) => {
           })}
         </>
       )}
+      <Modal
+        open={!!opened}
+        title="🎁 เปิดกล่องสุ่มได้"
+        footer={<Button onClick={() => setOpened(null)}>ตกลง</Button>}
+        onCancel={() => setOpened(null)}
+      >
+        {opened && (
+          <div className="flex flex-col gap-2">
+            <ItemLine item={opened} />
+            <CompareLine
+              item={opened}
+              worn={equipmentData?.items.find((it) => it.equipped && it.slot === opened.slot)}
+            />
+            <p className="text-xs text-slate-500">เก็บไว้ในกระเป๋าอุปกรณ์แล้ว</p>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

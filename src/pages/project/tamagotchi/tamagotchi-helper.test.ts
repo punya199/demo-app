@@ -7,7 +7,6 @@ import {
   getActionBlocker,
   getBattleBlocker,
   getEvolutionCountdown,
-  getMinigameBlocker,
   describePctBonus,
   describeWorldBossReward,
   formatFriendCode,
@@ -16,6 +15,19 @@ import {
   formatTimeLeft,
   getWorldBossBlocker,
   describeSetEffect,
+  compareEquipment,
+  canAllocatePassive,
+  canDeallocatePassive,
+  describePassiveEffect,
+  describeReset,
+  elementLabel,
+  lineOptions,
+  potentialPercent,
+  signed,
+  findMergeForm,
+  getMergeBlocker,
+  getRespecCost,
+  sumPassiveEffects,
   describeStats,
   formatRatingChange,
   getDefenseBlocker,
@@ -28,8 +40,6 @@ import {
   getShopBlocker,
   getUseItemBlocker,
   hpAfter,
-  isInZone,
-  minigameBarPosition,
   toHearts,
   toThaiErrorMessage,
 } from './tamagotchi-helper'
@@ -40,7 +50,11 @@ import {
   EnumMonsterStage,
   IBattleData,
   IBattleEvent,
+  IBattleStats,
+  IEquipmentItem,
+  IMergeForm,
   IEvolutionRuleInfo,
+  IPassiveNode,
   IMonsterData,
 } from './tamagotchi-interface'
 
@@ -57,7 +71,6 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   strength: 4,
   weight: 20,
   poops: 1,
-  stamina: 100,
   isSick: false,
   careMistakes: 0,
   trainCount: 0,
@@ -66,7 +79,8 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   ageMinutes: 0,
   bornAt: NOW.toISOString(),
   trainReadyAt: null,
-  minigameReadyAt: null,
+  battleStats: null,
+  potentialView: { isLegacy: true, grade: null, average: null, stats: {} as never },
   autoBattleReadyAt: null,
   expeditionAreaId: null,
   expeditionMinutes: 0,
@@ -151,8 +165,8 @@ describe('getBattleBlocker', () => {
     expect(getBattleBlocker(monster({ isSick: true }))).toBe('ป่วยอยู่ สู้ไม่ได้')
   })
 
-  it('still allows fighting with no strength or stamina (stats are halved instead)', () => {
-    expect(getBattleBlocker(monster({ strength: 0, stamina: 0 }))).toBeNull()
+  it('still allows fighting with no strength', () => {
+    expect(getBattleBlocker(monster({ strength: 0 }))).toBeNull()
   })
 })
 
@@ -276,31 +290,6 @@ describe('evolution conditions', () => {
     expect(
       describeMissingConditions(rule, monster({ careMistakes: 2, trainCount: 10, wins: 1 }))
     ).toEqual(['ดูแลพลาดเกินแล้ว (ได้ไม่เกิน 1 ครั้ง)', 'ชนะอีก 4 ครั้ง'])
-  })
-})
-
-describe('mini-game helpers', () => {
-  it('sweeps the bar 0 -> 100 -> 0 once per period', () => {
-    expect(minigameBarPosition(0, 1000)).toBe(0)
-    expect(minigameBarPosition(250, 1000)).toBe(50)
-    expect(minigameBarPosition(500, 1000)).toBe(100)
-    expect(minigameBarPosition(750, 1000)).toBe(50)
-    expect(minigameBarPosition(1000, 1000)).toBe(0)
-  })
-
-  it('checks the zone inclusively', () => {
-    const zone = { start: 40, width: 20 }
-    expect(isInZone(40, zone)).toBe(true)
-    expect(isInZone(60, zone)).toBe(true)
-    expect(isInZone(39.9, zone)).toBe(false)
-  })
-
-  it('blocks the mini-game during its cooldown', () => {
-    const readyAt = new Date(NOW.getTime() + 90_000).toISOString()
-    expect(getMinigameBlocker(monster({ minigameReadyAt: readyAt }), NOW)).toBe(
-      'เล่นได้อีกครั้งใน 2 นาที'
-    )
-    expect(getMinigameBlocker(monster(), NOW)).toBeNull()
   })
 })
 
@@ -474,7 +463,7 @@ describe('getRaidBlocker', () => {
     expect(getRaidBlocker(monster({ isSick: true }), open, 3)).toBe('ป่วยอยู่ สู้ไม่ได้')
     expect(getRaidBlocker(monster({ expeditionAreaId: 'meadow' }), open, 3)).toBe('มอนออกสำรวจอยู่')
     expect(getRaidBlocker(monster(), { unlocked: false }, 3)).toContain('ยังไม่ปลดล็อก')
-    expect(getRaidBlocker(monster(), open, 0)).toBe('สู้บอสครบจำนวนของวันนี้แล้ว')
+    expect(getRaidBlocker(monster(), open, 0)).toBe('สู้บอสครบจำนวนแล้ว รอรีเซ็ต')
   })
 
   it('names the currency in the shop blocker', () => {
@@ -519,7 +508,7 @@ describe('getWorldBossBlocker', () => {
     expect(
       getWorldBossBlocker(monster(), status({ boss: { isDefeated: true, hp: 0, maxHp: 100 } }))
     ).toBe('บอสตัวนี้ถูกล้มแล้ว รอบอสสัปดาห์หน้า')
-    expect(getWorldBossBlocker(monster(), status({ hitsLeft: 0 }))).toBe('ตีครบจำนวนของวันนี้แล้ว')
+    expect(getWorldBossBlocker(monster(), status({ hitsLeft: 0 }))).toBe('ตีครบจำนวนแล้ว รอรีเซ็ต')
   })
 
   it('describes a reward and the time left', () => {
@@ -599,5 +588,149 @@ describe('team replays with a rented ally', () => {
     // the boss's bar follows everyone who hit it
     const hitsOnBoss = [event({ member: 0, targetHp: 900 }), event({ member: 1, targetHp: 850 })]
     expect(hpAfter(hitsOnBoss, 2, 'enemy', 1000)).toBe(850)
+  })
+})
+
+describe('compareEquipment', () => {
+  const piece = (stats: Partial<IBattleStats>) =>
+    ({ stats: { hp: 0, atk: 0, def: 0, spd: 0, ...stats } }) as IEquipmentItem
+
+  it('lists what rises and falls against the worn piece, skipping unchanged stats', () => {
+    expect(compareEquipment(piece({ atk: 8, hp: 5 }), piece({ atk: 5, def: 2, hp: 5 }))).toEqual([
+      { key: 'atk', diff: 3 },
+      { key: 'def', diff: -2 },
+    ])
+  })
+
+  it('treats an empty slot as zero stats', () => {
+    expect(compareEquipment(piece({ spd: 4 }), undefined)).toEqual([{ key: 'spd', diff: 4 }])
+  })
+})
+
+describe('describeReset', () => {
+  it('shows the time left and the Thai clock time of the reset', () => {
+    // 11:00Z is 18:00 in Thailand
+    expect(describeReset('2026-01-01T11:00:00Z', new Date('2026-01-01T08:45:00Z'))).toBe(
+      'รีเซ็ตใน 2 ชม. 15 นาที (18:00 น.)'
+    )
+  })
+})
+
+describe('passive tree helpers', () => {
+  const node = (id: string, adj: string[], fx: IPassiveNode['fx'] = {}) =>
+    ({ id, adj, fx }) as IPassiveNode
+  const nodes = [
+    node('hub', ['a']),
+    node('a', ['hub', 'b'], { atk: 3 }),
+    node('b', ['a'], { atk: 3, hp: -20 }),
+  ]
+
+  it('allocates only next to the hub or an owned node', () => {
+    expect(canAllocatePassive(nodes, [], 'a')).toBe(true)
+    expect(canAllocatePassive(nodes, [], 'b')).toBe(false)
+    expect(canAllocatePassive(nodes, ['a'], 'b')).toBe(true)
+    expect(canAllocatePassive(nodes, ['a'], 'a')).toBe(false)
+  })
+
+  it('drops only a node that keeps the rest connected', () => {
+    expect(canDeallocatePassive(nodes, ['a', 'b'], 'b')).toBe(true)
+    expect(canDeallocatePassive(nodes, ['a', 'b'], 'a')).toBe(false)
+  })
+
+  it('sums and describes effects', () => {
+    expect(sumPassiveEffects(nodes, ['a', 'b'])).toEqual([
+      { key: 'atk', value: 6 },
+      { key: 'hp', value: -20 },
+    ])
+    expect(describePassiveEffect('hp', -20)).toBe('−20% HP')
+    expect(describePassiveEffect('burn', 1)).toBe('เทิร์นเผาไหม้ของท่าพิเศษ +1')
+  })
+
+  it('charges gems only past the free refunds', () => {
+    const respec = { refunded: 8, freeLeft: 2, gemPrice: 1 }
+    expect(getRespecCost(respec, 2)).toBe(0)
+    expect(getRespecCost(respec, 5)).toBe(3)
+  })
+})
+
+describe('merge helpers', () => {
+  const cost = { coin: 2000, gem: 20 }
+  const rich = { coin: 5000, gem: 50 }
+  const ultimate = (over: Partial<IMonsterData> = {}) =>
+    monster({ stage: EnumMonsterStage.ULTIMATE, ...over })
+
+  it('finds the form for a pair of lines in either order', () => {
+    const forms = [
+      { id: 'a', lines: [EnumMonsterLine.FLAME, EnumMonsterLine.TIDE] },
+      { id: 'b', lines: [EnumMonsterLine.LEAF, EnumMonsterLine.LEAF] },
+    ] as IMergeForm[]
+    expect(findMergeForm(forms, EnumMonsterLine.TIDE, EnumMonsterLine.FLAME)?.id).toBe('a')
+    expect(findMergeForm(forms, EnumMonsterLine.LEAF, EnumMonsterLine.LEAF)?.id).toBe('b')
+    expect(findMergeForm(forms, EnumMonsterLine.LEAF, EnumMonsterLine.TIDE)).toBeUndefined()
+  })
+
+  it('explains what blocks a merge, in the order the server checks', () => {
+    const a = ultimate({ id: 'a' })
+    const b = ultimate({ id: 'b' })
+    expect(getMergeBlocker(a, undefined, rich, cost)).toBe('เลือกมอนสองตัว')
+    expect(getMergeBlocker(a, monster({ stage: EnumMonsterStage.PERFECT }), rich, cost)).toBe(
+      'ต้องเป็นร่างสูงสุด (ยังไม่ใช่ร่างสุดท้าย)'
+    )
+    expect(getMergeBlocker(a, ultimate({ isSick: true }), rich, cost)).toBe('ป่วยอยู่')
+    expect(getMergeBlocker(a, ultimate({ expeditionAreaId: 'meadow' }), rich, cost)).toBe(
+      'ออกสำรวจอยู่'
+    )
+    expect(getMergeBlocker(a, b, { coin: 1999, gem: 50 }, cost)).toBe('เหรียญไม่พอ')
+    expect(getMergeBlocker(a, b, { coin: 5000, gem: 19 }, cost)).toBe('เพชรไม่พอ')
+    expect(getMergeBlocker(a, b, rich, cost)).toBeNull()
+    const spirit = [EnumMonsterLine.HOLY, EnumMonsterLine.DARK, EnumMonsterLine.SHADOW]
+    expect(getMergeBlocker(a, ultimate({ line: EnumMonsterLine.HOLY }), rich, cost, spirit)).toBe(
+      'ธาตุธรรมชาติกับธาตุจิตวิญญาณรวมกันไม่ได้'
+    )
+    expect(
+      getMergeBlocker(
+        ultimate({ line: EnumMonsterLine.DARK }),
+        ultimate({ line: EnumMonsterLine.HOLY }),
+        rich,
+        cost,
+        spirit
+      )
+    ).toBeNull()
+  })
+})
+
+describe('potential helpers', () => {
+  it('places a rolled value inside its range, and a fixed stat at 0', () => {
+    expect(potentialPercent({ min: 100, max: 120, value: 115 })).toBe(75)
+    expect(potentialPercent({ min: 5, max: 5, value: 5 })).toBe(0)
+  })
+
+  it('signs the breakdown numbers', () => {
+    expect(signed(3)).toBe('+3')
+    expect(signed(-2.5)).toBe('−2.5')
+    expect(signed(0)).toBe('+0')
+  })
+
+  it('describes a dodged hit', () => {
+    const battle = {
+      player: { name: 'A' },
+      enemy: { name: 'B' },
+    } as IBattleData
+    const event = { actor: 'player', isDodged: true, damage: 0 } as IBattleEvent
+    expect(describeBattleEvent(event, battle)).toBe('B หลบการโจมตีของ A ได้')
+  })
+})
+
+describe('elements', () => {
+  it('labels every element and offers an egg for each normal one', () => {
+    for (const line of Object.values(EnumMonsterLine)) {
+      expect(elementLabel[line]).toBeTruthy()
+    }
+    expect(lineOptions.map((option) => option.line)).toEqual(Object.values(EnumMonsterLine))
+    expect(lineOptions.filter((option) => option.isRare).map((option) => option.line)).toEqual([
+      EnumMonsterLine.HOLY,
+      EnumMonsterLine.DARK,
+      EnumMonsterLine.SHADOW,
+    ])
   })
 })

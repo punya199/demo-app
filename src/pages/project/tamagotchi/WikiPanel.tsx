@@ -70,19 +70,23 @@ const hatchedStages = [
   EnumMonsterStage.ADULT,
   EnumMonsterStage.PERFECT,
   EnumMonsterStage.ULTIMATE,
+  EnumMonsterStage.FUSED,
 ] as const
 
 const buildSections = (wiki: IWikiData) => {
   const {
     care,
-    stamina,
     online,
     evolution,
+    merge,
+    rareEgg,
+    potential,
     battle,
     adventure,
     idle,
     equipment,
     raid,
+    passive,
     worldBoss,
     social,
     pvp,
@@ -104,12 +108,13 @@ const buildSections = (wiki: IWikiData) => {
       children: (
         <List
           items={[
-            'เลือกไข่ 1 ใน 3 ธาตุ แล้วรอไข่ฟัก',
+            `ไข่ธาตุจิตวิญญาณ (ศักดิ์สิทธิ์ มืด เงา) เป็นไข่หายาก ฟักครั้งละ 🎖️ ${rareEgg.raidTokenPrice} Raid Token ธาตุจิตวิญญาณชนะแพ้กันเองเป็นวงสามเหลี่ยม และตีธาตุธรรมชาติเป็นดาเมจปกติทั้งสองทาง`,
+            'เลือกไข่ธาตุปกติ 1 ใน 5 ธาตุ (เพลิง วารี พฤกษ์ ธรณี สายฟ้า) แล้วรอไข่ฟัก เลี้ยงพร้อมกันได้ 4 ตัว (กดช่องด้านบนเพื่อเลือกตัวที่จะเล่นด้วยในโหมดอื่น ๆ)',
             'ดูแลให้อิ่ม แข็งแรง สะอาด และหายป่วย เวลาในเกมเดินต่อแม้ปิดแอป',
             'ครบเวลาแต่ละร่าง มอนจะวิวัฒนาการ ร่างที่ได้ขึ้นกับการเลี้ยง การฝึก และการชนะ',
-            'พามอนไปสู้ในโหมดผจญภัย ทำภารกิจประจำวัน เก็บเหรียญและเพชรไว้ซื้อของและเติม stamina',
-            `เปิดเกมค้างไว้ = ออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)} และ stamina ลดช้าลง`,
-            `มอนมีอายุขัย ${formatAge(care.lifespanMinutes)} นับจากฟัก ตายแล้วได้ไข่ใบใหม่ ความคืบหน้าผจญภัย เหรียญ เพชร และ Dex ยังอยู่`,
+            'พามอนไปสู้ในโหมดผจญภัย ทำภารกิจประจำวัน เก็บเหรียญและเพชรไว้ซื้อของ',
+            `เปิดเกมค้างไว้ = ออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)} `,
+            `มอนมีอายุขัย ${formatAge(care.lifespanMinutes)} นับจากฟัก (ร่างผสาน ${formatAge(care.fusedLifespanMinutes)}) ตายแล้วได้ไข่ใบใหม่ ความคืบหน้าผจญภัย เหรียญ เพชร และ Dex ยังอยู่`,
           ]}
         />
       ),
@@ -170,37 +175,15 @@ const buildSections = (wiki: IWikiData) => {
       ),
     },
     {
-      key: 'stamina',
-      label: '⚡ Stamina และออนไลน์',
+      key: 'online',
+      label: '⚡ ออนไลน์',
       children: (
         <>
-          <Heading>Stamina</Heading>
-          <List
-            items={[
-              `0–${stamina.max} ฟื้นเองทุกนาที ${stamina.recoveryPerMinute} ต่อนาที (เต็มจากศูนย์ใน ${formatAge(Math.ceil(stamina.max / stamina.recoveryPerMinute))}) เปิดเกมไว้ฟื้นเร็วขึ้น ${times(stamina.recoveryOnlineMultiplier)}`,
-              `สู้ 1 ครั้งใช้ ${stamina.battleCost}`,
-              `Stamina หมด (0): ยังสู้ได้ แต่ค่าพลังต่อสู้ทุกค่า ${times(stamina.noStaminaStatMultiplier)}`,
-              `เติมเต็มด้วย 💎 ${stamina.refillGemPrice}`,
-            ]}
-          />
-          <Heading>มินิเกม</Heading>
-          <List
-            items={[
-              `หยุดแถบให้ตรงโซนเขียว ${stamina.minigameRounds} รอบ เล่นได้ทุก ${formatAge(stamina.minigameCooldownMinutes)}`,
-            ]}
-          />
-          <Table
-            head={['โดน', 'ได้ stamina']}
-            rows={stamina.minigameRewards.map((reward, hits) => [
-              `${hits}/${stamina.minigameRounds}`,
-              `+${reward}`,
-            ])}
-          />
           <Heading>ออนไลน์</Heading>
           <List
             items={[
               `เปิดหน้าเกมไว้บนจอ หน้าเกมจะเช็กกับเซิร์ฟเวอร์ทุก 1 นาที แต่ละนาทีที่อยู่ภายใน ${online.graceMinutes} นาทีหลังการเช็กล่าสุดนับเป็นออนไลน์`,
-              `ระหว่างออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)} และ stamina ลดช้าลงครึ่งหนึ่ง`,
+              `ระหว่างออนไลน์: วิวัฒนาการเร็วขึ้น ${times(online.evolutionMultiplier)}`,
               'ความหิว ความแข็งแรง อึ และอายุ เดินตามเวลาจริงเสมอ ไม่ว่าออนไลน์หรือไม่',
             ]}
           />
@@ -237,7 +220,10 @@ const buildSections = (wiki: IWikiData) => {
               <Heading>{elementLabel[option.line]}</Heading>
               <div className="flex flex-col gap-2">
                 {evolution.species
-                  .filter((species) => species.line === option.line)
+                  .filter(
+                    (species) =>
+                      species.line === option.line && species.stage !== EnumMonsterStage.FUSED
+                  )
                   .map((species) => (
                     <div
                       key={species.id}
@@ -262,6 +248,44 @@ const buildSections = (wiki: IWikiData) => {
               </div>
             </div>
           ))}
+          <Heading>ร่างผสาน (รวมร่าง)</Heading>
+          <List
+            items={[
+              `รวมมอนของคุณสองตัวที่เป็นร่างสูงสุด (สายหลักหรือสายแตกก็ได้ ต้องไม่ป่วยและไม่ได้ออกสำรวจ) เป็นร่างผสานหนึ่งตัว จ่าย 🪙 ${merge.coinCost} และ 💎 ${merge.gemCost}`,
+              `ค่าพลัง = ร่างสูงสุด ${times(merge.powerMultiplier)} ปรับตามสายของพ่อแม่ทั้งสอง ธาตุและสกิลมาจากตัวหลักที่คุณเลือก`,
+              'ธาตุธรรมชาติ (เพลิง วารี พฤกษ์ ธรณี สายฟ้า) รวมกันเองได้ และธาตุจิตวิญญาณ (ศักดิ์สิทธิ์ มืด เงา) รวมกันเองได้ ข้ามกลุ่มไม่ได้',
+              `เริ่มชีวิตใหม่: อายุเริ่มนับ 0 อายุขัย ${formatAge(merge.lifespanMinutes)} ชนะ/แพ้เริ่มใหม่ ความอิ่มและความแข็งแรงเฉลี่ยจากพ่อแม่`,
+              'ร่างผสานไม่วิวัฒนาการต่อและรวมซ้ำไม่ได้ เข้าสนามประลองไม่ได้ ตีบอสโลกและ Raid ได้ พ่อแม่หายไปถาวร (ย้อนกลับไม่ได้) ส่วนอุปกรณ์และต้นไม้เป็นของบัญชี ไม่หาย',
+              'แต่ละร่างผสานเป็นรายการใหม่ใน Dex (ได้เพชรและแต้มต้นไม้เหมือนร่างอื่น)',
+            ]}
+          />
+          <Table
+            head={['ร่าง', 'พ่อแม่', 'ค่าพลัง']}
+            rows={merge.forms.map((form) => [
+              `${form.emoji} ${form.name}`,
+              form.lines.map((line) => elementLabel[line]).join(' + '),
+              statsText(form.stats),
+            ])}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'potential',
+      label: '🎲 ค่าสุ่มมอน',
+      children: (
+        <>
+          <List
+            items={[
+              'มอนแต่ละตัวสุ่มค่าพลัง 7 ค่าตอนไข่ฟัก และคงที่ตลอดชีวิต หน้าเลี้ยงแสดงต่ำสุด สูงสุด และตำแหน่งที่ได้ของทุกค่า',
+              `HP ATK DEF SPD: สุ่ม ${times(1 - potential.statSpread)} ถึง ${times(1 + potential.statSpread)} ของค่าร่างนั้น (ค่ากลางเท่ากับค่าเดิม)`,
+              `คริติคอล: ${percent(battle.criticalChance)} ถึง ${percent(battle.criticalChance + potential.critRateBonusMax)} · ดาเมจคริติคอล: ${times(battle.criticalMultiplier)} ถึง ${times(battle.criticalMultiplier + potential.critDamageBonusMax)} · หลบหลีก: 0% ถึง ${percent(potential.evasionMax)}`,
+              `ค่าที่ได้จากอุปกรณ์และต้นไม้บวกทับ แต่ไม่เกินเพดาน: คริติคอล ${percent(potential.critRateCap)} ดาเมจคริติคอล ${times(potential.critDamageCap)} หลบหลีก ${percent(potential.evasionCap)}`,
+              'เกรดรวมมาจากค่าเฉลี่ยของ 7 ค่า: ' +
+                potential.grades.map((g) => `${g.grade} ≥ ${percent(g.minAverage)}`).join(' · '),
+              'รวมร่าง: ได้ค่าสุ่มที่ดีกว่าของพ่อแม่ในแต่ละค่า มอนรุ่นเก่าไม่มีค่าสุ่มและค่าพลังเหมือนเดิม',
+            ]}
+          />
         </>
       ),
     },
@@ -277,7 +301,6 @@ const buildSections = (wiki: IWikiData) => {
               `ATK +${percent(battle.atkBonusPerStrengthHeart)} ต่อหัวใจความแข็งแรง`,
               `หิว (ความอิ่ม 0): ATK ${times(battle.hungryAtkMultiplier)}`,
               `น้ำหนักเกิน ${battle.overweightRatio} เท่าของขั้นต่ำ: SPD ${times(battle.overweightSpdMultiplier)}`,
-              `Stamina 0: ทุกค่า ${times(stamina.noStaminaStatMultiplier)}`,
             ]}
           />
           <Heading>ลำดับการต่อสู้</Heading>
@@ -304,23 +327,24 @@ const buildSections = (wiki: IWikiData) => {
           <Table
             head={['ธาตุ', 'ได้เปรียบ', 'เสียเปรียบ']}
             rows={(Object.keys(battle.beats) as EnumMonsterLine[]).map((element) => {
-              const losesTo = (Object.keys(battle.beats) as EnumMonsterLine[]).find(
-                (other) => battle.beats[other] === element
+              const losesTo = (Object.keys(battle.beats) as EnumMonsterLine[]).filter((other) =>
+                battle.beats[other].includes(element)
               )
               return [
                 elementLabel[element],
-                `${elementLabel[battle.beats[element]]} ${times(battle.strongMultiplier)}`,
-                losesTo ? `${elementLabel[losesTo]} ${times(battle.weakMultiplier)}` : '–',
+                battle.beats[element]
+                  .map((target) => `${elementLabel[target]} ${times(battle.strongMultiplier)}`)
+                  .join(' · '),
+                losesTo.length
+                  ? losesTo
+                      .map((other) => `${elementLabel[other]} ${times(battle.weakMultiplier)}`)
+                      .join(' · ')
+                  : '–',
               ]
             })}
           />
           <Heading>ค่าใช้จ่าย</Heading>
-          <List
-            items={[
-              `สู้ 1 ครั้ง: stamina −${stamina.battleCost}, น้ำหนัก −${battle.weightLoss}`,
-              'ป่วยอยู่สู้ไม่ได้',
-            ]}
-          />
+          <List items={[`สู้ 1 ครั้ง: น้ำหนัก −${battle.weightLoss}`, 'ป่วยอยู่สู้ไม่ได้']} />
         </>
       ),
     },
@@ -383,7 +407,7 @@ const buildSections = (wiki: IWikiData) => {
           <List
             items={[
               'เปิดหน้าผจญภัยค้างไว้ มอนสู้ด่านที่ชนะแล้ว (ไม่ใช่บอส) วนไปเรื่อย ๆ ปิดหน้าหรือสลับแท็บแล้วหยุด',
-              `สู้ได้ทุก ${idle.autoBattleCooldownSeconds} วินาที ใช้ stamina ครั้งละ ${idle.autoBattleStaminaCost} จ่ายเหรียญตามตารางด้านล่าง`,
+              `สู้ได้ทุก ${idle.autoBattleCooldownSeconds} วินาที จ่ายเหรียญตามตารางด้านล่าง`,
               `เพดานรางวัลต่อสู้อัตโนมัติ 🪙 ${idle.autoBattleDailyCoinCap} ต่อวัน (รีเซ็ตเที่ยงคืนเวลาไทย)`,
               'ต่อชั่วโมงได้มากกว่าการสำรวจเล็กน้อย เป็นแรงจูงใจให้เปิดเกมค้างไว้',
             ]}
@@ -396,6 +420,30 @@ const buildSections = (wiki: IWikiData) => {
                 `🪙 ${reward.coins}`,
               ])
             )}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'passive',
+      label: '🌳 ต้นไม้ความสามารถ',
+      children: (
+        <>
+          <Heading>ต้นไม้ของผู้ฝึก</Heading>
+          <List
+            items={[
+              'ผูกกับบัญชี ไม่หายเมื่อมอนตาย ใช้ได้ทุกโหมดรวมถึง PvP',
+              'เริ่มจากจุดกลาง เลือกได้เฉพาะโหนดที่ติดกับโหนดที่มีอยู่ ถอนได้เฉพาะโหนดที่ไม่ตัดสายอื่นขาด',
+              'โหนดคีย์สโตนแลกกัน: ค่าหนึ่งเพิ่มมาก อีกค่าลดลง',
+              `แต้มได้จาก Dex ร่างละ 1, เคลียร์เรดครั้งแรกบอสละระดับ 1, ล้มบอสโลก 1 และจบซีซัน PvP ที่ผ่านเกณฑ์ (${passive.pvpSeasonPoints
+                .map(
+                  (tier) =>
+                    `${tier.maxRank ? `อันดับ ≤ ${tier.maxRank}` : 'ที่เหลือ'}: ${tier.points}`
+                )
+                .join(' · ')}) รวมสูงสุด ${passive.maxPoints} แต้ม`,
+              `ถอนแต้มคืนได้ ${passive.freeRefunds} แต้มแรกฟรี หลังจากนั้นแต้มละ 💎 ${passive.respecGemPrice}`,
+              `โหนดเหรียญสำรวจและโอกาสดรอปอุปกรณ์รวมกันได้ไม่เกิน +${passive.economyCap}% อย่างละ`,
+            ]}
           />
         </>
       ),
@@ -478,11 +526,11 @@ const buildSections = (wiki: IWikiData) => {
           <Heading>Boss Raid (เดี่ยว)</Heading>
           <List
             items={[
-              `สู้ได้วันละ ${raid.dailyAttempts} ครั้ง (รวมทุกบอส) ใช้ stamina ${stamina.battleCost} ชนะต้องภายใน ${battle.maxRounds} รอบ`,
+              `สู้ได้ ${raid.attempts} ครั้ง (รวมทุกบอส) รีเซ็ตทุก ${raid.resetHours} ชม. (นับจากเที่ยงคืน) ชนะต้องภายใน ${battle.maxRounds} รอบ`,
               'ไม่ใช้ตารางธาตุ ความยากมาจากค่าพลังล้วน ๆ ทุกสายชนะได้ทุกบอส ธาตุของบอสเป็นแค่ลายเรื่อง',
               'ต้องถึงร่างที่กำหนดของแต่ละระดับ และชนะระดับก่อนหน้าของบอสตัวเดียวกันก่อน',
               `ชนะ: ได้ชิ้นเซ็ตของบอส 1 ชิ้น (ช่องสุ่ม ช่องละเท่ากัน) เกรดตามระดับ + 🎫 Boss Token ${raid.bossTokensPerWin} + 🎖️ Raid Token (ชนะครั้งแรกของแต่ละบอส/ระดับได้ ${times(raid.firstClearMultiplier)})`,
-              'กระเป๋าอุปกรณ์เต็มจะสู้ไม่ได้ (ไม่เสียโควตา) แพ้ไม่ได้อะไรและเสียโควตาของวัน',
+              'กระเป๋าอุปกรณ์เต็มจะสู้ไม่ได้ (ไม่เสียโควตา) แพ้ไม่ได้อะไรและเสียโควตา',
               'ผลการสู้บอสไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ',
             ]}
           />
@@ -527,7 +575,7 @@ const buildSections = (wiki: IWikiData) => {
           <List
             items={[
               `ทุกคนช่วยกันตีบอสตัวเดียวกัน ${worldBoss.bosses.map((boss) => `${boss.emoji} ${boss.name} (HP ${boss.hp})`).join(' · ')} สัปดาห์ละหนึ่งตัว (นับจันทร์ 00:00 ถึงอาทิตย์ เวลาไทย) ถ้าไม่แตกก็ยังได้รางวัลตามส่วนร่วม`,
-              `ต้องเป็นร่างโตขึ้นไป ตีได้วันละ ${worldBoss.dailyHits} ครั้ง ครั้งละไม่เกิน ${worldBoss.rounds} รอบ (หรือจนมอนล้ม) ใช้ stamina ${stamina.battleCost}`,
+              `ต้องเป็นร่างโตขึ้นไป ตีได้ ${worldBoss.hits} ครั้ง รีเซ็ตทุก ${worldBoss.resetHours} ชม. (นับจากเที่ยงคืน) ครั้งละไม่เกิน ${worldBoss.rounds} รอบ (หรือจนมอนล้ม)`,
               'ดาเมจที่ทำได้ลด HP รวมของบอสทันที ใช้ค่าพลังสดของมอนรวมอุปกรณ์และเอฟเฟกต์เซ็ต ไม่ใช้ตารางธาตุ มอนที่ HP/เกราะดีอยู่ได้นานกว่าและทำดาเมจรวมมากกว่า',
               'ผลไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ',
               `ผู้ตีครั้งสุดท้ายที่ทำให้บอสแตกได้ชิ้นชุดสายฟ้าเร็ว (${gradeLabel[worldBoss.killingBlowGrade]}) การันตี`,
@@ -594,9 +642,9 @@ const buildSections = (wiki: IWikiData) => {
           <Heading>วิธีเล่น</Heading>
           <List
             items={[
-              `ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้ ตั้ง "ทีมป้องกัน" ไว้ก่อน (ระบบจำค่าพลังรวมอุปกรณ์ของมอนตอนนั้น stamina เต็ม) ถึงจะท้าคนอื่นได้ เปลี่ยนทีมได้ทุก ${pvp.defenseCooldownMinutes} นาที`,
+              `ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้ ตั้ง "ทีมป้องกัน" ไว้ก่อน (ระบบจำค่าพลังรวมอุปกรณ์ของมอนตอนนั้น) ถึงจะท้าคนอื่นได้ เปลี่ยนทีมได้ทุก ${pvp.defenseCooldownMinutes} นาที`,
               `ท้าได้วันละ ${pvp.dailyAttempts} ครั้ง ระบบเสนอ ${pvp.opponentCount} คนที่เป็นร่างเดียวกัน เรตติ้งห่างไม่เกิน ${pvp.ratingWindow} คนเดิมท้าได้ไม่เกิน ${pvp.maxFightsPerOpponentPerDay} ครั้งต่อวัน`,
-              `ท้าด้วยค่าพลังสดของมอนคุณ (stamina หมดค่าพลังลดครึ่ง) ใช้ stamina ${stamina.battleCost} ผลไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ`,
+              `ท้าด้วยค่าพลังสดของมอนคุณ ผลไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ`,
               `ชนะได้ 🪙 ${pvp.winCoin} แพ้ได้ 🪙 ${pvp.lossCoin}`,
               'ผู้ที่ถูกท้าก็ได้/เสียเรตติ้งแม้ไม่ได้ออนไลน์ และดูการต่อสู้ย้อนหลังได้ในประวัติ',
               'ชื่อที่คนอื่นเห็นคือชื่อสนามที่คุณตั้งเอง ไม่แสดงชื่อผู้ใช้',
@@ -649,7 +697,7 @@ const buildSections = (wiki: IWikiData) => {
               [
                 '💎 เพชร',
                 `ชนะบอสครั้งแรก · ค้นพบร่างใหม่ใน Dex (+${economy.dexDiscoveryGems})`,
-                `เติม stamina เต็ม (💎 ${stamina.refillGemPrice})`,
+                'ซื้อวัตถุดิบตีบวกบางชนิด',
               ],
             ]}
           />

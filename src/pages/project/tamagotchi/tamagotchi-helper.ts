@@ -19,7 +19,12 @@ import {
   IBattleEvent,
   IEvolutionInfo,
   IEvolutionRuleInfo,
+  IEquipmentItem,
+  IMergeForm,
   IMonsterData,
+  IPassiveNode,
+  IPotentialStat,
+  PassiveEffectKey,
 } from './tamagotchi-interface'
 
 // Display helpers only. Whether an action is allowed is decided by the server; getActionBlocker
@@ -34,12 +39,14 @@ export const stageLabel: Record<EnumMonsterStage, string> = {
   [EnumMonsterStage.ADULT]: 'ร่างโต',
   [EnumMonsterStage.PERFECT]: 'ร่างสมบูรณ์',
   [EnumMonsterStage.ULTIMATE]: 'ร่างสูงสุด',
+  [EnumMonsterStage.FUSED]: 'ร่างผสาน',
 }
 
 export const deathCauseLabel: Record<EnumMonsterDeathCause, string> = {
   [EnumMonsterDeathCause.OLD_AGE]: 'จากไปอย่างสงบตามอายุขัย',
   [EnumMonsterDeathCause.SICKNESS]: 'ป่วยหนักโดยไม่ได้รับการรักษา',
   [EnumMonsterDeathCause.STARVATION]: 'หิวจนทนไม่ไหว',
+  [EnumMonsterDeathCause.MERGED]: 'รวมร่างเป็นมอนตัวใหม่แล้ว',
 }
 
 interface ILineOption {
@@ -47,6 +54,8 @@ interface ILineOption {
   title: string
   emoji: string
   description: string
+  // Rare eggs cost Raid Tokens to hatch (price comes from the server's guide data).
+  isRare?: boolean
 }
 
 export const lineOptions: ILineOption[] = [
@@ -62,6 +71,39 @@ export const lineOptions: ILineOption[] = [
     title: 'ไข่พฤกษ์',
     emoji: '🌿',
     description: 'ธาตุพฤกษ์ อ่อนโยน ฟื้นตัวไว',
+  },
+  {
+    line: EnumMonsterLine.EARTH,
+    title: 'ไข่ศิลา',
+    emoji: '🪨',
+    description: 'ธาตุธรณี หนักแน่น แกร่ง เชื่องช้า',
+  },
+  {
+    line: EnumMonsterLine.LIGHTNING,
+    title: 'ไข่อสนี',
+    emoji: '⚡',
+    description: 'ธาตุสายฟ้า ว่องไว พลังระเบิด เปราะบาง',
+  },
+  {
+    line: EnumMonsterLine.HOLY,
+    title: 'ไข่รัศมี',
+    emoji: '✨',
+    description: 'ธาตุศักดิ์สิทธิ์ อึดและฟื้นฟู ไข่หายาก',
+    isRare: true,
+  },
+  {
+    line: EnumMonsterLine.DARK,
+    title: 'ไข่รัตติกาล',
+    emoji: '🌑',
+    description: 'ธาตุมืด พลังโจมตีสูง ไข่หายาก',
+    isRare: true,
+  },
+  {
+    line: EnumMonsterLine.SHADOW,
+    title: 'ไข่เงา',
+    emoji: '🌫️',
+    description: 'ธาตุเงา ว่องไว หลบเก่ง ไข่หายาก',
+    isRare: true,
   },
 ]
 
@@ -82,6 +124,18 @@ export const actionOptions: IActionOption[] = [
 // Hearts are stored as fractions; any partly-filled heart still shows as a full one.
 export const toHearts = (value: number) =>
   Math.min(MAX_HEARTS, Math.max(0, Math.ceil(Math.round(value * 1000) / 1000)))
+
+// "รีเซ็ตใน 2 ชม. 15 นาที (18:00 น.)": time left to `resetsAt` plus its clock time in Thailand.
+export const describeReset = (resetsAt: string, now: Date) => {
+  const at = new Date(resetsAt)
+  const clock = at.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Bangkok',
+  })
+  return `รีเซ็ตใน ${formatAge(Math.ceil((at.getTime() - now.getTime()) / 60_000))} (${clock} น.)`
+}
 
 export const formatAge = (ageMinutes: number) => {
   const rounded = Math.max(0, Math.round(ageMinutes))
@@ -129,6 +183,11 @@ export const elementLabel: Record<EnumMonsterLine, string> = {
   [EnumMonsterLine.FLAME]: '🔥 เพลิง',
   [EnumMonsterLine.TIDE]: '💧 วารี',
   [EnumMonsterLine.LEAF]: '🌿 พฤกษ์',
+  [EnumMonsterLine.EARTH]: '🪨 ธรณี',
+  [EnumMonsterLine.LIGHTNING]: '⚡ สายฟ้า',
+  [EnumMonsterLine.HOLY]: '✨ ศักดิ์สิทธิ์',
+  [EnumMonsterLine.DARK]: '🌑 มืด',
+  [EnumMonsterLine.SHADOW]: '🌫️ เงา',
 }
 
 // Mirrors the server's battle checks (assertCanBattle) so the button explains itself.
@@ -197,6 +256,9 @@ export const describeBattleEvent = (event: IBattleEvent, battle: IBattleData) =>
   if (event.kind === 'regen') {
     return `${affected.name} ฟื้นฟู +${event.damage} HP`
   }
+  if (event.isDodged) {
+    return `${affected.name} หลบการโจมตีของ ${attacker.name} ได้`
+  }
   const notes = [
     event.effectiveness === 'strong' && 'ได้เปรียบธาตุ!',
     event.effectiveness === 'weak' && 'เสียเปรียบธาตุ',
@@ -224,6 +286,10 @@ export const hpAfter = (
 }
 
 const serverMessageLabel: Record<string, string> = {
+  'Only monsters in their final form can be merged': 'รวมร่างได้เฉพาะมอนร่างสูงสุด',
+  'Pick two different monsters': 'เลือกมอนสองตัวที่ต่างกัน',
+  'The base must be one of the two monsters': 'ตัวหลักต้องเป็นหนึ่งในสองตัวที่เลือก',
+  'Monster not found': 'ไม่พบมอนตัวนี้',
   'Monster is sick': 'มอนป่วยอยู่ ฝึกไม่ได้',
   'Monster is still resting from training': 'มอนยังพักจากการฝึกอยู่',
   'Monster is not sick': 'มอนไม่ได้ป่วย',
@@ -234,7 +300,6 @@ const serverMessageLabel: Record<string, string> = {
   'Stage is locked': 'ด่านนี้ยังไม่ปลดล็อก',
   'Not enough coins': 'เหรียญไม่พอ',
   'Not enough gems': 'เพชรไม่พอ',
-  'Stamina is already full': 'Stamina เต็มอยู่แล้ว',
   'Mini-game is not ready yet': 'มินิเกมยังไม่พร้อม รออีกสักครู่',
   'Invalid mini-game score': 'คะแนนมินิเกมไม่ถูกต้อง',
   'Your monster is too young for the arena': 'ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้',
@@ -247,8 +312,9 @@ const serverMessageLabel: Record<string, string> = {
   'Not enough fights to earn a season reward': 'สู้ไม่ถึงเกณฑ์รับรางวัลซีซัน',
   'Battle not found': 'ไม่พบการต่อสู้',
   'Not enough raid tokens': 'Raid Token ไม่พอ',
+  'Natural and spiritual elements cannot be merged': 'ธาตุธรรมชาติกับธาตุจิตวิญญาณรวมกันไม่ได้',
   'Not enough boss tokens': 'Boss Token ไม่พอ',
-  'Daily raid limit reached': 'สู้บอสครบจำนวนของวันนี้แล้ว',
+  'Raid attempts used up until the next reset': 'สู้บอสครบจำนวนแล้ว รอรีเซ็ต',
   'Your monster is not strong enough for this difficulty': 'ร่างของมอนยังไม่ถึงเกณฑ์ของระดับนี้',
   'Clear the previous difficulty first': 'ต้องชนะระดับก่อนหน้าก่อน',
   'Clear this difficulty first': 'ต้องชนะระดับที่ดรอปเกรดนี้ก่อนถึงจะแลกได้',
@@ -268,7 +334,7 @@ const serverMessageLabel: Record<string, string> = {
   'Support unit was changed recently': 'เพิ่งเปลี่ยนตัวซัพพอร์ต รอสักครู่',
   'Support unit is not available': 'ใช้ตัวซัพพอร์ตนี้ไม่ได้',
   'Your monster is too young for the world boss': 'ต้องเป็นร่างโตขึ้นไปถึงตีบอสโลกได้',
-  'Daily world boss limit reached': 'ตีบอสโลกครบจำนวนของวันนี้แล้ว',
+  'World boss hits used up until the next reset': 'ตีบอสโลกครบจำนวนแล้ว รอรีเซ็ต',
   'World boss is not active': 'บอสโลกตัวนี้ถูกล้มหรือหมดเวลาแล้ว',
   'World boss has not ended yet': 'สัปดาห์นี้ยังไม่จบ',
   'World boss week not found': 'ไม่พบบอสโลกสัปดาห์นี้',
@@ -356,28 +422,6 @@ export const describeConditions = (rule: {
   return parts.length ? parts.join(' · ') : 'ไม่มีเงื่อนไข'
 }
 
-export const getMinigameBlocker = (monster: IMonsterData, now: Date): string | null => {
-  if (monster.diedAt || monster.stage === EnumMonsterStage.EGG) {
-    return 'ต้องมีมอนที่ฟักแล้ว'
-  }
-  if (monster.minigameReadyAt && new Date(monster.minigameReadyAt) > now) {
-    const minutesLeft = Math.ceil(
-      (new Date(monster.minigameReadyAt).getTime() - now.getTime()) / 60_000
-    )
-    return `เล่นได้อีกครั้งใน ${formatAge(minutesLeft)}`
-  }
-  return null
-}
-
-// Mini-game bar: position 0-100 sweeping back and forth once per `periodMs`.
-export const minigameBarPosition = (elapsedMs: number, periodMs: number) => {
-  const phase = (elapsedMs % periodMs) / periodMs
-  return phase < 0.5 ? phase * 200 : (1 - phase) * 200
-}
-
-export const isInZone = (position: number, zone: { start: number; width: number }) =>
-  position >= zone.start && position <= zone.start + zone.width
-
 export const slotLabel: Record<EnumEquipmentSlot, string> = {
   [EnumEquipmentSlot.WEAPON]: '⚔️ อาวุธ',
   [EnumEquipmentSlot.ARMOR]: '🛡️ เกราะ',
@@ -414,6 +458,13 @@ export const describeStats = (stats: Partial<Record<StatKey, number>>) =>
     .map((key) => `+${stats[key]} ${statLabel[key]}`)
     .join(' · ')
 
+// What swapping the worn piece (or an empty slot) for `item` changes, per stat, skipping stats
+// that stay the same. A positive diff means the candidate is stronger.
+export const compareEquipment = (item: IEquipmentItem, worn: IEquipmentItem | undefined) =>
+  (Object.keys(statLabel) as StatKey[])
+    .map((key) => ({ key, diff: item.stats[key] - (worn?.stats[key] ?? 0) }))
+    .filter(({ diff }) => diff !== 0)
+
 // Gear can't change while the monster is away (the server refuses).
 export const getEquipBlocker = (monster: IMonsterData | null): string | null =>
   monster?.expeditionAreaId ? 'มอนออกสำรวจอยู่' : null
@@ -442,6 +493,8 @@ export const getEnhanceBlocker = (
 export const toPercent = (fraction: number) => `${Math.round(fraction * 1000) / 10}%`
 
 const PVP_STAGES = [EnumMonsterStage.ADULT, EnumMonsterStage.PERFECT, EnumMonsterStage.ULTIMATE]
+// The World Boss takes every grown form, fused ones included (the arena does not).
+const WORLD_BOSS_STAGES = [...PVP_STAGES, EnumMonsterStage.FUSED]
 
 // Mirrors the server's arena checks so the button explains itself.
 export const getPvpBlocker = (
@@ -524,7 +577,7 @@ export const getRaidBlocker = (
     return 'ยังไม่ปลดล็อก (ต้องถึงร่างที่กำหนด และชนะระดับก่อนหน้า)'
   }
   if (attemptsLeft <= 0) {
-    return 'สู้บอสครบจำนวนของวันนี้แล้ว'
+    return 'สู้บอสครบจำนวนแล้ว รอรีเซ็ต'
   }
   return null
 }
@@ -537,7 +590,7 @@ export const getWorldBossBlocker = (
   if (!monster || monster.diedAt) {
     return 'ต้องมีมอนที่มีชีวิต'
   }
-  if (!PVP_STAGES.includes(monster.stage)) {
+  if (!WORLD_BOSS_STAGES.includes(monster.stage)) {
     return 'ต้องเป็นร่างโตขึ้นไปถึงตีบอสโลกได้'
   }
   if (monster.isSick) {
@@ -550,7 +603,7 @@ export const getWorldBossBlocker = (
     return 'บอสตัวนี้ถูกล้มแล้ว รอบอสสัปดาห์หน้า'
   }
   if (status && status.hitsLeft <= 0) {
-    return 'ตีครบจำนวนของวันนี้แล้ว'
+    return 'ตีครบจำนวนแล้ว รอรีเซ็ต'
   }
   return null
 }
@@ -600,3 +653,139 @@ export const getGiftBlocker = (giftsLeft: number, ownedItems: number): string | 
   }
   return ownedItems <= 0 ? 'ไม่มีไอเทมในกระเป๋าให้ส่ง' : null
 }
+
+export const PASSIVE_HUB = 'hub'
+
+export const passiveEffectLabel: Record<PassiveEffectKey, string> = {
+  atk: 'ATK',
+  hp: 'HP',
+  def: 'DEF',
+  spd: 'SPD',
+  crit: 'โอกาสคริติคอล',
+  critdmg: 'ดาเมจคริติคอล',
+  shield: 'โล่เริ่มต้น (% ของ HP)',
+  regen: 'ฟื้น HP ต่อเทิร์น (%)',
+  dbl: 'โอกาสโจมตีซ้ำ',
+  burn: 'เทิร์นเผาไหม้ของท่าพิเศษ',
+  hunger: 'ความอิ่มลดช้าลง',
+  expCoin: 'เหรียญจากการสำรวจ',
+  drop: 'โอกาสดรอปอุปกรณ์',
+}
+
+// "+3% ATK", "−20% HP", "เทิร์นเผาไหม้ของท่าพิเศษ +1".
+export const describePassiveEffect = (key: PassiveEffectKey, value: number) => {
+  const sign = value > 0 ? '+' : '−'
+  const amount = Math.abs(value)
+  // These labels already carry their unit.
+  if (key === 'burn' || key === 'shield' || key === 'regen') {
+    return `${passiveEffectLabel[key]} ${sign}${amount}`
+  }
+  return `${sign}${amount}% ${passiveEffectLabel[key]}`
+}
+
+// Mirrors the server's passive rules (passive-data.ts) so a click can explain itself; the server
+// still decides.
+export const canAllocatePassive = (nodes: IPassiveNode[], owned: string[], nodeId: string) => {
+  const node = nodes.find((entry) => entry.id === nodeId)
+  return (
+    !!node &&
+    !owned.includes(nodeId) &&
+    node.adj.some((id) => id === PASSIVE_HUB || owned.includes(id))
+  )
+}
+
+export const canDeallocatePassive = (nodes: IPassiveNode[], owned: string[], nodeId: string) => {
+  if (!owned.includes(nodeId)) {
+    return false
+  }
+  const rest = new Set(owned.filter((id) => id !== nodeId))
+  const seen = new Set([PASSIVE_HUB])
+  const stack = [PASSIVE_HUB]
+  while (stack.length) {
+    const node = nodes.find((entry) => entry.id === stack.pop())
+    for (const id of node?.adj ?? []) {
+      if (rest.has(id) && !seen.has(id)) {
+        seen.add(id)
+        stack.push(id)
+      }
+    }
+  }
+  return [...rest].every((id) => seen.has(id))
+}
+
+// Total of every effect over the owned nodes, in the order of passiveEffectLabel.
+export const sumPassiveEffects = (nodes: IPassiveNode[], owned: string[]) => {
+  const totals: Partial<Record<PassiveEffectKey, number>> = {}
+  for (const node of nodes) {
+    if (owned.includes(node.id)) {
+      for (const [key, value] of Object.entries(node.fx) as [PassiveEffectKey, number][]) {
+        totals[key] = Math.round(((totals[key] ?? 0) + value) * 10) / 10
+      }
+    }
+  }
+  return (Object.keys(passiveEffectLabel) as PassiveEffectKey[])
+    .filter((key) => totals[key])
+    .map((key) => ({ key, value: totals[key]! }))
+}
+
+// Gems needed to take back `count` points when `refunded` were already taken back.
+export const getRespecCost = (
+  respec: { refunded: number; freeLeft: number; gemPrice: number },
+  count: number
+) => Math.max(0, count - respec.freeLeft) * respec.gemPrice
+
+// Mirrors the server's merge checks for one parent, so the picker explains itself.
+export const getMergeParentBlocker = (monster: IMonsterData): string | null => {
+  if (monster.diedAt) {
+    return 'ตายไปแล้ว'
+  }
+  if (monster.stage !== EnumMonsterStage.ULTIMATE) {
+    return 'ต้องเป็นร่างสูงสุด (ยังไม่ใช่ร่างสุดท้าย)'
+  }
+  if (monster.isSick) {
+    return 'ป่วยอยู่'
+  }
+  return monster.expeditionAreaId ? 'ออกสำรวจอยู่' : null
+}
+
+// The form two parents make, whichever order they are picked in.
+export const findMergeForm = (
+  forms: IMergeForm[],
+  first: EnumMonsterLine,
+  second: EnumMonsterLine
+) =>
+  forms.find(
+    (form) =>
+      (form.lines[0] === first && form.lines[1] === second) ||
+      (form.lines[0] === second && form.lines[1] === first)
+  )
+
+export const getMergeBlocker = (
+  first: IMonsterData | undefined,
+  second: IMonsterData | undefined,
+  wallet: { coin: number; gem: number } | undefined,
+  cost: { coin: number; gem: number },
+  spiritualLines: EnumMonsterLine[] = []
+): string | null => {
+  if (!first || !second) {
+    return 'เลือกมอนสองตัว'
+  }
+  const parentBlocker = getMergeParentBlocker(first) ?? getMergeParentBlocker(second)
+  if (parentBlocker) {
+    return parentBlocker
+  }
+  if (spiritualLines.includes(first.line) !== spiritualLines.includes(second.line)) {
+    return 'ธาตุธรรมชาติกับธาตุจิตวิญญาณรวมกันไม่ได้'
+  }
+  if ((wallet?.coin ?? 0) < cost.coin) {
+    return 'เหรียญไม่พอ'
+  }
+  return (wallet?.gem ?? 0) < cost.gem ? 'เพชรไม่พอ' : null
+}
+
+// Where a rolled value sits inside its range, 0-100 (a fixed stat sits at 0).
+export const potentialPercent = (stat: IPotentialStat) =>
+  stat.max === stat.min ? 0 : Math.round(((stat.value - stat.min) / (stat.max - stat.min)) * 100)
+
+export const signed = (value: number) =>
+  `${value >= 0 ? '+' : '−'}${Math.abs(Math.round(value * 10) / 10)}`

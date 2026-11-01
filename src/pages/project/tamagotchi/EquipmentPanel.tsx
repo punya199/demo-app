@@ -1,15 +1,8 @@
-import { Button, Card, Popconfirm, Spin, Tag, Tooltip } from 'antd'
+import { Button, Card, Popconfirm, Spin, Tooltip } from 'antd'
 import { useState } from 'react'
 import { EnhanceModal } from './EnhanceModal'
-import {
-  describeSetEffect,
-  describeStats,
-  getEquipBlocker,
-  gradeColor,
-  gradeLabel,
-  slotLabel,
-  statLabel,
-} from './tamagotchi-helper'
+import { CompareLine, ItemLine } from './EquipmentParts'
+import { describeSetEffect, getEquipBlocker, slotLabel } from './tamagotchi-helper'
 import { EnumEquipmentSlot, IEquipmentItem, IMonsterData } from './tamagotchi-interface'
 import { useDismantle, useEquip, useGetEquipment, useUnequip } from './tamagotchi-service'
 
@@ -17,22 +10,6 @@ interface IEquipmentPanelProps {
   monster: IMonsterData | null
   coin: number
   onError: (error: unknown) => void
-}
-
-const ItemLine = (props: { item: IEquipmentItem }) => {
-  const { item } = props
-  return (
-    <div className="min-w-0 flex-1">
-      <div className="font-medium text-slate-900 dark:text-slate-100">
-        {item.emoji} {item.name} <Tag color={gradeColor[item.grade]}>{gradeLabel[item.grade]}</Tag>
-        {item.enhanceLevel > 0 && <Tag color="orange">+{item.enhanceLevel}</Tag>}
-      </div>
-      <div className="text-xs text-slate-500 dark:text-slate-400">
-        {statLabel[item.mainStat]} {item.mainValue}
-        {describeStats(item.subStats) && ` · ${describeStats(item.subStats)}`}
-      </div>
-    </div>
-  )
 }
 
 export const EquipmentPanel = (props: IEquipmentPanelProps) => {
@@ -80,6 +57,9 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
                 {item ? (
                   <>
                     <ItemLine item={item} />
+                    <Button size="small" onClick={() => setEnhancing(item)}>
+                      ตีบวก
+                    </Button>
                     <Tooltip title={blocker}>
                       <Button
                         size="small"
@@ -139,6 +119,9 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
                 แยก
               </Button>
             </Popconfirm>
+            <div className="basis-full">
+              <CompareLine item={item} worn={worn.get(item.slot)} />
+            </div>
           </div>
         </Card>
       ))}

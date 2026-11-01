@@ -1,3 +1,10 @@
+# [1.25.0](https://github.com/punya199/demo-app/compare/v1.24.1...v1.25.0) (2026-11-01)
+
+
+### New
+
+* add pet bar, menu grid, evolution trees, adventure stamina and gear rules ([ae4b011](https://github.com/punya199/demo-app/commit/ae4b01109aecb4cc4b78fa9dfa83269cb0f69007))
+
 ## [1.24.1](https://github.com/punya199/demo-app/compare/v1.24.0...v1.24.1) (2026-11-01)
 
 

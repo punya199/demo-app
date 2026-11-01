@@ -82,25 +82,38 @@ const StatRow = (props: { label: string; value: string | number }) => (
 
 const EggPicker = () => {
   const { mutate: hatch, isPending } = useHatchMonster()
+  const { data: wallet } = useGetWallet()
+  const { data: wiki } = useGetWiki()
+  const price = wiki?.rareEgg.raidTokenPrice ?? 0
+  const tokens = wallet?.raidToken ?? 0
   return (
     <div className="flex w-full flex-col gap-3">
       <p className="text-center text-slate-600 dark:text-slate-300">เลือกไข่ที่จะเลี้ยง</p>
-      {lineOptions.map((option) => (
-        <Card
-          key={option.line}
-          hoverable={!isPending}
-          className="dark:border-slate-700 dark:bg-slate-900"
-          onClick={() => !isPending && hatch(option.line, { onError: showError })}
-        >
-          <div className="flex items-center gap-4">
-            <div className="text-4xl">🥚{option.emoji}</div>
-            <div>
-              <div className="font-semibold text-slate-900 dark:text-slate-100">{option.title}</div>
-              <div className="text-sm text-slate-500 dark:text-slate-400">{option.description}</div>
-            </div>
-          </div>
-        </Card>
-      ))}
+      {lineOptions.map((option) => {
+        const blocker = option.isRare && tokens < price ? 'Raid Token ไม่พอ' : null
+        return (
+          <Tooltip key={option.line} title={blocker}>
+            <Card
+              hoverable={!isPending && !blocker}
+              className={`dark:border-slate-700 dark:bg-slate-900 ${blocker ? 'opacity-60' : ''}`}
+              onClick={() => !isPending && !blocker && hatch(option.line, { onError: showError })}
+            >
+              <div className="flex items-center gap-4">
+                <div className="text-4xl">🥚{option.emoji}</div>
+                <div className="flex-1">
+                  <div className="font-semibold text-slate-900 dark:text-slate-100">
+                    {option.title}
+                  </div>
+                  <div className="text-sm text-slate-500 dark:text-slate-400">
+                    {option.description}
+                  </div>
+                </div>
+                {option.isRare && <Tag color="purple">🎖️ {price}</Tag>}
+              </div>
+            </Card>
+          </Tooltip>
+        )
+      })}
     </div>
   )
 }

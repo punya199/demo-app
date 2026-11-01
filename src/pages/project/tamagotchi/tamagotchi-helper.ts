@@ -54,6 +54,8 @@ interface ILineOption {
   title: string
   emoji: string
   description: string
+  // Rare eggs cost Raid Tokens to hatch (price comes from the server's guide data).
+  isRare?: boolean
 }
 
 export const lineOptions: ILineOption[] = [
@@ -81,6 +83,27 @@ export const lineOptions: ILineOption[] = [
     title: 'ไข่อสนี',
     emoji: '⚡',
     description: 'ธาตุสายฟ้า ว่องไว พลังระเบิด เปราะบาง',
+  },
+  {
+    line: EnumMonsterLine.HOLY,
+    title: 'ไข่รัศมี',
+    emoji: '✨',
+    description: 'ธาตุศักดิ์สิทธิ์ อึดและฟื้นฟู ไข่หายาก',
+    isRare: true,
+  },
+  {
+    line: EnumMonsterLine.DARK,
+    title: 'ไข่รัตติกาล',
+    emoji: '🌑',
+    description: 'ธาตุมืด พลังโจมตีสูง ไข่หายาก',
+    isRare: true,
+  },
+  {
+    line: EnumMonsterLine.SHADOW,
+    title: 'ไข่เงา',
+    emoji: '🌫️',
+    description: 'ธาตุเงา ว่องไว หลบเก่ง ไข่หายาก',
+    isRare: true,
   },
 ]
 
@@ -162,6 +185,9 @@ export const elementLabel: Record<EnumMonsterLine, string> = {
   [EnumMonsterLine.LEAF]: '🌿 พฤกษ์',
   [EnumMonsterLine.EARTH]: '🪨 ธรณี',
   [EnumMonsterLine.LIGHTNING]: '⚡ สายฟ้า',
+  [EnumMonsterLine.HOLY]: '✨ ศักดิ์สิทธิ์',
+  [EnumMonsterLine.DARK]: '🌑 มืด',
+  [EnumMonsterLine.SHADOW]: '🌫️ เงา',
 }
 
 // Mirrors the server's battle checks (assertCanBattle) so the button explains itself.
@@ -286,6 +312,7 @@ const serverMessageLabel: Record<string, string> = {
   'Not enough fights to earn a season reward': 'สู้ไม่ถึงเกณฑ์รับรางวัลซีซัน',
   'Battle not found': 'ไม่พบการต่อสู้',
   'Not enough raid tokens': 'Raid Token ไม่พอ',
+  'Natural and spiritual elements cannot be merged': 'ธาตุธรรมชาติกับธาตุจิตวิญญาณรวมกันไม่ได้',
   'Not enough boss tokens': 'Boss Token ไม่พอ',
   'Raid attempts used up until the next reset': 'สู้บอสครบจำนวนแล้ว รอรีเซ็ต',
   'Your monster is not strong enough for this difficulty': 'ร่างของมอนยังไม่ถึงเกณฑ์ของระดับนี้',
@@ -737,7 +764,8 @@ export const getMergeBlocker = (
   first: IMonsterData | undefined,
   second: IMonsterData | undefined,
   wallet: { coin: number; gem: number } | undefined,
-  cost: { coin: number; gem: number }
+  cost: { coin: number; gem: number },
+  spiritualLines: EnumMonsterLine[] = []
 ): string | null => {
   if (!first || !second) {
     return 'เลือกมอนสองตัว'
@@ -745,6 +773,9 @@ export const getMergeBlocker = (
   const parentBlocker = getMergeParentBlocker(first) ?? getMergeParentBlocker(second)
   if (parentBlocker) {
     return parentBlocker
+  }
+  if (spiritualLines.includes(first.line) !== spiritualLines.includes(second.line)) {
+    return 'ธาตุธรรมชาติกับธาตุจิตวิญญาณรวมกันไม่ได้'
   }
   if ((wallet?.coin ?? 0) < cost.coin) {
     return 'เหรียญไม่พอ'

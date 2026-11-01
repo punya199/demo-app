@@ -683,6 +683,19 @@ describe('merge helpers', () => {
     expect(getMergeBlocker(a, b, { coin: 1999, gem: 50 }, cost)).toBe('เหรียญไม่พอ')
     expect(getMergeBlocker(a, b, { coin: 5000, gem: 19 }, cost)).toBe('เพชรไม่พอ')
     expect(getMergeBlocker(a, b, rich, cost)).toBeNull()
+    const spirit = [EnumMonsterLine.HOLY, EnumMonsterLine.DARK, EnumMonsterLine.SHADOW]
+    expect(getMergeBlocker(a, ultimate({ line: EnumMonsterLine.HOLY }), rich, cost, spirit)).toBe(
+      'ธาตุธรรมชาติกับธาตุจิตวิญญาณรวมกันไม่ได้'
+    )
+    expect(
+      getMergeBlocker(
+        ultimate({ line: EnumMonsterLine.DARK }),
+        ultimate({ line: EnumMonsterLine.HOLY }),
+        rich,
+        cost,
+        spirit
+      )
+    ).toBeNull()
   })
 })
 
@@ -714,5 +727,10 @@ describe('elements', () => {
       expect(elementLabel[line]).toBeTruthy()
     }
     expect(lineOptions.map((option) => option.line)).toEqual(Object.values(EnumMonsterLine))
+    expect(lineOptions.filter((option) => option.isRare).map((option) => option.line)).toEqual([
+      EnumMonsterLine.HOLY,
+      EnumMonsterLine.DARK,
+      EnumMonsterLine.SHADOW,
+    ])
   })
 })

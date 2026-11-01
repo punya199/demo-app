@@ -4,6 +4,9 @@ export enum EnumMonsterLine {
   LEAF = 'leaf',
   EARTH = 'earth',
   LIGHTNING = 'lightning',
+  HOLY = 'holy',
+  DARK = 'dark',
+  SHADOW = 'shadow',
 }
 
 export enum EnumMonsterStage {
@@ -652,9 +655,13 @@ export interface IWikiData {
     coinCost: number
     gemCost: number
     powerMultiplier: number
+    // Spiritual elements only merge with each other, natural ones with natural ones.
+    spiritualLines: EnumMonsterLine[]
     lifespanMinutes: number
     forms: IMergeForm[]
   }
+  // Spiritual eggs are rare: hatching one costs Raid Tokens.
+  rareEgg: { lines: EnumMonsterLine[]; raidTokenPrice: number }
   potential: {
     statSpread: number
     critRateBonusMax: number

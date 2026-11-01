@@ -31,10 +31,13 @@ export const MergeModal = (props: IMergeModalProps) => {
   const second = monsters.find((monster) => monster.id === picks[1])
   const base = second && baseId === second.id ? second : first
   const form = first && second ? findMergeForm(merge.forms, first.line, second.line) : undefined
-  const blocker = getMergeBlocker(first, second, wallet, {
-    coin: merge.coinCost,
-    gem: merge.gemCost,
-  })
+  const blocker = getMergeBlocker(
+    first,
+    second,
+    wallet,
+    { coin: merge.coinCost, gem: merge.gemCost },
+    merge.spiritualLines
+  )
 
   const reset = () => {
     setPicks([])

@@ -119,6 +119,8 @@ export const useHatchMonster = () => {
     onSuccess: (data) => {
       queryClient.setQueryData(MY_MONSTER_KEY, data)
       queryClient.invalidateQueries({ queryKey: ['monster', 'history'] })
+      // A rare egg is paid for in Raid Tokens.
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
     },
   })
 }

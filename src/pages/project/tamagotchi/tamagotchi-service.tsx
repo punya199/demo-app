@@ -6,6 +6,8 @@ import {
   EnumMonsterLine,
   IAdventureArea,
   IBattleData,
+  ICostumeState,
+  EnumCostumeSlot,
   IDexEntry,
   IEnhanceOutcome,
   IEnhancePreview,
@@ -980,3 +982,44 @@ export const usePassiveRespec = () =>
     const { data } = await apiClient.post<IPassiveState>(`/passive/respec`)
     return data
   })
+
+const COSTUME_KEY = ['costume']
+
+// The catalog never changes within a session; what the player owns and wears does.
+export const useGetCostumes = () => {
+  return useQuery({
+    queryKey: COSTUME_KEY,
+    queryFn: async () => {
+      const { data } = await apiClient.get<ICostumeState>(`/costume`)
+      return data
+    },
+  })
+}
+
+// Every costume write answers with the fresh state, so the shop and every pet view stay in step.
+const useCostumeMutation = <T,>(path: string) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: T) => {
+      const { data } = await apiClient.post<ICostumeState>(`/costume/${path}`, input)
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<ICostumeState>(COSTUME_KEY, data)
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: COSTUME_KEY })
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+    },
+  })
+}
+
+export const useBuyCostume = () => useCostumeMutation<{ costumeId: string }>('buy')
+export const useEquipCostume = () =>
+  useCostumeMutation<{ costumeId: string; monsterId?: string }>('equip')
+export const useUnequipCostume = () =>
+  useCostumeMutation<{ slot: EnumCostumeSlot; monsterId?: string }>('unequip')
+export const useSetShowCostume = () => useCostumeMutation<{ show: boolean }>('privacy')

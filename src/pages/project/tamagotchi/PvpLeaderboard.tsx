@@ -1,5 +1,6 @@
 import { Spin, Tag } from 'antd'
 import { useGetPvpLeaderboard } from './tamagotchi-service'
+import { PetAvatar } from './PetAvatar'
 import { petLabel } from './tamagotchi-helper'
 
 interface IPvpLeaderboardProps {
@@ -31,7 +32,12 @@ export const PvpLeaderboard = (props: IPvpLeaderboardProps) => {
           }`}
         >
           <span className="w-8 text-right font-semibold">#{entry.rank}</span>
-          <span className="text-xl">{entry.emoji ?? '❔'}</span>
+          <PetAvatar
+            emoji={entry.emoji ?? '❔'}
+            costume={entry.costume}
+            scale={0.3}
+            label={entry.displayName}
+          />
           <span className="flex-1 truncate">
             {entry.displayName}
             {entry.name && (

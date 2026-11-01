@@ -19,6 +19,10 @@ import {
   IBattleEvent,
   IEvolutionInfo,
   IEvolutionRuleInfo,
+  ICostume,
+  ICostumeState,
+  ILoadout,
+  EnumCostumeSlot,
   IEquipmentItem,
   IMergeForm,
   IMonsterData,
@@ -819,3 +823,79 @@ export const isWornBy = (item: IEquipmentItem, monsterId: string | null) =>
 // Species name with the owner's nickname in front when the pet has one.
 export const petLabel = (speciesName: string, nickname?: string | null) =>
   nickname ? `${nickname} (${speciesName})` : speciesName
+
+export const costumeSlotLabel: Record<EnumCostumeSlot, string> = {
+  [EnumCostumeSlot.HAT]: 'หมวก',
+  [EnumCostumeSlot.FACE]: 'หน้า',
+  [EnumCostumeSlot.BACK]: 'หลัง',
+  [EnumCostumeSlot.AURA]: 'ออร่า',
+  [EnumCostumeSlot.BACKDROP]: 'ฉากหลัง',
+}
+
+export const costumeThemeLabel: Record<string, string> = {
+  casual: 'ลำลอง',
+  spring: 'ฤดูใบไม้ผลิ',
+  winter: 'ฤดูหนาว',
+  festival: 'เทศกาล',
+  knight: 'อัศวิน',
+  sea: 'ทะเล',
+  spirit: 'วิญญาณ',
+  element: 'ธาตุ',
+  royal: 'ราชวงศ์',
+}
+
+// The costumes a loadout names, by slot, looked up in the catalog; ids the catalog does not know
+// are skipped, so a stale or odd id can never break the drawing.
+export const resolveLoadout = (
+  loadout: ILoadout | null | undefined,
+  catalog: ICostume[] | undefined
+): Partial<Record<EnumCostumeSlot, ICostume>> => {
+  const layers: Partial<Record<EnumCostumeSlot, ICostume>> = {}
+  for (const slot of Object.values(EnumCostumeSlot)) {
+    const costume = catalog?.find((row) => row.id === loadout?.[slot])
+    if (costume && costume.slot === slot) {
+      layers[slot] = costume
+    }
+  }
+  return layers
+}
+
+export const describeCostumePrice = (costume: ICostume) => {
+  const { currency, amount } = costume.price
+  if (currency === 'season') {
+    return 'รางวัลซีซัน PvP'
+  }
+  if (currency === 'boss_token') {
+    return `🎫 ${amount} เหรียญบอส`
+  }
+  if (amount === 0) {
+    return 'ฟรี'
+  }
+  return `${currency === 'gem' ? '💎' : '🪙'} ${amount}`
+}
+
+// Mirrors the server's buy checks so the button explains itself. The server decides.
+export const getCostumeBuyBlocker = (
+  costume: ICostume,
+  state: ICostumeState,
+  coin: number,
+  gem: number,
+  now: Date
+): string | null => {
+  if (state.owned.includes(costume.id)) {
+    return 'มีแล้ว'
+  }
+  if (costume.price.currency === 'season') {
+    return 'ซื้อไม่ได้ เป็นรางวัลซีซัน'
+  }
+  if (costume.endsAt && now.getTime() >= new Date(costume.endsAt).getTime()) {
+    return 'หมดเวลาจำหน่ายแล้ว'
+  }
+  if (costume.price.currency === 'coin' && coin < costume.price.amount) {
+    return 'เหรียญไม่พอ'
+  }
+  if (costume.price.currency === 'gem' && gem < costume.price.amount) {
+    return 'เพชรไม่พอ'
+  }
+  return null
+}

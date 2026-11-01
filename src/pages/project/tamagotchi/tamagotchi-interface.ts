@@ -100,6 +100,8 @@ export interface IMonsterData {
   // The owner's name for it (null = none), and what to show: nickname or species name.
   nickname: string | null
   displayName: string
+  // What it wears: slot -> costume id.
+  costume: ILoadout
   emoji: string
   fullness: number
   strength: number
@@ -344,7 +346,7 @@ export interface IProfile {
 export interface IFriend {
   relationId: string
   displayName: string
-  monster: { emoji: string; stage: EnumMonsterStage } | null
+  monster: { emoji: string; stage: EnumMonsterStage; costume: ILoadout | null } | null
   points: number
   hasSupport: boolean
   canGreet: boolean
@@ -370,6 +372,7 @@ export interface IFriendVisit {
     emoji: string
     name: string
     nickname: string | null
+    costume: ILoadout | null
     stage: EnumMonsterStage
     ageMinutes: number
     isSick: boolean
@@ -394,6 +397,7 @@ export interface ISupportUnit {
 
 export interface IRentableUnit extends ISupportUnit {
   ownerName: string
+  costume: ILoadout | null
 }
 
 export interface IWorldBossReward {
@@ -459,6 +463,7 @@ export interface IWorldBossRankingEntry {
   rank: number
   displayName: string
   emoji: string | null
+  costume: ILoadout | null
   damage: number
   hits: number
   isMe: boolean
@@ -517,6 +522,7 @@ export interface IPvpOpponent {
   emoji: string
   name: string
   nickname: string | null
+  costume: ILoadout | null
   element: EnumMonsterLine
   stats: IBattleStats
   rating: number
@@ -595,6 +601,7 @@ export interface IPvpLeaderboardEntry {
   emoji: string | null
   name: string | null
   nickname: string | null
+  costume: ILoadout | null
   rating: number
   wins: number
   losses: number
@@ -904,4 +911,38 @@ export interface IGetMyMonsterResponse {
   // Every living monster (up to maxMonsters), selected one included.
   monsters: IMonsterData[]
   maxMonsters: number
+}
+
+export enum EnumCostumeSlot {
+  HAT = 'hat',
+  FACE = 'face',
+  BACK = 'back',
+  AURA = 'aura',
+  BACKDROP = 'backdrop',
+}
+
+// What a pet wears: slot -> costume id (ids from the server's catalog).
+export type ILoadout = Partial<Record<EnumCostumeSlot, string>>
+
+export interface ICostume {
+  id: string
+  slot: EnumCostumeSlot
+  name: string
+  emoji?: string
+  color?: string
+  gradient?: string
+  rarity: EnumEquipmentGrade
+  theme: string | null
+  price: { currency: 'coin' | 'gem' | 'boss_token' | 'season'; amount: number; bossId?: string }
+  endsAt?: string
+}
+
+// GET /costume
+export interface ICostumeState {
+  catalog: ICostume[]
+  owned: string[]
+  themes: { theme: string; total: number; owned: number; isComplete: boolean }[]
+  selectedId: string | null
+  pets: { id: string; costume: ILoadout }[]
+  showCostume: boolean
 }

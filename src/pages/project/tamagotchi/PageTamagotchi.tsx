@@ -7,6 +7,7 @@ import { Link, Navigate } from 'react-router-dom'
 import { appPath } from '../../../config/app-paths'
 import { useGetMeSuspense } from '../../../service'
 import { AdventurePanel } from './AdventurePanel'
+import { CostumePanel } from './CostumePanel'
 import { DexPanel } from './DexPanel'
 import { EquipmentPanel } from './EquipmentPanel'
 import { ExpeditionPanel } from './ExpeditionPanel'
@@ -261,7 +262,12 @@ const MonsterScreen = (props: { monster: IMonsterData; fetchedAt: number }) => {
           <Tag color="blue">{stageLabel[monster.stage]}</Tag>
         </div>
         <div className="rounded-2xl bg-lime-100 p-4 dark:bg-lime-200">
-          <PetSprite emoji={monster.emoji} isSick={monster.isSick} isEgg={isEgg} />
+          <PetSprite
+            emoji={monster.emoji}
+            isSick={monster.isSick}
+            isEgg={isEgg}
+            costume={monster.costume}
+          />
           <div className="h-7 text-center text-xl" aria-label={`อึ ${monster.poops} กอง`}>
             {'💩'.repeat(monster.poops)}
           </div>
@@ -485,6 +491,11 @@ const GameTabs = () => {
             key: 'shop',
             label: 'ร้านค้า',
             children: <ShopPanel monster={monster} coin={coin} onError={showError} />,
+          },
+          {
+            key: 'costume',
+            label: 'ชุดแต่งตัว',
+            children: <CostumePanel monster={monster} onError={showError} />,
           },
           { key: 'dex', label: 'Dex', children: <DexPanel /> },
           { key: 'wiki', label: 'คู่มือ', children: <WikiPanel /> },

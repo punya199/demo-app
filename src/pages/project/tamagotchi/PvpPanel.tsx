@@ -1,6 +1,7 @@
 import { Alert, Button, Card, Collapse, Input, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { BattleModal } from './BattleModal'
+import { PetAvatar } from './PetAvatar'
 import { PvpLeaderboard } from './PvpLeaderboard'
 import {
   elementLabel,
@@ -187,7 +188,12 @@ export const PvpPanel = (props: IPvpPanelProps) => {
       {opponents?.opponents.map((opponent) => (
         <Card key={opponent.id} size="small" className="dark:border-slate-700 dark:bg-slate-900">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">{opponent.emoji}</span>
+            <PetAvatar
+              emoji={opponent.emoji}
+              costume={opponent.costume}
+              scale={0.4}
+              label={opponent.displayName}
+            />
             <div className="flex-1 text-sm">
               <div className="font-medium text-slate-900 dark:text-slate-100">
                 {opponent.displayName} {opponent.isNpc && <Tag>NPC</Tag>}

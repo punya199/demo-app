@@ -30,6 +30,9 @@ import {
   getRespecCost,
   sumPassiveEffects,
   describeStats,
+  describeCostumePrice,
+  getCostumeBuyBlocker,
+  resolveLoadout,
   petLabel,
   isWornBy,
   formatRatingChange,
@@ -54,6 +57,9 @@ import {
   IBattleData,
   IBattleEvent,
   IBattleStats,
+  ICostume,
+  ICostumeState,
+  EnumCostumeSlot,
   IEquipmentItem,
   IMergeForm,
   IEvolutionRuleInfo,
@@ -71,6 +77,7 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   name: 'เพลิงจอมซน',
   nickname: null,
   displayName: 'เพลิงจอมซน',
+  costume: {},
   emoji: '🦎',
   fullness: 4,
   strength: 4,
@@ -779,5 +786,72 @@ describe('petLabel', () => {
   it('puts the nickname first and keeps the species name', () => {
     expect(petLabel('Sun King', 'Mochi')).toBe('Mochi (Sun King)')
     expect(petLabel('Sun King', null)).toBe('Sun King')
+  })
+})
+
+describe('costumes', () => {
+  const costume = (over: Partial<ICostume>): ICostume => ({
+    id: 'cap',
+    slot: EnumCostumeSlot.HAT,
+    name: 'หมวก',
+    emoji: '🧢',
+    rarity: EnumEquipmentGrade.COMMON,
+    theme: null,
+    price: { currency: 'coin', amount: 150 },
+    ...over,
+  })
+  const state = (owned: string[] = []): ICostumeState => ({
+    catalog: [],
+    owned,
+    themes: [],
+    selectedId: null,
+    pets: [],
+    showCostume: true,
+  })
+  const NOW = new Date('2026-06-01T00:00:00Z')
+
+  it('resolves a loadout against the catalog and skips unknown or misplaced ids', () => {
+    const hat = costume({})
+    const face = costume({ id: 'shades', slot: EnumCostumeSlot.FACE, emoji: '🕶️' })
+    const layers = resolveLoadout({ hat: 'cap', face: 'cap', back: 'nope' }, [hat, face])
+    expect(layers).toEqual({ hat })
+    expect(resolveLoadout(null, [hat])).toEqual({})
+    expect(resolveLoadout({ hat: 'cap' }, undefined)).toEqual({})
+  })
+
+  it('writes each price source in Thai', () => {
+    expect(describeCostumePrice(costume({}))).toBe('🪙 150')
+    expect(describeCostumePrice(costume({ price: { currency: 'gem', amount: 40 } }))).toBe('💎 40')
+    expect(describeCostumePrice(costume({ price: { currency: 'season', amount: 0 } }))).toBe(
+      'รางวัลซีซัน PvP'
+    )
+    expect(describeCostumePrice(costume({ price: { currency: 'coin', amount: 0 } }))).toBe('ฟรี')
+  })
+
+  it('explains why a costume cannot be bought', () => {
+    expect(getCostumeBuyBlocker(costume({}), state(['cap']), 999, 0, NOW)).toBe('มีแล้ว')
+    expect(getCostumeBuyBlocker(costume({}), state(), 100, 0, NOW)).toBe('เหรียญไม่พอ')
+    expect(
+      getCostumeBuyBlocker(
+        costume({ price: { currency: 'gem', amount: 40 } }),
+        state(),
+        999,
+        10,
+        NOW
+      )
+    ).toBe('เพชรไม่พอ')
+    expect(
+      getCostumeBuyBlocker(
+        costume({ price: { currency: 'season', amount: 0 } }),
+        state(),
+        999,
+        99,
+        NOW
+      )
+    ).toMatch(/ซีซัน/)
+    expect(
+      getCostumeBuyBlocker(costume({ endsAt: '2026-05-01T00:00:00Z' }), state(), 999, 99, NOW)
+    ).toBe('หมดเวลาจำหน่ายแล้ว')
+    expect(getCostumeBuyBlocker(costume({}), state(), 150, 0, NOW)).toBeNull()
   })
 })

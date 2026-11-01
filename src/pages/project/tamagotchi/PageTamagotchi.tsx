@@ -354,7 +354,10 @@ const TamagotchiGame = () => {
   const [isChoosingEgg, setIsChoosingEgg] = useState(false)
   const [isMerging, setIsMerging] = useState(false)
   const monster = data?.monster ?? null
-  const monsters = data?.monsters ?? []
+  // Fixed slot order (oldest first), whichever pet is selected.
+  const monsters = [...(data?.monsters ?? [])].sort(
+    (a, b) => new Date(a.bornAt).getTime() - new Date(b.bornAt).getTime()
+  )
   const diedAt = monster?.diedAt
 
   // A new egg was hatched: back from the picker to the care screen.

@@ -324,13 +324,19 @@ const buildSections = (wiki: IWikiData) => {
           <Table
             head={['ธาตุ', 'ได้เปรียบ', 'เสียเปรียบ']}
             rows={(Object.keys(battle.beats) as EnumMonsterLine[]).map((element) => {
-              const losesTo = (Object.keys(battle.beats) as EnumMonsterLine[]).find(
-                (other) => battle.beats[other] === element
+              const losesTo = (Object.keys(battle.beats) as EnumMonsterLine[]).filter((other) =>
+                battle.beats[other].includes(element)
               )
               return [
                 elementLabel[element],
-                `${elementLabel[battle.beats[element]]} ${times(battle.strongMultiplier)}`,
-                losesTo ? `${elementLabel[losesTo]} ${times(battle.weakMultiplier)}` : '–',
+                battle.beats[element]
+                  .map((target) => `${elementLabel[target]} ${times(battle.strongMultiplier)}`)
+                  .join(' · '),
+                losesTo.length
+                  ? losesTo
+                      .map((other) => `${elementLabel[other]} ${times(battle.weakMultiplier)}`)
+                      .join(' · ')
+                  : '–',
               ]
             })}
           />

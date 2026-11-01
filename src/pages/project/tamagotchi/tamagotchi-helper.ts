@@ -70,6 +70,18 @@ export const lineOptions: ILineOption[] = [
     emoji: '🌿',
     description: 'ธาตุพฤกษ์ อ่อนโยน ฟื้นตัวไว',
   },
+  {
+    line: EnumMonsterLine.EARTH,
+    title: 'ไข่ศิลา',
+    emoji: '🪨',
+    description: 'ธาตุธรณี หนักแน่น แกร่ง เชื่องช้า',
+  },
+  {
+    line: EnumMonsterLine.LIGHTNING,
+    title: 'ไข่อสนี',
+    emoji: '⚡',
+    description: 'ธาตุสายฟ้า ว่องไว พลังระเบิด เปราะบาง',
+  },
 ]
 
 interface IActionOption {
@@ -148,6 +160,8 @@ export const elementLabel: Record<EnumMonsterLine, string> = {
   [EnumMonsterLine.FLAME]: '🔥 เพลิง',
   [EnumMonsterLine.TIDE]: '💧 วารี',
   [EnumMonsterLine.LEAF]: '🌿 พฤกษ์',
+  [EnumMonsterLine.EARTH]: '🪨 ธรณี',
+  [EnumMonsterLine.LIGHTNING]: '⚡ สายฟ้า',
 }
 
 // Mirrors the server's battle checks (assertCanBattle) so the button explains itself.

@@ -2,6 +2,8 @@ export enum EnumMonsterLine {
   FLAME = 'flame',
   TIDE = 'tide',
   LEAF = 'leaf',
+  EARTH = 'earth',
+  LIGHTNING = 'lightning',
 }
 
 export enum EnumMonsterStage {
@@ -677,7 +679,7 @@ export interface IWikiData {
     defenseFactor: number
     damageVariance: number
     weightLoss: number
-    beats: Record<EnumMonsterLine, EnumMonsterLine>
+    beats: Record<EnumMonsterLine, EnumMonsterLine[]>
   }
   adventure: {
     firstClearMultiplier: number

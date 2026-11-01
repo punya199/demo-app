@@ -20,6 +20,8 @@ import {
   canDeallocatePassive,
   describePassiveEffect,
   describeReset,
+  elementLabel,
+  lineOptions,
   potentialPercent,
   signed,
   findMergeForm,
@@ -703,5 +705,14 @@ describe('potential helpers', () => {
     } as IBattleData
     const event = { actor: 'player', isDodged: true, damage: 0 } as IBattleEvent
     expect(describeBattleEvent(event, battle)).toBe('B หลบการโจมตีของ A ได้')
+  })
+})
+
+describe('elements', () => {
+  it('labels every element and offers an egg for each normal one', () => {
+    for (const line of Object.values(EnumMonsterLine)) {
+      expect(elementLabel[line]).toBeTruthy()
+    }
+    expect(lineOptions.map((option) => option.line)).toEqual(Object.values(EnumMonsterLine))
   })
 })

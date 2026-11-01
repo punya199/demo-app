@@ -1,3 +1,10 @@
+# [1.27.0](https://github.com/punya199/demo-app/compare/v1.26.0...v1.27.0) (2026-11-01)
+
+
+### Update
+
+* rewrite README with project overview, commands, and layout ([b09a233](https://github.com/punya199/demo-app/commit/b09a2335fd5fc8dd3da056d9d79787b699e0bebc))
+
 # [1.26.0](https://github.com/punya199/demo-app/compare/v1.25.0...v1.26.0) (2026-11-01)
 
 

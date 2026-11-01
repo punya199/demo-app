@@ -1,5 +1,6 @@
 import { Spin, Tag } from 'antd'
 import { useGetPvpLeaderboard } from './tamagotchi-service'
+import { petLabel } from './tamagotchi-helper'
 
 interface IPvpLeaderboardProps {
   season?: string
@@ -31,7 +32,15 @@ export const PvpLeaderboard = (props: IPvpLeaderboardProps) => {
         >
           <span className="w-8 text-right font-semibold">#{entry.rank}</span>
           <span className="text-xl">{entry.emoji ?? '❔'}</span>
-          <span className="flex-1 truncate">{entry.displayName}</span>
+          <span className="flex-1 truncate">
+            {entry.displayName}
+            {entry.name && (
+              <span className="text-xs text-slate-500">
+                {' '}
+                · {petLabel(entry.name, entry.nickname)}
+              </span>
+            )}
+          </span>
           <Tag>{entry.rating}</Tag>
           <span className="w-16 text-right text-xs text-slate-500">
             {entry.wins}ช-{entry.losses}พ

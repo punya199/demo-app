@@ -351,6 +351,10 @@ const serverMessageLabel: Record<string, string> = {
   'Equipment is already at the maximum level': 'ตีบวกสูงสุดแล้ว',
   'Material not found': 'ไม่พบวัตถุดิบ',
   'Monster is on an expedition': 'มอนออกสำรวจอยู่',
+  'Pet name must be 1-16 characters': 'ชื่อต้องยาว 1-16 ตัวอักษร',
+  'Pet name has characters that are not allowed':
+    'ชื่อใช้ได้เฉพาะภาษาไทย อังกฤษ ตัวเลข ช่องว่าง และ - _ .',
+  'Pet was renamed recently': 'เพิ่งเปลี่ยนชื่อ รออีกสักครู่ (เปลี่ยนได้ทุก 10 นาที)',
   'Monster is already on an expedition': 'มอนออกสำรวจอยู่แล้ว',
   'Monster is too unwell to explore': 'มอนป่วยหรือหิว ออกสำรวจไม่ได้',
   'Monster is not on an expedition': 'มอนไม่ได้ออกสำรวจ',
@@ -811,3 +815,7 @@ export const foldSelectedMonster = (
 // A piece counts as worn on the gear screen only for the pet that screen is about.
 export const isWornBy = (item: IEquipmentItem, monsterId: string | null) =>
   item.equipped && item.monsterId === monsterId
+
+// Species name with the owner's nickname in front when the pet has one.
+export const petLabel = (speciesName: string, nickname?: string | null) =>
+  nickname ? `${nickname} (${speciesName})` : speciesName

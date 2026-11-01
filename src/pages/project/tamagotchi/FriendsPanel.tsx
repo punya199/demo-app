@@ -4,6 +4,7 @@ import {
   formatFriendCode,
   getGiftBlocker,
   getSupportBlocker,
+  petLabel,
   stageLabel,
   statLabel,
 } from './tamagotchi-helper'
@@ -98,7 +99,7 @@ const SupportCard = (props: {
             <span className="text-3xl">{unit.emoji}</span>
             <div className="flex-1">
               <div className="font-medium">
-                {unit.name} <Tag>{stageLabel[unit.stage]}</Tag>
+                {petLabel(unit.name, unit.nickname)} <Tag>{stageLabel[unit.stage]}</Tag>
               </div>
               <div className="text-xs text-slate-500">
                 {(Object.keys(statLabel) as StatKey[])
@@ -145,7 +146,7 @@ const VisitModal = (props: { visit: IFriendVisit | null; onClose: () => void }) 
           <span className="text-6xl">{monster.emoji}</span>
           <div className="text-sm">
             <div className="font-semibold">
-              {monster.name} <Tag>{stageLabel[monster.stage]}</Tag>
+              {petLabel(monster.name, monster.nickname)} <Tag>{stageLabel[monster.stage]}</Tag>
               {monster.isSick && <Tag color="red">ป่วย</Tag>}
               {monster.isExploring && <Tag color="blue">ออกสำรวจ</Tag>}
             </div>

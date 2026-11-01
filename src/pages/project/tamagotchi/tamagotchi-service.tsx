@@ -151,6 +151,19 @@ export const useMergeMonsters = () => {
   })
 }
 
+export const useRenameMonster = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { monsterId: string; name: string }) => {
+      const { data } = await apiClient.post<{ monster: IMonsterData }>(`/monster/rename`, input)
+      return data
+    },
+    onSuccess: (data) => {
+      setSelectedMonster(queryClient, data.monster)
+    },
+  })
+}
+
 export const useSelectMonster = () => {
   const queryClient = useQueryClient()
   return useMutation({

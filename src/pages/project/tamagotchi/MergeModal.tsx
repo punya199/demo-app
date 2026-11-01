@@ -71,8 +71,8 @@ export const MergeModal = (props: IMergeModalProps) => {
           <div className="text-center text-5xl">{form.emoji}</div>
           <div className="text-center text-lg font-semibold">{form.name}</div>
           <p className="rounded border border-amber-400 p-2 text-amber-700 dark:text-amber-300">
-            {first.emoji} {first.name} และ {second.emoji} {second.name} จะหายไปถาวร ย้อนกลับไม่ได้
-            จ่าย 🪙 {merge.coinCost} และ 💎 {merge.gemCost}
+            {first.emoji} {first.displayName} และ {second.emoji} {second.displayName} จะหายไปถาวร
+            ย้อนกลับไม่ได้ จ่าย 🪙 {merge.coinCost} และ 💎 {merge.gemCost}
           </p>
           <div className="flex justify-end gap-2">
             <Button onClick={() => setIsConfirming(false)} disabled={isPending}>
@@ -104,7 +104,7 @@ export const MergeModal = (props: IMergeModalProps) => {
                   >
                     <span className="flex flex-col items-center leading-tight">
                       <span className="text-xl">{monster.emoji}</span>
-                      <span className="text-xs">{monster.name}</span>
+                      <span className="text-xs">{monster.displayName}</span>
                     </span>
                   </Button>
                 </Tooltip>

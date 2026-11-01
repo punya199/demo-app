@@ -97,6 +97,9 @@ export interface IMonsterData {
   speciesId: string
   stage: EnumMonsterStage
   name: string
+  // The owner's name for it (null = none), and what to show: nickname or species name.
+  nickname: string | null
+  displayName: string
   emoji: string
   fullness: number
   strength: number
@@ -134,6 +137,7 @@ export interface IBattleStats {
 
 export interface IFighter {
   name: string
+  nickname?: string
   emoji: string
   element: EnumMonsterLine
   stats: IBattleStats
@@ -365,6 +369,7 @@ export interface IFriendVisit {
   monster: {
     emoji: string
     name: string
+    nickname: string | null
     stage: EnumMonsterStage
     ageMinutes: number
     isSick: boolean
@@ -379,6 +384,7 @@ export interface ISupportUnit {
   supportId: string
   emoji: string
   name: string
+  nickname: string | null
   stage: EnumMonsterStage
   stats: IBattleStats
   effects: IFighterEffects | null
@@ -510,6 +516,7 @@ export interface IPvpOpponent {
   displayName: string
   emoji: string
   name: string
+  nickname: string | null
   element: EnumMonsterLine
   stats: IBattleStats
   rating: number
@@ -587,6 +594,7 @@ export interface IPvpLeaderboardEntry {
   displayName: string
   emoji: string | null
   name: string | null
+  nickname: string | null
   rating: number
   wins: number
   losses: number

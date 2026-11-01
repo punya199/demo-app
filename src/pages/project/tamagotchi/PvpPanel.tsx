@@ -7,6 +7,7 @@ import {
   formatRatingChange,
   getDefenseBlocker,
   getPvpBlocker,
+  petLabel,
   stageLabel,
 } from './tamagotchi-helper'
 import {
@@ -142,7 +143,8 @@ export const PvpPanel = (props: IPvpPanelProps) => {
             <span className="text-3xl">{status.defense.fighter.emoji}</span>
             <div className="flex-1 text-sm">
               <div className="font-medium">
-                {status.defense.displayName} · {status.defense.fighter.name}
+                {status.defense.displayName} ·{' '}
+                {petLabel(status.defense.fighter.name, status.defense.fighter.nickname)}
               </div>
               <div className="text-xs text-slate-500">
                 {stageLabel[status.defense.stage]} · HP {status.defense.fighter.stats.hp} · ATK{' '}
@@ -191,8 +193,8 @@ export const PvpPanel = (props: IPvpPanelProps) => {
                 {opponent.displayName} {opponent.isNpc && <Tag>NPC</Tag>}
               </div>
               <div className="text-xs text-slate-500">
-                {elementLabel[opponent.element]} · HP {opponent.stats.hp} · ATK {opponent.stats.atk}{' '}
-                · เรตติ้ง {opponent.rating}
+                {petLabel(opponent.name, opponent.nickname)} · {elementLabel[opponent.element]} · HP{' '}
+                {opponent.stats.hp} · ATK {opponent.stats.atk} · เรตติ้ง {opponent.rating}
               </div>
             </div>
             <Tooltip title={blocker}>

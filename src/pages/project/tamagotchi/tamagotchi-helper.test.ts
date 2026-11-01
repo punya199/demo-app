@@ -30,6 +30,7 @@ import {
   getRespecCost,
   sumPassiveEffects,
   describeStats,
+  petLabel,
   isWornBy,
   formatRatingChange,
   getDefenseBlocker,
@@ -68,6 +69,8 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   speciesId: 'flame_adultGood',
   stage: EnumMonsterStage.ADULT,
   name: 'เพลิงจอมซน',
+  nickname: null,
+  displayName: 'เพลิงจอมซน',
   emoji: '🦎',
   fullness: 4,
   strength: 4,
@@ -769,5 +772,12 @@ describe('isWornBy', () => {
     expect(isWornBy(piece({}), 'a')).toBe(true)
     expect(isWornBy(piece({}), 'b')).toBe(false)
     expect(isWornBy(piece({ equipped: false, monsterId: null }), 'a')).toBe(false)
+  })
+})
+
+describe('petLabel', () => {
+  it('puts the nickname first and keeps the species name', () => {
+    expect(petLabel('Sun King', 'Mochi')).toBe('Mochi (Sun King)')
+    expect(petLabel('Sun King', null)).toBe('Sun King')
   })
 })

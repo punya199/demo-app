@@ -11,7 +11,10 @@
 // Big hard-mode levels take minutes each, so the work can be split across
 // processes: --levels=1,2,3 picks levels and --out=file writes just those
 // results to a JSON file, to be merged into trays.ts afterwards;
-// --attempts=N tries more candidates when a level comes out off target.
+// --attempts=N tries more candidates when a level comes out off target;
+// --target=0.15 overrides the win rate aimed for (when a level plays too easy
+// or too hard by hand); --shortlist=N measures N candidates with the real
+// rules instead of 12, for more choice at a slower pace.
 
 /* eslint-disable no-console -- a command-line tool: printing progress is its job */
 import { writeFileSync } from 'node:fs'
@@ -36,6 +39,8 @@ const only = arg('mode')
 const pickLevels = arg('levels')?.split(',').map(Number)
 const partOut = arg('out')
 const attemptsArg = arg('attempts')
+const targetArg = arg('target')
+const shortlistArg = arg('shortlist')
 
 type Entry = { layout: TrayLayout; solution: number[] }
 const MIN_WIN_RATE = 0.12
@@ -86,33 +91,42 @@ for (const mode of MODES) {
     // Big maps cost far more per candidate, so try fewer of them.
     const huge = level.art.length * level.art[0].length > 800
     const attempts = attemptsArg ? Number(attemptsArg) : huge ? 40 : 200
-    const opt = { ...trayOptions(level, seed), attempts, greedyRuns: huge ? 24 : 60 }
+    // Even the last levels must be beatable without +1 slot by a player who
+    // thinks a little: a tray that a non-planning player never wins feels
+    // impossible, however winnable it is on paper.
+    const target = Math.max(targetArg ? Number(targetArg) : level.greedy, MIN_WIN_RATE)
+    const opt = {
+      ...trayOptions(level, seed),
+      greedyTarget: target, // search around the floor too, or every candidate is too hard
+      attempts,
+      greedyRuns: huge ? 24 : 60,
+    }
     // The search's quick model of play digs in a different order than the real
     // game, so how hard a tray really is can be far off its estimate (big hard
     // pictures came out unwinnable for players who don't plan). Measure a spread
     // of candidates with the real rules: the model's picks plus easier and
     // harder ones, and keep the winnable one truly closest to the target.
-    const found = generateCandidates(board, opt, 12)
-    const rest = found.slice(6)
-    const every = Math.max(1, Math.floor(rest.length / 6))
+    const half = shortlistArg ? Math.ceil(Number(shortlistArg) / 2) : 6
+    const found = generateCandidates(board, opt, half * 2)
+    const rest = found.slice(half)
+    const every = Math.max(1, Math.floor(rest.length / half))
     const candidates = [
-      ...found.slice(0, 6),
-      ...rest.filter((_, k) => k % every === 0).slice(0, 6),
+      ...found.slice(0, half),
+      ...rest.filter((_, k) => k % every === 0).slice(0, half),
     ].map((c) => c.tray)
     candidates.push(plainTray(board, opt))
     const runs = huge ? 30 : 40
-    // Even the last levels must be beatable without +1 slot by a player who
-    // thinks a little: a tray that a non-planning player never wins feels
-    // impossible, however winnable it is on paper.
-    const target = Math.max(level.greedy, MIN_WIN_RATE)
+    // The rate is measured on a few dozen games, so it can easily read a few
+    // points high: coming out harder than the target counts three times as bad
+    // as coming out easier, and only a tray at or above the target ends the search.
+    const miss = (rate: number) => (rate < target ? (target - rate) * 3 : rate - target)
     let best: (Entry & { rate: number }) | null = null
     for (const layout of candidates) {
       const solution = solveReal(level, seed, layout)
       if (!solution) continue
       const rate = realWinRate(level, seed, layout, runs, mulberry32(seed))
-      if (!best || Math.abs(rate - target) < Math.abs(best.rate - target))
-        best = { layout, solution, rate }
-      if (Math.abs(best.rate - target) <= 0.05) break
+      if (!best || miss(rate) < miss(best.rate)) best = { layout, solution, rate }
+      if (best.rate >= target && best.rate - target <= 0.06) break
     }
     if (!best) {
       failed++

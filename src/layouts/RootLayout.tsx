@@ -38,11 +38,13 @@ const RootLayout = () => {
   // force-redirect to /login on refresh failure - a visitor with a stale session must never be
   // bounced off a link they were never asked to log in for.
   const isPublicVote = !!matchPath(VOTE_ROUTE_TEMPLATE, location.pathname)
+  // The game has its own fixed colors and a bottom tool bar the floating theme button would cover.
+  const isGame = location.pathname === appPath.gemDiggers()
   const hideAuthenticatedChrome = isPaojiaoLedger || isPublicVote
   const mode = useThemeStore((state) => state.mode)
 
   return (
-    <div className="relative isolate flex h-screen flex-col bg-slate-50 dark:bg-slate-950">
+    <div className="relative isolate flex h-dvh flex-col bg-slate-50 dark:bg-slate-950">
       <FlickeringGrid
         className="fixed inset-0 -z-10"
         squareSize={4}
@@ -69,7 +71,7 @@ const RootLayout = () => {
           </AnimatePresence>
         </Suspense>
       </div>
-      {!isPaojiaoLedger && <ThemeToggle />}
+      {!isPaojiaoLedger && !isGame && <ThemeToggle />}
       {appConfig().VITE_IS_DEVELOPMENT && !hideAuthenticatedChrome && <DevTools />}
     </div>
   )

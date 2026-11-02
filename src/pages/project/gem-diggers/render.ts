@@ -175,8 +175,10 @@ export class Renderer {
     // The picture plus one cell of path on each side plus the rock frame.
     const availW = this.w - pad * 2
     const availH = this.h - pad * 2 - below
+    // Big pictures on a short phone screen get small cells rather than pushing
+    // the tray off the bottom: every cart row must stay on screen.
     const cell = Math.max(
-      8,
+      4,
       Math.floor(Math.min(availW / (board.width + 2.6), availH / (board.height + 2.6)))
     )
     const gridX = Math.round((this.w - cell * board.width) / 2)

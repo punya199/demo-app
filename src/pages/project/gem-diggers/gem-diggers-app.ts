@@ -131,7 +131,9 @@ export function mountGemDiggers(): () => void {
 
   // ---------- Endless levels ----------
   // Built in a worker (a few seconds each), kept in memory and in localStorage,
-  // and the next one is built ahead while the current one is played.
+  // and the next one is built ahead while the current one is played. If the
+  // worker fails to load, crashes or goes quiet, levels are built on the page
+  // instead: the player waits a little longer but is never stuck.
 
   const isEndless = (index: number) => index + 1 >= ENDLESS_FROM
   const levelLabel = (index: number) =>
@@ -145,6 +147,8 @@ export function mountGemDiggers(): () => void {
     { resolve: (b: BuiltLevel) => void; reject: (e: Error) => void }[]
   >()
   let endlessWorker: Worker | null = null
+  let endlessWorkerBroken = false
+  const WORKER_PATIENCE = 45_000 // a build takes seconds; this long means the worker is gone
 
   function onEndlessBuilt(reply: EndlessReply) {
     const id = endlessId(reply.mode, reply.n)
@@ -183,14 +187,52 @@ export function mountGemDiggers(): () => void {
         return
       }
       endlessWaiting.set(id, [{ resolve, reject }])
-      if (!endlessWorker) {
-        endlessWorker = new Worker(new URL('./endless-worker.ts', import.meta.url), {
-          type: 'module',
-        })
-        endlessWorker.onmessage = (e: MessageEvent<EndlessReply>) => onEndlessBuilt(e.data)
+      if (endlessWorkerBroken) {
+        void buildHere(n, mode)
+        return
       }
-      endlessWorker.postMessage({ n, mode })
+      try {
+        if (!endlessWorker) {
+          endlessWorker = new Worker(new URL('./endless-worker.ts', import.meta.url), {
+            type: 'module',
+          })
+          endlessWorker.onmessage = (e: MessageEvent<EndlessReply>) => onEndlessBuilt(e.data)
+          endlessWorker.onerror = endlessWorkerFailed
+          endlessWorker.onmessageerror = endlessWorkerFailed
+        }
+        endlessWorker.postMessage({ n, mode })
+        timers.push(
+          window.setTimeout(() => endlessWaiting.has(id) && endlessWorkerFailed(), WORKER_PATIENCE)
+        )
+      } catch {
+        endlessWorkerFailed()
+      }
     })
+  }
+
+  /** Stop using the worker and build whatever is still awaited on the page itself. */
+  function endlessWorkerFailed() {
+    if (endlessWorkerBroken) return
+    endlessWorkerBroken = true
+    endlessWorker?.terminate()
+    endlessWorker = null
+    for (const id of endlessWaiting.keys()) {
+      const [mode, n] = id.split(':')
+      void buildHere(Number(n), mode as Mode)
+    }
+  }
+
+  async function buildHere(n: number, mode: Mode) {
+    let reply: EndlessReply
+    try {
+      const { buildEndless } = await import('./endless')
+      // Let the "digging" panel paint before the page is busy for a few seconds.
+      await new Promise((r) => setTimeout(r, 50))
+      reply = { n, mode, built: buildEndless(n, mode) }
+    } catch (err) {
+      reply = { n, mode, error: String(err) }
+    }
+    if (!disposed) onEndlessBuilt(reply)
   }
 
   /** Start building the level after this one if it will be endless, so it is ready in time. */
@@ -299,6 +341,11 @@ export function mountGemDiggers(): () => void {
     if (!hintWorker) {
       hintWorker = new Worker(new URL('./hint-worker.ts', import.meta.url), { type: 'module' })
       hintWorker.onmessage = (e: MessageEvent<HintReply>) => showHint(e.data)
+      hintWorker.onerror = () => {
+        hintWorker?.terminate()
+        hintWorker = null
+        showToast('😵 ใบ้ไม่ได้ตอนนี้ ลองใหม่อีกครั้ง')
+      }
     }
     const req: HintRequest = { id: ++hintId, ...current, log: game.log, steps: game.steps }
     hintWorker.postMessage(req)

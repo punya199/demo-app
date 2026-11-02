@@ -19,7 +19,6 @@ import { buildBoard, trayOptions } from '../../src/pages/project/gem-diggers/gam
 import {
   TrayLayout,
   generateCandidates,
-  greedyWinRate,
   mulberry32,
   plainTray,
   trayKey,
@@ -27,7 +26,7 @@ import {
 import { LEVELS } from '../../src/pages/project/gem-diggers/levels'
 import { MODES, MODE_NAMES, applyMode } from '../../src/pages/project/gem-diggers/modes'
 import { PREGENERATED_TRAYS } from '../../src/pages/project/gem-diggers/trays'
-import { solveReal } from '../../src/pages/project/gem-diggers/verify'
+import { realWinRate, solveReal } from '../../src/pages/project/gem-diggers/verify'
 
 const OUT = 'src/pages/project/gem-diggers/trays.ts' // yarn runs scripts from the project folder
 const all = process.argv.includes('--all')
@@ -87,21 +86,28 @@ for (const mode of MODES) {
     const huge = level.art.length * level.art[0].length > 800
     const attempts = attemptsArg ? Number(attemptsArg) : huge ? 40 : 200
     const opt = { ...trayOptions(level, seed), attempts, greedyRuns: huge ? 24 : 60 }
-    // The quick estimate used while searching is noisy, so re-measure the
-    // shortlist properly and keep the winnable one truly closest to the target.
+    // The search's quick model of play digs in a different order than the real
+    // game, so how hard a tray really is can be far off its estimate (big hard
+    // pictures came out unwinnable for players who don't plan). Measure a spread
+    // of candidates with the real rules: the model's picks plus easier and
+    // harder ones, and keep the winnable one truly closest to the target.
+    const found = generateCandidates(board, opt, 12)
+    const rest = found.slice(6)
+    const every = Math.max(1, Math.floor(rest.length / 6))
     const candidates = [
-      ...generateCandidates(board, opt, 6)
-        .slice(0, 8)
-        .map((c) => c.tray),
-      plainTray(board, opt),
-    ]
+      ...found.slice(0, 6),
+      ...rest.filter((_, k) => k % every === 0).slice(0, 6),
+    ].map((c) => c.tray)
+    candidates.push(plainTray(board, opt))
+    const runs = huge ? 24 : 40
     let best: (Entry & { rate: number }) | null = null
     for (const layout of candidates) {
       const solution = solveReal(level, seed, layout)
       if (!solution) continue
-      const rate = greedyWinRate(board, layout, opt, 200, mulberry32(seed))
+      const rate = realWinRate(level, seed, layout, runs, mulberry32(seed))
       if (!best || Math.abs(rate - level.greedy) < Math.abs(best.rate - level.greedy))
         best = { layout, solution, rate }
+      if (Math.abs(best.rate - level.greedy) <= 0.06) break
     }
     if (!best) {
       failed++
@@ -112,7 +118,7 @@ for (const mode of MODES) {
     const carts = best.layout.columns.flat()
     console.log(
       `${tag}: ${level.art[0].length}x${level.art.length}, ${carts.length} carts (biggest ${Math.max(...carts.map((c) => c.count))}), ` +
-        `no-planning win rate ${(best.rate * 100).toFixed(0)}% (target ${Math.round(level.greedy * 100)}%), ` +
+        `no-planning win rate (real rules) ${(best.rate * 100).toFixed(0)}% (target ${Math.round(level.greedy * 100)}%), ` +
         `won in ${best.solution.length} taps, ${((performance.now() - t0) / 1000).toFixed(1)}s`
     )
     // Save as we go: the hard mode takes a while.

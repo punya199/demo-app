@@ -66,3 +66,33 @@ export function solveFrom(start: Game, budget = 4000): number[] | null {
   settle(root)
   return search(root)
 }
+
+/**
+ * How often a sensible player who doesn't plan ahead wins: waits until
+ * everything has settled, then taps a cart that can dig right away (random
+ * among those), or any tappable one if none can. Played with the real rules,
+ * so it is slow: for the final pick between a few trays, not the search.
+ */
+export function realWinRate(
+  level: LevelDef,
+  seed: number,
+  layout: TrayLayout,
+  runs: number,
+  rng: () => number
+): number {
+  let wins = 0
+  for (let r = 0; r < runs; r++) {
+    const g = new Game(level, seed, layout)
+    settle(g)
+    while (g.status === 'playing') {
+      const moves = g.tray.map((_, c) => c).filter((c) => g.canTap(c) && g.groupColumns(c)[0] === c)
+      if (!moves.length) break
+      const ready = moves.filter((c) => g.frontReady(c))
+      const pool = ready.length ? ready : moves
+      g.tap(pool[Math.floor(rng() * pool.length)])
+      settle(g)
+    }
+    if (g.status === 'won') wins++
+  }
+  return wins / runs
+}

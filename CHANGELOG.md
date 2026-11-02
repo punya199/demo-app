@@ -1,3 +1,10 @@
+# [1.28.0](https://github.com/punya199/demo-app/compare/v1.27.1...v1.28.0) (2026-11-02)
+
+
+### Update
+
+* Gem Diggers keeps two modes, easy and hard, and no level is near-impossible ([7f22b27](https://github.com/punya199/demo-app/commit/7f22b27d782cb26ef276202f864d5f39ad7d87a7))
+
 ## [1.27.1](https://github.com/punya199/demo-app/compare/v1.27.0...v1.27.1) (2026-11-02)
 
 

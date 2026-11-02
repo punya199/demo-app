@@ -41,27 +41,24 @@ export function mountGemDiggers(): () => void {
   const timers: number[] = []
 
   const save: Save = {
-    mode: 'easy',
+    mode: 'medium',
     byMode: {},
     slotBoosters: 3,
     muted: false,
     seenHelp: false,
     seenIntro: [],
-    seenModes: ['easy'],
+    seenModes: [],
   }
   try {
     Object.assign(save, JSON.parse(localStorage.getItem(SAVE_KEY) ?? '{}'))
   } catch {
     // Private mode or corrupt data: start fresh.
   }
-  // Saves from before difficulty modes kept progress at the top level: that was easy mode.
-  if (save.unlocked && !save.byMode.easy) {
-    save.byMode.easy = {
-      unlocked: save.unlocked,
-      stars: save.stars ?? [],
-      deepest: save.deepest ?? ENDLESS_FROM,
-    }
-  }
+  // The old easy mode is gone (as is the progress kept at the top level by saves
+  // from before modes, which was easy mode): carry on in the mode now called easy.
+  if (!MODES.includes(save.mode)) save.mode = 'medium'
+  Reflect.deleteProperty(save.byMode, 'easy')
+  save.seenModes = save.seenModes.filter((m) => MODES.includes(m))
   delete save.unlocked
   delete save.stars
   delete save.deepest
@@ -294,7 +291,7 @@ export function mountGemDiggers(): () => void {
 
   function updateHud() {
     if (!game) return
-    const mode = save.mode === 'easy' ? '' : `[${MODE_NAMES[save.mode]}] `
+    const mode = save.mode === 'hard' ? `[${MODE_NAMES[save.mode]}] ` : ''
     levelName.textContent = `${mode}${levelLabel(levelIndex)}: ${game.level.name}`
     slotCount.textContent = `×${save.slotBoosters}`
     btnSlot.disabled =
@@ -448,12 +445,11 @@ export function mountGemDiggers(): () => void {
        <li>แตะ <b>รถเหมือง</b> คันหน้าสุดในถาดด้านล่าง รถจะวิ่งไปจอดใน <b>ช่องรอ</b> (มี 5 ช่อง)</li>
        <li>นักขุดสีเดียวกับรถจะเดินรอบภาพ ไปขุดอัญมณีสีนั้นที่ <b>เดินไปถึง</b> คือช่องที่อยู่ขอบภาพ หรือติดกับอุโมงค์ที่ขุดแล้ว</li>
        <li>ตัวเลขบนรถ = จำนวนที่ต้องขุด ครบแล้วรถออก ช่องว่างคืน</li>
-       <li>รถที่มี <b>กรอบขาวกระพริบ</b> = แตะแล้วขุดได้ทันที</li>
        <li>🔗 รถพ่วงต้องไปพร้อมกัน · ❓ รถปริศนาเผยสีเมื่อขึ้นหน้าสุด · 🔒 ห้องลับเปิดเมื่อขุดสีกุญแจครบ · 🪨 หินขุดไม่ได้</li>
        <li>🧊 รถแช่แข็งรอรถอื่นเสร็จก่อน · 💎 อัญมณีหุ้มหินต้องขุด 2 ครั้ง · 🌑 เหมืองมืดเห็นสีเฉพาะช่องที่ขุดถึง</li>
        <li>ขุดภาพจนหมด = ชนะ · ช่องรอเต็มแล้วไม่มีใครขุดต่อได้ = แพ้</li>
      </ol>
-     <p>เลือกความยาก ง่าย / กลาง / ยาก ได้ที่เมนู ☰ (ความคืบหน้าแยกกันแต่ละโหมด)</p>
+     <p>เลือกความยาก ง่าย / ยาก ได้ที่เมนู ☰ (ความคืบหน้าแยกกันแต่ละโหมด)</p>
      <p>💡 คำใบ้: บอกแถวที่ควรแตะต่อ (ใช้แล้วได้สูงสุด 2 ดาว)</p>
      <p>คีย์ลัด: 1–5 แตะถาด · H คำใบ้ · Space ความเร็ว · R เริ่มใหม่</p>`,
       [

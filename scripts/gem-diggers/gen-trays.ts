@@ -38,6 +38,7 @@ const partOut = arg('out')
 const attemptsArg = arg('attempts')
 
 type Entry = { layout: TrayLayout; solution: number[] }
+const MIN_WIN_RATE = 0.12
 // What trays.ts held when this script was bundled, i.e. just before it ran.
 const existing: Record<string, Entry> = PREGENERATED_TRAYS
 
@@ -99,15 +100,19 @@ for (const mode of MODES) {
       ...rest.filter((_, k) => k % every === 0).slice(0, 6),
     ].map((c) => c.tray)
     candidates.push(plainTray(board, opt))
-    const runs = huge ? 24 : 40
+    const runs = huge ? 30 : 40
+    // Even the last levels must be beatable without +1 slot by a player who
+    // thinks a little: a tray that a non-planning player never wins feels
+    // impossible, however winnable it is on paper.
+    const target = Math.max(level.greedy, MIN_WIN_RATE)
     let best: (Entry & { rate: number }) | null = null
     for (const layout of candidates) {
       const solution = solveReal(level, seed, layout)
       if (!solution) continue
       const rate = realWinRate(level, seed, layout, runs, mulberry32(seed))
-      if (!best || Math.abs(rate - level.greedy) < Math.abs(best.rate - level.greedy))
+      if (!best || Math.abs(rate - target) < Math.abs(best.rate - target))
         best = { layout, solution, rate }
-      if (Math.abs(best.rate - level.greedy) <= 0.06) break
+      if (Math.abs(best.rate - target) <= 0.05) break
     }
     if (!best) {
       failed++
@@ -118,7 +123,7 @@ for (const mode of MODES) {
     const carts = best.layout.columns.flat()
     console.log(
       `${tag}: ${level.art[0].length}x${level.art.length}, ${carts.length} carts (biggest ${Math.max(...carts.map((c) => c.count))}), ` +
-        `no-planning win rate (real rules) ${(best.rate * 100).toFixed(0)}% (target ${Math.round(level.greedy * 100)}%), ` +
+        `no-planning win rate (real rules) ${(best.rate * 100).toFixed(0)}% (target ${Math.round(target * 100)}%), ` +
         `won in ${best.solution.length} taps, ${((performance.now() - t0) / 1000).toFixed(1)}s`
     )
     // Save as we go: the hard mode takes a while.

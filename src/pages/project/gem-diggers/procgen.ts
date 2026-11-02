@@ -138,14 +138,14 @@ export const ENDLESS_FROM = 17
  * Level for depth `n` (1-based, n >= ENDLESS_FROM). `variant` gives another
  * take on the same depth, used when a generated level turns out unwinnable.
  */
-export function makeLevel(n: number, variant = 0, mode: Mode = 'easy'): LevelDef {
+export function makeLevel(n: number, variant = 0, mode: Mode = 'medium'): LevelDef {
   const rng = mulberry32(n * 9973 + variant * 31337 + 7)
   const depth = n - ENDLESS_FROM // 0, 1, 2, ...
   const pick = <T>(xs: T[]) => xs[Math.floor(rng() * xs.length)]
   const randInt = (lo: number, hi: number) => lo + Math.floor(rng() * (hi - lo + 1))
 
   // Harder modes get bigger pictures, for room to fit more of everything.
-  const grow = mode === 'hard' ? 4 : mode === 'medium' ? 2 : 0
+  const grow = mode === 'hard' ? 4 : 2
   const W = Math.min(20 + grow, 14 + grow + Math.floor(depth / 3) * 2 + (rng() < 0.5 ? 0 : 2))
   const H = Math.min(22 + grow, W + randInt(-2, 2))
   const horizon = Math.round(H * (0.72 + rng() * 0.1))

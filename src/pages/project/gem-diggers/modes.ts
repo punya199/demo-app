@@ -1,18 +1,18 @@
-// Difficulty modes. Easy is the game as designed; medium and hard derive a
-// tougher version of every level from the same picture.
+// Difficulty modes, both derived from every level's picture: "medium" (shown as
+// easy: the plain designed game was dropped as too easy) and hard.
 
 import { BIG_PICTURES, IBigPicture } from './big-pictures'
 import type { LevelDef } from './levels'
 
-export type Mode = 'easy' | 'medium' | 'hard'
-export const MODES: Mode[] = ['easy', 'medium', 'hard']
-export const MODE_NAMES: Record<Mode, string> = { easy: 'ง่าย', medium: 'กลาง', hard: 'ยาก' }
+// Ids stay as they were so saved progress and pre-built trays still match.
+export type Mode = 'medium' | 'hard'
+export const MODES: Mode[] = ['medium', 'hard']
+export const MODE_NAMES: Record<Mode, string> = { medium: 'ง่าย', hard: 'ยาก' }
 
 export const MODE_INFO: Record<Mode, string> = {
-  easy: 'เกมแบบปกติ มีกรอบกระพริบบอกรถที่แตะแล้วขุดได้ทันที',
   medium:
-    'ไม่มีกรอบกระพริบบอกรถที่ควรแตะ · รถพ่วงต้องขุดครบ <b>ทั้งกลุ่ม</b> ถึงจะออกจากช่องรอ · บางด่านมีรถพ่วง 3 คัน · รถใหญ่ขึ้น',
-  hard: 'ทุกอย่างของโหมดกลาง + <b>ภาพใหญ่ราว 48×42 วาดละเอียด</b> · <b>รถ 5 แถว</b> ให้เลือกน้อยลง · <b>รถใหญ่สูงสุด 60 บล็อก</b> ที่เก็บรวดเดียวไม่ได้ ต้องขุดสีอื่นเปิดทางไปด้วย · แช่แข็งมากขึ้น',
+    'ภาพขนาดปกติ · รถพ่วงต้องขุดครบ <b>ทั้งกลุ่ม</b> ถึงจะออกจากช่องรอ · บางด่านมีรถพ่วง 3 คัน',
+  hard: 'ทุกอย่างของโหมดง่าย + <b>ภาพใหญ่ราว 48×42 วาดละเอียด</b> · <b>รถ 5 แถว</b> ให้เลือกน้อยลง · <b>รถใหญ่สูงสุด 60 บล็อก</b> ที่เก็บรวดเดียวไม่ได้ ต้องขุดสีอื่นเปิดทางไปด้วย · แช่แข็งมากขึ้น',
 }
 
 /** Every pixel becomes a k x k block. */
@@ -54,7 +54,6 @@ function bigPicture(def: LevelDef, big: IBigPicture) {
  * bigger ones). Endless pictures are drawn big instead.
  */
 export function applyMode(def: LevelDef, mode: Mode, enlarge = true): LevelDef {
-  if (mode === 'easy') return def
   const hard = mode === 'hard'
   const drawn = hard && enlarge ? BIG_PICTURES[def.name] : undefined
   const big = drawn ? bigPicture(def, drawn) : null

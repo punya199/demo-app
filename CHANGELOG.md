@@ -1,3 +1,10 @@
+## [1.27.1](https://github.com/punya199/demo-app/compare/v1.27.0...v1.27.1) (2026-11-02)
+
+
+### Fix
+
+* Gem Diggers hard levels too hard, endless hang and phone layout ([2e33caf](https://github.com/punya199/demo-app/commit/2e33caf89a4ee0bce99430d6e4ad78d47e25d4e2))
+
 # [1.27.0](https://github.com/punya199/demo-app/compare/v1.26.0...v1.27.0) (2026-11-01)
 
 

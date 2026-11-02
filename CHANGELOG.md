@@ -1,3 +1,10 @@
+# [1.29.0](https://github.com/punya199/demo-app/compare/v1.28.0...v1.29.0) (2026-11-02)
+
+
+### Update
+
+* Gem Diggers hard level 16 plays harder and tray picking avoids too-hard trays ([b6b2f32](https://github.com/punya199/demo-app/commit/b6b2f32017b532e7fa79322e35ab21fa66f50768))
+
 # [1.28.0](https://github.com/punya199/demo-app/compare/v1.27.1...v1.28.0) (2026-11-02)
 
 

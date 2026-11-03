@@ -1,5 +1,5 @@
 import { Button, Input, Popconfirm, Spin } from 'antd'
-import { PointerEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { PointerEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import {
   canAllocateAscendancyNode,
   canAllocatePassive,
@@ -12,6 +12,8 @@ import {
   searchPassiveNodes,
   sumPassiveEffects,
 } from './tamagotchi-helper'
+import { getNodeGlyph } from './passive-glyphs'
+import { PassiveGlyph } from './passive-icons'
 import { IPassiveNode, PassiveEffectKey } from './tamagotchi-interface'
 import {
   useGetPassive,
@@ -60,6 +62,9 @@ const FULL = 1400
 const MIN_SCALE = 0.7
 const MAX_SCALE = 5
 const DRAG_PIXELS = 6
+// A small node's glyph is this many units wide; it shows once that is at least this many pixels.
+const GLYPH_UNITS = 12
+const GLYPH_MIN_PX = 11
 
 const hexagon = (r: number) =>
   Array.from({ length: 6 }, (_, i) => {
@@ -243,6 +248,11 @@ export const PassivePanel = (props: IPassivePanelProps) => {
     setView((v) => ({ x: node.x, y: node.y, scale: Math.max(v.scale, 2) }))
   }
 
+  // Frames show the kind at every zoom; the glyph inside only once it would be big enough to read
+  // (about 11px on screen), so a zoomed-out tree stays light.
+  const pxPerUnit = (svgRef.current?.clientWidth ?? 560) / size
+  const showGlyphs = GLYPH_UNITS * pxPerUnit >= GLYPH_MIN_PX
+
   const nodeShape = (
     node: IPassiveNode,
     on: boolean,
@@ -258,19 +268,64 @@ export const PassivePanel = (props: IPassivePanelProps) => {
       fill: on ? color : undefined,
       className: `${on ? '' : 'fill-white dark:fill-slate-900'} ${on || reachable ? '' : 'stroke-slate-300 dark:stroke-slate-600'}`,
     }
+    const glyph = showGlyphs ? getNodeGlyph(node, masteries[node.id]) : null
+    const ink = on ? '#14121a' : reachable ? color : undefined
+    const inkClass = on || reachable ? undefined : 'text-slate-400 dark:text-slate-600'
+    const halo = reachable ? 15 : 0
+    const draw = (frame: ReactNode, size: number) => (
+      <>
+        {halo > 0 && (
+          <circle
+            r={halo + (node.kind === 'key' ? 8 : 0)}
+            fill={color}
+            opacity={0.22}
+            className="motion-safe:animate-pulse"
+          />
+        )}
+        {frame}
+        {glyph && <PassiveGlyph glyph={glyph.main} size={size} stroke={ink} className={inkClass} />}
+        {glyph?.second && (
+          <>
+            <circle
+              cx={10}
+              cy={-10}
+              r={5.5}
+              className="fill-white dark:fill-slate-900"
+              stroke={color}
+            />
+            <PassiveGlyph glyph={glyph.second} x={10} y={-10} size={7} stroke={color} />
+          </>
+        )}
+        {glyph?.drawback && (
+          <>
+            <circle
+              cx={14}
+              cy={14}
+              r={7}
+              className="fill-white dark:fill-slate-900"
+              stroke="#e5484d"
+            />
+            <PassiveGlyph glyph={glyph.drawback} x={14} y={14} size={9} stroke="#e5484d" />
+          </>
+        )}
+      </>
+    )
     if (node.kind === 'key') {
-      return <polygon points={hexagon(17)} {...common} />
+      return draw(<polygon points={hexagon(19)} {...common} />, 20)
     }
     if (node.kind === 'mastery') {
-      return <rect x={-11} y={-11} width={22} height={22} rx={6} {...common} />
+      return draw(<rect x={-12} y={-12} width={24} height={24} rx={7} {...common} />, 16)
     }
     if (node.kind === 'ascend') {
-      return <polygon points={star(13)} {...common} />
+      return draw(<polygon points={star(15)} {...common} />, 12)
     }
     if (node.kind === 'notable') {
-      return <rect x={-9} y={-9} width={18} height={18} transform="rotate(45)" {...common} />
+      return draw(
+        <rect x={-10.5} y={-10.5} width={21} height={21} transform="rotate(45)" {...common} />,
+        GLYPH_UNITS
+      )
     }
-    return <circle r={8} {...common} />
+    return draw(<circle r={10} {...common} />, GLYPH_UNITS)
   }
 
   return (

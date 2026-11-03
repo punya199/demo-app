@@ -228,6 +228,8 @@ export interface IEquipmentItem {
   mainValue: number
   subStats: Partial<Record<StatKey, number>>
   specialOptions: ISpecialOption[]
+  // A refine roll waiting to be kept or discarded.
+  pendingRefine: { key: StatKey; value: number } | null
   // The youngest form that may wear it (null = any).
   minStage: EnumMonsterStage | null
   stats: IBattleStats
@@ -454,6 +456,7 @@ export interface IWorldBossReward {
   raidToken: number
   bossToken: number
   pieceGrade: EnumEquipmentGrade | null
+  refineStones: Record<string, number>
 }
 
 export interface IWorldBossStatus {
@@ -559,6 +562,8 @@ export interface IRaidBattleResponse {
   isFirstClear: boolean
   raidTokens: number
   bossTokens: number
+  // The refine stone a win dropped (null on a loss or on Normal).
+  refineStone: string | null
   drop: IEquipmentItem | null
   attemptsLeft: number
   resetsAt: string
@@ -810,6 +815,8 @@ export interface IWikiData {
     dropChancePercent: number
     dropGradeRatesByArea: Record<string, Partial<Record<EnumEquipmentGrade, number>>>
     dismantleStones: Record<EnumEquipmentGrade, number>
+    dismantleStoneLevelStep: number
+    refineTiers: { material: string; name: string; maxLevel: number; coin: number }[]
     materials: {
       id: string
       name: string
@@ -886,6 +893,7 @@ export interface IWikiData {
       bossToken: number
       pieceChance: number
       pieceGrade: EnumEquipmentGrade
+      refineStones: Record<string, number>
     }[]
   }
   raid: {
@@ -900,6 +908,7 @@ export interface IWikiData {
       minStage: EnumMonsterStage
       grade: EnumEquipmentGrade
       raidTokens: number
+      refineStone: string | null
     }[]
     setEnhanceThreshold: number
     setEnhanceMultiplier: number

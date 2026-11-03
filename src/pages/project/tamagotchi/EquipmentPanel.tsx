@@ -1,6 +1,7 @@
 import { Button, Card, Checkbox, Popconfirm, Segmented, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { EnhanceModal } from './EnhanceModal'
+import { RefineModal } from './RefineModal'
 import { CompareLine, ItemLine } from './EquipmentParts'
 import {
   BagFilterSlot,
@@ -43,6 +44,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
   const { mutate: dismantleMany, isPending: isDismantlingMany } = useDismantleMany()
   const [selected, setSelected] = useState<string[] | null>(null)
   const [enhancing, setEnhancing] = useState<IEquipmentItem | null>(null)
+  const [refiningId, setRefiningId] = useState<string | null>(null)
   const [bagSlot, setBagSlot] = useState<BagFilterSlot>('all')
   const [freeOnly, setFreeOnly] = useState(false)
 
@@ -129,6 +131,11 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
                     <Button size="small" onClick={() => setEnhancing(item)}>
                       ตีบวก
                     </Button>
+                    {Object.keys(item.subStats).length > 0 && (
+                      <Button size="small" onClick={() => setRefiningId(item.id)}>
+                        รีไฟน์{item.pendingRefine ? ' (รอเลือก)' : ''}
+                      </Button>
+                    )}
                     <Tooltip title={getEquipBlocker(monster)}>
                       <Button
                         size="small"
@@ -287,6 +294,11 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
               <Button size="small" onClick={() => setEnhancing(item)}>
                 ตีบวก
               </Button>
+              {Object.keys(item.subStats).length > 0 && (
+                <Button size="small" onClick={() => setRefiningId(item.id)}>
+                  รีไฟน์{item.pendingRefine ? ' (รอเลือก)' : ''}
+                </Button>
+              )}
               <Popconfirm
                 title="แยกชิ้นส่วนเป็นหินตีบวก?"
                 description="อุปกรณ์ชิ้นนี้จะหายไป"
@@ -305,6 +317,12 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
           </Card>
         )
       })}
+      <RefineModal
+        item={data.items.find((row) => row.id === refiningId) ?? null}
+        coin={coin}
+        onClose={() => setRefiningId(null)}
+        onError={onError}
+      />
       <EnhanceModal
         item={enhancing}
         coin={coin}

@@ -14,7 +14,6 @@ export interface CartSpec {
   count: number
   hidden?: boolean // color unknown until it reaches the front
   links?: [number, number][] // [column, index] of the other carts chained to this one: all go together
-  frozen?: number // can't be tapped until this many carts have finished
 }
 
 export interface TrayLayout {
@@ -162,22 +161,10 @@ function addLinks(tray: TrayLayout, pairs: number, triples: number, rng: () => n
         ])
       }
       const carts = members.map(([col, idx]) => cols[col][idx])
-      if (carts.some((cart) => !cart || cart.links || cart.frozen)) continue
+      if (carts.some((cart) => !cart || cart.links)) continue
       carts.forEach((cart, k) => (cart.links = members.filter((_, j) => j !== k)))
       break
     }
-  }
-}
-
-/** Freeze some carts near the front: each thaws once enough other carts have finished. */
-function addFrozen(tray: TrayLayout, count: number, rng: () => number) {
-  for (let made = 0, tries = 0; made < count && tries < 200; tries++) {
-    const col = tray.columns[Math.floor(rng() * tray.columns.length)]
-    const i = Math.floor(rng() * Math.min(col.length, 3))
-    const cart = col[i]
-    if (!cart || cart.links || cart.frozen) continue
-    cart.frozen = randInt(rng, 2 + i, 5 + i * 2)
-    made++
   }
 }
 
@@ -198,22 +185,20 @@ export function capMystery(tray: TrayLayout, rng: () => number) {
 
 /**
  * Tap options from the current fronts: a single cart, or a chained group whose
- * other members are all at the front too. `done` = carts finished so far
- * (thaws frozen ones).
+ * other members are all at the front too.
  */
-export function frontMoves(tray: TrayLayout, ptr: number[], done: number): number[][] {
+export function frontMoves(tray: TrayLayout, ptr: number[]): number[][] {
   const moves: number[][] = []
-  const thawed = (c: CartSpec) => (c.frozen ?? 0) <= done
   tray.columns.forEach((col, c) => {
     const cart = col[ptr[c]]
-    if (!cart || !thawed(cart)) return
+    if (!cart) return
     if (!cart.links) {
       moves.push([c])
       return
     }
     // List each group once, from its leftmost column.
     if (cart.links.some(([lc]) => lc < c)) return
-    if (cart.links.every(([lc, li]) => ptr[lc] === li && thawed(tray.columns[lc][li]))) {
+    if (cart.links.every(([lc, li]) => ptr[lc] === li)) {
       moves.push([c, ...cart.links.map(([lc]) => lc)])
     }
   })
@@ -246,8 +231,6 @@ export function settle(b: Board, slots: SimSlot[], together = false): SimSlot[] 
     together && s.group !== undefined && slots.some((o) => o.group === s.group && o.left > 0)
   return slots.filter((s) => s.left > 0 || waiting(s))
 }
-
-const finished = (ptr: number[], slots: SimSlot[]) => ptr.reduce((a, b) => a + b, 0) - slots.length
 
 let nextGroup = 1
 
@@ -289,7 +272,7 @@ export function solvable(
     seen.add(key)
 
     const open = new Set(reachableColors(b))
-    const moves = frontMoves(tray, ptr, finished(ptr, slots))
+    const moves = frontMoves(tray, ptr)
       .filter((m) => slots.length + m.length <= rules.slots)
       .map((m) => ({ m, useful: m.some((c) => open.has(tray.columns[c][ptr[c]].color)) }))
       .sort((a, z) => Number(z.useful) - Number(a.useful))
@@ -323,7 +306,7 @@ export function greedyWinRate(
   for (let r = 0; r < runs; r++) {
     let state = { b: cloneBoard(board), ptr: tray.columns.map(() => 0), slots: [] as SimSlot[] }
     while (gemsLeft(state.b) > 0) {
-      let moves = frontMoves(tray, state.ptr, finished(state.ptr, state.slots)).filter(
+      let moves = frontMoves(tray, state.ptr).filter(
         (m) => state.slots.length + m.length <= rules.slots
       )
       if (!moves.length) break
@@ -356,7 +339,6 @@ export interface GenOptions extends PlayRules {
   links: number // chained pairs
   triples?: number // chained groups of three
   mystery: number // share of non-front carts with hidden color (0..1)
-  frozen: number // frozen carts
   greedyTarget: number // desired greedyWinRate: 1 = trivial, ~0.3 = needs real planning
   attempts?: number // candidates to try (more = closer to the target, slower)
   greedyRuns?: number // games sampled per candidate when estimating difficulty
@@ -396,7 +378,6 @@ export function generateCandidates(
     const carts = shuffleNearby(cut(board, rng, opt), rng, drift)
     const tray = deal(carts, opt.columns, rng)
     addLinks(tray, opt.links, opt.triples ?? 0, rng)
-    addFrozen(tray, opt.frozen, rng)
     if (!solvable(board, tray, opt, opt.solverBudget)) continue
     addMystery(tray, opt.mystery, rng)
     const gap = Math.abs(

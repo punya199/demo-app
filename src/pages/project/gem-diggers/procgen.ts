@@ -290,7 +290,6 @@ export function makeLevel(n: number, variant = 0, mode: Mode = 'medium'): LevelD
     shuffle: 16 + Math.min(8, depth),
     links: Math.min(6, 3 + Math.floor(depth / 3)),
     mystery: Math.min(0.5, 0.35 + depth * 0.01),
-    frozen: Math.min(5, 2 + Math.floor(depth / 3)),
     armored: rng() < 0.45 ? 'o' : undefined,
     dark: depth % 3 === 2,
     greedy: Math.max(0.2, 0.4 - depth * 0.01),

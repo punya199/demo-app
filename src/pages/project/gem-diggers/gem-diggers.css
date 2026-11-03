@@ -235,6 +235,23 @@
   display: block;
 }
 
+.gem-diggers .thumb.photo {
+  image-rendering: auto;
+  width: min(280px, 70vw);
+}
+
+.gem-diggers .thumb.photo.big {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+}
+
+.gem-diggers .level-card canvas.photo {
+  image-rendering: auto;
+  border-radius: 6px;
+}
+
 .gem-diggers .stars {
   font-size: 30px;
   letter-spacing: 4px;

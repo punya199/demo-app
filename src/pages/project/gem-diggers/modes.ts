@@ -12,7 +12,7 @@ export const MODE_NAMES: Record<Mode, string> = { medium: 'ง่าย', hard: 
 export const MODE_INFO: Record<Mode, string> = {
   medium:
     'ภาพขนาดปกติ · รถพ่วงต้องขุดครบ <b>ทั้งกลุ่ม</b> ถึงจะออกจากช่องรอ · บางด่านมีรถพ่วง 3 คัน',
-  hard: 'ทุกอย่างของโหมดง่าย + <b>ภาพใหญ่ราว 48×42 วาดละเอียด</b> · <b>รถ 5 แถว</b> ให้เลือกน้อยลง · <b>รถใหญ่สูงสุด 60 บล็อก</b> ที่เก็บรวดเดียวไม่ได้ ต้องขุดสีอื่นเปิดทางไปด้วย · แช่แข็งมากขึ้น',
+  hard: 'ทุกอย่างของโหมดง่าย + <b>ภาพใหญ่ราว 48×42 วาดละเอียด</b> · <b>รถ 5 แถว</b> ให้เลือกน้อยลง · <b>รถใหญ่สูงสุด 60 บล็อก</b> ที่เก็บรวดเดียวไม่ได้ ต้องขุดสีอื่นเปิดทางไปด้วย',
 }
 
 /** Every pixel becomes a k x k block. */
@@ -96,12 +96,11 @@ export function applyMode(def: LevelDef, mode: Mode, enlarge = true): LevelDef {
       : hard
         ? [def.cart[0] + 3, def.cart[1] + 10]
         : [def.cart[0] + 2, def.cart[1] + 6],
-    // Five columns leave room for triple chains and extra frozen carts. The
+    // Five columns leave room for triple chains. The
     // hand-drawn big pictures keep chains few: fewer columns already make them hard.
     columns: Math.max(def.columns, hard ? 5 : 3),
     links: big ? 2 : Math.max(def.links, hard ? 2 : 1),
     triples: big ? 1 : hard ? 2 : def.links >= 3 ? 1 : 0,
-    frozen: hard ? (def.frozen ?? 0) + 2 : def.frozen,
     mystery: Math.min(0.6, def.mystery + (hard ? 0.15 : 0.05)),
     shuffle: def.shuffle * (hard ? 1.5 : 1.2),
     greedy: Math.max(hard ? 0.05 : 0.1, def.greedy - (hard ? 0.25 : 0.12)),

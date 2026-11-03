@@ -11,6 +11,8 @@ import { GEN_VERSION, TrayLayout } from './generator'
 import type { HintReply, HintRequest } from './hint-worker'
 import { LEVELS, LevelDef } from './levels'
 import { MODES, MODE_INFO, MODE_NAMES, Mode, applyMode } from './modes'
+import { PHOTO_ASSETS } from './photo-assets'
+import { PHOTO_LEVELS, PHOTO_SEED } from './photo-levels'
 import { ENDLESS_FROM, PROCGEN_VERSION } from './procgen'
 import { Renderer, drawThumbnail } from './render'
 import { setMuted, sfx } from './sfx'
@@ -31,9 +33,14 @@ interface Save extends Partial<Progress> {
   seenHelp: boolean
   seenIntro: number[] // levels whose new-mechanic intro was shown
   seenModes: Mode[] // modes whose rules were explained
+  photoStars: number[] // photo levels (a mode of their own, outside easy/hard)
+  seenPhoto: boolean // photo mode was explained
 }
 
 const SAVE_KEY = 'gem-diggers-save-v1'
+// Photo levels play by their own rules: they are not shaped by the easy/hard mode.
+const PHOTO_INFO =
+  'ภาพจากรูปถ่ายจริง <b>100×88 = 8,800 บล็อก</b> สีใกล้กันมาก · <b>แตะบล็อกบนภาพ</b> รถสีเดียวกันจะกะพริบขอบ · ขุดหมดแล้วได้เห็นรูปจริง'
 // Testing: every level is playable from the level menu. Set to false to unlock levels one by one again.
 const UNLOCK_ALL = true
 export function mountGemDiggers(): () => void {
@@ -48,6 +55,8 @@ export function mountGemDiggers(): () => void {
     seenHelp: false,
     seenIntro: [],
     seenModes: [],
+    photoStars: [],
+    seenPhoto: false,
   }
   try {
     Object.assign(save, JSON.parse(localStorage.getItem(SAVE_KEY) ?? '{}'))
@@ -96,6 +105,8 @@ export function mountGemDiggers(): () => void {
   // What is being played: a hand-made level (tray from trays.json) or an endless one (tray built in a worker).
   let current: { def: LevelDef; seed: number; layout?: TrayLayout } | null = null
   let currentMode: Mode = save.mode // the mode the level on screen was started in
+  let photoIndex: number | null = null // the photo level being played, or null for a numbered one
+  let photo: HTMLImageElement | null = null // its real photo, loaded ahead for the win
   let game: Game | null = null
   let renderer: Renderer | null = null
   let speed = 1
@@ -273,8 +284,15 @@ export function mountGemDiggers(): () => void {
       await new Promise((r) => setTimeout(r, 30))
     }
     if (token !== startToken || disposed) return
+    photoIndex = null
     current = next
     currentMode = save.mode
+    play(next)
+    prefetchNext(index)
+  }
+
+  /** Sets up the game and screen for a level, numbered or photo. */
+  function play(next: { def: LevelDef; seed: number; layout?: TrayLayout }) {
     game = new Game(next.def, next.seed, next.layout)
     usedBooster = false
     clearHint()
@@ -284,15 +302,37 @@ export function mountGemDiggers(): () => void {
     renderer.resize(stage.clientWidth, stage.clientHeight)
     hidePanel()
     updateHud()
-    prefetchNext(index)
     if (!save.seenHelp) showHelp()
     else showIntro()
+  }
+
+  async function startPhoto(index: number) {
+    const token = ++startToken
+    const def = PHOTO_LEVELS[index]
+    showPanel(`<h2>⛏️ กำลังเตรียมเหมือง…</h2><p>โหมดพิเศษ: ${def.name}</p>`)
+    // The photo only shows at the end, but load it now so it is there in time.
+    photo = new Image()
+    photo.src = PHOTO_ASSETS[def.name]?.src ?? ''
+    await new Promise((r) => setTimeout(r, 30))
+    if (token !== startToken || disposed) return
+    photoIndex = index
+    current = { def, seed: PHOTO_SEED + index }
+    play(current)
+  }
+
+  /** Start the level on screen again. */
+  function restart() {
+    if (photoIndex !== null) startPhoto(photoIndex)
+    else startLevel(levelIndex)
   }
 
   function updateHud() {
     if (!game) return
     const mode = save.mode === 'hard' ? `[${MODE_NAMES[save.mode]}] ` : ''
-    levelName.textContent = `${mode}${levelLabel(levelIndex)}: ${game.level.name}`
+    levelName.textContent =
+      photoIndex !== null
+        ? `โหมดพิเศษ: ${game.level.name}`
+        : `${mode}${levelLabel(levelIndex)}: ${game.level.name}`
     slotCount.textContent = `×${save.slotBoosters}`
     btnSlot.disabled =
       save.slotBoosters <= 0 || game.slots.length >= MAX_SLOTS || game.status === 'won'
@@ -380,8 +420,68 @@ export function mountGemDiggers(): () => void {
     return [1, 2, 3].map((i) => (i <= n ? '★' : '<span class="off">★</span>')).join('')
   }
 
+  function showPhotoWin() {
+    if (!game || photoIndex === null) return
+    const index = photoIndex
+    const stars = usedBooster ? 2 : 3
+    save.photoStars[index] = Math.max(save.photoStars[index] ?? 0, stars)
+    persist()
+    updateHud()
+    const more = index + 1 < PHOTO_LEVELS.length
+    showPanel(
+      `<h2>ขุดสำเร็จ! 🎉</h2><div class="stars">${starsHtml(stars)}</div>
+     <div id="win-thumb"></div>
+     <p>นี่คือภาพจริงของ “${game.level.name}”<br>ดูอีกครั้งได้ที่เมนู ☰ › โหมดพิเศษ</p>`,
+      [
+        { label: 'เล่นอีกครั้ง', onClick: () => startPhoto(index) },
+        more
+          ? { label: 'ภาพต่อไป ▶', primary: true, onClick: () => startPhoto(index + 1) }
+          : { label: 'เลือกด่าน', primary: true, onClick: () => showLevels(true) },
+      ]
+    )
+    $('win-thumb').appendChild(photoView(game.level.name, 600, 'thumb photo'))
+  }
+
+  const photoImages = new Map<string, HTMLImageElement>()
+
+  /** The part of a level's real photo its picture was made from, drawn once the photo loads. */
+  function photoView(name: string, width: number, className: string): HTMLCanvasElement {
+    const c = document.createElement('canvas')
+    c.className = className
+    const asset = PHOTO_ASSETS[name]
+    if (!asset) return c
+    const [sx, sy, sw, sh] = asset.crop
+    c.width = width
+    c.height = Math.round((width * sh) / sw)
+    let img = photoImages.get(name)
+    if (!img) {
+      img = new Image()
+      img.src = asset.src
+      photoImages.set(name, img)
+    }
+    const draw = (i: HTMLImageElement) =>
+      c.getContext('2d')!.drawImage(i, sx, sy, sw, sh, 0, 0, c.width, c.height)
+    if (img.complete && img.naturalWidth) draw(img)
+    else img.addEventListener('load', () => draw(img), { once: true })
+    return c
+  }
+
+  /** A won special-mode level's real photo, opened from the level menu. */
+  function showPhotoViewer(index: number) {
+    const lv = PHOTO_LEVELS[index]
+    showPanel(
+      `<h2>${lv.name}</h2><div class="stars">${starsHtml(save.photoStars[index] ?? 0)}</div><div id="photo-view"></div>`,
+      [
+        { label: '◀ กลับ', onClick: () => showLevels(true) },
+        { label: 'เล่นอีกครั้ง', primary: true, onClick: () => startPhoto(index) },
+      ]
+    )
+    $('photo-view').appendChild(photoView(lv.name, 900, 'thumb photo big'))
+  }
+
   function showWin() {
     if (!game) return
+    if (photoIndex !== null) return showPhotoWin()
     const stars = usedBooster ? 2 : 3
     const p = prog()
     const first = !p.stars[levelIndex]
@@ -423,7 +523,7 @@ export function mountGemDiggers(): () => void {
      <p>รถเหมืองทุกคันในช่องรอขุดต่อไม่ได้ เพราะอัญมณีสีนั้นยังถูกหินสีอื่นบังอยู่</p>
      <p>เคล็ดลับ: ขุดสีที่อยู่ข้างล่างก่อน และเก็บช่องว่างไว้อย่างน้อย 1 ช่อง</p>`,
       [
-        { label: 'เริ่มใหม่', onClick: () => startLevel(levelIndex) },
+        { label: 'เริ่มใหม่', onClick: restart },
         {
           label: `ใช้ +1 ช่อง (เหลือ ${save.slotBoosters})`,
           primary: true,
@@ -446,8 +546,9 @@ export function mountGemDiggers(): () => void {
        <li>นักขุดสีเดียวกับรถจะเดินรอบภาพ ไปขุดอัญมณีสีนั้นที่ <b>เดินไปถึง</b> คือช่องที่อยู่ขอบภาพ หรือติดกับอุโมงค์ที่ขุดแล้ว</li>
        <li>ตัวเลขบนรถ = จำนวนที่ต้องขุด ครบแล้วรถออก ช่องว่างคืน</li>
        <li>🔗 รถพ่วงต้องไปพร้อมกัน · ❓ รถปริศนาเผยสีเมื่อขึ้นหน้าสุด · 🔒 ห้องลับเปิดเมื่อขุดสีกุญแจครบ · 🪨 หินขุดไม่ได้</li>
-       <li>🧊 รถแช่แข็งรอรถอื่นเสร็จก่อน · 💎 อัญมณีหุ้มหินต้องขุด 2 ครั้ง · 🌑 เหมืองมืดเห็นสีเฉพาะช่องที่ขุดถึง</li>
+       <li>💎 อัญมณีหุ้มหินต้องขุด 2 ครั้ง · 🌑 เหมืองมืดเห็นสีเฉพาะช่องที่ขุดถึง</li>
        <li>ขุดภาพจนหมด = ชนะ · ช่องรอเต็มแล้วไม่มีใครขุดต่อได้ = แพ้</li>
+       <li>👆 แตะบล็อกบนภาพ รถสีเดียวกันจะกะพริบขอบ (ช่วยแยกสีที่คล้ายกัน)</li>
      </ol>
      <p>เลือกความยาก ง่าย / ยาก ได้ที่เมนู ☰ (ความคืบหน้าแยกกันแต่ละโหมด)</p>
      <p>💡 คำใบ้: บอกแถวที่ควรแตะต่อ (ใช้แล้วได้สูงสุด 2 ดาว)</p>
@@ -467,6 +568,15 @@ export function mountGemDiggers(): () => void {
 
   /** First time a level brings in a new mechanic (or a harder mode is tried), explain it. */
   function showIntro() {
+    if (photoIndex !== null) {
+      if (save.seenPhoto) return
+      save.seenPhoto = true
+      persist()
+      showPanel(`<h2>✨ โหมดพิเศษ</h2><p>${PHOTO_INFO}</p>`, [
+        { label: 'เข้าใจแล้ว', primary: true, onClick: hidePanel },
+      ])
+      return
+    }
     if (!save.seenModes.includes(save.mode)) {
       save.seenModes.push(save.mode)
       persist()
@@ -491,14 +601,17 @@ export function mountGemDiggers(): () => void {
     ])
   }
 
-  function showLevels() {
+  function showLevels(photos = photoIndex !== null) {
     showPanel(
-      `<h2>เลือกด่าน</h2><div class="mode-picker" id="mode-picker"></div><p class="mode-info">${MODE_INFO[save.mode]}</p><div class="level-grid" id="level-grid"></div>`,
+      `<h2>เลือกด่าน</h2><div class="mode-picker" id="mode-picker"></div><p class="mode-info">${photos ? PHOTO_INFO : MODE_INFO[save.mode]}</p><div class="level-grid" id="level-grid"></div>`,
       [
         // After switching modes, closing the menu restarts the level in the new mode.
         {
           label: 'ปิด',
-          onClick: () => (game && currentMode === save.mode ? hidePanel() : startLevel(levelIndex)),
+          onClick: () =>
+            game && (photoIndex !== null || currentMode === save.mode)
+              ? hidePanel()
+              : startLevel(levelIndex),
         },
       ]
     )
@@ -506,16 +619,39 @@ export function mountGemDiggers(): () => void {
     for (const m of MODES) {
       const b = document.createElement('button')
       b.textContent = MODE_NAMES[m]
-      b.className = m === save.mode ? 'primary' : ''
+      b.className = !photos && m === save.mode ? 'primary' : ''
       b.onclick = () => {
-        if (m === save.mode) return
         save.mode = m
         persist()
-        showLevels()
+        showLevels(false)
       }
       picker.appendChild(b)
     }
+    // Photo levels: a mode of their own, shown in place of the numbered levels.
+    const photoTab = document.createElement('button')
+    photoTab.textContent = 'โหมดพิเศษ'
+    photoTab.className = photos ? 'primary' : ''
+    photoTab.onclick = () => showLevels(true)
+    picker.appendChild(photoTab)
     const grid = $('level-grid')
+    if (photos) {
+      PHOTO_LEVELS.forEach((lv, i) => {
+        const card = document.createElement('button')
+        card.className = 'level-card' + (i === photoIndex ? ' current' : '')
+        const stars = save.photoStars[i] ?? 0
+        // Won: the card shows the real photo and opens it (with a button to play again).
+        card.appendChild(stars ? photoView(lv.name, 160, 'photo') : thumbnail(lv, true))
+        const label = document.createElement('div')
+        label.textContent = lv.name
+        card.appendChild(label)
+        const s = document.createElement('small')
+        s.innerHTML = stars ? `${'★'.repeat(stars)} · ดูรูป` : '&nbsp;'
+        card.appendChild(s)
+        card.onclick = () => (stars ? showPhotoViewer(i) : startPhoto(i))
+        grid.appendChild(card)
+      })
+      return
+    }
     LEVELS.forEach((lv, i) => {
       const card = document.createElement('button')
       card.className = 'level-card' + (i === levelIndex ? ' current' : '')
@@ -572,7 +708,11 @@ export function mountGemDiggers(): () => void {
         break
       case 'won':
         sfx.win()
-        timers.push(window.setTimeout(showWin, 700))
+        // Photo levels first fade the real photo in where the blocks were.
+        if (photoIndex !== null && photo) {
+          renderer?.showPhoto(photo, PHOTO_ASSETS[game!.level.name]?.crop ?? [0, 0, 1, 1])
+          timers.push(window.setTimeout(showWin, 2600))
+        } else timers.push(window.setTimeout(showWin, 700))
         break
       case 'lost':
         sfx.lose()
@@ -591,8 +731,18 @@ export function mountGemDiggers(): () => void {
   const onPointer = (e: PointerEvent) => {
     if (!renderer) return
     const rect = canvas.getBoundingClientRect()
-    const col = renderer.hitTray(e.clientX - rect.left, e.clientY - rect.top)
-    if (col >= 0) tapColumn(col)
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const col = renderer.hitTray(x, y)
+    if (col >= 0) {
+      tapColumn(col)
+      return
+    }
+    // A block on the picture: flash the carts of its color (colors can be hard to tell apart).
+    if (!game || game.status !== 'playing' || !overlay.hidden) return
+    const color = renderer.flashAt(x, y)
+    if (color >= 0 && !renderer.cartShown(color))
+      showToast('ยังไม่มีรถสีนี้ในช่องรอหรือ 3 แถวหน้า', 2000)
   }
   canvas.addEventListener('pointerdown', onPointer)
 
@@ -600,7 +750,7 @@ export function mountGemDiggers(): () => void {
     // Leave typing in other inputs alone.
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
     if (e.key >= '1' && e.key <= '9') tapColumn(Number(e.key) - 1)
-    else if (e.key === 'r' || e.key === 'R') startLevel(levelIndex)
+    else if (e.key === 'r' || e.key === 'R') restart()
     else if (e.key === 'h' || e.key === 'H') requestHint()
     else if (e.key === ' ') {
       e.preventDefault()
@@ -609,8 +759,8 @@ export function mountGemDiggers(): () => void {
   }
   window.addEventListener('keydown', onKey)
 
-  $('btn-levels').onclick = showLevels
-  $('btn-restart').onclick = () => startLevel(levelIndex)
+  $('btn-levels').onclick = () => showLevels()
+  $('btn-restart').onclick = restart
   $('btn-help').onclick = showHelp
   $('btn-hint').onclick = requestHint
   btnSlot.onclick = () => {
@@ -661,6 +811,7 @@ export function mountGemDiggers(): () => void {
         },
         tap: tapColumn,
         start: startLevel,
+        startPhoto,
         step(seconds: number) {
           for (let t = 0; t < seconds; t += 0.05) tick(0.05)
         },

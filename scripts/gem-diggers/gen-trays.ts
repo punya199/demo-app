@@ -14,7 +14,8 @@
 // --attempts=N tries more candidates when a level comes out off target;
 // --target=0.15 overrides the win rate aimed for (when a level plays too easy
 // or too hard by hand); --shortlist=N measures N candidates with the real
-// rules instead of 12, for more choice at a slower pace.
+// rules instead of 12, for more choice at a slower pace. Photo levels
+// (photo-levels.ts) come last; --mode=photo makes just those (~10-20 min).
 
 /* eslint-disable no-console -- a command-line tool: printing progress is its job */
 import { writeFileSync } from 'node:fs'
@@ -28,6 +29,7 @@ import {
 } from '../../src/pages/project/gem-diggers/generator'
 import { LEVELS } from '../../src/pages/project/gem-diggers/levels'
 import { MODES, MODE_NAMES, applyMode } from '../../src/pages/project/gem-diggers/modes'
+import { PHOTO_LEVELS, PHOTO_SEED } from '../../src/pages/project/gem-diggers/photo-levels'
 import { PREGENERATED_TRAYS } from '../../src/pages/project/gem-diggers/trays'
 import { realWinRate, solveReal } from '../../src/pages/project/gem-diggers/verify'
 
@@ -72,79 +74,92 @@ function traysModule(trays: Record<string, Entry>): string {
 const out: Record<string, Entry> = {}
 const fresh: Record<string, Entry> = {} // generated in this run
 let failed = 0
-for (const mode of MODES) {
-  LEVELS.forEach((base, i) => {
-    const level = applyMode(base, mode)
-    const tag = `[${MODE_NAMES[mode]}] ${String(i + 1).padStart(2)} ${level.name}`
-    const seed = i + 1
-    const key = trayKey(level, seed)
-    if (
-      (!all && existing[key]) ||
-      (only && only !== mode) ||
-      (pickLevels && !pickLevels.includes(i + 1))
-    ) {
-      if (existing[key]) out[key] = existing[key]
-      return
-    }
-    const { board } = buildBoard(level)
-    const t0 = performance.now()
-    // Big maps cost far more per candidate, so try fewer of them.
-    const huge = level.art.length * level.art[0].length > 800
-    const attempts = attemptsArg ? Number(attemptsArg) : huge ? 40 : 200
-    // Even the last levels must be beatable without +1 slot by a player who
-    // thinks a little: a tray that a non-planning player never wins feels
-    // impossible, however winnable it is on paper.
-    const target = Math.max(targetArg ? Number(targetArg) : level.greedy, MIN_WIN_RATE)
-    const opt = {
-      ...trayOptions(level, seed),
-      greedyTarget: target, // search around the floor too, or every candidate is too hard
-      attempts,
-      greedyRuns: huge ? 24 : 60,
-    }
-    // The search's quick model of play digs in a different order than the real
-    // game, so how hard a tray really is can be far off its estimate (big hard
-    // pictures came out unwinnable for players who don't plan). Measure a spread
-    // of candidates with the real rules: the model's picks plus easier and
-    // harder ones, and keep the winnable one truly closest to the target.
-    const half = shortlistArg ? Math.ceil(Number(shortlistArg) / 2) : 6
-    const found = generateCandidates(board, opt, half * 2)
-    const rest = found.slice(half)
-    const every = Math.max(1, Math.floor(rest.length / half))
-    const candidates = [
-      ...found.slice(0, half),
-      ...rest.filter((_, k) => k % every === 0).slice(0, half),
-    ].map((c) => c.tray)
-    candidates.push(plainTray(board, opt))
-    const runs = huge ? 30 : 40
-    // The rate is measured on a few dozen games, so it can easily read a few
-    // points high: coming out harder than the target counts three times as bad
-    // as coming out easier, and only a tray at or above the target ends the search.
-    const miss = (rate: number) => (rate < target ? (target - rate) * 3 : rate - target)
-    let best: (Entry & { rate: number }) | null = null
-    for (const layout of candidates) {
-      const solution = solveReal(level, seed, layout)
-      if (!solution) continue
-      const rate = realWinRate(level, seed, layout, runs, mulberry32(seed))
-      if (!best || miss(rate) < miss(best.rate)) best = { layout, solution, rate }
-      if (best.rate >= target && best.rate - target <= 0.06) break
-    }
-    if (!best) {
-      failed++
-      console.log(`${tag}: ERROR no tray the real game can win (${candidates.length} tried)`)
-      return
-    }
-    out[key] = fresh[key] = { layout: best.layout, solution: best.solution }
-    const carts = best.layout.columns.flat()
-    console.log(
-      `${tag}: ${level.art[0].length}x${level.art.length}, ${carts.length} carts (biggest ${Math.max(...carts.map((c) => c.count))}), ` +
-        `no-planning win rate (real rules) ${(best.rate * 100).toFixed(0)}% (target ${Math.round(target * 100)}%), ` +
-        `won in ${best.solution.length} taps, ${((performance.now() - t0) / 1000).toFixed(1)}s`
-    )
-    // Save as we go: the hard mode takes a while.
-    if (partOut) writeFileSync(partOut, JSON.stringify(fresh))
-    else writeFileSync(OUT, traysModule({ ...existing, ...out }))
-  })
-}
+// Every level in every mode, then the photo levels: a mode of their own
+// (--mode=photo picks just those; --levels picks numbered levels only).
+const jobs = [
+  ...MODES.flatMap((mode) =>
+    LEVELS.map((base, i) => ({
+      level: applyMode(base, mode),
+      tag: `[${MODE_NAMES[mode]}] ${String(i + 1).padStart(2)} ${base.name}`,
+      seed: i + 1,
+      skip: (only && only !== mode) || (pickLevels && !pickLevels.includes(i + 1)),
+    }))
+  ),
+  ...PHOTO_LEVELS.map((level, i) => ({
+    level,
+    tag: `[ภาพจริง] ${i + 1} ${level.name}`,
+    seed: PHOTO_SEED + i,
+    skip: (only && only !== 'photo') || !!pickLevels,
+  })),
+]
+jobs.forEach(({ level, tag, seed, skip }) => {
+  const key = trayKey(level, seed)
+  if ((!all && existing[key]) || skip) {
+    if (existing[key]) out[key] = existing[key]
+    return
+  }
+  const { board } = buildBoard(level)
+  const t0 = performance.now()
+  // Big maps cost far more per candidate, so try fewer of them.
+  const area = level.art.length * level.art[0].length
+  const huge = area > 800
+  // Photo pictures (thousands of cells) take about half a minute per game
+  // played with the real rules: a handful of candidates and games only.
+  const photo = area > 5000
+  const attempts = attemptsArg ? Number(attemptsArg) : photo ? 8 : huge ? 40 : 200
+  // Even the last levels must be beatable without +1 slot by a player who
+  // thinks a little: a tray that a non-planning player never wins feels
+  // impossible, however winnable it is on paper.
+  const target = Math.max(targetArg ? Number(targetArg) : level.greedy, MIN_WIN_RATE)
+  const opt = {
+    ...trayOptions(level, seed),
+    greedyTarget: target, // search around the floor too, or every candidate is too hard
+    attempts,
+    greedyRuns: photo ? 8 : huge ? 24 : 60,
+  }
+  // The search's quick model of play digs in a different order than the real
+  // game, so how hard a tray really is can be far off its estimate (big hard
+  // pictures came out unwinnable for players who don't plan). Measure a spread
+  // of candidates with the real rules: the model's picks plus easier and
+  // harder ones, and keep the winnable one truly closest to the target.
+  const half = shortlistArg ? Math.ceil(Number(shortlistArg) / 2) : photo ? 2 : 6
+  const found = generateCandidates(board, opt, half * 2)
+  const rest = found.slice(half)
+  const every = Math.max(1, Math.floor(rest.length / half))
+  const candidates = [
+    ...found.slice(0, half),
+    ...rest.filter((_, k) => k % every === 0).slice(0, half),
+  ].map((c) => c.tray)
+  candidates.push(plainTray(board, opt))
+  const runs = photo ? 10 : huge ? 30 : 40
+  // The rate is measured on a few dozen games, so it can easily read a few
+  // points high: coming out harder than the target counts three times as bad
+  // as coming out easier, and only a tray at or above the target ends the search.
+  const miss = (rate: number) => (rate < target ? (target - rate) * 3 : rate - target)
+  let best: (Entry & { rate: number }) | null = null
+  for (const layout of candidates) {
+    const solution = solveReal(level, seed, layout)
+    if (!solution) continue
+    const rate = realWinRate(level, seed, layout, runs, mulberry32(seed))
+    if (!best || miss(rate) < miss(best.rate)) best = { layout, solution, rate }
+    if (best.rate >= target && best.rate - target <= 0.06) break
+  }
+  if (!best) {
+    failed++
+    console.log(`${tag}: ERROR no tray the real game can win (${candidates.length} tried)`)
+    return
+  }
+  out[key] = fresh[key] = { layout: best.layout, solution: best.solution }
+  const carts = best.layout.columns.flat()
+  console.log(
+    `${tag}: ${level.art[0].length}x${level.art.length}, ${carts.length} carts (biggest ${Math.max(...carts.map((c) => c.count))}), ` +
+      `no-planning win rate (real rules) ${(best.rate * 100).toFixed(0)}% (target ${Math.round(target * 100)}%), ` +
+      `won in ${best.solution.length} taps, ${((performance.now() - t0) / 1000).toFixed(1)}s`
+  )
+  // Save as we go: the hard mode takes a while.
+  if (partOut) writeFileSync(partOut, JSON.stringify(fresh))
+  else writeFileSync(OUT, traysModule({ ...existing, ...out }))
+})
 
 if (partOut) {
   writeFileSync(partOut, JSON.stringify(fresh))

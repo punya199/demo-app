@@ -81,6 +81,13 @@ export class Renderer {
   private time = 0
   private sprites = new Map<string, HTMLCanvasElement>()
   private bgPattern: CanvasPattern | string | null = null
+  private flatCanvas: HTMLCanvasElement | null = null // one pixel per cell, for flat pictures
+  private flatImage: ImageData | null = null
+  private flatColors: Record<'gem' | 'lit' | 'dug', number[][]> &
+    Record<'rock' | 'locked', number[]> = null!
+  // A tapped block: carts of its color flash until `until` (seconds of this.time).
+  private flash: { color: number; cell: number; until: number } | null = null
+  private reveal: { image: CanvasImageSource; crop: number[]; t: number } | null = null
   hint: number[] = [] // tray columns the hint says to tap
 
   constructor(
@@ -96,7 +103,15 @@ export class Renderer {
     this.leaving = []
     this.particles = []
     this.hint = []
+    this.flash = null
+    this.reveal = null
+    this.flatCanvas = null
     this.layout()
+  }
+
+  /** Cell size for the space available: whole pixels for raised blocks, any size for flat ones. */
+  private fitCell(raw: number, min: number): number {
+    return this.game.level.flat ? Math.max(2, raw) : Math.max(min, Math.floor(raw))
   }
 
   resize(width: number, height: number) {
@@ -129,9 +144,9 @@ export class Renderer {
     const yardY = this.h - pad - yardH
     const areaW = this.w - side - pad * 3
     const areaH = yardY - pad - 6
-    const cell = Math.max(
-      6,
-      Math.floor(Math.min(areaW / (board.width + 2.6), areaH / (board.height + 2.6)))
+    const cell = this.fitCell(
+      Math.min(areaW / (board.width + 2.6), areaH / (board.height + 2.6)),
+      6
     )
     const gridX = Math.round(pad + (areaW - cell * board.width) / 2)
     const gridY = Math.round(pad + (areaH - cell * (board.height + 2.6)) / 2 + cell * 1.3)
@@ -177,9 +192,9 @@ export class Renderer {
     const availH = this.h - pad * 2 - below
     // Big pictures on a short phone screen get small cells rather than pushing
     // the tray off the bottom: every cart row must stay on screen.
-    const cell = Math.max(
-      4,
-      Math.floor(Math.min(availW / (board.width + 2.6), availH / (board.height + 2.6)))
+    const cell = this.fitCell(
+      Math.min(availW / (board.width + 2.6), availH / (board.height + 2.6)),
+      4
     )
     const gridX = Math.round((this.w - cell * board.width) / 2)
     const gridY = Math.round(pad + cell * 1.3)
@@ -226,6 +241,34 @@ export class Renderer {
       }
     })
     return best
+  }
+
+  /**
+   * Tapping a block on the picture: flash the carts of its color. Returns the
+   * color, or -1 if the point is not on a block whose color can be seen.
+   */
+  flashAt(x: number, y: number): number {
+    const L = this.L
+    const { board } = this.game
+    const cx = Math.floor((x - L.gridX) / L.cell)
+    const cy = Math.floor((y - L.gridY) / L.cell)
+    if (cx < 0 || cy < 0 || cx >= board.width || cy >= board.height) return -1
+    const i = cy * board.width + cx
+    const color = board.cells[i]
+    if (color < 0 || isLocked(board, i) || (this.game.level.dark && !this.lit(i))) return -1
+    this.flash = { color, cell: i, until: this.time + 2.5 }
+    return color
+  }
+
+  /** Whether a cart of this color can be seen right now (in a slot or the tray's front rows). */
+  cartShown(color: number): boolean {
+    const seen = (c: Cart | null | undefined) => !!c && !c.hidden && c.color === color
+    return this.game.slots.some(seen) || this.game.tray.some((col) => col.slice(0, 3).some(seen))
+  }
+
+  /** After a photo level is won: fade the real photo in over the picture. */
+  showPhoto(image: CanvasImageSource, crop: number[]) {
+    this.reveal = { image, crop, t: 0 }
   }
 
   handle(ev: GameEvent) {
@@ -318,8 +361,10 @@ export class Renderer {
     ctx.fillRect(L.gridX, L.gridY, board.width * c, board.height * c)
 
     this.drawShaft()
-    this.drawCells()
+    if (this.game.level.flat) this.drawFlatCells()
+    else this.drawCells()
     this.drawLockBadges()
+    this.drawFlashMarker()
 
     // Slots: white boxes the carts park in.
     this.game.slots.forEach((cart, i) => {
@@ -369,6 +414,90 @@ export class Renderer {
       ctx.globalAlpha = 1
       return p.life > 0
     })
+
+    if (this.reveal) {
+      // The real photo fades in over the emptied picture.
+      const r = this.reveal
+      r.t += dt
+      const [sx, sy, sw, sh] = r.crop
+      ctx.globalAlpha = Math.min(1, r.t / 1.5)
+      ctx.drawImage(r.image, sx, sy, sw, sh, L.gridX, L.gridY, board.width * c, board.height * c)
+      ctx.globalAlpha = 1
+    }
+  }
+
+  /**
+   * Flat pictures (photos): one pixel per cell in a small canvas, scaled up
+   * without smoothing. Thousands of tiny cells, so no raised sprites. Gems of a
+   * tapped color blink so they can be found on the picture.
+   */
+  private drawFlatCells() {
+    const { board, colors, original } = this.game
+    if (!this.flatCanvas) {
+      this.flatCanvas = document.createElement('canvas')
+      this.flatCanvas.width = board.width
+      this.flatCanvas.height = board.height
+      this.flatImage = new ImageData(board.width, board.height)
+      const rgb = (hex: string) => {
+        const v = parseInt(hex.slice(1), 16)
+        return [v >> 16, (v >> 8) & 255, v & 255]
+      }
+      const floor = rgb(FLOOR)
+      this.flatColors = {
+        gem: colors.map(rgb),
+        lit: colors.map((c) => rgb(c).map((p) => p + (255 - p) * 0.6)),
+        // Faint imprint of the picture that used to be here.
+        dug: colors.map((c) => rgb(c).map((p, k) => floor[k] + (p - floor[k]) * 0.14)),
+        rock: rgb('#8d8a94'),
+        locked: rgb('#6a7184'),
+      }
+    }
+    const pal = this.flatColors
+    const blink = this.flash && this.flash.until > this.time && Math.sin(this.time * 12) > 0
+    const lit = blink ? this.flash!.color : -1
+    const data = this.flatImage!.data
+    for (let i = 0; i < board.cells.length; i++) {
+      const v = board.cells[i]
+      const px =
+        v === DUG
+          ? pal.dug[original[i]]
+          : v === ROCK
+            ? pal.rock
+            : isLocked(board, i)
+              ? pal.locked
+              : v === lit
+                ? pal.lit[v]
+                : pal.gem[v]
+      data[i * 4] = px[0]
+      data[i * 4 + 1] = px[1]
+      data[i * 4 + 2] = px[2]
+      data[i * 4 + 3] = 255
+    }
+    this.flatCanvas.getContext('2d')!.putImageData(this.flatImage!, 0, 0)
+    const ctx = this.ctx
+    const L = this.L
+    ctx.imageSmoothingEnabled = false
+    ctx.drawImage(this.flatCanvas, L.gridX, L.gridY, board.width * L.cell, board.height * L.cell)
+    ctx.imageSmoothingEnabled = true
+  }
+
+  /** Ring around the block that was tapped to find its carts. */
+  private drawFlashMarker() {
+    const f = this.flash
+    if (!f || f.until <= this.time) return
+    const ctx = this.ctx
+    const p = this.cellCenter(f.cell)
+    const r = Math.max(8, this.L.cell * 1.2) + Math.sin(this.time * 12) * 2
+    ctx.lineWidth = 3
+    ctx.strokeStyle = '#ffffff'
+    ctx.beginPath()
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.lineWidth = 1.5
+    ctx.strokeStyle = TEXT_DARK
+    ctx.beginPath()
+    ctx.arc(p.x, p.y, r + 2.5, 0, Math.PI * 2)
+    ctx.stroke()
   }
 
   private drawCells() {
@@ -863,47 +992,26 @@ export class Renderer {
       ctx.fillText('z', x + cw - 8, y + 9)
     }
     ctx.restore()
+    // Carts of a tapped block's color: thick blinking border, white and dark in turn.
+    const f = this.flash
+    if (!opt.done && f && f.until > this.time && !cart.hidden && cart.color === f.color) {
+      const on = Math.sin(this.time * 12) > 0
+      ctx.lineWidth = 5
+      ctx.strokeStyle = on ? '#ffffff' : TEXT_DARK
+      ctx.beginPath()
+      ctx.roundRect(x - 4, y - 4, cw + 8, ch + 8, r + 3)
+      ctx.stroke()
+    }
     // Linked carts carry their pair badge at full opacity, even when dimmed further back.
     if (opt.badge && cart.pair)
       this.drawPairBadge(x + 2, y + ch * 0.2, Math.max(9, ch * 0.22), cart.pair)
-    const ice = opt.done ? 0 : this.game.iceLeft(cart)
-    if (ice > 0) this.drawIce(x, y, cw, ch, ice)
-  }
-
-  /** Ice block over a frozen cart, with how many carts must finish before it thaws. */
-  private drawIce(x: number, y: number, w: number, h: number, left: number) {
-    const ctx = this.ctx
-    ctx.fillStyle = 'rgba(190,230,255,0.72)'
-    ctx.strokeStyle = '#e8f7ff'
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.roundRect(x - 3, y + h * 0.05, w + 6, h * 0.9, 8)
-    ctx.fill()
-    ctx.stroke()
-    // Frost glints.
-    ctx.strokeStyle = 'rgba(255,255,255,0.9)'
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.moveTo(x + w * 0.1, y + h * 0.35)
-    ctx.lineTo(x + w * 0.25, y + h * 0.2)
-    ctx.moveTo(x + w * 0.75, y + h * 0.8)
-    ctx.lineTo(x + w * 0.9, y + h * 0.65)
-    ctx.stroke()
-    ctx.font = `800 ${Math.round(h * 0.34)}px ${FONT}`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.lineWidth = 3
-    ctx.strokeStyle = '#1e5f8c'
-    const label = `❄${left}`
-    ctx.strokeText(label, x + w / 2, y + h / 2)
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText(label, x + w / 2, y + h / 2)
   }
 
   private drawMiner(m: Miner) {
     const ctx = this.ctx
     const p = this.minerPos(m)
-    const s = Math.max(13, Math.min(24, this.L.cell * 1.1))
+    // Flat pictures have tiny cells: smaller miners keep them from covering it.
+    const s = Math.max(this.game.level.flat ? 10 : 13, Math.min(24, this.L.cell * 1.1))
     const color = this.game.colors[m.cart.color]
     const bob = m.state === 'dig' ? 0 : Math.sin((this.time + m.id) * 18) * s * 0.06
     const x = p.x

@@ -2,7 +2,7 @@
 // `palette`; '#' is bedrock (can't be dug, blocks tunnels and entrances).
 // `lockMap` (same size as the art) marks locked rooms with a letter; `locks`
 // says which color opens each room and how many of it must be mined first.
-// Levels 11+ are bigger pictures with more colors and add frozen carts,
+// Levels 11+ are bigger pictures with more colors and add
 // armored gems and dark mines.
 
 export interface LevelDef {
@@ -16,7 +16,6 @@ export interface LevelDef {
   shuffle: number
   links: number // chained cart pairs
   mystery: number // share of hidden-color carts behind the front row
-  frozen?: number // carts frozen until enough others have finished
   armored?: string // palette keys whose gems need two hits
   dark?: boolean // only gems at the edge or next to a tunnel show their color
   greedy: number // target win rate for a no-planning player (1 = easy)
@@ -25,6 +24,8 @@ export interface LevelDef {
   together?: boolean // chained carts leave their slots only when all of them are done
   triples?: number // chained groups of three
   bigCarts?: boolean // carts bigger than what is reachable at once
+  flat?: boolean // plain square blocks: photo pictures, too many and too small for raised ones
+  speed?: number // miners move this much faster on top of the big-map pace (photo pictures)
   intro?: { title: string; text: string } // shown the first time a new mechanic appears
 }
 
@@ -465,12 +466,7 @@ export const LEVELS: LevelDef[] = [
     shuffle: 16,
     links: 3,
     mystery: 0.35,
-    frozen: 3,
     greedy: 0.4,
-    intro: {
-      title: '🧊 รถแช่แข็ง',
-      text: 'รถที่มีน้ำแข็งเกาะแตะไม่ได้<br>ตัวเลขบนน้ำแข็ง = จำนวนรถที่ต้องขุดเสร็จก่อน น้ำแข็งจึงจะละลาย',
-    },
   },
   {
     name: 'เต่าทะเล',
@@ -509,7 +505,6 @@ export const LEVELS: LevelDef[] = [
     shuffle: 16,
     links: 3,
     mystery: 0.4,
-    frozen: 3,
     greedy: 0.38,
     intro: {
       title: '💎 อัญมณีหุ้มหิน',
@@ -576,7 +571,6 @@ export const LEVELS: LevelDef[] = [
     shuffle: 18,
     links: 4,
     mystery: 0.4,
-    frozen: 4,
     greedy: 0.35,
   },
   {
@@ -619,7 +613,6 @@ export const LEVELS: LevelDef[] = [
     shuffle: 18,
     links: 4,
     mystery: 0.4,
-    frozen: 3,
     greedy: 0.33,
     intro: {
       title: '🌑 เหมืองมืด',
@@ -683,7 +676,6 @@ export const LEVELS: LevelDef[] = [
     shuffle: 20,
     links: 4,
     mystery: 0.45,
-    frozen: 4,
     greedy: 0.3,
   },
   {
@@ -756,7 +748,6 @@ export const LEVELS: LevelDef[] = [
     shuffle: 20,
     links: 5,
     mystery: 0.45,
-    frozen: 5,
     greedy: 0.28,
   },
 ]

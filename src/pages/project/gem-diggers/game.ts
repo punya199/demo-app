@@ -21,7 +21,7 @@ import {
   pickTarget,
   tunnelMap,
 } from './board'
-import { GenOptions, TrayLayout, generateTray, trayKey } from './generator'
+import { GenOptions, TrayLayout, generateTray, plainTray, trayKey } from './generator'
 import { LevelDef, SLOTS } from './levels'
 import { Pt, routeLength, routeToEdgeCell } from './rim'
 import { PREGENERATED_TRAYS } from './trays'
@@ -47,7 +47,6 @@ export interface Cart {
   hidden: boolean // color not shown until it reaches the front
   links: Cart[] // other carts chained to this one: all are tapped together
   pair: number // 1-based label shared by the carts of a chained group, 0 if not chained
-  frozen: number // can't be tapped until this many carts have finished (0 = not frozen)
 }
 
 export interface Miner {
@@ -97,7 +96,6 @@ export function trayOptions(level: LevelDef, seed: number): GenOptions {
     links: level.links,
     triples: level.triples,
     mystery: level.mystery,
-    frozen: level.frozen ?? 0,
     greedyTarget: level.greedy,
   }
 }
@@ -113,7 +111,10 @@ function loadTray(level: LevelDef, board: Board, seed: number): TrayLayout {
     console.warn(
       `${level.name}: no up-to-date pre-generated tray (run yarn gem:gen), generating now`
     )
-    layout = generateTray(board, trayOptions(level, seed))
+    // Photo-sized pictures would keep the page frozen for minutes searching:
+    // take the plain tray instead (always winnable, just less shuffled).
+    const opt = trayOptions(level, seed)
+    layout = board.cells.length > 5000 ? plainTray(board, opt) : generateTray(board, opt)
     trayCache.set(key, layout)
   }
   return layout
@@ -194,7 +195,6 @@ export class Game {
   reserved = new Set<number>()
   status: Status = 'playing'
   events: GameEvent[] = []
-  cartsDone = 0 // thaws frozen carts
   private clock = 0 // time not yet simulated, always < FIXED_STEP
   steps = 0 // fixed steps simulated so far
   log: Action[] = [] // everything the player did, for replaying (hints)
@@ -211,7 +211,7 @@ export class Game {
     this.totalGems = gemsLeft(board)
     this.original = board.cells.slice()
     this.originalArmor = board.armor.slice()
-    this.pace = Math.max(1, (board.width + board.height) / 48)
+    this.pace = Math.max(1, (board.width + board.height) / 48) * (level.speed ?? 1)
     layout ??= loadTray(level, board, seed)
     this.tray = layout.columns.map((col) =>
       col.map((c) => ({
@@ -225,7 +225,6 @@ export class Game {
         hidden: !!c.hidden,
         links: [] as Cart[],
         pair: 0,
-        frozen: c.frozen ?? 0,
       }))
     )
     let groups = 0
@@ -254,14 +253,8 @@ export class Game {
       if (lc < 0) return null // a chained partner isn't at the front yet
       group.push({ cart: link, column: lc })
     }
-    if (group.some((g) => this.iceLeft(g.cart) > 0)) return null
     const free = this.slots.filter((s) => s === null).length
     return free >= group.length ? group : null
-  }
-
-  /** Carts that still have to finish before this frozen cart can be tapped. */
-  iceLeft(cart: Cart): number {
-    return Math.max(0, cart.frozen - this.cartsDone)
   }
 
   /** Whether tapping this column now would send at least one cart that can dig right away. */
@@ -418,7 +411,6 @@ export class Game {
     this.slots.forEach((cart, i) => {
       if (cart && this.isDone(cart) && !this.waitingForPartner(cart)) {
         this.slots[i] = null
-        this.cartsDone++
         this.events.push({ type: 'cartDone', cart, slot: i })
       }
     })

@@ -1,3 +1,10 @@
+# [1.33.0](https://github.com/punya199/demo-app/compare/v1.32.0...v1.33.0) (2026-11-03)
+
+
+### New
+
+* icons on every passive tree node ([bc9e257](https://github.com/punya199/demo-app/commit/bc9e257269abda1da9a401972cf09a8ba1bd2044))
+
 # [1.32.0](https://github.com/punya199/demo-app/compare/v1.31.0...v1.32.0) (2026-11-03)
 
 

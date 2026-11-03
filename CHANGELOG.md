@@ -1,3 +1,10 @@
+# [1.37.0](https://github.com/punya199/demo-app/compare/v1.36.0...v1.37.0) (2026-11-03)
+
+
+### New
+
+* add refine modal and refine stone info ([900eaa8](https://github.com/punya199/demo-app/commit/900eaa8a5ca7fd178e0b849c5c4f3ef6dae713c1))
+
 # [1.36.0](https://github.com/punya199/demo-app/compare/v1.35.0...v1.36.0) (2026-11-03)
 
 

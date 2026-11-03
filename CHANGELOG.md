@@ -1,3 +1,10 @@
+# [1.34.0](https://github.com/punya199/demo-app/compare/v1.33.0...v1.34.0) (2026-11-03)
+
+
+### New
+
+* edit the passive tree as a draft with one save or cancel, and bigger spaced-out nodes ([5458a04](https://github.com/punya199/demo-app/commit/5458a0499acc0626cdb5c5245e111c63f46fdbb8))
+
 # [1.33.0](https://github.com/punya199/demo-app/compare/v1.32.0...v1.33.0) (2026-11-03)
 
 

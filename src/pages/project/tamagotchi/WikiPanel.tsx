@@ -526,6 +526,8 @@ const buildSections = (wiki: IWikiData) => {
                 .join(' · ')}) รวมสูงสุด ${passive.maxPoints} แต้ม`,
               `ถอนแต้มคืนได้ ${passive.freeRefunds} แต้มแรกฟรี หลังจากนั้นแต้มละ 💎 ${passive.respecGemPrice} (ถอนทั้งสายสูงสุด 💎 ${passive.branchRefundCap} ต่อครั้ง)`,
               `โหนดเหรียญสำรวจและโอกาสดรอปอุปกรณ์รวมกันได้ไม่เกิน +${passive.economyCap}% อย่างละ`,
+              `มาสเตอรีเลือก 1 จาก 3 ตัวเลือก เลือกครั้งแรกฟรี เปลี่ยนใช้ 💎 ${passive.masteryRepickGemPrice}`,
+              `เส้นทางสูงสุด 3 เส้นทาง เลือกได้เส้นทางเดียว ใช้แต้มแยก (สูงสุด ${passive.ascendancyMaxPoints} แต้ม จากเรด Nightmare และบอสโลก) เริ่มใหม่ใช้ 💎 ${passive.ascendancyResetGemPrice}`,
             ]}
           />
         </>

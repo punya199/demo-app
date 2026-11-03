@@ -342,6 +342,12 @@ export const describeBattleEvent = (event: IBattleEvent, battle: IBattleData) =>
   if (event.absorbed) {
     notes.push(`โล่ดูด ${event.absorbed}`)
   }
+  if (event.healed) {
+    notes.push(`ดูดเลือด +${event.healed}`)
+  }
+  if (event.reflected) {
+    notes.push(`โดนสะท้อน −${event.reflected}`)
+  }
   const verb = event.kind === 'double' ? 'โจมตีซ้ำ' : `ใช้ ${event.moveName}`
   return `${attacker.name} ${verb} ${event.damage} ดาเมจ${notes.length ? ` (${notes.join(' ')})` : ''}`
 }
@@ -353,11 +359,19 @@ export const hpAfter = (
   side: BattleSide,
   maxHp: number
 ) => {
-  // In a team fight the player's bar follows the player (member 0), not the rented ally.
-  const hits = events
-    .slice(0, shownEvents)
-    .filter((event) => event.actor !== side && (side !== 'player' || (event.member ?? 0) === 0))
-  return hits.length ? hits[hits.length - 1].targetHp : maxHp
+  // In a team fight the player's bar follows the player (member 0), not the rented ally. A hit
+  // changes the target's HP; lifesteal and thorns also change the attacker's (`actorHp`).
+  let hp = maxHp
+  for (const event of events.slice(0, shownEvents)) {
+    if (event.actor !== side) {
+      if (side !== 'player' || (event.member ?? 0) === 0) {
+        hp = event.targetHp
+      }
+    } else if (event.actorHp !== undefined) {
+      hp = event.actorHp
+    }
+  }
+  return hp
 }
 
 const serverMessageLabel: Record<string, string> = {
@@ -766,12 +780,19 @@ export const passiveEffectLabel: Record<PassiveEffectKey, string> = {
   hunger: 'ความอิ่มลดช้าลง',
   expCoin: 'เหรียญจากการสำรวจ',
   drop: 'โอกาสดรอปอุปกรณ์',
+  lifesteal: 'ดูดเลือด (% ของดาเมจ)',
+  thorns: 'สะท้อนดาเมจ (%)',
+  firstStrike: 'ลงมือก่อนเสมอ',
+  noCrit: 'ไม่ติดคริติคอล',
 }
 
 // "+3% ATK", "−20% HP", "เทิร์นเผาไหม้ของท่าพิเศษ +1".
 export const describePassiveEffect = (key: PassiveEffectKey, value: number) => {
   const sign = value > 0 ? '+' : '−'
   const amount = Math.abs(value)
+  if (key === 'firstStrike' || key === 'noCrit') {
+    return passiveEffectLabel[key]
+  }
   // These labels already carry their unit.
   if (key === 'burn' || key === 'shield' || key === 'regen') {
     return `${passiveEffectLabel[key]} ${sign}${amount}`
@@ -809,12 +830,18 @@ export const canDeallocatePassive = (nodes: IPassiveNode[], owned: string[], nod
   return [...rest].every((id) => seen.has(id))
 }
 
-// Total of every effect over the owned nodes, in the order of passiveEffectLabel.
-export const sumPassiveEffects = (nodes: IPassiveNode[], owned: string[]) => {
+// Total of every effect over the owned nodes (plus the picked mastery options), in the order of
+// passiveEffectLabel.
+export const sumPassiveEffects = (
+  nodes: IPassiveNode[],
+  owned: string[],
+  picks: Record<string, number> = {}
+) => {
   const totals: Partial<Record<PassiveEffectKey, number>> = {}
   for (const node of nodes) {
     if (owned.includes(node.id)) {
-      for (const [key, value] of Object.entries(node.fx) as [PassiveEffectKey, number][]) {
+      const fx = { ...node.fx, ...(node.options?.[picks[node.id]]?.fx ?? {}) }
+      for (const [key, value] of Object.entries(fx) as [PassiveEffectKey, number][]) {
         totals[key] = Math.round(((totals[key] ?? 0) + value) * 10) / 10
       }
     }
@@ -822,6 +849,22 @@ export const sumPassiveEffects = (nodes: IPassiveNode[], owned: string[]) => {
   return (Object.keys(passiveEffectLabel) as PassiveEffectKey[])
     .filter((key) => totals[key])
     .map((key) => ({ key, value: totals[key]! }))
+}
+
+// Mirrors the server's ascendancy rule: the first node of a path is free to take, the rest must
+// touch an owned node, and only one path can be used.
+export const canAllocateAscendancyNode = (
+  node: IPassiveNode,
+  path: string | null,
+  owned: string[]
+) => {
+  if (node.kind !== 'ascend' || owned.includes(node.id)) {
+    return false
+  }
+  if (owned.length === 0) {
+    return node.id.endsWith('-00')
+  }
+  return node.id.startsWith(`v2-asc-${path}-`) && node.adj.some((id) => owned.includes(id))
 }
 
 // `nodeId` plus every owned node that loses its link to the hub without it (a whole branch).

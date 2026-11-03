@@ -166,6 +166,11 @@ export interface IBattleEvent {
   absorbed?: number
   // The target dodged the hit (damage is 0).
   isDodged?: boolean
+  // Passive keystones: HP the attacker healed (lifesteal) or took back from thorns, and its HP
+  // afterwards (present whenever one of them is).
+  healed?: number
+  reflected?: number
+  actorHp?: number
   // Team fights: which member of the player's side attacked, or was hit when the enemy attacks.
   member?: number
 }
@@ -857,6 +862,9 @@ export interface IWikiData {
     respecGemPrice: number
     economyCap: number
     branchRefundCap: number
+    ascendancyMaxPoints: number
+    ascendancyResetGemPrice: number
+    masteryRepickGemPrice: number
     adventureMaxPoints: number
     winsPerPoint: number
     winMaxPoints: number
@@ -933,22 +941,40 @@ export type PassiveEffectKey =
   | 'hunger'
   | 'expCoin'
   | 'drop'
+  | 'lifesteal'
+  | 'thorns'
+  | 'firstStrike'
+  | 'noCrit'
 
 export interface IPassiveNode {
   id: string
   name: string
-  kind: 'small' | 'notable' | 'key'
-  arm: 'flame' | 'tide' | 'leaf' | 'earth' | 'lightning' | 'spirit' | 'bridge'
+  kind: 'small' | 'notable' | 'key' | 'mastery' | 'ascend'
+  arm: 'flame' | 'tide' | 'leaf' | 'earth' | 'lightning' | 'spirit' | 'bridge' | 'ascend'
   fx: Partial<Record<PassiveEffectKey, number>>
+  // Masteries: pick one (index 0..2); `fx` is empty until then.
+  options?: { name: string; fx: Partial<Record<PassiveEffectKey, number>> }[]
   x: number
   y: number
   adj: string[]
 }
 
 // GET /passive: the whole graph (drawn as is), what the player owns and what they can still do.
+export type AscendancyPath = 'vanguard' | 'striker' | 'warden'
+
 export interface IPassiveState {
   nodes: IPassiveNode[]
   allocated: string[]
+  // Mastery node id -> picked option index.
+  masteries: Record<string, number>
+  ascendancy: {
+    path: AscendancyPath | null
+    nodeIds: string[]
+    points: { earned: number; used: number; left: number; max: number }
+    // Gems to start the ascendancy over (0 while it is empty).
+    resetCost: number
+    masteryRepickPrice: number
+  }
   points: {
     earned: number
     used: number

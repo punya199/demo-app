@@ -1,3 +1,11 @@
+# [1.32.0](https://github.com/punya199/demo-app/compare/v1.31.0...v1.32.0) (2026-11-03)
+
+
+### New
+
+* hover tooltip on passive tree nodes ([a247ace](https://github.com/punya199/demo-app/commit/a247ace73d5ae16753bd9f5f7ca0b85c6251523f))
+* passive masteries, ascendancy ring and keystone replay in the passive panel ([8835079](https://github.com/punya199/demo-app/commit/8835079ff0baedf6e7e09ee23641c1effa45c96f))
+
 # [1.31.0](https://github.com/punya199/demo-app/compare/v1.30.0...v1.31.0) (2026-11-03)
 
 

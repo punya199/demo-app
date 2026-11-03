@@ -996,6 +996,12 @@ export const usePassiveDeallocate = () =>
     return data
   })
 
+export const usePassiveDeallocateBranch = () =>
+  usePassiveMutation(async (nodeId: string) => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/deallocate-branch`, { nodeId })
+    return data
+  })
+
 export const usePassiveRespec = () =>
   usePassiveMutation(async () => {
     const { data } = await apiClient.post<IPassiveState>(`/passive/respec`)

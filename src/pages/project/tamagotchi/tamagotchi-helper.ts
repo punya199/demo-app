@@ -824,11 +824,56 @@ export const sumPassiveEffects = (nodes: IPassiveNode[], owned: string[]) => {
     .map((key) => ({ key, value: totals[key]! }))
 }
 
+// `nodeId` plus every owned node that loses its link to the hub without it (a whole branch).
+export const getPassiveBranch = (nodes: IPassiveNode[], owned: string[], nodeId: string) => {
+  const rest = new Set(owned.filter((id) => id !== nodeId))
+  const byId = new Map(nodes.map((node) => [node.id, node]))
+  const seen = new Set([PASSIVE_HUB])
+  const stack = [PASSIVE_HUB]
+  while (stack.length) {
+    for (const id of byId.get(stack.pop()!)?.adj ?? []) {
+      if (rest.has(id) && !seen.has(id)) {
+        seen.add(id)
+        stack.push(id)
+      }
+    }
+  }
+  return owned.includes(nodeId) ? owned.filter((id) => !seen.has(id)) : []
+}
+
+// Ids of nodes whose name or effect text contains `query` (case-insensitive); empty query = none.
+export const searchPassiveNodes = (nodes: IPassiveNode[], query: string) => {
+  const needle = query.trim().toLowerCase()
+  if (!needle) {
+    return new Set<string>()
+  }
+  return new Set(
+    nodes
+      .filter(
+        (node) =>
+          node.id !== PASSIVE_HUB &&
+          (node.name.toLowerCase().includes(needle) ||
+            Object.keys(node.fx).some(
+              (key) =>
+                key.toLowerCase().includes(needle) ||
+                passiveEffectLabel[key as PassiveEffectKey].toLowerCase().includes(needle)
+            ))
+      )
+      .map((node) => node.id)
+  )
+}
+
 // Gems needed to take back `count` points when `refunded` were already taken back.
 export const getRespecCost = (
   respec: { refunded: number; freeLeft: number; gemPrice: number },
   count: number
 ) => Math.max(0, count - respec.freeLeft) * respec.gemPrice
+
+// A branch refund costs the same per point but never more than the cap.
+export const getBranchRespecCost = (
+  respec: { refunded: number; freeLeft: number; gemPrice: number; branchCap: number },
+  count: number
+) => Math.min(getRespecCost(respec, count), respec.branchCap)
 
 // Mirrors the server's merge checks for one parent, so the picker explains itself.
 export const getMergeParentBlocker = (monster: IMonsterData): string | null => {

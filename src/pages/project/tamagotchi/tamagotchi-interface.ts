@@ -856,6 +856,10 @@ export interface IWikiData {
     freeRefunds: number
     respecGemPrice: number
     economyCap: number
+    branchRefundCap: number
+    adventureMaxPoints: number
+    winsPerPoint: number
+    winMaxPoints: number
     pvpSeasonPoints: { maxRank: number | null; points: number }[]
   }
   worldBoss: {
@@ -934,7 +938,7 @@ export interface IPassiveNode {
   id: string
   name: string
   kind: 'small' | 'notable' | 'key'
-  arm: 'flame' | 'tide' | 'leaf' | 'bridge'
+  arm: 'flame' | 'tide' | 'leaf' | 'earth' | 'lightning' | 'spirit' | 'bridge'
   fx: Partial<Record<PassiveEffectKey, number>>
   x: number
   y: number
@@ -952,11 +956,13 @@ export interface IPassiveState {
     sources: {
       dexSpecies: number
       raidFirstClears: number
+      adventureClears: number
+      totalWins: number
       worldBossDefeats: number
       pvpSeasons: number
     }
   }
-  respec: { refunded: number; freeLeft: number; gemPrice: number }
+  respec: { refunded: number; freeLeft: number; gemPrice: number; branchCap: number }
 }
 
 // GET /monster/me

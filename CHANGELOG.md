@@ -1,3 +1,10 @@
+# [1.36.0](https://github.com/punya199/demo-app/compare/v1.35.0...v1.36.0) (2026-11-03)
+
+
+### Update
+
+* add select-and-dismantle-many to the equipment bag ([9711ad0](https://github.com/punya199/demo-app/commit/9711ad0c0b3bcb66fd2d73291ca116347a4348e7))
+
 # [1.35.0](https://github.com/punya199/demo-app/compare/v1.34.0...v1.35.0) (2026-11-03)
 
 

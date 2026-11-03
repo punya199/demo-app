@@ -90,6 +90,9 @@ export const PassivePanel = (props: IPassivePanelProps) => {
   const [query, setQuery] = useState('')
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 })
   const svgRef = useRef<SVGSVGElement>(null)
+  const boxRef = useRef<HTMLDivElement>(null)
+  // Mouse hover: the node under the cursor and where, relative to the map box.
+  const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null)
   const pointers = useRef(new Map<number, { x: number; y: number }>())
   const gesture = useRef({ moved: 0, pinch: 0 })
 
@@ -205,6 +208,7 @@ export const PassivePanel = (props: IPassivePanelProps) => {
     const dy = event.clientY - last.y
     gesture.current.moved += Math.abs(dx) + Math.abs(dy)
     if (gesture.current.moved > DRAG_PIXELS) {
+      setHover(null)
       setView((v) => ({ ...v, x: v.x - dx * unit, y: v.y - dy * unit }))
     }
   }
@@ -212,6 +216,26 @@ export const PassivePanel = (props: IPassivePanelProps) => {
     pointers.current.delete(event.pointerId)
     gesture.current.pinch = 0
   }
+  const trackHover = (event: PointerEvent<SVGGElement>, id: string) => {
+    const rect = boxRef.current?.getBoundingClientRect()
+    if (event.pointerType !== 'mouse' || !rect || event.buttons) {
+      return
+    }
+    setHover({ id, x: event.clientX - rect.left, y: event.clientY - rect.top })
+  }
+  const hovered = hover ? byId.get(hover.id) : undefined
+  const hoveredCanTake =
+    !!hovered &&
+    (hovered.kind === 'ascend'
+      ? canAllocateAscendancyNode(hovered, ascendancy.path, ascendancyIds)
+      : canAllocatePassive(nodes, allocated, hovered.id))
+  const hoveredState = !hovered
+    ? ''
+    : isOwned(hovered.id)
+      ? 'มีแล้ว'
+      : hoveredCanTake
+        ? 'เลือกได้ (1 แต้ม)'
+        : 'ยังไม่ติดกับโหนดที่มี'
   const zoomBy = (factor: number) =>
     setView((v) => ({ ...v, scale: clamp(v.scale * factor, MIN_SCALE, MAX_SCALE) }))
   const focus = (node: IPassiveNode) => {
@@ -272,7 +296,10 @@ export const PassivePanel = (props: IPassivePanelProps) => {
         suffix={query ? <span className="text-xs text-slate-500">{matches.size}</span> : null}
       />
 
-      <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
+      <div
+        ref={boxRef}
+        className="relative overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950"
+      >
         <svg
           ref={svgRef}
           viewBox={viewBox}
@@ -344,6 +371,9 @@ export const PassivePanel = (props: IPassivePanelProps) => {
                   opacity={matches.size && !found ? 0.35 : 1}
                   onClick={() => gesture.current.moved <= DRAG_PIXELS && setSelectedId(node.id)}
                   onFocus={() => setSelectedId(node.id)}
+                  onPointerEnter={(event) => trackHover(event, node.id)}
+                  onPointerMove={(event) => trackHover(event, node.id)}
+                  onPointerLeave={() => setHover(null)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault()
@@ -357,6 +387,54 @@ export const PassivePanel = (props: IPassivePanelProps) => {
               )
             })}
         </svg>
+
+        {hover && hovered && (
+          <div
+            className="pointer-events-none absolute z-10 w-56 rounded-md border border-slate-300 bg-white/95 p-2 text-xs shadow-lg dark:border-slate-600 dark:bg-slate-900/95"
+            style={{
+              left: hover.x,
+              top: hover.y,
+              transform: `translate(${hover.x > (boxRef.current?.clientWidth ?? 0) / 2 ? 'calc(-100% - 14px)' : '14px'}, ${hover.y > (boxRef.current?.clientHeight ?? 0) * 0.55 ? 'calc(-100% - 14px)' : '14px'})`,
+            }}
+          >
+            <div className="text-slate-500 dark:text-slate-400">
+              {KIND_LABEL[hovered.kind]} · {hoveredState}
+            </div>
+            <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              {hovered.name}
+            </div>
+            <ul>
+              {(Object.entries(hovered.fx) as [PassiveEffectKey, number][]).map(([key, value]) => (
+                <li
+                  key={key}
+                  className={value < 0 ? 'text-red-500' : 'text-slate-700 dark:text-slate-200'}
+                >
+                  {describePassiveEffect(key, value)}
+                </li>
+              ))}
+            </ul>
+            {hovered.options && (
+              <ul className="mt-1 border-t border-slate-200 pt-1 dark:border-slate-700">
+                {hovered.options.map((option, index) => (
+                  <li
+                    key={option.name}
+                    className={
+                      masteries[hovered.id] === index
+                        ? 'font-semibold text-amber-600 dark:text-amber-400'
+                        : 'text-slate-700 dark:text-slate-200'
+                    }
+                  >
+                    {masteries[hovered.id] === index ? '✓ ' : '• '}
+                    {option.name}:{' '}
+                    {(Object.entries(option.fx) as [PassiveEffectKey, number][])
+                      .map(([key, value]) => describePassiveEffect(key, value))
+                      .join(', ')}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
 
         <div className="absolute top-2 right-2 flex flex-col gap-1">
           <Button size="small" aria-label="ขยาย" onClick={() => zoomBy(1.3)}>

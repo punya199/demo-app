@@ -1,3 +1,10 @@
+# [1.35.0](https://github.com/punya199/demo-app/compare/v1.34.0...v1.35.0) (2026-11-03)
+
+
+### Update
+
+* lock equipment the pet is too young for and document set-piece rolls ([69c14f9](https://github.com/punya199/demo-app/commit/69c14f90d0e7320c0dc60536b2fbaabbaad986bd))
+
 # [1.34.0](https://github.com/punya199/demo-app/compare/v1.33.0...v1.34.0) (2026-11-03)
 
 

@@ -576,8 +576,21 @@ export const compareEquipment = (item: IEquipmentItem, worn: IEquipmentItem | un
     .filter(({ diff }) => diff !== 0)
 
 // Gear can't change while the monster is away (the server refuses).
-export const getEquipBlocker = (monster: IMonsterData | null): string | null =>
-  monster?.expeditionAreaId ? 'มอนออกสำรวจอยู่' : null
+// Enum order is evolution order (egg ... fused).
+const stageRank = (stage: EnumMonsterStage) => Object.values(EnumMonsterStage).indexOf(stage)
+
+export const getEquipBlocker = (
+  monster: IMonsterData | null,
+  item?: Pick<IEquipmentItem, 'minStage'>
+): string | null => {
+  if (monster?.expeditionAreaId) {
+    return 'มอนออกสำรวจอยู่'
+  }
+  if (monster && item?.minStage && stageRank(monster.stage) < stageRank(item.minStage)) {
+    return `ต้องวิวัฒนาการถึง ${stageLabel[item.minStage]} ขึ้นไป`
+  }
+  return null
+}
 
 // Mirrors the server's enhance checks so the button explains itself.
 export const getEnhanceBlocker = (

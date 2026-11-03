@@ -1,3 +1,11 @@
+# [1.31.0](https://github.com/punya199/demo-app/compare/v1.30.0...v1.31.0) (2026-11-03)
+
+
+### New
+
+* passive tree v2 panel with zoom, search, minimap and branch refund ([b03727d](https://github.com/punya199/demo-app/commit/b03727d30158038038b6191bddcf1b1e47453e39))
+* weekly quests, gem rewards and daily login card in the quest panel ([cb94c66](https://github.com/punya199/demo-app/commit/cb94c6677a7ed462b2ad5b0b27f272d9b9612733))
+
 # [1.30.0](https://github.com/punya199/demo-app/compare/v1.29.0...v1.30.0) (2026-11-03)
 
 

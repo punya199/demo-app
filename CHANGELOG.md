@@ -1,3 +1,10 @@
+# [1.38.0](https://github.com/punya199/demo-app/compare/v1.37.0...v1.38.0) (2026-11-03)
+
+
+### Update
+
+* show percentage DEF damage formula in the wiki ([0eb5dc8](https://github.com/punya199/demo-app/commit/0eb5dc8793e3d4df36bfbd13e1c6f4d2fa7b2fad))
+
 # [1.37.0](https://github.com/punya199/demo-app/compare/v1.36.0...v1.37.0) (2026-11-03)
 
 

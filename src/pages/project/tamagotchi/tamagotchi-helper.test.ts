@@ -26,6 +26,7 @@ import {
   describeSetEffect,
   compareEquipment,
   canAllocatePassive,
+  canAllocateAscendancyNode,
   canDeallocatePassive,
   getBranchRespecCost,
   getPassiveBranch,
@@ -1037,5 +1038,51 @@ describe('passive branch and search', () => {
     const respec = { refunded: 10, freeLeft: 0, gemPrice: 1, branchCap: 20 }
     expect(getBranchRespecCost(respec, 12)).toBe(12)
     expect(getBranchRespecCost(respec, 60)).toBe(20)
+  })
+})
+
+describe('masteries, ascendancy and keystone replay', () => {
+  const node = (id: string, adj: string[], extra: Partial<IPassiveNode> = {}) =>
+    ({ id, adj, name: id, fx: {}, kind: 'small', ...extra }) as IPassiveNode
+
+  it('adds the picked mastery option to the totals', () => {
+    const nodes = [
+      node('m', [], {
+        kind: 'mastery',
+        options: [
+          { name: 'a', fx: { atk: 8 } },
+          { name: 'b', fx: { hp: 8 } },
+        ],
+      }),
+    ]
+    expect(sumPassiveEffects(nodes, ['m'])).toEqual([])
+    expect(sumPassiveEffects(nodes, ['m'], { m: 1 })).toEqual([{ key: 'hp', value: 8 }])
+  })
+
+  it('starts an ascendancy path at its first node, then follows the chain on that path only', () => {
+    const root = node('v2-asc-striker-00', ['v2-asc-striker-01'], { kind: 'ascend' })
+    const next = node('v2-asc-striker-01', ['v2-asc-striker-00'], { kind: 'ascend' })
+    const other = node('v2-asc-warden-00', [], { kind: 'ascend' })
+    expect(canAllocateAscendancyNode(root, null, [])).toBe(true)
+    expect(canAllocateAscendancyNode(next, null, [])).toBe(false)
+    expect(canAllocateAscendancyNode(next, 'striker', [root.id])).toBe(true)
+    expect(canAllocateAscendancyNode(other, 'striker', [root.id])).toBe(false)
+    expect(canAllocateAscendancyNode(node('x', []), null, [])).toBe(false)
+  })
+
+  it('describes flag effects without a number', () => {
+    expect(describePassiveEffect('firstStrike', 1)).toBe('ลงมือก่อนเสมอ')
+    expect(describePassiveEffect('lifesteal', 15)).toBe('+15% ดูดเลือด (% ของดาเมจ)')
+  })
+
+  it('follows the attacker HP through lifesteal and thorns', () => {
+    const events = [
+      { actor: 'player', targetHp: 20, actorHp: 45, healed: 5 },
+      { actor: 'enemy', targetHp: 30, actorHp: 25, reflected: 5 },
+    ] as IBattleEvent[]
+    expect(hpAfter(events, 1, 'player', 50)).toBe(45)
+    expect(hpAfter(events, 1, 'enemy', 40)).toBe(20)
+    expect(hpAfter(events, 2, 'enemy', 40)).toBe(25)
+    expect(hpAfter(events, 2, 'player', 50)).toBe(30)
   })
 })

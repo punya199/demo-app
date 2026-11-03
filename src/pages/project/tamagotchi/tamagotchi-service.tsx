@@ -1002,6 +1002,26 @@ export const usePassiveDeallocateBranch = () =>
     return data
   })
 
+export const usePassivePickMastery = () =>
+  usePassiveMutation(async (input: { nodeId: string; option: number }) => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/mastery`, input)
+    return data
+  })
+
+export const usePassiveAllocateAscendancy = () =>
+  usePassiveMutation(async (nodeId: string) => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/ascendancy/allocate`, {
+      nodeId,
+    })
+    return data
+  })
+
+export const usePassiveResetAscendancy = () =>
+  usePassiveMutation(async () => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/ascendancy/reset`)
+    return data
+  })
+
 export const usePassiveRespec = () =>
   usePassiveMutation(async () => {
     const { data } = await apiClient.post<IPassiveState>(`/passive/respec`)

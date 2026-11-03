@@ -1,6 +1,7 @@
 import { Button, Input, Popconfirm, Spin } from 'antd'
 import { PointerEvent, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  canAllocateAscendancyNode,
   canAllocatePassive,
   canDeallocatePassive,
   describePassiveEffect,
@@ -16,7 +17,10 @@ import {
   useGetPassive,
   usePassiveAllocate,
   usePassiveDeallocate,
+  usePassiveAllocateAscendancy,
   usePassiveDeallocateBranch,
+  usePassivePickMastery,
+  usePassiveResetAscendancy,
   usePassiveRespec,
 } from './tamagotchi-service'
 
@@ -32,6 +36,7 @@ const ARM_COLOR: Record<IPassiveNode['arm'], string> = {
   lightning: '#d9c52e',
   spirit: '#a56fe0',
   bridge: '#8d85a0',
+  ascend: '#c9a227',
 }
 const ARM_LABEL = {
   flame: 'เพลิง',
@@ -41,10 +46,17 @@ const ARM_LABEL = {
   lightning: 'อสนี',
   spirit: 'วิญญาณ',
 } as const
-const KIND_LABEL = { small: 'โหนดเล็ก', notable: 'โหนดเด่น', key: 'คีย์สโตน' }
+const KIND_LABEL = {
+  small: 'โหนดเล็ก',
+  notable: 'โหนดเด่น',
+  key: 'คีย์สโตน',
+  mastery: 'มาสเตอรี (เลือก 1 จาก 3)',
+  ascend: 'เส้นทางสูงสุด',
+}
+const PATH_LABEL = { vanguard: 'แวนการ์ด', striker: 'สไตรเกอร์', warden: 'วอร์เดน' } as const
 
-// The tree spans about +-520 around the hub; the view is a square window onto it.
-const FULL = 1100
+// The tree spans about +-520 around the hub and the ascendancy ring about +-640.
+const FULL = 1400
 const MIN_SCALE = 0.7
 const MAX_SCALE = 5
 const DRAG_PIXELS = 6
@@ -53,6 +65,13 @@ const hexagon = (r: number) =>
   Array.from({ length: 6 }, (_, i) => {
     const t = (i * Math.PI) / 3
     return `${(r * Math.cos(t)).toFixed(1)},${(r * Math.sin(t)).toFixed(1)}`
+  }).join(' ')
+
+const star = (r: number) =>
+  Array.from({ length: 10 }, (_, i) => {
+    const radius = i % 2 ? r * 0.45 : r
+    const t = -Math.PI / 2 + (i * Math.PI) / 5
+    return `${(radius * Math.cos(t)).toFixed(1)},${(radius * Math.sin(t)).toFixed(1)}`
   }).join(' ')
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
@@ -64,16 +83,24 @@ export const PassivePanel = (props: IPassivePanelProps) => {
   const { mutate: deallocate, isPending: isDeallocating } = usePassiveDeallocate()
   const { mutate: deallocateBranch, isPending: isBranching } = usePassiveDeallocateBranch()
   const { mutate: respec, isPending: isRespeccing } = usePassiveRespec()
+  const { mutate: pickMastery, isPending: isPicking } = usePassivePickMastery()
+  const { mutate: allocateAscendancy, isPending: isAscending } = usePassiveAllocateAscendancy()
+  const { mutate: resetAscendancy, isPending: isResetting } = usePassiveResetAscendancy()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 })
   const svgRef = useRef<SVGSVGElement>(null)
+  const boxRef = useRef<HTMLDivElement>(null)
+  // Mouse hover: the node under the cursor and where, relative to the map box.
+  const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null)
   const pointers = useRef(new Map<number, { x: number; y: number }>())
   const gesture = useRef({ moved: 0, pinch: 0 })
 
   const nodes = useMemo(() => data?.nodes ?? [], [data])
   const allocated = useMemo(() => data?.allocated ?? [], [data])
   const owned = useMemo(() => new Set(allocated), [allocated])
+  const ascendancyIds = useMemo(() => data?.ascendancy.nodeIds ?? [], [data])
+  const ascOwned = useMemo(() => new Set(ascendancyIds), [ascendancyIds])
   const byId = useMemo(() => new Map(nodes.map((node) => [node.id, node])), [nodes])
   const edges = useMemo(
     () =>
@@ -105,15 +132,26 @@ export const PassivePanel = (props: IPassivePanelProps) => {
     return <Spin />
   }
 
-  const { points, respec: refunds } = data
-  const isBusy = isAllocating || isDeallocating || isBranching || isRespeccing
+  const { points, respec: refunds, ascendancy, masteries } = data
+  const isBusy =
+    isAllocating ||
+    isDeallocating ||
+    isBranching ||
+    isRespeccing ||
+    isPicking ||
+    isAscending ||
+    isResetting
   const selected = byId.get(selectedId ?? PASSIVE_HUB)!
-  const isOwned = (id: string) => id === PASSIVE_HUB || owned.has(id)
-  const totals = sumPassiveEffects(nodes, allocated)
+  const isOwned = (id: string) => id === PASSIVE_HUB || owned.has(id) || ascOwned.has(id)
+  const totals = sumPassiveEffects(nodes, [...allocated, ...ascendancyIds], masteries)
   const size = FULL / view.scale
   const viewBox = `${view.x - size / 2} ${view.y - size / 2} ${size} ${size}`
 
-  const canTake = !owned.has(selected.id) && canAllocatePassive(nodes, allocated, selected.id)
+  const isAscend = selected.kind === 'ascend'
+  const canTake = isAscend
+    ? canAllocateAscendancyNode(selected, ascendancy.path, ascendancyIds)
+    : !owned.has(selected.id) && canAllocatePassive(nodes, allocated, selected.id)
+  const poolLeft = isAscend ? ascendancy.points.left : points.left
   const canDrop = owned.has(selected.id) && canDeallocatePassive(nodes, allocated, selected.id)
   const branch = owned.has(selected.id) ? getPassiveBranch(nodes, allocated, selected.id) : []
   const branchCost = getBranchRespecCost(refunds, branch.length)
@@ -123,13 +161,23 @@ export const PassivePanel = (props: IPassivePanelProps) => {
     if (selected.id === PASSIVE_HUB) {
       return 'แตะโหนดเพื่อดูรายละเอียด แล้วกดปุ่มด้านล่างเพื่อเลือก'
     }
+    if (ascOwned.has(selected.id)) {
+      return 'เส้นทางสูงสุดถอนทีละโหนดไม่ได้ ใช้ปุ่มรีเซ็ตด้านล่าง'
+    }
     if (owned.has(selected.id)) {
       return canDrop ? null : 'เอาโหนดนี้ออกเดี่ยวๆ ไม่ได้ เพราะโหนดอื่นต่อสายผ่านมัน ลองถอนทั้งสาย'
     }
     if (!canTake) {
-      return 'ยังไม่ติดกับโหนดที่มี เลือกโหนดข้างเคียงก่อน'
+      return isAscend
+        ? 'เริ่มที่โหนดแรกของเส้นทาง แล้วต่อไปทีละโหนด (เลือกได้เส้นทางเดียว)'
+        : 'ยังไม่ติดกับโหนดที่มี เลือกโหนดข้างเคียงก่อน'
     }
-    return points.left <= 0 ? 'แต้มหมดแล้ว หาแต้มเพิ่มจาก Dex เรด ด่านผจญภัย บอสโลก และ PvP' : null
+    if (poolLeft <= 0) {
+      return isAscend
+        ? 'แต้มเส้นทางสูงสุดหมดแล้ว ได้จากเรดระดับ Nightmare และล้มบอสโลก'
+        : 'แต้มหมดแล้ว หาแต้มเพิ่มจาก Dex เรด ด่านผจญภัย บอสโลก และ PvP'
+    }
+    return null
   })()
 
   // Pan with one pointer, pinch with two; a press that barely moved still counts as a tap.
@@ -160,6 +208,7 @@ export const PassivePanel = (props: IPassivePanelProps) => {
     const dy = event.clientY - last.y
     gesture.current.moved += Math.abs(dx) + Math.abs(dy)
     if (gesture.current.moved > DRAG_PIXELS) {
+      setHover(null)
       setView((v) => ({ ...v, x: v.x - dx * unit, y: v.y - dy * unit }))
     }
   }
@@ -167,6 +216,26 @@ export const PassivePanel = (props: IPassivePanelProps) => {
     pointers.current.delete(event.pointerId)
     gesture.current.pinch = 0
   }
+  const trackHover = (event: PointerEvent<SVGGElement>, id: string) => {
+    const rect = boxRef.current?.getBoundingClientRect()
+    if (event.pointerType !== 'mouse' || !rect || event.buttons) {
+      return
+    }
+    setHover({ id, x: event.clientX - rect.left, y: event.clientY - rect.top })
+  }
+  const hovered = hover ? byId.get(hover.id) : undefined
+  const hoveredCanTake =
+    !!hovered &&
+    (hovered.kind === 'ascend'
+      ? canAllocateAscendancyNode(hovered, ascendancy.path, ascendancyIds)
+      : canAllocatePassive(nodes, allocated, hovered.id))
+  const hoveredState = !hovered
+    ? ''
+    : isOwned(hovered.id)
+      ? 'มีแล้ว'
+      : hoveredCanTake
+        ? 'เลือกได้ (1 แต้ม)'
+        : 'ยังไม่ติดกับโหนดที่มี'
   const zoomBy = (factor: number) =>
     setView((v) => ({ ...v, scale: clamp(v.scale * factor, MIN_SCALE, MAX_SCALE) }))
   const focus = (node: IPassiveNode) => {
@@ -191,6 +260,12 @@ export const PassivePanel = (props: IPassivePanelProps) => {
     }
     if (node.kind === 'key') {
       return <polygon points={hexagon(17)} {...common} />
+    }
+    if (node.kind === 'mastery') {
+      return <rect x={-11} y={-11} width={22} height={22} rx={6} {...common} />
+    }
+    if (node.kind === 'ascend') {
+      return <polygon points={star(13)} {...common} />
     }
     if (node.kind === 'notable') {
       return <rect x={-9} y={-9} width={18} height={18} transform="rotate(45)" {...common} />
@@ -221,7 +296,10 @@ export const PassivePanel = (props: IPassivePanelProps) => {
         suffix={query ? <span className="text-xs text-slate-500">{matches.size}</span> : null}
       />
 
-      <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
+      <div
+        ref={boxRef}
+        className="relative overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950"
+      >
         <svg
           ref={svgRef}
           viewBox={viewBox}
@@ -274,8 +352,12 @@ export const PassivePanel = (props: IPassivePanelProps) => {
           {nodes
             .filter((node) => node.id !== PASSIVE_HUB)
             .map((node) => {
-              const on = owned.has(node.id)
-              const reachable = !on && canAllocatePassive(nodes, allocated, node.id)
+              const on = owned.has(node.id) || ascOwned.has(node.id)
+              const reachable =
+                !on &&
+                (node.kind === 'ascend'
+                  ? canAllocateAscendancyNode(node, ascendancy.path, ascendancyIds)
+                  : canAllocatePassive(nodes, allocated, node.id))
               const found = matches.has(node.id)
               return (
                 <g
@@ -289,6 +371,9 @@ export const PassivePanel = (props: IPassivePanelProps) => {
                   opacity={matches.size && !found ? 0.35 : 1}
                   onClick={() => gesture.current.moved <= DRAG_PIXELS && setSelectedId(node.id)}
                   onFocus={() => setSelectedId(node.id)}
+                  onPointerEnter={(event) => trackHover(event, node.id)}
+                  onPointerMove={(event) => trackHover(event, node.id)}
+                  onPointerLeave={() => setHover(null)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault()
@@ -302,6 +387,54 @@ export const PassivePanel = (props: IPassivePanelProps) => {
               )
             })}
         </svg>
+
+        {hover && hovered && (
+          <div
+            className="pointer-events-none absolute z-10 w-56 rounded-md border border-slate-300 bg-white/95 p-2 text-xs shadow-lg dark:border-slate-600 dark:bg-slate-900/95"
+            style={{
+              left: hover.x,
+              top: hover.y,
+              transform: `translate(${hover.x > (boxRef.current?.clientWidth ?? 0) / 2 ? 'calc(-100% - 14px)' : '14px'}, ${hover.y > (boxRef.current?.clientHeight ?? 0) * 0.55 ? 'calc(-100% - 14px)' : '14px'})`,
+            }}
+          >
+            <div className="text-slate-500 dark:text-slate-400">
+              {KIND_LABEL[hovered.kind]} · {hoveredState}
+            </div>
+            <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              {hovered.name}
+            </div>
+            <ul>
+              {(Object.entries(hovered.fx) as [PassiveEffectKey, number][]).map(([key, value]) => (
+                <li
+                  key={key}
+                  className={value < 0 ? 'text-red-500' : 'text-slate-700 dark:text-slate-200'}
+                >
+                  {describePassiveEffect(key, value)}
+                </li>
+              ))}
+            </ul>
+            {hovered.options && (
+              <ul className="mt-1 border-t border-slate-200 pt-1 dark:border-slate-700">
+                {hovered.options.map((option, index) => (
+                  <li
+                    key={option.name}
+                    className={
+                      masteries[hovered.id] === index
+                        ? 'font-semibold text-amber-600 dark:text-amber-400'
+                        : 'text-slate-700 dark:text-slate-200'
+                    }
+                  >
+                    {masteries[hovered.id] === index ? '✓ ' : '• '}
+                    {option.name}:{' '}
+                    {(Object.entries(option.fx) as [PassiveEffectKey, number][])
+                      .map(([key, value]) => describePassiveEffect(key, value))
+                      .join(', ')}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
 
         <div className="absolute top-2 right-2 flex flex-col gap-1">
           <Button size="small" aria-label="ขยาย" onClick={() => zoomBy(1.3)}>
@@ -358,7 +491,7 @@ export const PassivePanel = (props: IPassivePanelProps) => {
       <div className="rounded-lg border border-slate-200 p-3 dark:border-slate-700">
         <div className="text-xs text-slate-500 dark:text-slate-400">
           {selected.id === PASSIVE_HUB ? 'จุดเริ่มต้น' : KIND_LABEL[selected.kind]}
-          {owned.has(selected.id) && ' · มีแล้ว'}
+          {(owned.has(selected.id) || ascOwned.has(selected.id)) && ' · มีแล้ว'}
         </div>
         <div className="font-semibold text-slate-900 dark:text-slate-100">
           {selected.id === PASSIVE_HUB ? 'จุดกลางของผู้ฝึก' : selected.name}
@@ -373,17 +506,51 @@ export const PassivePanel = (props: IPassivePanelProps) => {
             </li>
           ))}
         </ul>
+        {selected.kind === 'mastery' && selected.options && (
+          <div className="mt-2 flex flex-col gap-1">
+            {selected.options.map((option, index) => {
+              const picked = masteries[selected.id] === index
+              return (
+                <Button
+                  key={option.name}
+                  size="small"
+                  type={picked ? 'primary' : 'default'}
+                  disabled={!owned.has(selected.id) || picked || isBusy}
+                  onClick={() => pickMastery({ nodeId: selected.id, option: index }, { onError })}
+                >
+                  <span className="font-medium">{option.name}</span>{' '}
+                  <span className="text-xs">
+                    {(Object.entries(option.fx) as [PassiveEffectKey, number][])
+                      .map(([key, value]) => describePassiveEffect(key, value))
+                      .join(', ')}
+                  </span>
+                </Button>
+              )
+            })}
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {owned.has(selected.id)
+                ? masteries[selected.id] === undefined
+                  ? 'เลือกครั้งแรกฟรี'
+                  : `เปลี่ยนตัวเลือกใช้ 💎 ${ascendancy.masteryRepickPrice}`
+                : 'เลือกโหนดนี้ก่อน แล้วค่อยเลือกตัวเลือก'}
+            </p>
+          </div>
+        )}
         {pickHint && <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{pickHint}</p>}
         {selected.id !== PASSIVE_HUB && (
           <div className="mt-2 flex flex-wrap gap-2">
-            {!owned.has(selected.id) && (
+            {!owned.has(selected.id) && !ascOwned.has(selected.id) && (
               <Button
                 type="primary"
                 size="small"
-                disabled={!canTake || points.left <= 0 || isBusy}
-                onClick={() => allocate(selected.id, { onError })}
+                disabled={!canTake || poolLeft <= 0 || isBusy}
+                onClick={() =>
+                  isAscend
+                    ? allocateAscendancy(selected.id, { onError })
+                    : allocate(selected.id, { onError })
+                }
               >
-                เลือกโหนดนี้ (1 แต้ม)
+                เลือกโหนดนี้ (1 แต้ม{isAscend ? 'เส้นทางสูงสุด' : ''})
               </Button>
             )}
             {owned.has(selected.id) && (
@@ -413,6 +580,27 @@ export const PassivePanel = (props: IPassivePanelProps) => {
             </Button>
           </div>
         )}
+      </div>
+
+      <div className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 p-3 text-sm dark:border-slate-700">
+        <div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">เส้นทางสูงสุด (วงนอกสุด)</div>
+          <div className="text-slate-900 dark:text-slate-100">
+            {ascendancy.path ? PATH_LABEL[ascendancy.path] : 'ยังไม่เลือกเส้นทาง'} · แต้ม{' '}
+            {ascendancy.points.left} / {ascendancy.points.earned}
+          </div>
+        </div>
+        <Popconfirm
+          title="เริ่มเส้นทางสูงสุดใหม่?"
+          description={`ใช้ 💎 ${ascendancy.resetCost}`}
+          okText="รีเซ็ต"
+          cancelText="ยกเลิก"
+          onConfirm={() => resetAscendancy(undefined, { onError })}
+        >
+          <Button size="small" disabled={ascendancy.nodeIds.length === 0 || isBusy}>
+            รีเซ็ต
+          </Button>
+        </Popconfirm>
       </div>
 
       <div className="rounded-lg border border-slate-200 p-3 dark:border-slate-700">

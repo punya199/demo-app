@@ -228,6 +228,8 @@ export interface IEquipmentItem {
   mainValue: number
   subStats: Partial<Record<StatKey, number>>
   specialOptions: ISpecialOption[]
+  // The youngest form that may wear it (null = any).
+  minStage: EnumMonsterStage | null
   stats: IBattleStats
   enhanceLevel: number
   pity: number

@@ -395,6 +395,18 @@ describe('getEquipBlocker', () => {
     expect(getEquipBlocker(null)).toBeNull()
     expect(getEquipBlocker(monster({ expeditionAreaId: 'meadow' }))).toBe('มอนออกสำรวจอยู่')
   })
+
+  it('blocks a piece the monster is too young for', () => {
+    const adult = monster()
+    expect(getEquipBlocker(adult, { minStage: null })).toBeNull()
+    expect(getEquipBlocker(adult, { minStage: EnumMonsterStage.ADULT })).toBeNull()
+    expect(getEquipBlocker(adult, { minStage: EnumMonsterStage.PERFECT })).toMatch(/ถึง/)
+    expect(
+      getEquipBlocker(monster({ stage: EnumMonsterStage.FUSED }), {
+        minStage: EnumMonsterStage.PERFECT,
+      })
+    ).toBeNull()
+  })
 })
 
 describe('getEnhanceBlocker', () => {

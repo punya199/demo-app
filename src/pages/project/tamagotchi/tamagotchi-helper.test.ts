@@ -28,6 +28,10 @@ import {
   canAllocatePassive,
   canAllocateAscendancyNode,
   canDeallocatePassive,
+  canDropAscendancyNode,
+  diffPassiveDraft,
+  getAscendancyPathOf,
+  getPassiveSaveCost,
   getBranchRespecCost,
   getPassiveBranch,
   searchPassiveNodes,
@@ -83,6 +87,7 @@ import {
   ISetProgress,
   IMergeForm,
   IEvolutionRuleInfo,
+  IPassiveDraft,
   IPassiveNode,
   IMonsterData,
 } from './tamagotchi-interface'
@@ -1084,5 +1089,78 @@ describe('masteries, ascendancy and keystone replay', () => {
     expect(hpAfter(events, 1, 'enemy', 40)).toBe(20)
     expect(hpAfter(events, 2, 'enemy', 40)).toBe(25)
     expect(hpAfter(events, 2, 'player', 50)).toBe(30)
+  })
+})
+
+describe('passive draft and save', () => {
+  const draft = (overrides: Partial<IPassiveDraft> = {}): IPassiveDraft => ({
+    nodeIds: [],
+    masteries: {},
+    ascendancyNodeIds: [],
+    ...overrides,
+  })
+  const prices = { respec: { freeLeft: 2, gemPrice: 1 }, masteryRepick: 1, ascendancyReset: 20 }
+
+  it('is free to add, free within the free refunds, then 1 gem per point taken back', () => {
+    const saved = draft({ nodeIds: ['a', 'b', 'c', 'd'] })
+    expect(
+      getPassiveSaveCost(saved, draft({ nodeIds: ['a', 'b', 'c', 'd', 'e'] }), prices).total
+    ).toBe(0)
+    expect(getPassiveSaveCost(saved, draft({ nodeIds: ['a', 'b'] }), prices).total).toBe(0)
+    expect(getPassiveSaveCost(saved, draft(), prices)).toMatchObject({ removed: 4, total: 2 })
+  })
+
+  it('charges for a changed mastery pick on a kept node, but not for a first pick', () => {
+    const saved = draft({ nodeIds: ['m'], masteries: { m: 0 } })
+    expect(
+      getPassiveSaveCost(saved, draft({ nodeIds: ['m'], masteries: { m: 2 } }), prices).repicks
+    ).toBe(1)
+    expect(
+      getPassiveSaveCost(
+        draft({ nodeIds: ['m'] }),
+        draft({ nodeIds: ['m'], masteries: { m: 2 } }),
+        prices
+      ).total
+    ).toBe(0)
+  })
+
+  it('charges the ascendancy price only when something in it is removed', () => {
+    const saved = draft({ ascendancyNodeIds: ['v2-asc-striker-00'] })
+    expect(getPassiveSaveCost(saved, draft(), prices).total).toBe(20)
+    expect(
+      getPassiveSaveCost(
+        saved,
+        draft({ ascendancyNodeIds: ['v2-asc-striker-00', 'v2-asc-striker-01'] }),
+        prices
+      ).total
+    ).toBe(0)
+  })
+
+  it('reports what changed, and nothing for an identical draft', () => {
+    const saved = draft({ nodeIds: ['a', 'b'], masteries: { m: 0 } })
+    expect(diffPassiveDraft(saved, saved).isDirty).toBe(false)
+    expect(
+      diffPassiveDraft(saved, draft({ nodeIds: ['a', 'c', 'd'], masteries: { m: 1 } }))
+    ).toMatchObject({
+      added: 2,
+      removed: 1,
+      picked: 1,
+      isDirty: true,
+    })
+  })
+
+  it('knows the ascendancy path and only drops a node that leaves the rest connected', () => {
+    const node = (id: string, adj: string[]) =>
+      ({ id, adj, fx: {}, kind: 'ascend' }) as unknown as IPassiveNode
+    const nodes = [
+      node('v2-asc-warden-00', ['v2-asc-warden-01']),
+      node('v2-asc-warden-01', ['v2-asc-warden-00', 'v2-asc-warden-02']),
+      node('v2-asc-warden-02', ['v2-asc-warden-01']),
+    ]
+    const ids = nodes.map((n) => n.id)
+    expect(getAscendancyPathOf(ids)).toBe('warden')
+    expect(getAscendancyPathOf([])).toBeNull()
+    expect(canDropAscendancyNode(nodes, ids, 'v2-asc-warden-02')).toBe(true)
+    expect(canDropAscendancyNode(nodes, ids, 'v2-asc-warden-01')).toBe(false)
   })
 })

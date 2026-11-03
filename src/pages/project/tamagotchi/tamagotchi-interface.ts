@@ -960,6 +960,13 @@ export interface IPassiveNode {
 }
 
 // GET /passive: the whole graph (drawn as is), what the player owns and what they can still do.
+// A tree as edited on the client and saved in one request (POST /passive/save).
+export interface IPassiveDraft {
+  nodeIds: string[]
+  masteries: Record<string, number>
+  ascendancyNodeIds: string[]
+}
+
 export type AscendancyPath = 'vanguard' | 'striker' | 'warden'
 
 export interface IPassiveState {
@@ -973,6 +980,8 @@ export interface IPassiveState {
     points: { earned: number; used: number; left: number; max: number }
     // Gems to start the ascendancy over (0 while it is empty).
     resetCost: number
+    // What starting the ascendancy over costs, whether or not there is anything to reset.
+    resetPrice: number
     masteryRepickPrice: number
   }
   points: {

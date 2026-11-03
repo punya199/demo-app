@@ -28,6 +28,8 @@ import {
   IMergeForm,
   IMonsterData,
   IGetMyMonsterResponse,
+  AscendancyPath,
+  IPassiveDraft,
   IPassiveNode,
   IPotentialStat,
   PassiveEffectKey,
@@ -904,6 +906,81 @@ export const searchPassiveNodes = (nodes: IPassiveNode[], query: string) => {
       )
       .map((node) => node.id)
   )
+}
+
+export const getAscendancyPathOf = (ids: string[]): AscendancyPath | null => {
+  const match = /^v2-asc-([a-z]+)-/.exec(ids[0] ?? '')
+  return match ? (match[1] as AscendancyPath) : null
+}
+
+// An ascendancy node can be dropped while every other owned one stays connected to the path's
+// first node (in practice: from the far end of the chain).
+export const canDropAscendancyNode = (nodes: IPassiveNode[], ids: string[], nodeId: string) => {
+  const path = getAscendancyPathOf(ids)
+  if (!path || !ids.includes(nodeId)) {
+    return false
+  }
+  const rest = new Set(ids.filter((id) => id !== nodeId))
+  const byId = new Map(nodes.map((node) => [node.id, node]))
+  const root = `v2-asc-${path}-00`
+  const seen = new Set(rest.has(root) ? [root] : [])
+  const stack = [...seen]
+  while (stack.length) {
+    for (const id of byId.get(stack.pop()!)?.adj ?? []) {
+      if (rest.has(id) && !seen.has(id)) {
+        seen.add(id)
+        stack.push(id)
+      }
+    }
+  }
+  return [...rest].every((id) => seen.has(id))
+}
+
+// Mirrors the server's save cost (calcPassiveSaveCost): points taken back beyond the free refunds,
+// a changed mastery pick, and starting the ascendancy over. The server still decides.
+export const getPassiveSaveCost = (
+  saved: IPassiveDraft,
+  draft: IPassiveDraft,
+  prices: {
+    respec: { freeLeft: number; gemPrice: number }
+    masteryRepick: number
+    ascendancyReset: number
+  }
+) => {
+  const kept = new Set(draft.nodeIds)
+  const removed = saved.nodeIds.filter((id) => !kept.has(id)).length
+  const respec = getRespecCost({ refunded: 0, ...prices.respec }, removed)
+  const repicks = Object.entries(saved.masteries).filter(
+    ([id, option]) =>
+      kept.has(id) && draft.masteries[id] !== undefined && draft.masteries[id] !== option
+  ).length
+  const restarted =
+    saved.ascendancyNodeIds.length > 0 &&
+    saved.ascendancyNodeIds.some((id) => !draft.ascendancyNodeIds.includes(id))
+  const total = respec + repicks * prices.masteryRepick + (restarted ? prices.ascendancyReset : 0)
+  return { removed, respec, repicks, restarted, total }
+}
+
+// How a draft differs from what is saved, for the "unsaved changes" bar.
+export const diffPassiveDraft = (saved: IPassiveDraft, draft: IPassiveDraft) => {
+  const added = draft.nodeIds.filter((id) => !saved.nodeIds.includes(id)).length
+  const removed = saved.nodeIds.filter((id) => !draft.nodeIds.includes(id)).length
+  const ascAdded = draft.ascendancyNodeIds.filter(
+    (id) => !saved.ascendancyNodeIds.includes(id)
+  ).length
+  const ascRemoved = saved.ascendancyNodeIds.filter(
+    (id) => !draft.ascendancyNodeIds.includes(id)
+  ).length
+  const picks = new Set([...Object.keys(saved.masteries), ...Object.keys(draft.masteries)])
+  const picked = [...picks].filter((id) => saved.masteries[id] !== draft.masteries[id]).length
+  return {
+    added,
+    removed,
+    ascAdded,
+    ascRemoved,
+    picked,
+    isDirty: added + removed + ascAdded + ascRemoved + picked > 0,
+  }
 }
 
 // Gems needed to take back `count` points when `refunded` were already taken back.

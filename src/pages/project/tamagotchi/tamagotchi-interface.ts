@@ -769,7 +769,8 @@ export interface IWikiData {
     criticalMultiplier: number
     strongMultiplier: number
     weakMultiplier: number
-    defenseFactor: number
+    defenseK: number
+    maxDefenseReduction: number
     damageVariance: number
     weightLoss: number
     beats: Record<EnumMonsterLine, EnumMonsterLine[]>

@@ -398,8 +398,9 @@ const buildSections = (wiki: IWikiData) => {
           />
           <Heading>สูตรดาเมจ</Heading>
           <div className="rounded-lg bg-slate-100 p-2 font-mono text-xs dark:bg-slate-800">
-            (ATK × พลังท่า × ธาตุ − DEF × {battle.defenseFactor}) × สุ่ม {1 - battle.damageVariance}
-            –{1 + battle.damageVariance} × คริติคอล
+            (ATK × พลังท่า × ธาตุ × (1 − min({battle.maxDefenseReduction * 100}%, DEF/(DEF+
+            {battle.defenseK})))) × สุ่ม {1 - battle.damageVariance}–{1 + battle.damageVariance} ×
+            คริติคอล
           </div>
           <List
             items={[

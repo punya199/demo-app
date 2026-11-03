@@ -1085,4 +1085,13 @@ describe('masteries, ascendancy and keystone replay', () => {
     expect(hpAfter(events, 2, 'enemy', 40)).toBe(25)
     expect(hpAfter(events, 2, 'player', 50)).toBe(30)
   })
+
+  it('ignores a rented ally lifesteal when following the player HP in a team fight', () => {
+    const events = [
+      { actor: 'player', member: 1, targetHp: 20, actorHp: 99, healed: 5 },
+      { actor: 'player', member: 0, targetHp: 15, actorHp: 44, healed: 4 },
+    ] as IBattleEvent[]
+    expect(hpAfter(events, 1, 'player', 50)).toBe(50)
+    expect(hpAfter(events, 2, 'player', 50)).toBe(44)
+  })
 })

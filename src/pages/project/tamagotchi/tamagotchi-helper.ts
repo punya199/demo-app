@@ -367,7 +367,8 @@ export const hpAfter = (
       if (side !== 'player' || (event.member ?? 0) === 0) {
         hp = event.targetHp
       }
-    } else if (event.actorHp !== undefined) {
+    } else if (event.actorHp !== undefined && (side !== 'player' || (event.member ?? 0) === 0)) {
+      // Lifesteal / thorns changed the attacker's own HP (a rented ally's HP is not the player's).
       hp = event.actorHp
     }
   }

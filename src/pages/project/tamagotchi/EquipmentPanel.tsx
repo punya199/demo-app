@@ -14,8 +14,19 @@ import {
   setPieceLabel,
   slotLabel,
 } from './tamagotchi-helper'
-import { EnumEquipmentSlot, IEquipmentItem, IMonsterData } from './tamagotchi-interface'
-import { useDismantle, useEquip, useGetEquipment, useUnequip } from './tamagotchi-service'
+import {
+  EnumEquipmentGrade,
+  EnumEquipmentSlot,
+  IEquipmentItem,
+  IMonsterData,
+} from './tamagotchi-interface'
+import {
+  useDismantle,
+  useDismantleMany,
+  useEquip,
+  useGetEquipment,
+  useUnequip,
+} from './tamagotchi-service'
 
 interface IEquipmentPanelProps {
   monster: IMonsterData | null
@@ -29,6 +40,8 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
   const { mutate: equip, isPending: isEquipping } = useEquip()
   const { mutate: unequip, isPending: isUnequipping } = useUnequip()
   const { mutate: dismantle, isPending: isDismantling } = useDismantle()
+  const { mutate: dismantleMany, isPending: isDismantlingMany } = useDismantleMany()
+  const [selected, setSelected] = useState<string[] | null>(null)
   const [enhancing, setEnhancing] = useState<IEquipmentItem | null>(null)
   const [bagSlot, setBagSlot] = useState<BagFilterSlot>('all')
   const [freeOnly, setFreeOnly] = useState(false)
@@ -37,7 +50,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
     return <Spin />
   }
 
-  const isBusy = isEquipping || isUnequipping || isDismantling
+  const isBusy = isEquipping || isUnequipping || isDismantling || isDismantlingMany
   const isWorn = (item: IEquipmentItem) => isWornBy(item, data.monsterId)
   const worn = new Map(data.items.filter(isWorn).map((item) => [item.slot, item]))
   const bag = data.items.filter((item) => !isWorn(item))
@@ -164,6 +177,53 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
       <Checkbox checked={freeOnly} onChange={(event) => setFreeOnly(event.target.checked)}>
         เฉพาะชิ้นที่ยังไม่มีใครใส่
       </Checkbox>
+      {selected === null ? (
+        <Button size="small" onClick={() => setSelected([])}>
+          เลือกแยกหลายชิ้น
+        </Button>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="small"
+            onClick={() =>
+              setSelected(shownBag.filter((item) => !petOf(item)).map((item) => item.id))
+            }
+          >
+            เลือกทั้งหมดที่แสดง
+          </Button>
+          <Button size="small" onClick={() => setSelected([])}>
+            ล้าง
+          </Button>
+          <Popconfirm
+            title={`แยก ${selected.length} ชิ้นเป็นหินตีบวก?`}
+            description={(() => {
+              const risky = data.items.filter(
+                (item) =>
+                  selected.includes(item.id) &&
+                  (item.grade === EnumEquipmentGrade.EPIC ||
+                    item.grade === EnumEquipmentGrade.LEGENDARY ||
+                    item.enhanceLevel > 0)
+              ).length
+              return risky > 0
+                ? `มีชิ้นเกรดสูงหรือตีบวกแล้ว ${risky} ชิ้น อุปกรณ์ทั้งหมดจะหายไป`
+                : 'อุปกรณ์ทั้งหมดจะหายไป'
+            })()}
+            okText="แยก"
+            cancelText="ยกเลิก"
+            disabled={selected.length === 0 || isBusy}
+            onConfirm={() =>
+              dismantleMany(selected, { onError, onSuccess: () => setSelected(null) })
+            }
+          >
+            <Button size="small" danger disabled={selected.length === 0 || isBusy}>
+              แยกที่เลือก ({selected.length})
+            </Button>
+          </Popconfirm>
+          <Button size="small" type="link" onClick={() => setSelected(null)}>
+            เสร็จสิ้น
+          </Button>
+        </div>
+      )}
       {shownBag.length === 0 && (
         <p className="text-center text-sm text-slate-500 dark:text-slate-400">
           {bag.length === 0
@@ -176,6 +236,19 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
         return (
           <Card key={item.id} size="small" className="dark:border-slate-700 dark:bg-slate-900">
             <div className="flex flex-wrap items-center gap-2">
+              {selected !== null && (
+                <Checkbox
+                  checked={selected.includes(item.id)}
+                  disabled={!!petOf(item) || isBusy}
+                  onChange={(event) =>
+                    setSelected(
+                      event.target.checked
+                        ? [...selected, item.id]
+                        : selected.filter((id) => id !== item.id)
+                    )
+                  }
+                />
+              )}
               <span className="text-xs text-slate-500">{slotLabel[item.slot]}</span>
               <ItemLine item={item} set={setOf(item)} />
               {petOf(item) && (

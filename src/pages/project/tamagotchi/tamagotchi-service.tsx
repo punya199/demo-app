@@ -450,6 +450,14 @@ export const useDismantle = () =>
     return data
   })
 
+export const useDismantleMany = () =>
+  useEquipmentMutation(async (equipmentIds: string[]) => {
+    const { data } = await apiClient.post<IEquipmentData>(`/equipment/dismantle-many`, {
+      equipmentIds,
+    })
+    return data
+  })
+
 export const useGetEnhancePreview = (equipmentId: string | null) => {
   return useQuery({
     queryKey: ['equipment', 'preview', equipmentId],

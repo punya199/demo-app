@@ -5,6 +5,7 @@ import { EvolutionTree } from './EvolutionTree'
 import {
   describeConditions,
   describePctBonus,
+  describeRefineStones,
   describeSetEffect,
   elementLabel,
   formatAge,
@@ -585,7 +586,13 @@ const buildSections = (wiki: IWikiData) => {
                 .map(
                   ([grade, stones]) => `${gradeLabel[grade as keyof typeof gradeLabel]} ${stones}`
                 )
-                .join(' · ')}) และเพิ่ม 1 ก้อนต่อ 2 ระดับบวก`,
+                .join(
+                  ' · '
+                )}) และเพิ่ม 1 ก้อนต่อ ${equipment.dismantleStoneLevelStep} ระดับบวก พร้อมหินรีไฟน์ 1 ก้อน (ชิ้นที่บวกไม่เกิน +${equipment.refineTiers[0].maxLevel} ได้ ${equipment.refineTiers[0].name} ที่เหลือได้ ${equipment.refineTiers[1].name})`,
+              `รีไฟน์: สุ่มค่ารองใหม่ 1 ช่อง (ช่วงค่าเท่ากับตอนดรอป) เลือกเก็บค่าใหม่หรือคงค่าเดิมได้ ใช้หิน 1 ก้อนกับเหรียญทุกครั้ง ระบบใช้หินระดับต่ำสุดที่ครอบคลุม: ${equipment.refineTiers
+                .map((tier) => `${tier.name} ถึง +${tier.maxLevel} 🪙 ${tier.coin}`)
+                .join(' · ')}`,
+              'หินรีไฟน์มหากาพย์/ตำนานได้จากบอสเท่านั้น: Boss Raid ระดับ Hard/Nightmare ชนะได้ 1 ก้อน และรางวัลอันดับ World Boss',
             ]}
           />
           <Table
@@ -692,11 +699,12 @@ const buildSections = (wiki: IWikiData) => {
               `ทุกคนที่ตีอย่างน้อย 1 ครั้ง: ต่อการตี 1 ครั้งได้ 🪙 ${worldBoss.perHit.coin} + 🎖️ ${worldBoss.perHit.raidToken}`,
               `บอสแตกก่อนสัปดาห์จบ: ทุกคนที่ร่วมได้เพิ่ม 🪙 ${worldBoss.defeatedBonus.coin} + 🎖️ ${worldBoss.defeatedBonus.raidToken}`,
               'รางวัลตามอันดับดาเมจ (ด้านล่าง) ชิ้นเซ็ตสุ่มด้วยค่าที่คงที่ต่อผู้เล่นต่อสัปดาห์ รับซ้ำหรือรับหลังเคลียร์กระเป๋าก็ได้ผลเดิม',
+              'ผู้ตีครั้งสุดท้ายที่ทำให้บอสแตกได้หินรีไฟน์มหากาพย์เพิ่ม 1 ก้อน',
               'กระเป๋าอุปกรณ์เต็มรับไม่ได้ถ้ามีชิ้นเซ็ตในรางวัล (ไม่เสียสิทธิ์) แลกชิ้นด้วย 🎫 ได้เฉพาะเกรดหายากและมหากาพย์ หลังเคยรับรางวัลบอสนี้',
             ]}
           />
           <Table
-            head={['อันดับดาเมจ', '🎖️', '🎫', 'โอกาสได้ชิ้นเซ็ต']}
+            head={['อันดับดาเมจ', '🎖️', '🎫', 'โอกาสได้ชิ้นเซ็ต', 'หินรีไฟน์']}
             rows={worldBoss.rankRewards.map((tier, index) => [
               tier.maxRank === null
                 ? 'ที่เหลือ'
@@ -708,6 +716,7 @@ const buildSections = (wiki: IWikiData) => {
               tier.pieceChance > 0
                 ? `${percent(tier.pieceChance)} (${gradeLabel[tier.pieceGrade]})`
                 : '-',
+              describeRefineStones(tier.refineStones) || '-',
             ])}
           />
         </>

@@ -739,9 +739,38 @@ export const describeWorldBossReward = (reward: IWorldBossReward, bossTokenName 
     reward.raidToken > 0 && `🎖️ ${reward.raidToken}`,
     reward.bossToken > 0 && `${bossTokenName} ${reward.bossToken}`,
     reward.pieceGrade && `ชิ้นเซ็ต (${gradeLabel[reward.pieceGrade]})`,
+    describeRefineStones(reward.refineStones),
   ]
     .filter(Boolean)
     .join(' · ')
+
+export const refineStoneLabel: Record<string, string> = {
+  refine_stone_common: '💠 รีไฟน์ธรรมดา',
+  refine_stone_rare: '💠 รีไฟน์หายาก',
+  refine_stone_epic: '💠 รีไฟน์มหากาพย์',
+  refine_stone_legendary: '💠 รีไฟน์ตำนาน',
+}
+
+// "💠 รีไฟน์มหากาพย์ ×2 · ..." (empty when there are none).
+export const describeRefineStones = (stones: Record<string, number>) =>
+  Object.entries(stones)
+    .filter(([, quantity]) => quantity > 0)
+    .map(([material, quantity]) => `${refineStoneLabel[material] ?? material} ×${quantity}`)
+    .join(' · ')
+
+interface IRefineTier {
+  material: string
+  maxLevel: number
+  coin: number
+}
+
+// The tier a refine will spend, mirroring the server: the lowest one that covers the piece's
+// enhance level and that the player owns (null when none).
+export const pickRefineTier = (
+  tiers: IRefineTier[],
+  enhanceLevel: number,
+  quantityOf: (material: string) => number
+) => tiers.find((tier) => tier.maxLevel >= enhanceLevel && quantityOf(tier.material) > 0) ?? null
 
 // Time left until `endsAt`, in days/hours/minutes ("2 วัน 3 ชม.").
 export const formatTimeLeft = (endsAt: string, now: Date) => {

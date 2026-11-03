@@ -10,6 +10,7 @@ import {
   gradeLabel,
   slotLabel,
   stageLabel,
+  refineStoneLabel,
 } from './tamagotchi-helper'
 import {
   EnumEquipmentGrade,
@@ -61,6 +62,7 @@ const describeResult = (result: IRaidBattleResponse) => {
     'ชนะ!',
     `🎖️ Raid Token +${result.raidTokens}${result.isFirstClear ? ' (ชนะครั้งแรก x2)' : ''}`,
     `🎫 Boss Token +${result.bossTokens}`,
+    result.refineStone && `${refineStoneLabel[result.refineStone] ?? result.refineStone} ×1`,
     drop && `ได้ ${drop.emoji} ${drop.name} (${gradeLabel[drop.grade]})`,
   ]
     .filter(Boolean)

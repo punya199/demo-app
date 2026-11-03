@@ -41,6 +41,7 @@ import {
   IQuestsData,
   IShopItem,
   IWallet,
+  StatKey,
   IWikiData,
 } from './tamagotchi-interface'
 
@@ -455,6 +456,38 @@ export const useDismantleMany = () =>
     const { data } = await apiClient.post<IEquipmentData>(`/equipment/dismantle-many`, {
       equipmentIds,
     })
+    return data
+  })
+
+// Rolls a new value for one secondary stat line; it waits to be kept or discarded.
+export const useRefine = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { equipmentId: string; line: StatKey }) => {
+      const { data } = await apiClient.post<{
+        pending: { line: StatKey; oldValue: number; newValue: number }
+        wallet: IWallet
+        equipment: IEquipmentData
+        inventory: IInventoryItem[]
+      }>(`/equipment/refine`, input)
+      return data
+    },
+    onSuccess: ({ wallet, equipment, inventory }) => {
+      queryClient.setQueryData<IEquipmentData>(EQUIPMENT_KEY, equipment)
+      queryClient.setQueryData<IWallet>(WALLET_KEY, wallet)
+      queryClient.setQueryData<IInventoryResponse>(INVENTORY_KEY, { items: inventory })
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
+      queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
+    },
+  })
+}
+
+export const useResolveRefine = () =>
+  useEquipmentMutation(async (input: { equipmentId: string; keep: boolean }) => {
+    const { data } = await apiClient.post<IEquipmentData>(`/equipment/refine/resolve`, input)
     return data
   })
 

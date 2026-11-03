@@ -64,6 +64,7 @@ import {
   getAutoBattleDelayMs,
   getEnhanceBlocker,
   getEquipBlocker,
+  pickRefineTier,
   getExpeditionBlocker,
   getShopBlocker,
   getUseItemBlocker,
@@ -409,6 +410,31 @@ describe('getEquipBlocker', () => {
   })
 })
 
+describe('pickRefineTier', () => {
+  const tiers = [
+    { material: 'c', maxLevel: 4, coin: 50 },
+    { material: 'r', maxLevel: 8, coin: 100 },
+    { material: 'e', maxLevel: 12, coin: 200 },
+  ]
+  const owns =
+    (...owned: string[]) =>
+    (material: string) =>
+      owned.includes(material) ? 1 : 0
+
+  it('spends the lowest owned tier that covers the enhance level', () => {
+    expect(pickRefineTier(tiers, 3, owns('c', 'e'))?.material).toBe('c')
+    expect(pickRefineTier(tiers, 3, owns('e', 'r'))?.material).toBe('r')
+    expect(pickRefineTier(tiers, 5, owns('c', 'r'))?.material).toBe('r')
+    expect(pickRefineTier(tiers, 12, owns('c', 'r', 'e'))?.material).toBe('e')
+  })
+
+  it('is null when no owned stone reaches the level', () => {
+    expect(pickRefineTier(tiers, 5, owns('c'))).toBeNull()
+    expect(pickRefineTier(tiers, 13, owns('c', 'r', 'e'))).toBeNull()
+    expect(pickRefineTier(tiers, 0, owns())).toBeNull()
+  })
+})
+
 describe('getEnhanceBlocker', () => {
   const item = {} as never
   const preview = {
@@ -577,7 +603,13 @@ describe('getWorldBossBlocker', () => {
 
   it('describes a reward and the time left', () => {
     expect(
-      describeWorldBossReward({ coin: 100, raidToken: 3, bossToken: 0, pieceGrade: null })
+      describeWorldBossReward({
+        coin: 100,
+        raidToken: 3,
+        bossToken: 0,
+        pieceGrade: null,
+        refineStones: {},
+      })
     ).toBe('🪙 100 · 🎖️ 3')
     expect(
       describeWorldBossReward({
@@ -585,8 +617,9 @@ describe('getWorldBossBlocker', () => {
         raidToken: 0,
         bossToken: 2,
         pieceGrade: EnumEquipmentGrade.EPIC,
+        refineStones: { refine_stone_epic: 2, refine_stone_legendary: 1 },
       })
-    ).toBe('🪙 50 · 🎫 2 · ชิ้นเซ็ต (มหากาพย์)')
+    ).toBe('🪙 50 · 🎫 2 · ชิ้นเซ็ต (มหากาพย์) · 💠 รีไฟน์มหากาพย์ ×2 · 💠 รีไฟน์ตำนาน ×1')
     const now = new Date('2026-05-04T00:00:00Z')
     expect(formatTimeLeft('2026-05-06T03:00:00Z', now)).toBe('2 วัน 3 ชม.')
     expect(formatTimeLeft('2026-05-04T05:30:00Z', now)).toBe('5 ชม. 30 นาที')

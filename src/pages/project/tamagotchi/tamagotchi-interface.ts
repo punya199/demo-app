@@ -333,14 +333,29 @@ export interface IQuest {
   emoji: string
   target: number
   coinReward: number
+  gemReward: number
   progress: number
   claimed: boolean
+}
+
+export interface ILoginReward {
+  coin: number
+  gem: number
 }
 
 export interface IQuestsData {
   date: string
   resetsAt: string
   quests: IQuest[]
+  weekly: { week: string; resetsAt: string; quests: IQuest[] }
+  login: {
+    claimedToday: boolean
+    streak: number
+    // 1-based day in the 7-day cycle: today's reward if claimed, otherwise the next one.
+    day: number
+    reward: ILoginReward
+    rewards: ILoginReward[]
+  }
 }
 
 export interface IExpeditionArea {
@@ -841,6 +856,10 @@ export interface IWikiData {
     freeRefunds: number
     respecGemPrice: number
     economyCap: number
+    branchRefundCap: number
+    adventureMaxPoints: number
+    winsPerPoint: number
+    winMaxPoints: number
     pvpSeasonPoints: { maxRank: number | null; points: number }[]
   }
   worldBoss: {
@@ -894,7 +913,8 @@ export interface IWikiData {
   }
   economy: {
     shopItems: IShopItem[]
-    dailyQuests: Pick<IQuest, 'id' | 'name' | 'emoji' | 'coinReward'>[]
+    dailyQuests: Pick<IQuest, 'id' | 'name' | 'emoji' | 'coinReward' | 'gemReward'>[]
+    weeklyQuests: Pick<IQuest, 'id' | 'name' | 'emoji' | 'coinReward' | 'gemReward'>[]
     dexDiscoveryGems: number
   }
 }
@@ -918,7 +938,7 @@ export interface IPassiveNode {
   id: string
   name: string
   kind: 'small' | 'notable' | 'key'
-  arm: 'flame' | 'tide' | 'leaf' | 'bridge'
+  arm: 'flame' | 'tide' | 'leaf' | 'earth' | 'lightning' | 'spirit' | 'bridge'
   fx: Partial<Record<PassiveEffectKey, number>>
   x: number
   y: number
@@ -936,11 +956,13 @@ export interface IPassiveState {
     sources: {
       dexSpecies: number
       raidFirstClears: number
+      adventureClears: number
+      totalWins: number
       worldBossDefeats: number
       pvpSeasons: number
     }
   }
-  respec: { refunded: number; freeLeft: number; gemPrice: number }
+  respec: { refunded: number; freeLeft: number; gemPrice: number; branchCap: number }
 }
 
 // GET /monster/me

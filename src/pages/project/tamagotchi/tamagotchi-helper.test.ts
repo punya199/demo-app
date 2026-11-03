@@ -27,6 +27,9 @@ import {
   compareEquipment,
   canAllocatePassive,
   canDeallocatePassive,
+  getBranchRespecCost,
+  getPassiveBranch,
+  searchPassiveNodes,
   describePassiveEffect,
   describeReset,
   foldSelectedMonster,
@@ -1005,5 +1008,34 @@ describe('filterBag', () => {
     expect(
       filterBag(bag, { slot: EnumEquipmentSlot.WEAPON, freeOnly: true }).map((i) => i.id)
     ).toEqual(['axe', 'sword'])
+  })
+})
+
+describe('passive branch and search', () => {
+  const node = (id: string, adj: string[], name = id, fx: IPassiveNode['fx'] = {}) =>
+    ({ id, adj, name, fx }) as IPassiveNode
+  const nodes = [
+    node('hub', ['a']),
+    node('a', ['hub', 'b'], 'Ember Might', { atk: 2 }),
+    node('b', ['a', 'c'], 'Deep Pool', { hp: 2 }),
+    node('c', ['b'], 'Deep Pool', { hp: 2 }),
+  ]
+
+  it('takes the node and everything cut off from the hub', () => {
+    expect(getPassiveBranch(nodes, ['a', 'b', 'c'], 'b')).toEqual(['b', 'c'])
+    expect(getPassiveBranch(nodes, ['a', 'b', 'c'], 'c')).toEqual(['c'])
+    expect(getPassiveBranch(nodes, ['a'], 'b')).toEqual([])
+  })
+
+  it('searches names and effect labels, and never the hub', () => {
+    expect([...searchPassiveNodes(nodes, 'deep')]).toEqual(['b', 'c'])
+    expect([...searchPassiveNodes(nodes, 'atk')]).toEqual(['a'])
+    expect(searchPassiveNodes(nodes, '  ').size).toBe(0)
+  })
+
+  it('caps a branch refund at the branch cap', () => {
+    const respec = { refunded: 10, freeLeft: 0, gemPrice: 1, branchCap: 20 }
+    expect(getBranchRespecCost(respec, 12)).toBe(12)
+    expect(getBranchRespecCost(respec, 60)).toBe(20)
   })
 })

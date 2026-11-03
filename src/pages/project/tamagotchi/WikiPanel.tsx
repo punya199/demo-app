@@ -518,13 +518,13 @@ const buildSections = (wiki: IWikiData) => {
               'ผูกกับบัญชี ไม่หายเมื่อมอนตาย ใช้ได้ทุกโหมดรวมถึง PvP',
               'เริ่มจากจุดกลาง เลือกได้เฉพาะโหนดที่ติดกับโหนดที่มีอยู่ ถอนได้เฉพาะโหนดที่ไม่ตัดสายอื่นขาด',
               'โหนดคีย์สโตนแลกกัน: ค่าหนึ่งเพิ่มมาก อีกค่าลดลง',
-              `แต้มได้จาก Dex ร่างละ 1, เคลียร์เรดครั้งแรกบอสละระดับ 1, ล้มบอสโลก 1 และจบซีซัน PvP ที่ผ่านเกณฑ์ (${passive.pvpSeasonPoints
+              `แต้มได้จาก Dex ร่างละ 1, เคลียร์เรดครั้งแรกบอสละระดับ 1, เคลียร์ด่านผจญภัยครั้งแรกด่านละ 1 (สูงสุด ${passive.adventureMaxPoints}), ชนะสะสมทุก ${passive.winsPerPoint} ครั้ง 1 แต้ม (สูงสุด ${passive.winMaxPoints}), ล้มบอสโลก 1 และจบซีซัน PvP ที่ผ่านเกณฑ์ (${passive.pvpSeasonPoints
                 .map(
                   (tier) =>
                     `${tier.maxRank ? `อันดับ ≤ ${tier.maxRank}` : 'ที่เหลือ'}: ${tier.points}`
                 )
                 .join(' · ')}) รวมสูงสุด ${passive.maxPoints} แต้ม`,
-              `ถอนแต้มคืนได้ ${passive.freeRefunds} แต้มแรกฟรี หลังจากนั้นแต้มละ 💎 ${passive.respecGemPrice}`,
+              `ถอนแต้มคืนได้ ${passive.freeRefunds} แต้มแรกฟรี หลังจากนั้นแต้มละ 💎 ${passive.respecGemPrice} (ถอนทั้งสายสูงสุด 💎 ${passive.branchRefundCap} ต่อครั้ง)`,
               `โหนดเหรียญสำรวจและโอกาสดรอปอุปกรณ์รวมกันได้ไม่เกิน +${passive.economyCap}% อย่างละ`,
             ]}
           />
@@ -818,7 +818,15 @@ const buildSections = (wiki: IWikiData) => {
             head={['ภารกิจ', 'รางวัล']}
             rows={economy.dailyQuests.map((quest) => [
               `${quest.emoji} ${quest.name}`,
-              `🪙 ${quest.coinReward}`,
+              `🪙 ${quest.coinReward}${quest.gemReward ? ` 💎 ${quest.gemReward}` : ''}`,
+            ])}
+          />
+          <Heading>ภารกิจประจำสัปดาห์ (รีเซ็ตเที่ยงคืนวันจันทร์เวลาไทย)</Heading>
+          <Table
+            head={['ภารกิจ', 'รางวัล']}
+            rows={economy.weeklyQuests.map((quest) => [
+              `${quest.emoji} ${quest.name}`,
+              `🪙 ${quest.coinReward} 💎 ${quest.gemReward}`,
             ])}
           />
         </>

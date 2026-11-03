@@ -317,6 +317,23 @@ export const useClaimQuest = () => {
   })
 }
 
+export const useClaimLogin = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiClient.post<IQuestsData & { wallet: IWallet }>(`/quests/login`)
+      return data
+    },
+    onSuccess: ({ wallet, ...quests }) => {
+      queryClient.setQueryData<IQuestsData>(['quests'], quests)
+      queryClient.setQueryData<IWallet>(WALLET_KEY, wallet)
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['quests'] })
+    },
+  })
+}
+
 export const useGetMonsterDex = () => {
   return useQuery({
     queryKey: ['monster', 'dex'],
@@ -976,6 +993,12 @@ export const usePassiveAllocate = () =>
 export const usePassiveDeallocate = () =>
   usePassiveMutation(async (nodeId: string) => {
     const { data } = await apiClient.post<IPassiveState>(`/passive/deallocate`, { nodeId })
+    return data
+  })
+
+export const usePassiveDeallocateBranch = () =>
+  usePassiveMutation(async (nodeId: string) => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/deallocate-branch`, { nodeId })
     return data
   })
 

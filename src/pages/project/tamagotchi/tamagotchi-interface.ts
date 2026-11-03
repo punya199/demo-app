@@ -333,14 +333,29 @@ export interface IQuest {
   emoji: string
   target: number
   coinReward: number
+  gemReward: number
   progress: number
   claimed: boolean
+}
+
+export interface ILoginReward {
+  coin: number
+  gem: number
 }
 
 export interface IQuestsData {
   date: string
   resetsAt: string
   quests: IQuest[]
+  weekly: { week: string; resetsAt: string; quests: IQuest[] }
+  login: {
+    claimedToday: boolean
+    streak: number
+    // 1-based day in the 7-day cycle: today's reward if claimed, otherwise the next one.
+    day: number
+    reward: ILoginReward
+    rewards: ILoginReward[]
+  }
 }
 
 export interface IExpeditionArea {
@@ -894,7 +909,8 @@ export interface IWikiData {
   }
   economy: {
     shopItems: IShopItem[]
-    dailyQuests: Pick<IQuest, 'id' | 'name' | 'emoji' | 'coinReward'>[]
+    dailyQuests: Pick<IQuest, 'id' | 'name' | 'emoji' | 'coinReward' | 'gemReward'>[]
+    weeklyQuests: Pick<IQuest, 'id' | 'name' | 'emoji' | 'coinReward' | 'gemReward'>[]
     dexDiscoveryGems: number
   }
 }

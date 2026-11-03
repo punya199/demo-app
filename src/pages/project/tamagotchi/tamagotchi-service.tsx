@@ -317,6 +317,23 @@ export const useClaimQuest = () => {
   })
 }
 
+export const useClaimLogin = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiClient.post<IQuestsData & { wallet: IWallet }>(`/quests/login`)
+      return data
+    },
+    onSuccess: ({ wallet, ...quests }) => {
+      queryClient.setQueryData<IQuestsData>(['quests'], quests)
+      queryClient.setQueryData<IWallet>(WALLET_KEY, wallet)
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['quests'] })
+    },
+  })
+}
+
 export const useGetMonsterDex = () => {
   return useQuery({
     queryKey: ['monster', 'dex'],

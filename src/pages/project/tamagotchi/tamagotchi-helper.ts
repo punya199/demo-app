@@ -441,6 +441,7 @@ const serverMessageLabel: Record<string, string> = {
   'Clear this stage once before auto-battling it': 'ต้องชนะด่านนี้ด้วยตัวเองก่อน',
   'Auto-battle is not available on boss stages': 'บอสต่อสู้อัตโนมัติไม่ได้',
   'You do not have this item': 'ไม่มีไอเทมนี้ในกระเป๋า',
+  'Login reward was already claimed today': 'วันนี้รับรางวัลเข้าสู่ระบบไปแล้ว',
   'Quest is not complete or was already claimed': 'ภารกิจยังไม่สำเร็จ หรือรับรางวัลไปแล้ว',
 }
 

@@ -818,7 +818,15 @@ const buildSections = (wiki: IWikiData) => {
             head={['ภารกิจ', 'รางวัล']}
             rows={economy.dailyQuests.map((quest) => [
               `${quest.emoji} ${quest.name}`,
-              `🪙 ${quest.coinReward}`,
+              `🪙 ${quest.coinReward}${quest.gemReward ? ` 💎 ${quest.gemReward}` : ''}`,
+            ])}
+          />
+          <Heading>ภารกิจประจำสัปดาห์ (รีเซ็ตเที่ยงคืนวันจันทร์เวลาไทย)</Heading>
+          <Table
+            head={['ภารกิจ', 'รางวัล']}
+            rows={economy.weeklyQuests.map((quest) => [
+              `${quest.emoji} ${quest.name}`,
+              `🪙 ${quest.coinReward} 💎 ${quest.gemReward}`,
             ])}
           />
         </>

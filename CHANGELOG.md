@@ -1,3 +1,10 @@
+# [1.30.0](https://github.com/punya199/demo-app/compare/v1.29.0...v1.30.0) (2026-11-03)
+
+
+### New
+
+* Gem Diggers special mode with a real photo picture, and no more frozen carts ([a892103](https://github.com/punya199/demo-app/commit/a89210360d0148a30dac4d6ecceda86992ef948f))
+
 # [1.29.0](https://github.com/punya199/demo-app/compare/v1.28.0...v1.29.0) (2026-11-02)
 
 

@@ -13,6 +13,7 @@ import {
   IEnhancePreview,
   IEquipmentData,
   IEquipmentItem,
+  IPassiveDraft,
   IPassiveState,
   IFriendsData,
   IFriendVisit,
@@ -984,47 +985,10 @@ const usePassiveMutation = <TInput,>(request: (input: TInput) => Promise<IPassiv
   })
 }
 
-export const usePassiveAllocate = () =>
-  usePassiveMutation(async (nodeId: string) => {
-    const { data } = await apiClient.post<IPassiveState>(`/passive/allocate`, { nodeId })
-    return data
-  })
-
-export const usePassiveDeallocate = () =>
-  usePassiveMutation(async (nodeId: string) => {
-    const { data } = await apiClient.post<IPassiveState>(`/passive/deallocate`, { nodeId })
-    return data
-  })
-
-export const usePassiveDeallocateBranch = () =>
-  usePassiveMutation(async (nodeId: string) => {
-    const { data } = await apiClient.post<IPassiveState>(`/passive/deallocate-branch`, { nodeId })
-    return data
-  })
-
-export const usePassivePickMastery = () =>
-  usePassiveMutation(async (input: { nodeId: string; option: number }) => {
-    const { data } = await apiClient.post<IPassiveState>(`/passive/mastery`, input)
-    return data
-  })
-
-export const usePassiveAllocateAscendancy = () =>
-  usePassiveMutation(async (nodeId: string) => {
-    const { data } = await apiClient.post<IPassiveState>(`/passive/ascendancy/allocate`, {
-      nodeId,
-    })
-    return data
-  })
-
-export const usePassiveResetAscendancy = () =>
-  usePassiveMutation(async () => {
-    const { data } = await apiClient.post<IPassiveState>(`/passive/ascendancy/reset`)
-    return data
-  })
-
-export const usePassiveRespec = () =>
-  usePassiveMutation(async () => {
-    const { data } = await apiClient.post<IPassiveState>(`/passive/respec`)
+// The panel edits a draft locally and saves the whole tree in one request.
+export const usePassiveSave = () =>
+  usePassiveMutation(async (draft: IPassiveDraft) => {
+    const { data } = await apiClient.post<IPassiveState>(`/passive/save`, draft)
     return data
   })
 

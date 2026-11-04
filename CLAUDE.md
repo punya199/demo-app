@@ -64,6 +64,10 @@ React 18 + TypeScript SPA (Vite 6) — a multi-tool app bundling several unrelat
 
 ## Agent skills
 
+### Project skills
+
+Shared skills live in `.claude/skills/` and are committed (only `.claude/skills/` is un-ignored — personal `.claude/settings.local.json` etc. stay local), so every developer's Claude follows the same checklist. Use `new-frontend-page` when adding a page/route or a monster-game screen, or wiring a backend endpoint into query hooks. The other repo has `new-monster-endpoint` for its side of the same feature.
+
 ### Issue tracker
 
 Issues live in this repo's GitHub Issues (via `gh` CLI). See `docs/agents/issue-tracker.md`.

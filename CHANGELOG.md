@@ -1,3 +1,10 @@
+# [1.41.0](https://github.com/punya199/demo-app/compare/v1.40.0...v1.41.0) (2026-11-04)
+
+
+### Update
+
+* explain the new stone sources in the wiki, patch notes and docs ([f7decd7](https://github.com/punya199/demo-app/commit/f7decd799e7249e359dfe8f34e3be27a255aa1ca))
+
 # [1.40.0](https://github.com/punya199/demo-app/compare/v1.39.0...v1.40.0) (2026-11-04)
 
 

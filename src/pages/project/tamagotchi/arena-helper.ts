@@ -229,6 +229,8 @@ export const describeArenaEvent = (
     }
     case 'dot':
       return st ? ['bad', `${n(e.who)} เสีย ${e.dmg} จาก${st.label}`] : null
+    case 'thorns':
+      return ['bad', `${n(e.who)} โดนสะท้อน ${e.dmg} จาก${n(e.by)}`]
     case 'status':
       return st
         ? [
@@ -271,6 +273,45 @@ export const describeArenaEvent = (
 // Status ids in the bit order the server packs them (its status table order).
 export const statusesFromBits = (bits: number, order: StatusId[]) =>
   order.filter((_, i) => bits & (1 << i))
+
+export interface IArenaCooldown {
+  id: string
+  name: string
+  icon: string
+  // Seconds until it can be used again; 0 = ready.
+  left: number
+  // Share of the full cooldown still to wait, 0 to 1.
+  fraction: number
+}
+
+// Index of the dodge cooldown in a frame row; the active skills' cooldowns follow it.
+const FRAME_DODGE_CD = 10
+
+// A fighter's active skills, then its dodge, as they stand in one replay frame row.
+export const fighterCooldowns = (
+  row: number[],
+  fighter: Pick<IArenaFighterSummary, 'skills' | 'dodge'>,
+  skills: Record<string, IArenaSkill>
+): IArenaCooldown[] => {
+  const toCooldown = (id: string, ticks: number, fullSeconds: number): IArenaCooldown => {
+    const left = Math.max(0, ticks) / ARENA_TICK
+    return {
+      id,
+      name: skills[id]?.name ?? id,
+      icon: skills[id]?.icon ?? '✨',
+      left,
+      fraction: fullSeconds > 0 ? Math.min(1, left / fullSeconds) : 0,
+    }
+  }
+  const cooldowns = fighter.skills.map((id, i) =>
+    toCooldown(id, row[FRAME_DODGE_CD + 1 + i] ?? 0, skills[id]?.cd ?? 0)
+  )
+  if (fighter.dodge) {
+    const full = Math.max(DODGE_MIN_CD, skills[fighter.dodge]?.dodge?.cd ?? 0)
+    cooldowns.push(toCooldown(fighter.dodge, row[FRAME_DODGE_CD] ?? 0, full))
+  }
+  return cooldowns
+}
 
 // Mirrors the server's equip rule (canEquipArenaSkill) so the pickers only offer legal skills:
 // the pet's own element(s) or neutral, never its innate, at most one passive in the loadout.

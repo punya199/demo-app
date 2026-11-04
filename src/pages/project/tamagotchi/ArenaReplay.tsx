@@ -306,6 +306,8 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
             e.st === 'burn' ? '#ff8a4c' : '#b6f27a',
             alpha
           )
+        } else if (e.kind === 'thorns') {
+          drawText(String(e.dmg), ex - 16, ey - 20 - rise, 15, '#6fe08a', alpha)
         } else if (e.kind === 'heal' && e.amount) {
           drawText(`+${e.amount}`, ex, ey - 34 - rise, 20, '#4fd47c', alpha)
         } else if (e.kind === 'dodge') {

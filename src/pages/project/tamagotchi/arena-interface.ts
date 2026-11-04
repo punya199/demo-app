@@ -56,6 +56,13 @@ export interface IArenaPassive {
   lastStand?: { belowPct: number; shield: number; immuneSec: number }
   enrage?: { belowPct: number; atk: number }
   afterDodge?: { critNext: boolean; bonus: number }
+  critDamage?: number
+  noCrit?: boolean
+  doubleStrike?: number
+  startShield?: number
+  firstStrike?: boolean
+  thorns?: number
+  attackSpeed?: number
 }
 
 export interface IArenaDodge {
@@ -221,9 +228,9 @@ export interface IArenaReplay {
   checksum: string
 }
 
-export interface IArenaBattleData {
+// A recorded fight, whatever the mode.
+export interface IArenaFight {
   kind: 'arena'
-  stageId: string
   won: boolean
   // Seconds the fight lasted.
   rounds: number
@@ -231,6 +238,10 @@ export interface IArenaBattleData {
   replay: IArenaReplay | null
   player: { name: string; emoji: string; element: EnumMonsterLine }
   enemy: IArenaEnemy | null
+}
+
+export interface IArenaBattleData extends IArenaFight {
+  stageId: string
   reward: number
   gemReward: number
   isFirstClear: boolean

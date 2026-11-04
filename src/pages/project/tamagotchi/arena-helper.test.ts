@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { canEquipSkill, describeArenaEvent, skillNumbers, skillTags } from './arena-helper'
+import {
+  canEquipSkill,
+  describeArenaEvent,
+  fighterCooldowns,
+  skillNumbers,
+  skillTags,
+} from './arena-helper'
 import { IArenaSkill, IArenaStatusInfo, StatusId } from './arena-interface'
 
 const skill = (over: Partial<IArenaSkill>): IArenaSkill => ({
@@ -48,6 +54,34 @@ describe('arena helper', () => {
     )
   })
 
+  it('reads cooldowns from a replay frame row', () => {
+    const skills = {
+      fire: skill({ id: 'fire', name: 'ไฟ', cd: 10 }),
+      step: skill({
+        id: 'step',
+        name: 'ก้าว',
+        icon: '💨',
+        slot: 'dodge',
+        kind: 'dodge',
+        dodge: { cd: 2, chance: 0 },
+      }),
+    }
+    // Eleven fixed fields, the dodge cooldown last, then one cooldown per active skill (in ticks).
+    const row = [0, 0, 100, 0, -1, 0, 0, 1, 0, 0, 40, 100, 0]
+    const cooldowns = fighterCooldowns(row, { skills: ['fire', 'unknown'], dodge: 'step' }, skills)
+    expect(cooldowns).toEqual([
+      { id: 'fire', name: 'ไฟ', icon: '🔥', left: 5, fraction: 0.5 },
+      { id: 'unknown', name: 'unknown', icon: '✨', left: 0, fraction: 0 },
+      // The dodge's 2 second cooldown counts as the arena's 4 second minimum.
+      { id: 'step', name: 'ก้าว', icon: '💨', left: 2, fraction: 0.5 },
+    ])
+    // The shared skill delay can hold a skill past its own cooldown; the fill stays full.
+    expect(
+      fighterCooldowns([...row.slice(0, 11), 400], { skills: ['fire'], dodge: null }, skills)[0]
+        .fraction
+    ).toBe(1)
+  })
+
   it('describes replay events', () => {
     const statuses = { burn: { label: 'เผาไหม้', icon: '🔥', kind: 'debuff', note: '' } } as Record<
       StatusId,
@@ -64,6 +98,9 @@ describe('arena helper', () => {
     expect(
       describeArenaEvent({ t: 1, kind: 'dot', who: 1, st: 'burn', dmg: 3 }, fighters, statuses)?.[1]
     ).toBe('B เสีย 3 จากเผาไหม้')
+    expect(
+      describeArenaEvent({ t: 1, kind: 'thorns', who: 0, by: 1, dmg: 4 }, fighters, statuses)?.[1]
+    ).toBe('A โดนสะท้อน 4 จากB')
     expect(describeArenaEvent({ t: 1, kind: 'burst' }, fighters, statuses)).toBeNull()
   })
 })

@@ -1,17 +1,29 @@
 import { Button, Modal, Progress, Segmented } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { ArenaReplay } from './ArenaReplay'
-import { ARENA_TICK, describeArenaEvent, StatusMap, statusesFromBits } from './arena-helper'
-import { IArenaBattleData, IArenaSkill, StatusId } from './arena-interface'
+import {
+  ARENA_TICK,
+  describeArenaEvent,
+  fighterCooldowns,
+  formatNumber,
+  IArenaCooldown,
+  StatusMap,
+  statusesFromBits,
+} from './arena-helper'
+import { IArenaBattleData, IArenaFight, IArenaSkill, StatusId } from './arena-interface'
 import { gradeLabel } from './tamagotchi-helper'
 
 interface IArenaBattleModalProps {
-  battle: IArenaBattleData | null
+  // Adventure fights bring their rewards; the other modes say the result in `summary`.
+  battle: (IArenaFight & Partial<IArenaBattleData>) | null
   statuses: StatusMap | undefined
   catalog: IArenaSkill[] | undefined
   onClose: () => void
   // Close by itself this long after the replay ends (auto-battle); omit to wait for the player.
   autoCloseMs?: number
+  title?: string
+  // Replaces the result block once the replay ends.
+  summary?: string
 }
 
 const TONE_CLASS: Record<string, string> = {
@@ -23,9 +35,40 @@ const TONE_CLASS: Record<string, string> = {
   '': 'text-slate-700 dark:text-slate-200',
 }
 
+// One skill's icon: a shade drains away as it recovers, with the seconds left on top.
+const CooldownChip = ({ cooldown }: { cooldown: IArenaCooldown }) => {
+  const { name, icon, left, fraction } = cooldown
+  const isReady = left <= 0
+  const label = `${name} · ${isReady ? 'พร้อมใช้' : `อีก ${formatNumber(left)} วิ`}`
+  return (
+    <div
+      title={label}
+      aria-label={label}
+      className={`relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-md border text-base ${
+        isReady
+          ? 'border-emerald-400 bg-emerald-400/15'
+          : 'border-slate-300 bg-slate-200 dark:border-slate-600 dark:bg-slate-700'
+      }`}
+    >
+      {icon}
+      {!isReady && (
+        <>
+          <span
+            className="absolute inset-x-0 bottom-0 bg-slate-900/60"
+            style={{ height: `${fraction * 100}%` }}
+          />
+          <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white tabular-nums [text-shadow:0_1px_2px_#000]">
+            {Math.ceil(left)}
+          </span>
+        </>
+      )}
+    </div>
+  )
+}
+
 // Plays the server's recorded arena fight, then shows the result.
 export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
-  const { battle, statuses, catalog, onClose, autoCloseMs } = props
+  const { battle, statuses, catalog, onClose, autoCloseMs, title, summary } = props
   const [tick, setTick] = useState(0)
   const [speed, setSpeed] = useState(1)
   const replay = battle?.replay ?? null
@@ -71,7 +114,10 @@ export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
       open
       onCancel={onClose}
       width={760}
-      title={`${battle.player.emoji} ${battle.player.name} ปะทะ ${battle.enemy?.emoji ?? ''} ${battle.enemy?.name ?? ''}`}
+      title={
+        title ??
+        `${battle.player.emoji} ${battle.player.name} ปะทะ ${battle.enemy?.emoji ?? ''} ${battle.enemy?.name ?? ''}`
+      }
       footer={
         isFinished ? (
           <Button type="primary" onClick={onClose}>
@@ -125,6 +171,15 @@ export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
                       </span>
                     ))}
                   </div>
+                  {r && (
+                    <div
+                      className={`mt-1 flex flex-wrap gap-1 ${f.team === 1 ? 'justify-end' : ''}`}
+                    >
+                      {fighterCooldowns(r, f, skills).map((cooldown) => (
+                        <CooldownChip key={cooldown.id} cooldown={cooldown} />
+                      ))}
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -152,7 +207,12 @@ export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
           ต่อสู้อัตโนมัติ (ไม่แสดงการต่อสู้)
         </p>
       )}
-      {isFinished && (
+      {isFinished && summary && (
+        <div className="mt-3 rounded-lg bg-slate-100 p-3 text-center text-sm text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+          {summary}
+        </div>
+      )}
+      {isFinished && !summary && (
         <div className="mt-3 rounded-lg bg-slate-100 p-3 text-center dark:bg-slate-800">
           <div className={`text-lg font-bold ${battle.won ? 'text-emerald-600' : 'text-rose-600'}`}>
             {battle.won ? 'ชนะ!' : 'แพ้'} · {battle.rounds} วินาที
@@ -160,7 +220,7 @@ export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
           {battle.won && (
             <div className="text-sm text-slate-700 dark:text-slate-200">
               🪙 {battle.reward}
-              {battle.gemReward > 0 ? ` · 💎 ${battle.gemReward}` : ''}
+              {battle.gemReward ? ` · 💎 ${battle.gemReward}` : ''}
               {battle.isFirstClear ? ' (ชนะครั้งแรก)' : ''}
             </div>
           )}

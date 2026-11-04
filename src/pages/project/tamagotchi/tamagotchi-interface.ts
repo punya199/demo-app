@@ -1,4 +1,4 @@
-import type { IArenaEnemy } from './arena-interface'
+import type { IArenaEnemy, IArenaFight } from './arena-interface'
 export enum EnumMonsterLine {
   FLAME = 'flame',
   TIDE = 'tide',
@@ -492,16 +492,7 @@ export interface IWorldBossStatus {
 
 export interface IWorldBossAttackResponse {
   monster: IMonsterData
-  battle: {
-    rounds: number
-    events: IBattleEvent[]
-    player: IFighter
-    team: IFighter[]
-    // The boss as it was going in, with the HP the whole server had left.
-    enemy: IFighter
-    damage: number
-    survived: boolean
-  }
+  battle: IArenaFight & { damage: number; survived: boolean }
   // The renter's own damage (what the ranking counts).
   damage: number
   ally: { name: string; emoji: string; damage: number; fee: number } | null
@@ -554,13 +545,7 @@ export interface IRaidData {
 
 export interface IRaidBattleResponse {
   monster: IMonsterData
-  battle: {
-    won: boolean
-    rounds: number
-    events: IBattleEvent[]
-    player: IFighter
-    enemy: IFighter
-  }
+  battle: IArenaFight
   isFirstClear: boolean
   raidTokens: number
   bossTokens: number
@@ -617,14 +602,7 @@ export interface IPvpStatus {
 
 export interface IPvpBattleResponse {
   monster: IMonsterData
-  battle: {
-    won: boolean
-    rounds: number
-    events: IBattleEvent[]
-    player: IFighter
-    enemy: IFighter
-    reward: number
-  }
+  battle: IArenaFight & { reward: number }
   rating: { before: number; after: number }
   attemptsLeft: number
   wallet: IWallet
@@ -642,7 +620,9 @@ export interface IPvpHistoryEntry {
   createdAt: string
 }
 
-export interface IPvpReplay {
+// A fight from before PvP moved to the arena replays on the old turn screen.
+export interface IPvpTurnReplay {
+  kind?: undefined
   role: 'attacker' | 'defender'
   attackerWon: boolean
   rounds: number
@@ -650,6 +630,10 @@ export interface IPvpReplay {
   attacker: IFighter
   defender: IFighter
 }
+
+export type IPvpReplay =
+  | IPvpTurnReplay
+  | (IArenaFight & { role: 'attacker' | 'defender'; attackerWon: boolean })
 
 export interface IPvpLeaderboardEntry {
   rank: number
@@ -881,6 +865,10 @@ export interface IWikiData {
     winsPerPoint: number
     winMaxPoints: number
     pvpSeasonPoints: { maxRank: number | null; points: number }[]
+    arenaRegenPerSecPct: number
+    arenaBurnChance: number
+    arenaAttackSpeedPct: number
+    arenaAttackSpeedCap: number
   }
   worldBoss: {
     hits: number

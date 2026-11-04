@@ -1,7 +1,7 @@
 import { ResetCountdown } from './ResetCountdown'
 import { Button, Card, Select, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
-import { BattleModal } from './BattleModal'
+import { ArenaBattleModal } from './ArenaBattleModal'
 import {
   describePctBonus,
   describeSetEffect,
@@ -15,7 +15,6 @@ import {
 import {
   EnumEquipmentGrade,
   EnumEquipmentSlot,
-  IBattleData,
   IMonsterData,
   IRaidBattleResponse,
   IRaidBossInfo,
@@ -25,6 +24,7 @@ import {
   useExchangeRaid,
   useGetRaid,
   useGetWiki,
+  useGetSkills,
   useRaidBattle,
 } from './tamagotchi-service'
 
@@ -38,20 +38,6 @@ const difficultyLabel: Record<string, string> = {
   hard: 'Hard',
   nightmare: 'Nightmare',
 }
-
-const toBattleData = (result: IRaidBattleResponse): IBattleData => ({
-  stageId: 'raid',
-  won: result.battle.won,
-  rounds: result.battle.rounds,
-  events: result.battle.events,
-  player: result.battle.player,
-  enemy: result.battle.enemy,
-  reward: 0,
-  gemReward: 0,
-  isFirstClear: result.isFirstClear,
-  drop: null,
-  dropBagFull: false,
-})
 
 const describeResult = (result: IRaidBattleResponse) => {
   if (!result.battle.won) {
@@ -184,6 +170,7 @@ export const RaidPanel = (props: IRaidPanelProps) => {
   const { data, isLoading } = useGetRaid()
   const { mutate: fight, isPending } = useRaidBattle()
   const applyResult = useApplyRaidResult()
+  const { data: skillState } = useGetSkills()
   const [replay, setReplay] = useState<IRaidBattleResponse | null>(null)
 
   if (isLoading || !data) {
@@ -211,9 +198,11 @@ export const RaidPanel = (props: IRaidPanelProps) => {
           }
         />
       ))}
-      <BattleModal
-        battle={replay ? toBattleData(replay) : null}
-        title={replay ? `ท้า ${replay.battle.enemy.name}` : undefined}
+      <ArenaBattleModal
+        battle={replay?.battle ?? null}
+        statuses={skillState?.statuses}
+        catalog={skillState?.catalog}
+        title={replay ? `ท้า ${replay.battle.enemy?.name}` : undefined}
         summary={replay ? describeResult(replay) : undefined}
         onClose={() => {
           if (replay) {

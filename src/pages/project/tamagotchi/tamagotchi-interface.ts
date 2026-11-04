@@ -467,6 +467,12 @@ export interface IWorldBossStatus {
     name: string
     emoji: string
     setId: string
+    setName: string
+    element: EnumMonsterLine
+    // Flat damage every hit has to chew through first (0 = none).
+    shield: number
+    // From this round on the boss hits harder (null = never).
+    enrage: { round: number; mult: number } | null
     hp: number
     maxHp: number
     isDefeated: boolean
@@ -884,7 +890,16 @@ export interface IWikiData {
     hits: number
     resetHours: number
     rounds: number
-    bosses: { id: string; name: string; emoji: string; setId: string; hp: number }[]
+    bosses: {
+      id: string
+      name: string
+      emoji: string
+      setId: string
+      element: EnumMonsterLine
+      hp: number
+      shield?: number
+      enrage?: { round: number; mult: number }
+    }[]
     perHit: { coin: number; raidToken: number }
     defeatedBonus: { coin: number; raidToken: number }
     killingBlowGrade: EnumEquipmentGrade

@@ -16,6 +16,7 @@ export type GameMenuKey =
   | 'friends'
   | 'dex'
   | 'wiki'
+  | 'patch-notes'
 
 export interface IGameMenuItem {
   key: GameMenuKey
@@ -56,6 +57,7 @@ export const GAME_MENU: IGameMenuGroup[] = [
       { key: 'friends', label: 'เพื่อน', emoji: '👥' },
       { key: 'dex', label: 'Dex', emoji: '📖' },
       { key: 'wiki', label: 'คู่มือ', emoji: '📘' },
+      { key: 'patch-notes', label: 'อัปเดต', emoji: '📰' },
     ],
   },
 ]

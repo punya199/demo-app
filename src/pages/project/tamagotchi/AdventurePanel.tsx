@@ -1,6 +1,6 @@
 import { Button, Card, Spin, Tag, Tooltip } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
-import { BattleModal } from './BattleModal'
+import { ArenaBattleModal } from './ArenaBattleModal'
 import { StaminaCard } from './StaminaCard'
 import {
   elementLabel,
@@ -10,10 +10,11 @@ import {
 } from './tamagotchi-helper'
 import { EnumMonsterStage, IMonsterData } from './tamagotchi-interface'
 import {
-  IBattleResponse,
+  IAdventureBattleResponse,
   useAdventureBattle,
   useApplyBattleResult,
   useGetAdventure,
+  useGetSkills,
   useGetWallet,
   useGetWiki,
 } from './tamagotchi-service'
@@ -28,7 +29,8 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
   const { data, isLoading } = useGetAdventure()
   const { mutate: battle, isPending } = useAdventureBattle()
   const applyBattleResult = useApplyBattleResult()
-  const [replay, setReplay] = useState<IBattleResponse | null>(null)
+  const [replay, setReplay] = useState<IAdventureBattleResponse | null>(null)
+  const { data: skillState } = useGetSkills()
   // Stage being auto-battled; the loop runs while this page is open and visible.
   const [autoStageId, setAutoStageId] = useState<string | null>(null)
   const { data: wiki } = useGetWiki()
@@ -117,10 +119,10 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
                   key={stage.id}
                   className={`flex items-center gap-3 ${stage.unlocked ? '' : 'opacity-50'}`}
                 >
-                  <span className="text-2xl">{stage.unlocked ? stage.enemy.emoji : '🔒'}</span>
+                  <span className="text-2xl">{stage.unlocked ? stage.enemy?.emoji : '🔒'}</span>
                   <div className="flex-1">
                     <div className="font-medium text-slate-900 dark:text-slate-100">
-                      {stage.enemy.name}
+                      {stage.enemy?.name}
                       {stage.isBoss && (
                         <Tag color="red" className="ml-2">
                           บอส
@@ -128,7 +130,18 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
                       )}
                     </div>
                     <div className="text-xs text-slate-500 dark:text-slate-400">
-                      {elementLabel[stage.enemy.element]} · HP {stage.enemy.stats.hp} ·{' '}
+                      {stage.enemy && (
+                        <>
+                          {elementLabel[stage.enemy.element]} · HP {stage.enemy.stats.hp} · ATK{' '}
+                          {stage.enemy.stats.atk} · สกิล{' '}
+                          {stage.enemy.skills.map((skill) => (
+                            <Tooltip key={skill.id} title={skill.name}>
+                              <span>{skill.icon}</span>
+                            </Tooltip>
+                          ))}{' '}
+                          ·{' '}
+                        </>
+                      )}
                       {stage.clearCount > 0
                         ? `🪙 ${stage.reward} · ชนะแล้ว ${stage.clearCount} ครั้ง`
                         : `🪙 ${stage.firstClearReward}${
@@ -173,8 +186,10 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
           </div>
         </Card>
       ))}
-      <BattleModal
+      <ArenaBattleModal
         battle={replay?.battle ?? null}
+        statuses={skillState?.statuses}
+        catalog={skillState?.catalog}
         onClose={closeReplay}
         autoCloseMs={autoStageId ? 1500 : undefined}
       />

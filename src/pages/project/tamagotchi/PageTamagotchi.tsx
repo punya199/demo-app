@@ -23,6 +23,7 @@ import { RaidPanel } from './RaidPanel'
 import { PvpPanel } from './PvpPanel'
 import { QuestPanel } from './QuestPanel'
 import { ShopPanel } from './ShopPanel'
+import { SkillsPanel } from './SkillsPanel'
 import { WikiPanel } from './WikiPanel'
 import { GAME_MENU, GameMenuKey, parseMenuHash } from './game-menu'
 import {
@@ -593,6 +594,7 @@ const GameShell = () => {
       </div>
     ),
     equipment: <EquipmentPanel monster={monster} coin={coin} onError={showError} />,
+    skills: <SkillsPanel monster={monster} onError={showError} />,
     passive: <PassivePanel onError={showError} />,
     costume: <CostumePanel monster={monster} onError={showError} />,
     shop: <ShopPanel monster={monster} coin={coin} onError={showError} />,

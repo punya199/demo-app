@@ -1,3 +1,4 @@
+import type { IArenaEnemy } from './arena-interface'
 export enum EnumMonsterLine {
   FLAME = 'flame',
   TIDE = 'tide',
@@ -305,7 +306,8 @@ export interface IEnhanceOutcome {
 export interface IAdventureStage {
   id: string
   isBoss: boolean
-  enemy: IFighter
+  // The stage's arena enemy (adventure fights run in the real-time arena).
+  enemy: IArenaEnemy | null
   reward: number
   firstClearReward: number
   firstClearGems: number

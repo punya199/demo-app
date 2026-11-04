@@ -41,4 +41,5 @@ public/config/env-config.js
 
 package-lock.json
 
-.claude/
+.claude/*
+!.claude/skills/

@@ -1,3 +1,10 @@
+# [1.42.0](https://github.com/punya199/demo-app/compare/v1.41.0...v1.42.0) (2026-11-04)
+
+
+### Update
+
+* show the release date and time on each patch note ([2427ffa](https://github.com/punya199/demo-app/commit/2427ffa3a98aa6bb32833eb847dd0092ed2a3cbe))
+
 # [1.41.0](https://github.com/punya199/demo-app/compare/v1.40.0...v1.41.0) (2026-11-04)
 
 

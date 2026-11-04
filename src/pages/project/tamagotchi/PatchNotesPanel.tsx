@@ -1,5 +1,5 @@
 import { Tag } from 'antd'
-import { PATCH_KIND_LABEL, PATCH_NOTES, PatchNoteKind } from './patch-notes'
+import { formatPatchDate, PATCH_KIND_LABEL, PATCH_NOTES, PatchNoteKind } from './patch-notes'
 
 const KIND_COLOR: Record<PatchNoteKind, string> = { new: 'green', update: 'blue', fix: 'orange' }
 
@@ -12,7 +12,9 @@ export const PatchNotesPanel = () => (
       >
         <div className="mb-2 flex items-baseline justify-between">
           <span className="font-semibold text-slate-900 dark:text-slate-100">v{note.version}</span>
-          <span className="text-xs text-slate-500 dark:text-slate-400">{note.date}</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">
+            {formatPatchDate(note.releasedAt)}
+          </span>
         </div>
         <ul className="flex flex-col gap-1 text-sm text-slate-700 dark:text-slate-300">
           {note.changes.map((change) => (

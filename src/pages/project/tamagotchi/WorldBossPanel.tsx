@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { ArenaBattleModal } from './ArenaBattleModal'
 import {
   describeWorldBossReward,
+  elementLabel,
   formatTimeLeft,
   getWorldBossBlocker,
   gradeLabel,
@@ -16,6 +17,7 @@ import {
   EnumEquipmentSlot,
   IMonsterData,
   IWorldBossAttackResponse,
+  IWorldBossStatus,
 } from './tamagotchi-interface'
 import {
   useApplyWorldBossResult,
@@ -80,6 +82,16 @@ const RankingList = () => {
   )
 }
 
+// What makes this week's boss different, shown under its name.
+const bossTraits = (boss: IWorldBossStatus['boss']) => [
+  `ธาตุ${elementLabel[boss.element]}`,
+  boss.ability,
+  ...(boss.shield > 0 ? [`🛡️ เกราะ ${boss.shield} ต่อการตี`] : []),
+  ...(boss.enrage
+    ? [`😡 โกรธตั้งแต่วินาทีที่ ${boss.enrage.sec} (โจมตี ×${boss.enrage.mult})`]
+    : []),
+]
+
 export const WorldBossPanel = (props: IWorldBossPanelProps) => {
   const { monster, onError } = props
   const { data: status, isLoading } = useGetWorldBoss()
@@ -118,6 +130,7 @@ export const WorldBossPanel = (props: IWorldBossPanelProps) => {
             <div className="font-semibold text-slate-900 dark:text-slate-100">
               {status.boss.name} <Tag>{status.week}</Tag>
             </div>
+            <div className="text-xs text-slate-500">{bossTraits(status.boss).join(' · ')}</div>
             <Progress
               percent={hpPercent}
               status={status.boss.isDefeated ? 'success' : 'exception'}
@@ -220,7 +233,7 @@ export const WorldBossPanel = (props: IWorldBossPanelProps) => {
           { key: 'ranking', label: 'อันดับดาเมจสัปดาห์นี้', children: <RankingList /> },
           {
             key: 'exchange',
-            label: `แลกชิ้นชุดสายฟ้าเร็ว (🎫 ${tokens})`,
+            label: `แลกชิ้น${status.boss.setName} (🎫 ${tokens})`,
             children: (
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 <Select

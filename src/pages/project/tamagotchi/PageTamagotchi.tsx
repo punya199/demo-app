@@ -25,6 +25,7 @@ import { QuestPanel } from './QuestPanel'
 import { ShopPanel } from './ShopPanel'
 import { SkillsPanel } from './SkillsPanel'
 import { WikiPanel } from './WikiPanel'
+import { PatchNotesPanel } from './PatchNotesPanel'
 import { GAME_MENU, GameMenuKey, parseMenuHash } from './game-menu'
 import {
   actionOptions,
@@ -607,6 +608,7 @@ const GameShell = () => {
     friends: <FriendsPanel monster={monster} onError={showError} />,
     dex: <DexPanel />,
     wiki: <WikiPanel />,
+    'patch-notes': <PatchNotesPanel />,
   }
 
   return (

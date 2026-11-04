@@ -63,6 +63,8 @@ export interface IArenaPassive {
   firstStrike?: boolean
   thorns?: number
   attackSpeed?: number
+  flatShield?: number
+  rage?: { sec: number; atk: number }
 }
 
 export interface IArenaDodge {

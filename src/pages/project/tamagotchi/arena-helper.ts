@@ -229,6 +229,8 @@ export const describeArenaEvent = (
     }
     case 'dot':
       return st ? ['bad', `${n(e.who)} เสีย ${e.dmg} จาก${st.label}`] : null
+    case 'rage':
+      return ['bad', `${n(e.who)} คลั่ง! โจมตีแรงขึ้น`]
     case 'thorns':
       return ['bad', `${n(e.who)} โดนสะท้อน ${e.dmg} จาก${n(e.by)}`]
     case 'status':

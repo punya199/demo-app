@@ -1,3 +1,21 @@
+# [1.41.0](https://github.com/punya199/demo-app/compare/v1.40.0...v1.41.0) (2026-11-04)
+
+
+### Update
+
+* explain the new stone sources in the wiki, patch notes and docs ([f7decd7](https://github.com/punya199/demo-app/commit/f7decd799e7249e359dfe8f34e3be27a255aa1ca))
+
+# [1.40.0](https://github.com/punya199/demo-app/compare/v1.39.0...v1.40.0) (2026-11-04)
+
+
+### New
+
+* add patch notes screen to the monster game menu ([2e8d1d4](https://github.com/punya199/demo-app/commit/2e8d1d4e8a388b0d31011b013d3a6bc707a5aeaa))
+
+### Update
+
+* show the weekly world boss element, shield and enrage ([a28264a](https://github.com/punya199/demo-app/commit/a28264a9289f5f5925b0b3cfd36c25f93d5fefcf))
+
 # [1.39.0](https://github.com/punya199/demo-app/compare/v1.38.0...v1.39.0) (2026-11-04)
 
 

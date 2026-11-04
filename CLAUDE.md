@@ -66,7 +66,7 @@ React 18 + TypeScript SPA (Vite 6) — a multi-tool app bundling several unrelat
 
 ### Project skills
 
-Shared skills live in `.claude/skills/` and are committed (only `.claude/skills/` is un-ignored — personal `.claude/settings.local.json` etc. stay local), so every developer's Claude follows the same checklist. Use `new-frontend-page` when adding a page/route or a monster-game screen, or wiring a backend endpoint into query hooks. The other repo has `new-monster-endpoint` for its side of the same feature.
+Shared skills live in `.claude/skills/` and are committed (only `.claude/skills/` is un-ignored — personal `.claude/settings.local.json` etc. stay local), so every developer's Claude follows the same checklist. Skills here: `new-frontend-page` (new page/route, monster-game screen, or query hooks for an endpoint), `add-env-var` (runtime/build config), `release-commit` (every commit/PR/push). The backend repo has `new-monster-endpoint`, `battle-golden-check`, `add-env-var` and `release-commit` for its side.
 
 ### Issue tracker
 

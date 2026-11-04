@@ -5,15 +5,15 @@ export type PatchNoteKind = 'new' | 'update' | 'fix'
 
 export interface IPatchNote {
   version: string
-  // YYYY-MM-DD
-  date: string
+  // When it shipped, ISO 8601 in UTC (the release commit time); shown in Thai time.
+  releasedAt: string
   changes: { kind: PatchNoteKind; text: string }[]
 }
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
     version: '1.40.0',
-    date: '2026-11-04',
+    releasedAt: '2026-11-04T13:53:06Z',
     changes: [
       {
         kind: 'update',
@@ -33,22 +33,22 @@ export const PATCH_NOTES: IPatchNote[] = [
   },
   {
     version: '1.38.0',
-    date: '2026-11-03',
+    releasedAt: '2026-11-03T15:49:30Z',
     changes: [{ kind: 'update', text: 'คู่มือแสดงสูตรความเสียหายแบบ DEF เป็นเปอร์เซ็นต์' }],
   },
   {
     version: '1.37.0',
-    date: '2026-11-03',
+    releasedAt: '2026-11-03T15:35:55Z',
     changes: [{ kind: 'new', text: 'หน้าต่างรีไฟน์ และข้อมูลหินรีไฟน์ในคู่มือ' }],
   },
   {
     version: '1.36.0',
-    date: '2026-11-03',
+    releasedAt: '2026-11-03T15:33:45Z',
     changes: [{ kind: 'update', text: 'เลือกอุปกรณ์หลายชิ้นในกระเป๋าแล้วแยกชิ้นส่วนพร้อมกันได้' }],
   },
   {
     version: '1.35.0',
-    date: '2026-11-03',
+    releasedAt: '2026-11-03T14:58:24Z',
     changes: [
       {
         kind: 'update',
@@ -63,3 +63,14 @@ export const PATCH_KIND_LABEL: Record<PatchNoteKind, string> = {
   update: 'ปรับปรุง',
   fix: 'แก้ไข',
 }
+
+// '2026-11-04 20:53 น.' in Thai time, whatever the viewer's own time zone is.
+export const formatPatchDate = (releasedAt: string) =>
+  `${new Date(releasedAt).toLocaleString('sv-SE', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })} น.`

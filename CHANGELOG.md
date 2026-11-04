@@ -1,3 +1,11 @@
+# [1.39.0](https://github.com/punya199/demo-app/compare/v1.38.0...v1.39.0) (2026-11-04)
+
+
+### New
+
+* add Claude skills for env vars and release commits ([40e72e4](https://github.com/punya199/demo-app/commit/40e72e409e7acce85304ed4c4b24fbfd969c2501))
+* add shared Claude skill for pages and game screens ([7a37c2f](https://github.com/punya199/demo-app/commit/7a37c2f0ae23316985a6bafca4bbacc3a4a05fa2))
+
 # [1.38.0](https://github.com/punya199/demo-app/compare/v1.37.0...v1.38.0) (2026-11-03)
 
 

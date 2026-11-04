@@ -843,7 +843,6 @@ export interface IWikiData {
         }[]
       }
     >
-    expeditionStoneEveryMinutes: number
     enhance: {
       maxLevel: number
       bonusPerLevel: number

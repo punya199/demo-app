@@ -582,7 +582,7 @@ const buildSections = (wiki: IWikiData) => {
                 .map(([grade, rate]) => `${gradeLabel[grade as keyof typeof gradeLabel]} ${rate}%`)
                 .join(' · ')}`,
               `ชนะด่านผจญภัยด้วยตัวเองมีโอกาสดรอป ${equipment.dropChancePercent}% (ต่อสู้อัตโนมัติและสำรวจไม่ดรอป) เกรดตามพื้นที่`,
-              `สำรวจได้หินตีบวก 1 ก้อนทุก ${formatAge(equipment.expeditionStoneEveryMinutes)}`,
+              'หินตีบวกและหินรีไฟน์ธรรมดาซื้อได้ในร้านค้า ส่วนหินอื่นต้องแยกชิ้นส่วนหรือได้จากบอส (การสำรวจไม่ให้หินแล้ว)',
               `แยกชิ้นส่วนได้หินตามเกรด (${Object.entries(equipment.dismantleStones)
                 .map(
                   ([grade, stones]) => `${gradeLabel[grade as keyof typeof gradeLabel]} ${stones}`

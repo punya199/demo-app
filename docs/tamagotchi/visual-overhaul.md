@@ -64,7 +64,8 @@ asked for this more than once.
 | Earth skills, all 8 | Done. New statuses in the prototype: stun (`stunT`, spinning stars, can't walk, auto mode waits), stone shield (`bubbleStone` on the shared bubble shield), attack up (`atkUpT`, ×1.2 outgoing damage, orange arrow), and the boulder's stone skin (`stoneSkin`: 12% less damage, crowd control 40% shorter, 15% slower). Heavy forms walk up close before ธรณีสั่น because they are slow |
 | Earth fused (ธรณีผู้ตื่น) | Done. After several rounds the owner picked the first redraw (a slim crouching rock beast in charcoal scale tufts with rust stripes, a tail curling up over its back, a three-lobed bone mask with one glowing cyan eye) and asked for it slimmer, with the amber belly kept to the lower part of the body (below y 66 in the 88 px grid) |
 | Earth world boss | Done: ตัวนิ่มศิลาโบราณ, a stone pangolin with thorned scale rows (the game's ต้นไม้โบราณ is earth; the new name is only a proposal). Choosing it switches the arena to the new canyon theme |
-| Lightning, holy, dark, shadow lines | Not started |
+| Lightning line, 11 forms + fused + boss | **Still drafts, waiting for the owner to choose** (section "มอนธาตุอสนี"). Bird branch (นกฟ้าผ่า → เหยี่ยวพายุ → วิหคราชาอสนี with storm-cloud wings), cat branch (เสือพายุ → เสือดาวสายฟ้า → วัชรพยัคฆ์, a white tiger carrying a gold spire struck by lightning). Poor forms: แมวไฟสถิต (puffed-up static cat), เมฆหม่นขี้เกียจ (sleeping rain cloud). Fused อสนีผู้ตื่น: the thunderbird king in gold armour. World boss: the game's จักรกลพายุ is a machine, so the draft is a storm bison with a thundercloud mane (name กระทิงพายุคำราม is a proposal). Wings use the shared `birdWing` helper |
+| Holy, dark, shadow lines | Not started |
 | The other 17 fused forms and 9 bosses | Not started |
 | Putting the art into the real game | Not started |
 
@@ -90,9 +91,8 @@ asked for this more than once.
 
 ## Next steps (suggested order)
 
-1. Lightning line next. The owner wants still pictures first: draw the 11 forms, the fused form
-   and the boss as still drafts (`buildBoard(…, true)` etc.), let them choose, then animate and do
-   the 8 skills. Then holy, dark, shadow the same way.
+1. Get the owner's choice on the lightning drafts, then animate them (drop the `true` still flags) and do
+   the 8 skills (`ltn_*` in `arena-data.ts`). Then holy, dark, shadow the same way: still drafts first.
 3. Integration plan for the real game: replace the emoji in `ArenaReplay.tsx` with sprite frames.
    Positions come from the server replay, so poses map to replay events (walk while moving,
    attack/cast at skill events, the parry pose on dodge events with `parry`). Combat results stay

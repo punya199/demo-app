@@ -1,3 +1,15 @@
+# [1.48.0](https://github.com/punya199/demo-app/compare/v1.47.0...v1.48.0) (2026-11-05)
+
+
+### Fix
+
+* correct the craft wiki patch note to the real 1.47.0 release ([353ade4](https://github.com/punya199/demo-app/commit/353ade46a38d69e6d9839934f0583bd3d86e095a)), closes [#31](https://github.com/punya199/demo-app/issues/31) [#32](https://github.com/punya199/demo-app/issues/32)
+* rewrite the wiki battle tab for the real-time arena ([06cc920](https://github.com/punya199/demo-app/commit/06cc9207564945a8e7948e15896d8f9d9fdb664c))
+
+### Update
+
+* add a skills tab to the in-game wiki ([31d2ef5](https://github.com/punya199/demo-app/commit/31d2ef5841b235d18e23bad59762044f021d9669))
+
 # [1.47.0](https://github.com/punya199/demo-app/compare/v1.46.0...v1.47.0) (2026-11-05)
 
 

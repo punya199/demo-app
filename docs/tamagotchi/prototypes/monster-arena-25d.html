@@ -333,7 +333,7 @@ td.st { white-space: nowrap; color: var(--muted) }
         <div class="act" id="act-efused"></div>
         <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
         <h3>ธรณีผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
-        <p class="hint">ร่างผสมศิลา+ศิลา เดิมเป็นอีโมจิภูเขา ⛰️ ใหม่วาดตามรูปที่เลือก แต่หันข้างให้ใช้ในสนามได้: สัตว์หลังค่อม ขนเป็นกระจุกเกล็ดหินสีดำทั้งตัวมีลายขวางสีส้มอิฐ หางใหญ่หนาเท่าลำตัวม้วนขึ้นเหนือหลังจนปลายชี้ฟ้า ท้องสีอำพันเป็นรูปจันทร์เสี้ยวใต้ลำตัว เท้าสีกระดูกมีกรงเล็บ หน้าเป็นหน้ากากกระดูกสามกลีบ มีหนามเป็นแผงบนกลีบบน และตาเดียวเรืองฟ้ากลางหน้ากาก และวงฝุ่นทองสองวงหมุนสวนกันตามแบบร่างผสม</p>
+        <p class="hint">ร่างผสมศิลา+ศิลา เดิมเป็นอีโมจิภูเขา ⛰️ ใหม่เป็นสัตว์หินตัวเพรียว เกล็ดหินสีดำเป็นกระจุกมีลายขวางสีส้มอิฐ หางยาวม้วนขึ้นเหนือหลังจนปลายชี้ฟ้า ท้องสีอำพันอยู่ครึ่งล่างของลำตัวเท่านั้น เท้าสีอำพัน หน้าเป็นหน้ากากกระดูกสามแฉก มีตาเดียวเรืองฟ้ากลางหน้ากาก และวงฝุ่นทองสองวงหมุนสวนกันตามแบบร่างผสม</p>
       </div>
       <div class="show boss earth">
         <canvas id="show-pangolin" width="128" height="112" aria-label="บอสโลกธาตุศิลา ตัวนิ่มศิลาโบราณ"></canvas>
@@ -1696,65 +1696,54 @@ const SPRITES = {
     s.spike(56 + hx, 49 + hy, 6, 2, 'rhino', -2);
     s.eye(63 + hx, 53 + hy, 'fierce'); s.line([[67 + hx, 59 + hy], [76 + hx, 59 + hy]], '#2e2826');
   }, glows: [[73, 32, '#ffc45a', 6], [34, 36, '#ffa02a', 5], [46, 36, '#ffa02a', 4]], emit: [], mouth: [77, 58] },
-  /* ----- Earth fused form (ธรณีผู้ตื่น), drawn from the owner's reference picture turned to a side view:
-     a hunched beast of rough charcoal scale tufts with rust stripes, a huge tail curling up over its back,
-     an amber belly sweeping back to the hind legs, tan clawed feet, and a three-lobed bone mask with one glowing eye ----- */
+  /* ----- Earth fused form (ธรณีผู้ตื่น): a crouching rock beast in charcoal scale tufts with amber stripes,
+     a bone mask with one glowing eye, an amber belly, and a heavy tail curled up over its back ----- */
   efused: { size: 88, rig: QUAD, aura: { type: 'twine', x: 44, y: 82, r: 34 }, draw(s, P) {
-    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 3.2;
-    const stripe = (x, y, a, len) => s.line([[x, y], [x + Math.cos(a) * len, y + Math.sin(a) * len]], '#b86a2e', '#dc9050');
-    const foot = (x, y, k) => { s.E(x, y, 5, 2, k); for (const [dx, a] of [[-3.5, 2.6], [0, 1.9], [3.5, 1.3]]) s.L(x + dx * .6, y, x + dx + Math.cos(a) * -.5, y + 1.6, 1.2, k, .9); for (const dx of [-3, 0, 3]) s.d(x + dx, y + 1, '#8a6a40'); };
-    // the tail: thick, rising from the rump behind the body, curling up and over with the tip pointing up
-    const C = [[30, 60], [18, 57], [10, 48], [8, 36], [12, 24], [19, 15], [26, 9], [31, 2]], tail = [];
-    for (let i = 0; i < C.length - 1; i++) for (let k = 0; k < 4; k++) { const u = k / 4; tail.push([lerp(C[i][0], C[i + 1][0], u), lerp(C[i][1], C[i + 1][1], u)]); }
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 3.4;
+    // tail: rises from the rump, arcs up and over, tip pointing up
+    const C = [[30, 64], [16, 60], [8, 48], [9, 34], [16, 22], [26, 14], [32, 5]], tail = [];
+    for (let i = 0; i < C.length - 1; i++) for (let k = 0; k < 5; k++) { const u = k / 5; tail.push([lerp(C[i][0], C[i + 1][0], u), lerp(C[i][1], C[i + 1][1], u)]); }
     tail.push(C[C.length - 1]);
-    const n = tail.length, tp = tail.map(([x, y], i) => { const q = i / (n - 1); return [x + bx * (1 - q) + t * q * q * 1.8, y + by * (1 - q), 9.5 - q * 8.2]; });
+    const n = tail.length, tp = tail.map(([x, y], i) => { const q = i / (n - 1); return [x + bx * (1 - q) + t * q * q * 1.6, y + by * (1 - q), 7 - q * 5.8]; });
+    tp.forEach(([x, y, r], i) => { if (i % 2 === 0 && i < n - 3) { const a = Math.atan2(y - 44, x - 26); s.E(x + Math.cos(a) * r * .8, y + Math.sin(a) * r * .8, r * .45 + .8, r * .45 + .8, 'basalt'); } });
     tp.forEach(([x, y, r]) => s.E(x, y, r, r, 'basalt'));
-    tp.forEach(([x, y, r], i) => { if (i < n - 1) { const a = tp[Math.min(n - 1, i + 1)], b = tp[Math.max(0, i - 1)], dx = a[0] - b[0], dy = a[1] - b[1], L = Math.hypot(dx, dy) || 1, nx = dy / L, ny = -dx / L;
-      for (const sd of [1, -1]) { const rr = r * (sd > 0 ? 1 : .85), k = sd > 0 ? 1.4 : 1; if (i % 2 === 0 || sd > 0) s.E(x + nx * rr * sd, y + ny * rr * sd, (1.4 + r * .25) * k, (1.2 + r * .22) * k, 'basalt'); } } });
+    tp.forEach(([x, y, r], i) => { if (i % 3 === 1 && i < n - 2) s.line([[x - r * .8, y - r * .3], [x + r * .4, y + r * .7]], '#b86a2e', '#dc9050'); if (i % 2 === 0) s.d(x - r * .4, y - r * .5, '#55555c'); });
     // far legs
-    s.L(40 + bx, 70 + by, 38 + P.bf[0], 81 + P.bf[1], 4.2, 'basalt2'); foot(38 + P.bf[0], 83 + P.bf[1], 'maskb2');
-    s.L(66 + bx, 68 + by, 69 + P.ff[0], 81 + P.ff[1], 4, 'basalt2'); foot(70 + P.ff[0], 83 + P.ff[1], 'maskb2');
-    // hunched body: rump, back and a high shoulder, with a ragged outline of scale tufts
-    s.E(44 + bx, 62 + by, 21, 12, 'basalt'); s.E(30 + bx, 63 + by, 9, 10, 'basalt'); s.E(60 + bx, 58 + by, 11, 11.5, 'basalt');
-    for (let i = 0; i < 18; i++) { const a = Math.PI * (1.0 + i * .058), x = 46 + Math.cos(a) * 22, y = 61 + Math.sin(a) * 13; s.E(x + bx, y + by, 2.6 + (i % 2) * .6, 2.2, 'basalt'); }
-    // amber belly: a crescent under the body, widest under the chest, sweeping back between the hind legs
-    { const lo = [], up = [];
-      for (let x = 28; x <= 68; x += 2) { const q = (x - 28) / 40, yb = 70 + Math.sin(q * Math.PI) * 4.5 - q * 1.5, w = 1 + Math.sin(Math.pow(q, .8) * Math.PI) * 8.5; lo.push([x + bx, yb + by]); up.push([x + bx, yb - w + by]); }
-      s.P([...lo, ...up.reverse()], 'amberB');
-      s.line(lo.slice(3, -2).map(([x, y]) => [x, y - 1.5]), '#f8c08a'); s.line(up.slice(2, -3).map(([x, y]) => [x, y + 1]), '#8a4a1c');
+    s.L(36 + bx, 72 + by, 34 + P.bf[0], 82 + P.bf[1], 4.2, 'basalt2'); s.E(34 + P.bf[0], 84 + P.bf[1], 4.6, 1.8, 'amberB2');
+    s.L(68 + bx, 70 + by, 70 + P.ff[0], 81 + P.ff[1], 4, 'basalt2'); s.E(71 + P.ff[0], 83.5 + P.ff[1], 4.4, 1.8, 'amberB2');
+    // body: low crouching barrel, round amber belly under the chest
+    s.E(48 + bx, 65 + by, 24, 10, 'basalt'); s.E(62 + bx, 61 + by, 10, 9, 'basalt');
+    { const pts = []; for (let i = 0; i <= 32; i++) { const a = i / 32 * TAU, x = 52 + Math.cos(a) * 15, y = 70 + Math.sin(a) * 8; pts.push([x + bx, Math.max(y, 66 + Math.abs(x - 52) * .04) + by]); } s.P(pts, 'amberB'); }
+    s.line([[40 + bx, 70 + by], [44 + bx, 75 + by], [52 + bx, 77 + by], [61 + bx, 75 + by]], '#f8c08a');
+    // scale tufts: a ragged outline along the back and rows of tufts with amber stripes
+    for (let i = 0; i < 12; i++) { const a = Math.PI * (1.02 + i * .085), x = 48 + Math.cos(a) * 24, y = 65 + Math.sin(a) * 10.5; s.E(x + bx, y + by, 3, 2.6, 'basalt'); }
+    for (const [x, y] of [[57, 53], [63, 52.5], [68, 54], [71, 57]]) s.E(x + bx, y + by, 3.2, 2.8, 'basalt');
+    for (let row = 0; row < 2; row++) for (let k = 0; k < 7; k++) {
+      const x = 30 + k * 6.5 + (row % 2) * 3, y = 58 + row * 4 + Math.abs(k - 3) * .6;
+      s.line([[x - 2 + bx, y + 1 + by], [x + bx, y + by], [x + 2 + bx, y + 1 + by]], '#0c0c0e'); s.d(x + bx, y - 1 + by, '#55555c');
     }
-    // near legs: thick, short, scaled, with wide tan clawed feet
-    s.E(32 + bx, 68 + by, 7, 7.5, 'basalt'); s.L(32 + bx, 72 + by, 31 + P.bl[0], 81 + P.bl[1], 4.8, 'basalt', 4.2); foot(31 + P.bl[0], 83.5 + P.bl[1], 'maskb');
-    s.L(60 + bx, 66 + by, 62 + P.fl[0], 81 + P.fl[1], 5, 'basalt', 4.4); foot(63 + P.fl[0], 83.5 + P.fl[1], 'maskb');
-    // neck and head behind the mask: a short heavy neck, a dark jaw under the mask
-    s.L(62 + bx, 58 + by, 70 + hx, 59 + hy, 8.5, 'basalt', 7.5);
-    s.E(72 + hx, 61 + hy, 8.5, 7.5, 'basalt');
-    s.P([[74 + hx, 62 + hy], [85 + hx, 63 + hy], [84 + hx, 67 + hy], [74 + hx, 68 + hy]], 'basalt2');
-    s.P([[74 + hx, 67 + hy], [84 + hx, 67 + j + hy], [81 + hx, 70 + j + hy], [74 + hx, 70 + hy]], 'basalt2');
-    if (j > 1) s.P([[76 + hx, 67 + hy], [84 + hx, 67 + hy], [81 + hx, 67 + j + hy], [76 + hx, 68 + j * .5 + hy]], 'maw');
-    // the bone mask: three rounded lobes (up, forward, down-back) round one eye, a spiky crest on top
-    const mx = 70 + hx, my = 56 + hy;
-    s.E(mx - 2.5, my - 7.5, 5.6, 6.6, 'maskb'); s.E(mx + 8.5, my + .5, 7.2, 5.4, 'maskb'); s.E(mx - 3, my + 7.5, 5.4, 5.6, 'maskb'); s.E(mx, my, 4.6, 4.6, 'maskb');
-    for (const [dx, dy, h, l] of [[-7, -11, 2.6, -2], [-5.5, -13, 3, -1.5], [-3.5, -14.5, 3.2, -.5], [-1, -14.5, 3, .5], [1.5, -13, 2.6, 1.5], [3, -10.5, 2.2, 2], [14, -3.5, 2.4, 2], [15.5, -.5, 2.6, 2.5], [15, 3, 2.2, 2.5], [-7.5, 11, 2.4, -2], [-5, 13, 2.4, -1]]) s.spike(mx + dx, my + dy, h, 1, 'maskb', l);
-    // ... then the scale texture: a dark arc and a light top on every tuft that is still charcoal
-    for (let y = 4; y < 80; y += 4) for (let x = 4 + (Math.floor(y / 4) % 2) * 2.5; x < 84; x += 5) {
-      const xi = Math.round(x), i = y * 88 + xi; if (s.m[i] !== 'basalt' || s.m[i + 88 * 2] !== 'basalt' || s.m[i - 88 * 2] !== 'basalt' || s.m[i - 2] !== 'basalt' || s.m[i + 2] !== 'basalt') continue;
-      s.d(xi - 2, y, '#16161a').d(xi - 1, y + 1, '#16161a').d(xi, y + 1, '#16161a').d(xi + 1, y + 1, '#16161a').d(xi + 2, y, '#16161a').d(xi - 1, y - 1, '#62626c').d(xi, y - 1, '#62626c');
-    }
-    tp.forEach(([x, y, r], i) => { if (i % 3 === 1 && i < n - 3) stripe(x - r * .6, y - r * .5, .9, r * 1.2); });
-    for (const [x, y, a, l] of [[30, 56, .9, 6], [40, 52, .9, 6], [50, 51, 1, 6], [58, 49, 1.1, 5], [24, 62, .8, 5], [36, 60, .9, 4], [46, 58, 1, 4], [32, 70, 1.2, 4], [61, 70, 1.3, 4]]) stripe(x + bx, y + by, a, l);
-    // mask lines, highlights and the glowing eye
-    // notches between the petals
-    s.line([[mx + 2.5, my - 3], [mx + 4.5, my - 5], [mx + 7, my - 5.5]], '#6a5638').line([[mx + 2.5, my + 3.5], [mx + 4, my + 6], [mx + 6, my + 6.5]], '#6a5638').line([[mx - 4, my + .5], [mx - 6.5, my + 1], [mx - 8, my + 2]], '#6a5638');
-    s.line([[mx - 1, my - 5], [mx - 3, my - 13]], '#a8906a').line([[mx - 4, my - 5], [mx - 6, my - 11]], '#c4aa80');
-    s.line([[mx + 5, my], [mx + 14, my + 1]], '#a8906a').line([[mx + 5, my + 3], [mx + 13, my + 4]], '#c4aa80');
-    s.line([[mx - 3, my + 5], [mx - 5, my + 11]], '#a8906a').line([[mx, my + 6], [mx - 1, my + 11]], '#c4aa80');
-    for (let i = 0; i < 18; i++) { const a = i / 18 * TAU; s.d(mx + Math.cos(a) * 4.6, my + Math.sin(a) * 4.6, '#a8906a'); }
-    s.line([[mx - 6, my - 12], [mx - 7, my - 6]], '#fff4e0').line([[mx + 8, my - 3], [mx + 13, my - 2.5]], '#fff4e0').line([[mx - 8, my + 5], [mx - 8, my + 9]], '#fff4e0');
-    s.E(mx + .5, my, 1.9, 3.2, 'ice'); s.d(mx, my - 1, '#ffffff').d(mx, my - 2, '#ffffff').d(mx + 1, my, '#e0ffff');
-    for (const x of [77, 80, 83]) s.d(x + hx, 67 + hy, '#fff4e0'); if (j > 1) for (const x of [78, 81]) s.d(x + hx, 66 + j + hy, '#fff4e0');
-    if (P.glow) glowMouth(s, 84 + hx, 67 + hy + j * .5);
-  }, glows: [[70.5, 56, '#7ee7ff', 7], [70.5, 56, '#ffffff', 2.5]], emit: [{ x: 46, y: 50, type: 'grit', rate: 2 }, { x: 70, y: 55, type: 'glint', rate: 1 }, { x: 30, y: 4, type: 'ember', rate: 1.2 }], mouth: [84, 67] },
+    for (const [x, y] of [[30, 57], [42, 56], [54, 56], [64, 56], [26, 62], [36, 61]]) s.line([[x + bx, y + by], [x + 5 + bx, y + 5 + by]], '#b86a2e', '#dc9050');
+    // near legs: thick, scaled, tan claws
+    s.L(30 + bx, 70 + by, 28 + P.bl[0], 82 + P.bl[1], 5, 'basalt'); s.E(28 + P.bl[0], 84.5 + P.bl[1], 5.6, 2, 'amberB');
+    s.L(66 + bx, 68 + by, 67 + P.fl[0], 82 + P.fl[1], 4.8, 'basalt'); s.E(68 + P.fl[0], 84.5 + P.fl[1], 5.4, 2, 'amberB');
+    for (const x of [24, 28, 32]) s.d(x + P.bl[0], 85 + P.bl[1], '#5a2a10'); for (const x of [64, 68, 72]) s.d(x + P.fl[0], 85 + P.fl[1], '#5a2a10');
+    s.line([[26 + P.bl[0] * .5, 74], [30 + P.bl[0] * .5, 77]], '#b86a2e').line([[65 + P.fl[0] * .5, 74], [69 + P.fl[0] * .5, 77]], '#b86a2e');
+    // head: short neck, long jaw, and the three-lobed bone mask with one glowing eye
+    s.L(64 + bx, 61 + by, 72 + hx - 4, 61 + hy, 7, 'basalt', 7);
+    s.E(74 + hx - 4, 62 + hy, 9, 8, 'basalt');
+    s.P([[76 + hx - 4, 58 + hy], [87 + hx - 4, 61 + hy], [86 + hx - 4, 66 + hy], [76 + hx - 4, 67 + hy]], 'basalt');
+    s.P([[75 + hx - 4, 66 + hy], [86 + hx - 4, 66 + j + hy], [83 + hx - 4, 69.5 + j + hy], [75 + hx - 4, 69.5 + hy]], 'basalt2');
+    if (j > 1) s.P([[77 + hx - 4, 66 + hy], [86 + hx - 4, 66 + hy], [83 + hx - 4, 66 + j + hy], [77 + hx - 4, 67 + j * .5 + hy]], 'maw');
+    for (const x of [78, 81, 84]) s.d(x + hx - 4, 66 + hy, '#fff4e0'); if (j > 1) for (const x of [79, 82]) s.d(x + hx - 4, 65 + j + hy, '#fff4e0');
+    s.d(87 + hx - 4, 62 + hy, '#0c0c0e');
+    const mx = 73 + hx - 4, my = 58 + hy;
+    s.E(mx - 2, my - 8, 5, 7.5, 'maskb'); s.E(mx + 8, my + 1, 7.5, 5, 'maskb'); s.E(mx - 4, my + 7, 5.5, 5.5, 'maskb'); s.E(mx, my, 5.6, 5.6, 'maskb');
+    for (const [dx, dy, h, l] of [[-6, -12, 5, -2], [-2, -15, 6, 0], [2, -12, 5, 2], [13, -1, 4, 3], [-8, 11, 4, -3], [14, 4, 3, 3]]) s.spike(mx + dx, my + dy, h, 1.5, 'maskb', l);
+    s.line([[mx, my - 4], [mx - 2, my - 13]], '#a8906a').line([[mx + 4, my], [mx + 14, my + 1]], '#a8906a').line([[mx - 2, my + 4], [mx - 5, my + 11]], '#a8906a');
+    s.line([[mx - 5, my - 12], [mx - 6, my - 6]], '#fff4e0').line([[mx + 7, my - 3], [mx + 12, my - 2]], '#fff4e0').line([[mx - 7, my + 5], [mx - 7, my + 9]], '#fff4e0');
+    s.E(mx + .5, my, 1.8, 3, 'ice'); s.d(mx, my - 1, '#ffffff').d(mx, my - 2, '#ffffff');
+    if (P.glow) glowMouth(s, 82 + hx, 66 + hy + j * .5);
+  }, glows: [[69.5, 58, '#7ee7ff', 7], [69.5, 58, '#ffffff', 2]], emit: [{ x: 50, y: 52, type: 'grit', rate: 2 }, { x: 70, y: 57, type: 'glint', rate: 1 }, { x: 30, y: 6, type: 'ember', rate: 1.5 }], mouth: [82, 66] },
   /* ----- Earth world boss (game: ต้นไม้โบราณ, reflects damage): an ancient pangolin of thorned stone scales ----- */
   pangolin: { size: 96, rig: QUAD, aura: { type: 'bosse', x: 46, y: 88, r: 36 }, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by;

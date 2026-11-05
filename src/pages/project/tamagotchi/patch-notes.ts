@@ -12,6 +12,17 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: '1.49.0',
+    // Provisional: set to the real release time once semantic-release publishes it.
+    releasedAt: '2026-11-05T17:00:00Z',
+    changes: [
+      {
+        kind: 'fix',
+        text: 'คู่มือแท็บ "การต่อสู้" เขียนใหม่ตามสนามเรียลไทม์จริง: ไฟต์สู้พร้อมกันไม่ผลัดตา มีเวลาจำกัดแล้วตัดสินด้วยสัดส่วน HP ที่เหลือ สูตรดาเมจ (สุ่ม 80%–120%) ธาตุ ×1.1 / ×0.9 (เดิมคู่มือแสดง ×1.3 / ×0.8 ผิด) สูตรหลบหลีก และค่า EVA / ACC / RES ของแต่ละสาย',
+      },
+    ],
+  },
+  {
     version: '1.48.0',
     // Provisional: set to the real release time once semantic-release publishes it.
     releasedAt: '2026-11-05T16:00:00Z',

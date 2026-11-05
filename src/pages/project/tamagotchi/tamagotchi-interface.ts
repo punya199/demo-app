@@ -820,6 +820,23 @@ export interface IWikiData {
   }
   // The real-time arena: only what the guide shows (statuses and crowd-control rules).
   arena: {
+    timeLimitSec: number
+    defenseK: number
+    maxDefenseReduction: number
+    damageVarianceMin: number
+    damageVarianceMax: number
+    strongMultiplier: number
+    weakMultiplier: number
+    // Percent (15 = 15%) and a multiplier (1.5).
+    critChance: number
+    critMultiplier: number
+    dodgeBase: number
+    dodgeMax: number
+    dodgeMinCooldown: number
+    bossRes: number
+    lineEva: Record<EnumMonsterLine, number>
+    lineAcc: Record<EnumMonsterLine, number>
+    lineRes: Record<EnumMonsterLine, number>
     maxResist: number
     statuses: Record<
       string,

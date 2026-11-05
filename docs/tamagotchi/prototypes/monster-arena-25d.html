@@ -368,7 +368,7 @@ td.st { white-space: nowrap; color: var(--muted) }
   <section aria-labelledby="bshow-h" data-group="bolt" style="order:16">
     <div class="eyebrow">ร่างผสมและบอสสายอสนี · ภาพนิ่ง</div>
     <h2 id="bshow-h">อสนีผู้ตื่น และบอสโลกธาตุอสนี</h2>
-    <p class="lede">ร่างผสมทำมาให้เลือกสามแบบ ทุกแบบบินด้วยปีกและขยับให้ดูแล้ว (ยืนลอยกระพือปีก บินไปข้างหน้า โฉบโจมตี กางปีกใช้สกิล) ลองในฉากต่อสู้ได้ที่ช่องมอนของเรา "สายอสนี"</p>
+    <p class="lede">ร่างผสมขยับให้ดูแล้ว ลองบินในฉากต่อสู้ได้ที่ช่องมอนของเรา "สายอสนี"</p>
     <div class="whale-opts bolt-opts" id="bolt-opts"></div>
     <div class="showcase">
       <div class="show boss bolt">
@@ -1984,66 +1984,9 @@ const SPRITES = {
     s.d(79 + hx, 47.5 + hy, '#0a0c1a'); s.line(m([[63, 44.5], [68, 45.5]], hx, hy), '#0a0c1a'); s.d(66 + hx, 45.5 + hy, '#fffac0').d(67 + hx, 45.5 + hy, '#ffe14a');
     for (const x of [70, 73]) s.d(x + hx, 51 + hy, '#ffffff');
   }, glows: [[14, 26, '#ffe14a', 5], [23, 27, '#ffe14a', 4], [-3, 44, '#ffe14a', 4], [66, 40, '#ffe14a', 3]], emit: [], mouth: [79, 49] },
-  /* ----- Lightning fused form (อสนีผู้ตื่น): three options for the owner, all flyers on the FLY rig ----- */
-  // A: the owner's reference, redrawn with a heavier body, an S-curved neck, a bigger head and paneled wings
-  bfused: { size: 88, rig: FLY, hover: 10, fly: true, aura: { type: 'twinb', x: 44, y: 84, r: 30 }, draw(s, P) {
-    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 3, w = P.wing > 0 ? 8 * P.wing : 16 * P.wing;
-    const o = (pts, dx = bx, dy = by) => pts.map(([x, y]) => [x + dx, y + dy]);
-    // far wing
-    dragonWing(s, o([[56, 46]])[0], [64 + bx, 20 + by - w * .7], o([[86, 10 - w], [86, 24 - w * .8], [80, 34 - w * .5]]), [64 + bx, 52 + by], 'tbird2', 'storm2');
-    // tail: down under the body, then sweeping right, crackling tuft
-    const C = [[36, 62], [30, 70], [34, 78], [46, 81], [60, 80], [72, 77], [82, 75]], tail = [];
-    for (let i = 0; i < C.length - 1; i++) for (let k = 0; k < 5; k++) { const u = k / 5; tail.push([lerp(C[i][0], C[i + 1][0], u), lerp(C[i][1], C[i + 1][1], u)]); }
-    tail.push(C[C.length - 1]);
-    const n = tail.length, tp = tail.map(([x, y], i) => { const q = i / (n - 1); return [x + bx * (1 - q * .6), y + by * (1 - q * .6) + Math.sin(q * Math.PI * 2 + t * .8) * 1.6 * q, 5.4 - q * 4.2]; });
-    tp.forEach(([x, y, r]) => s.E(x, y, r, r, 'tbird'));
-    tp.forEach(([x, y, r], i) => { if (i < n - 2) s.d(x, y + r - .6, i % 2 ? '#f2c13a' : '#c48a16'); if (i % 3 === 0 && i > 1 && i < n - 4) s.spike(x, y - r + 1, 3, 1.1, 'volt', -1); });
-    { const [ex, ey] = tp[n - 1]; for (const [dx, dy] of [[5, -4], [7, 0], [5, 4], [2, -6], [2, 6]]) s.L(ex, ey, ex + dx, ey + dy, .9, 'cloudw', .4); s.line([[ex, ey], [ex + 6, ey - 1]], '#ffe14a'); }
-    // hind leg (far) and body
-    s.L(40 + bx, 64 + by, 38 + P.bl[0], 72 + P.bl[1], 2.6, 'tbird2', 2); claws(s, 38 + P.bl[0], 72.5 + P.bl[1], 1);
-    s.E(46 + bx, 58 + by, 13, 9.5, 'tbird'); s.E(36 + bx, 61 + by, 6, 6, 'tbird');
-    // gold belly plates along the underside of the chest and neck
-    for (const [x, y, r] of [[38, 66, 3], [44, 67, 3.4], [50, 66.5, 3.6], [56, 63, 3.4]]) s.E(x + bx, y + by, r, r * .65, 'gold');
-    // S-curved neck to the head
-    const N = [[54, 54], [58, 48], [60, 42], [63, 38]], nk = [];
-    for (let i = 0; i < N.length - 1; i++) for (let k = 0; k < 4; k++) { const u = k / 4; nk.push([lerp(N[i][0], N[i + 1][0], u), lerp(N[i][1], N[i + 1][1], u)]); }
-    nk.forEach(([x, y], i) => { const q = i / (nk.length - 1), X = x + bx * (1 - q) + hx * q, Y = y + by * (1 - q) + hy * q; s.E(X, Y, 5.2 - q * 1.2, 5.2 - q * 1.2, 'tbird'); if (i % 2 === 0) { s.E(X + 2.5, Y + 3 - q, 2.2, 1.4, 'gold'); s.spike(X - 2, Y - 3.5 + q, 3.4, 1.2, 'volt', -1.5); } });
-    // back spikes
-    for (const [x, y, h, l] of [[34, 56, 3.4, -2], [39, 51, 4.4, -1.5], [44, 49, 4.8, -1], [50, 49, 4.4, -.5]]) s.spike(x + bx, y + by, h, 1.4, 'volt', l);
-    // front legs, bent with claws reaching forward
-    s.L(52 + bx, 62 + by, 57 + P.fl[0] * .5, 67 + P.fl[1] * .5, 2.6, 'tbird', 2.2); s.L(57 + P.fl[0] * .5, 67 + P.fl[1] * .5, 61 + P.fl[0], 69 + P.fl[1], 2, 'tbird', 1.6); claws(s, 61 + P.fl[0], 69.5 + P.fl[1], 1);
-    s.L(48 + bx, 63 + by, 50 + P.ff[0] * .5, 69 + P.ff[1] * .5, 2.4, 'tbird2', 2); s.L(50 + P.ff[0] * .5, 69 + P.ff[1] * .5, 54 + P.ff[0], 72 + P.ff[1], 1.8, 'tbird2', 1.5); claws(s, 54 + P.ff[0], 72.5 + P.ff[1], 1);
-    // near wing, paneled
-    dragonWing(s, [48 + bx, 50 + by], [30 + bx, 16 + by - w * .8], o([[2, 8 - w], [4, 24 - w * .8], [14, 36 - w * .55]]), [42 + bx, 58 + by], 'wingb', 'tbird');
-    // head
-    dragonHead(s, 64 + hx, 38 + hy, j, 1);
-    if (P.glow) glowSap(s, 82 + hx, 40 + hy + j * .5);
-  }, glows: [[70, 37, '#ffe14a', 3], [84, 75, '#ffe14a', 4], [84, 48, '#ffe14a', 3]], emit: [{ x: 84, y: 75, type: 'zap', rate: 3 }, { x: 82, y: 46, type: 'zap', rate: 2 }], mouth: [82, 41] },
-  // B: a long storm serpent on four feathered lightning wings, gold horns and armour bands
-  bfusedB: { size: 88, rig: FLY, hover: 8, fly: true, aura: { type: 'twinb', x: 44, y: 84, r: 30 }, draw(s, P) {
-    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 3, w = P.wing > 0 ? 7 * P.wing : 13 * P.wing;
-    const C = [[4, 52], [10, 64], [22, 70], [36, 66], [44, 56], [52, 50], [62, 52], [68, 44]], raw = [];
-    for (let i = 0; i < C.length - 1; i++) { const p0 = C[Math.max(0, i - 1)], p1 = C[i], p2 = C[i + 1], p3 = C[Math.min(C.length - 1, i + 2)]; for (let k = 0; k < 6; k++) { const u = k / 6, u2 = u * u, u3 = u2 * u, f = (a, b, c, d) => .5 * (2 * b + (-a + c) * u + (2 * a - 5 * b + 4 * c - d) * u2 + (-a + 3 * b - 3 * c + d) * u3); raw.push([f(p0[0], p1[0], p2[0], p3[0]), f(p0[1], p1[1], p2[1], p3[1])]); } }
-    raw.push(C[C.length - 1]);
-    const n = raw.length, pts = raw.map(([x, y], i) => { const q = i / (n - 1); return [x + bx * (1 - q) + hx * q, y + by * (1 - q) + hy * q + Math.sin(q * Math.PI * 2.5 + t * .7) * 2 * (1 - q)]; });
-    const rad = (q) => q < .15 ? 1.4 + q / .15 * 3.2 : 4.6 + Math.sin((q - .15) / .85 * Math.PI) * 1.4;
-    const at = (q) => pts[Math.round(q * (n - 1))];
-    // far wings
-    for (const [q, sc] of [[.62, .9], [.38, .7]]) { const [x, y] = at(q); featherWing(s, x + 2, y - 3, sc, 1, w, 'tbird2'); }
-    pts.forEach(([x, y], i) => { const q = i / (n - 1); if (i % 2 === 0 && q > .15 && q < .95) s.spike(x - 1, y - rad(q) + 1, 4, 1.3, 'volt', -1.5); });
-    pts.forEach(([x, y], i) => { const r = rad(i / (n - 1)); s.E(x, y, r, r, 'tbird'); });
-    pts.forEach(([x, y], i) => { const q = i / (n - 1); if (q > .12) { s.E(x, y + rad(q) * .55, rad(q) * .5, rad(q) * .35, 'cloudw'); if (i % 3 === 0) s.d(x, y - rad(q) * .3, '#9cc4ff'); } });
-    for (const q of [.5, .7, .85]) { const [x, y] = at(q), r = rad(q); s.L(x - .5, y - r, x + .5, y + r, .9, 'gold'); }
-    for (const q of [.45, .8]) { const [x, y] = at(q); s.L(x, y + 3, x + 2, y + 9, 1.4, 'tbird', 1.1); claws(s, x + 2, y + 9.5, 1); }
-    { const [x, y] = at(0); for (const [dx, dy] of [[-4, -4], [-6, 0], [-4, 4]]) s.L(x, y, x + dx, y + dy, .9, 'volt', .4); }
-    // near wings
-    for (const [q, sc] of [[.66, 1.15], [.42, .9]]) { const [x, y] = at(q); featherWing(s, x, y - 2, sc, -1, w, 'wingb', '#ffe14a'); }
-    const [ex, ey] = pts[n - 1];
-    dragonHead(s, ex, ey, j, 1);
-    if (P.glow) glowSap(s, ex + 18, ey + 2 + j * .5);
-  }, glows: [[74, 43, '#ffe14a', 3], [2, 52, '#ffe14a', 4]], emit: [{ x: 2, y: 52, type: 'zap', rate: 3 }], mouth: [86, 46] },
-  // C: a heavy storm wyvern: the arms are the wings, two strong legs, a crest of lightning, cloud-grey belly
-  bfusedC: { size: 88, rig: FLY, hover: 9, fly: true, aura: { type: 'twinb', x: 44, y: 84, r: 30 }, draw(s, P) {
+  /* ----- Lightning fused form (อสนีผู้ตื่น), the owner's pick (option C): a heavy storm wyvern that flies on the FLY rig ----- */
+  // the arms are the wings, two strong legs, a crest of lightning, cloud-grey belly
+  bfused: { size: 88, rig: FLY, hover: 9, fly: true, aura: { type: 'twinb', x: 44, y: 84, r: 30 }, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 3.4, w = P.wing > 0 ? 8 * P.wing : 16 * P.wing;
     const o = (pts) => pts.map(([x, y]) => [x + bx, y + by]);
     dragonWing(s, [52 + bx, 46 + by], [62 + bx, 22 + by - w * .7], o([[84, 12 - w], [84, 28 - w * .8], [76, 38 - w * .5]]), [58 + bx, 54 + by], 'storm2', 'tbird2', true);
@@ -2161,7 +2104,7 @@ function getFrame(def, name, i) {
   }
   return list[i];
 }
-const BOLT_IDS = ['begg', 'spark', 'cloudpuff', 'tbird', 'staticcat', 'stormfox', 'hawk', 'gloomcloud', 'boltfox', 'thunderking', 'foxking', 'bfused', 'bfusedB', 'bfusedC', 'stormbison'];
+const BOLT_IDS = ['begg', 'spark', 'cloudpuff', 'tbird', 'staticcat', 'stormfox', 'hawk', 'gloomcloud', 'boltfox', 'thunderking', 'foxking', 'bfused', 'stormbison'];
 const EARTH_IDS = ['eegg', 'pebble', 'clay', 'tortoise', 'worm', 'rhino', 'pillarturtle', 'boulder', 'orerhino', 'mountturtle', 'crystalrhino', 'efused', 'pangolin'];
 const LEAF_IDS = ['legg', 'seed', 'sprout', 'leafdeer', 'mushroom', 'wolf', 'stag', 'stump', 'barkwolf', 'forestdeer', 'wolfking', 'lfused', 'flora'];
 for (const [id, def] of Object.entries(SPRITES)) {
@@ -2353,7 +2296,7 @@ const STAGES = {
 const STAGE_OF = {
   egg: 'egg', wisp: 'b1', coal: 'b2', gecko: 'adult', smoke: 'adult', raptor: 'adult', frill: 'perfect', lava: 'perfect', dragon: 'perfect', sunking: 'ultimate', phoenix: 'ultimate', avatar: 'fused', boss: 'boss',
   whaleA: 'ultimate', whaleB: 'ultimate', whaleC: 'ultimate', wfused: 'fused',
-  begg: 'egg', spark: 'b1', cloudpuff: 'b2', tbird: 'adult', staticcat: 'adult', stormfox: 'adult', hawk: 'perfect', gloomcloud: 'perfect', boltfox: 'perfect', thunderking: 'ultimate', foxking: 'ultimate', bfused: 'fused', bfusedB: 'fused', bfusedC: 'fused', stormbison: 'boss',
+  begg: 'egg', spark: 'b1', cloudpuff: 'b2', tbird: 'adult', staticcat: 'adult', stormfox: 'adult', hawk: 'perfect', gloomcloud: 'perfect', boltfox: 'perfect', thunderking: 'ultimate', foxking: 'ultimate', bfused: 'fused', stormbison: 'boss',
   eegg: 'egg', pebble: 'b1', clay: 'b2', tortoise: 'adult', worm: 'adult', rhino: 'adult', pillarturtle: 'perfect', boulder: 'perfect', orerhino: 'perfect', mountturtle: 'ultimate', crystalrhino: 'ultimate', efused: 'fused', pangolin: 'boss',
   legg: 'egg', seed: 'b1', sprout: 'b2', leafdeer: 'adult', mushroom: 'adult', wolf: 'adult', stag: 'perfect', stump: 'perfect', barkwolf: 'perfect', forestdeer: 'ultimate', wolfking: 'ultimate', lfused: 'fused', flora: 'boss',
   wegg: 'egg', drop: 'b1', bubble: 'b2', swordwhale: 'adult', jelly: 'adult', shark: 'adult', armorwhale: 'perfect', octopus: 'perfect', seadragon: 'perfect', whaleking: 'ultimate', leviathan: 'ultimate', turtle: 'boss',
@@ -2522,9 +2465,7 @@ addCard(document.getElementById('show-turtle'), 'turtle', document.getElementByI
 addCard(document.getElementById('show-wfused'), 'wfused', document.getElementById('act-wfused'));
 {
   const opts = [
-    ['bfused', 'แบบ A · ตามรูปที่ส่งมา', 'มังกรสี่ขาตัวหนาขึ้น คอโค้งรูปตัว S หัวใหญ่ขึ้น ปีกค้างคาวแบ่งเป็นแผงสองสีมีขอบหยัก โครงปีกทองขอบขาว แผ่นทองใต้อกและคอ หางโค้งลงใต้ตัวแล้วปลายเป็นพู่ประกายไฟ'],
-    ['bfusedB', 'แบบ B · มังกรงูสี่ปีก', 'ตัวยาวแบบงูเลื้อยกลางอากาศ มีปีกขนนกสี่ปีกตลอดลำตัว ท้องขาวเมฆ ปล้องทองรอบตัว หนามสายฟ้าตามสันหลัง ขาเล็กสองคู่ หางแตกเป็นสายฟ้า'],
-    ['bfusedC', 'แบบ C · ไวเวิร์นพายุ', 'ตัวหนาดุดัน ขาหน้าเป็นปีกที่มีกรงเล็บทองตรงข้อพับ ปีกเป็นสีเมฆพายุ ขาหลังสองขาแข็งแรง หัวทู่กรามใหญ่ หงอนเป็นสายฟ้าเอนไปด้านหลัง ปลายหางเป็นสายฟ้า'],
+    ['bfused', 'อสนีผู้ตื่น · ไวเวิร์นพายุ (เลือกแบบ C แล้ว)', 'ร่างผสมอสนี+อสนี เดิมเป็นอีโมจิเมฆฟ้าผ่า 🌩️ ใหม่เป็นไวเวิร์นตัวหนาดุดัน ขาหน้าเป็นปีกสีเมฆพายุ โครงปีกทองมีกรงเล็บทองตรงข้อพับ ขาหลังสองขาแข็งแรง หัวทู่กรามใหญ่ เกราะทองที่หน้าผาก หงอนเป็นสายฟ้าเอนไปด้านหลัง ลายสายฟ้าบนตัว ปลายหางเป็นสายฟ้า บินด้วยปีก: ยืนลอยกระพือปีก บินไปข้างหน้า โฉบโจมตี กางปีกใช้สกิล'],
   ];
   const box = document.getElementById('bolt-opts');
   for (const [id, title, desc] of opts) {
@@ -2698,14 +2639,14 @@ const ROSTER = {
   mountturtle: { sprite: 'mountturtle', name: 'เต่าภูเขา', el: 'earth', hp: 1000 }, crystalrhino: { sprite: 'crystalrhino', name: 'ไททันแรดคริสตัล', el: 'earth', hp: 960 },
   efused: { sprite: 'efused', name: 'ธรณีผู้ตื่น', el: 'earth', hp: 1300 }, clay: { sprite: 'clay', name: 'ก้อนดินเหนียว', el: 'earth', hp: 170 }, pebble: { sprite: 'pebble', name: 'ก้อนกรวด', el: 'earth', hp: 100 },
   pangolin: { sprite: 'pangolin', name: 'ตัวนิ่มศิลาโบราณ', el: 'earth', hp: 7500, boss: true },
-  bfused: { sprite: 'bfused', name: 'อสนีผู้ตื่น (แบบ A)', el: 'bolt', hp: 1250 }, bfusedB: { sprite: 'bfusedB', name: 'อสนีผู้ตื่น (แบบ B)', el: 'bolt', hp: 1250 }, bfusedC: { sprite: 'bfusedC', name: 'อสนีผู้ตื่น (แบบ C)', el: 'bolt', hp: 1250 },
+  bfused: { sprite: 'bfused', name: 'อสนีผู้ตื่น', el: 'bolt', hp: 1250 },
 };
 const pickMe = document.getElementById('pick-me'), pickFoe = document.getElementById('pick-foe');
 { const gf = document.createElement('optgroup'); gf.label = 'สายเพลิง'; for (const id of ['sunking', 'phoenix', 'avatar', 'dragon', 'frill', 'lava', 'raptor', 'gecko', 'coal', 'wisp']) gf.append(new Option(ROSTER[id].name, id)); pickMe.append(gf);
   const gw = document.createElement('optgroup'); gw.label = 'สายวารี'; for (const id of ['wfused', 'whaleking', 'leviathan', 'seadragon', 'armorwhale', 'octopus', 'shark', 'swordwhale', 'jelly', 'bubble', 'drop']) gw.append(new Option(ROSTER[id].name, id)); pickMe.append(gw);
   const gl = document.createElement('optgroup'); gl.label = 'สายพฤกษ์'; for (const id of ['lfused', 'forestdeer', 'wolfking', 'stag', 'barkwolf', 'stump', 'leafdeer', 'wolf', 'mushroom', 'sprout', 'seed']) gl.append(new Option(ROSTER[id].name, id)); pickMe.append(gl);
   const ge = document.createElement('optgroup'); ge.label = 'สายศิลา'; for (const id of ['efused', 'mountturtle', 'crystalrhino', 'pillarturtle', 'orerhino', 'boulder', 'tortoise', 'rhino', 'worm', 'clay', 'pebble']) ge.append(new Option(ROSTER[id].name, id)); pickMe.append(ge);
-  const gb = document.createElement('optgroup'); gb.label = 'สายอสนี (ร่างผสม ลองบิน)'; for (const id of ['bfused', 'bfusedB', 'bfusedC']) gb.append(new Option(ROSTER[id].name, id)); pickMe.append(gb); }
+  const gb = document.createElement('optgroup'); gb.label = 'สายอสนี (ร่างผสม ลองบิน)'; gb.append(new Option(ROSTER.bfused.name, 'bfused')); pickMe.append(gb); }
 for (const id of ['shark', 'dragon', 'armorwhale', 'wolf', 'barkwolf', 'rhino', 'orerhino', 'boss', 'turtle', 'flora', 'pangolin']) pickFoe.add(new Option(ROSTER[id].boss ? 'บอส · ' + ROSTER[id].name : ROSTER[id].name, id));
 
 function makeEnt(rid, side) {

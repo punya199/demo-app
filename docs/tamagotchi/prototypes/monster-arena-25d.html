@@ -254,7 +254,7 @@ td.st { white-space: nowrap; color: var(--muted) }
         <div class="act" id="act-wfused"></div>
         <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
         <h3>สมุทรผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
-        <p class="hint">ร่างผสมวารี+วารี เดิมเป็นอีโมจิคลื่น 🌊 ใหม่เป็นมังกรทะเลดุดัน ตัวยาวเป็นรูปตัว S ลอยขึ้นจากน้ำ อ้าปากคำรามเห็นเขี้ยว มีหนวดยาว ครีบใสบนหลังและแผงคอ ท้องเกล็ดทอง เขาผลึกต่อจากราชาวาฬผลึก และวงน้ำสองวง (ฟ้ากับทอง) หมุนสวนกันตามแบบร่างผสม</p>
+        <p class="hint">ร่างผสมวารี+วารี เดิมเป็นอีโมจิคลื่น 🌊 ใหม่เป็นมังกรทะเลดุดัน ตัวหนาโค้งรูปตัว S ลอยขึ้นจากน้ำ ท้องเกล็ดทองอยู่ด้านหน้าตลอดตัว ครีบหลังเป็นแผ่นใสต่อเนื่อง มีครีบปีกที่ไหล่ เส้นเรืองแสงข้างตัว หัวมังกรปากยาวอ้าคำราม หนวดยาว เขาผลึกต่อจากราชาวาฬผลึก และวงน้ำสองวง (ฟ้ากับทอง) หมุนสวนกันตามแบบร่างผสม</p>
       </div>
       <div class="show boss water">
         <canvas id="show-turtle" width="128" height="112" aria-label="บอสโลก เต่ายักษ์วารี"></canvas>
@@ -988,46 +988,67 @@ const SPRITES = {
     s.eye(61 + hx, 47 + hy, 'fierce');
     if (P.glow) glowMouth(s, 63 + hx, 27 + hy);
   }, glows: [[63, 28, '#7ee7ff', 6]], emit: [{ x: 40, y: 34, type: 'mist', rate: 3 }, { x: 63, y: 28, type: 'glint', rate: 2 }, { x: 30, y: 64, type: 'bubble', rate: 1.5 }], mouth: [63, 28] },
-  /* ----- Tide fused form (สมุทรผู้ตื่น): a roaring sea-serpent dragon rising in an S-curve ----- */
-  wfused: { size: 88, rig: SWIM, hover: 5, aura: { type: 'twinw', x: 36, y: 64, r: 34 }, draw(s, P) {
+  /* ----- Tide fused form (สมุทรผู้ตื่น): a roaring sea dragon rising in an S-curve.
+     The belly always faces one side of the path (front/below), the back the other. ----- */
+  wfused: { size: 88, rig: SWIM, hover: 5, aura: { type: 'twinw', x: 34, y: 66, r: 34 }, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 4.5, w = -3 * P.wing;
-    const C = [[4, 62], [8, 74], [22, 79], [38, 74], [48, 62], [48, 48], [44, 38], [50, 28], [60, 23]];
+    const C = [[3, 54], [3, 70], [14, 80], [32, 79], [45, 68], [47, 52], [42, 40], [47, 28], [58, 21]];
     const raw = [];
     for (let i = 0; i < C.length - 1; i++) {
       const p0 = C[Math.max(0, i - 1)], p1 = C[i], p2 = C[i + 1], p3 = C[Math.min(C.length - 1, i + 2)];
       for (let k = 0; k < 6; k++) { const u = k / 6, u2 = u * u, u3 = u2 * u, f = (a, b, c, d) => .5 * (2 * b + (-a + c) * u + (2 * a - 5 * b + 4 * c - d) * u2 + (-a + 3 * b - 3 * c + d) * u3); raw.push([f(p0[0], p1[0], p2[0], p3[0]), f(p0[1], p1[1], p2[1], p3[1])]); }
     }
     raw.push(C[C.length - 1]);
-    const n = raw.length, pts = raw.map(([x, y], i) => { const q = i / (n - 1); return [x + bx * (1 - q) + hx * q + Math.sin(q * Math.PI * 2 + t * .6) * 2.2 * (1 - q), y + by * (1 - q) + hy * q]; });
-    const rad = (q) => q < .15 ? 1.6 + q / .15 * 3 : q < .6 ? 4.6 + (q - .15) / .45 * 2.6 : 7.2 - (q - .6) / .4 * 2;
-    const nrm = (i) => { const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)]; let dx = b[0] - a[0], dy = b[1] - a[1]; const L = Math.hypot(dx, dy) || 1; let nx = -dy / L, ny = dx / L; if (ny > 0 || (Math.abs(ny) < .2 && nx < 0)) { nx = -nx; ny = -ny; } return [nx, ny]; };
-    // tail fan and pectoral fins (see-through)
+    const n = raw.length, pts = raw.map(([x, y], i) => { const q = i / (n - 1); return [x + bx * (1 - q) + hx * q + Math.sin(q * Math.PI * 2 + t * .6) * 2 * (1 - q), y + by * (1 - q) + hy * q]; });
+    const rad = (q) => q < .14 ? 1.8 + q / .14 * 3.4 : q < .62 ? 5.2 + (q - .14) / .48 * 3 : 8.2 - (q - .62) / .38 * 2.4;
+    // back = left of the direction of travel (tail -> head); belly = right of it
+    const back = (i) => { const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)]; const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1; return [dy / L, -dx / L]; };
     const [tx0, ty0] = pts[0];
-    s.P([[tx0 + 2, ty0], [tx0 - 6, ty0 - 12], [tx0 - 3, ty0 - 3], [tx0 - 10, ty0 + 1], [tx0 - 2, ty0 + 3], [tx0 - 6, ty0 + 12]], 'finglass');
-    s.line([[tx0, ty0], [tx0 - 6, ty0 - 11]], '#4ad4ff').line([[tx0, ty0 + 1], [tx0 - 9, ty0 + 1]], '#4ad4ff').line([[tx0, ty0 + 2], [tx0 - 5, ty0 + 11]], '#4ad4ff');
-    const fi = Math.round(n * .58), [fx, fy] = pts[fi];
-    s.P([[fx - 2, fy], [fx - 16, fy + 6 + P.bl[1]], [fx - 12, fy + 10 + P.bl[1]], [fx - 3, fy + 5]], 'finglass');
-    // dorsal sails along the back
-    pts.forEach(([x, y], i) => { const q = i / (n - 1); if (i % 4 === 2 && q > .18 && q < .92) { const [nx, ny] = nrm(i), r = rad(q), h = r + 6 + w * .4; s.P([[x - ny * 2.4, y + nx * 2.4], [x + nx * h, y + ny * h], [x + ny * 2.4, y - nx * 2.4]], 'finglass'); s.line([[x + nx * r, y + ny * r], [x + nx * (h - 1), y + ny * (h - 1)]], '#4ad4ff'); } });
+    // big crescent tail fin
+    s.P([[tx0 + 1, ty0 + 2], [tx0 - 7, ty0 - 9], [tx0 - 2, ty0 - 2], [tx0 + 6, ty0 - 12], [tx0 + 4, ty0 + 1]], 'finglass');
+    s.line([[tx0, ty0 + 1], [tx0 - 6, ty0 - 8]], '#4ad4ff').line([[tx0 + 1, ty0], [tx0 + 5, ty0 - 11]], '#4ad4ff');
+    // far shoulder fin-wing (behind the body)
+    const si = Math.round(n * .6), [sx0, sy0] = pts[si];
+    s.P([[sx0 - 2, sy0 - 2], [sx0 - 18, sy0 - 16 + w], [sx0 - 14, sy0 - 8 + w * .5], [sx0 - 20, sy0 - 4 + w * .5], [sx0 - 6, sy0 + 3]], 'finglass');
+    s.line([[sx0 - 3, sy0 - 2], [sx0 - 17, sy0 - 15 + w]], '#4ad4ff').line([[sx0 - 4, sy0], [sx0 - 19, sy0 - 4 + w * .5]], '#4ad4ff');
+    // one continuous dorsal sail along the back, with spines
+    const edge = [], tips = [];
+    for (let i = Math.round(n * .16); i <= Math.round(n * .93); i++) { const q = i / (n - 1), [x, y] = pts[i], [bxn, byn] = back(i), r = rad(q), h = r + 4 + (i % 3 === 0 ? 4 : 1.5) + w * .3; edge.push([x + bxn * (r - 1), y + byn * (r - 1)]); tips.push([x + bxn * h, y + byn * h, i % 3 === 0]); }
+    s.P([...edge, ...tips.map(([x, y]) => [x, y]).reverse()], 'finglass');
+    tips.forEach(([x, y, big], k) => { if (big) { const [ex0, ey0] = edge[k]; s.line([[ex0, ey0], [x, y]], '#4ad4ff'); } });
     pts.forEach(([x, y], i) => { const r = rad(i / (n - 1)); s.E(x, y, r, r, 'serp'); });
-    // gold belly plates on the inner side, scale marks on the outer side
-    pts.forEach(([x, y], i) => { const q = i / (n - 1); if (q > .12 && q < .97) { const [nx, ny] = nrm(i), r = rad(q); s.E(x - nx * r * .55, y - ny * r * .55, r * .42, r * .42, 'serpb'); if (i % 2) s.d(x + nx * r * .35, y + ny * r * .35, '#03141a').d(x + nx * r * .35 + 1, y + ny * r * .35, '#2a909a'); } });
-    s.P([[fx + 4, fy + 1], [fx + 18, fy + 6 + P.fl[1]], [fx + 15, fy + 10 + P.fl[1]], [fx + 5, fy + 5]], 'finglass'); s.line([[fx + 5, fy + 2], [fx + 16, fy + 8 + P.fl[1]]], '#4ad4ff');
-    // head: frill, crystal horns, roaring jaw, whiskers
+    // belly plates (gold, on the belly side), scale marks on the back, glowing lateral line
+    pts.forEach(([x, y], i) => {
+      const q = i / (n - 1); if (q < .1 || q > .97) return;
+      const [bxn, byn] = back(i), r = rad(q);
+      s.E(x - bxn * r * .58, y - byn * r * .58, r * .48, r * .48, 'serpb');
+      if (i % 2 === 0) s.d(x - bxn * r * .9, y - byn * r * .9, '#9a6a12');
+      if (i % 2) s.d(x + bxn * r * .55, y + byn * r * .55, '#03141a').d(x + bxn * r * .3, y + byn * r * .3, '#2a909a');
+      if (i % 2 === 0 && q > .15) s.d(x, y, '#4ad4ff');
+    });
+    // near shoulder fin-wing (in front)
+    s.P([[sx0 + 2, sy0 + 1], [sx0 + 20, sy0 + 8 + P.fl[1]], [sx0 + 15, sy0 + 11 + P.fl[1]], [sx0 + 18, sy0 + 15 + P.fl[1]], [sx0 + 4, sy0 + 7]], 'finglass');
+    s.line([[sx0 + 3, sy0 + 2], [sx0 + 19, sy0 + 9 + P.fl[1]]], '#4ad4ff').line([[sx0 + 4, sy0 + 5], [sx0 + 17, sy0 + 14 + P.fl[1]]], '#4ad4ff');
+    // head: crest, swept-back horns, long snout, roaring jaw
     const [ex, ey] = pts[n - 1];
-    s.P([[ex - 2, ey - 3], [ex - 13, ey - 12], [ex - 7, ey - 3], [ex - 15, ey + 1], [ex - 6, ey + 2], [ex - 12, ey + 9], [ex - 3, ey + 4]], 'finglass');
-    s.spike(ex + 1, ey - 5, 10, 1.8, 'ice', -5); s.spike(ex + 6, ey - 5, 7, 1.5, 'ice', -3);
-    s.E(ex + 3, ey - 1, 8, 6.4, 'serp'); s.E(ex + 12, ey + 1, 7.5, 3.6, 'serp');
-    s.line([[ex - 1, ey - 5], [ex + 8, ey - 4], [ex + 17, ey - 1]], '#86dce0');
-    s.P([[ex + 1, ey + 4], [ex + 21, ey + 4 + j], [ex + 18, ey + 8 + j], [ex + 3, ey + 8]], 'serp2');
-    if (j > 1) s.P([[ex + 3, ey + 3.5], [ex + 19, ey + 3.5], [ex + 17, ey + 3 + j], [ex + 4, ey + 4 + j * .7]], 'maw');
-    for (const x of [6, 10, 14, 18]) { s.d(ex + x, ey + 3, '#ffffff').d(ex + x, ey + 4, '#ffffff'); }
-    for (const x of [8, 12, 16]) { s.d(ex + x, ey + 3 + j, '#ffffff').d(ex + x, ey + 2 + j, '#ffffff'); }
-    s.line([[ex + 16, ey + 1], [ex + 20, ey + 6], [ex + 20, ey + 13], [ex + 17, ey + 18]], '#7ee7ff').line([[ex + 13, ey + 2], [ex + 14, ey + 9], [ex + 11, ey + 15]], '#7ee7ff');
-    s.line([[ex - 2, ey + 1], [ex + 1, ey + 2]], '#03141a').line([[ex - 2, ey + 3], [ex + 1, ey + 4]], '#03141a');
-    s.d(ex + 5, ey - 3, '#fff3a8').d(ex + 6, ey - 3, '#ffb02a').d(ex + 4, ey - 4, '#03141a').d(ex + 5, ey - 4, '#03141a').d(ex + 6, ey - 4, '#03141a').d(ex + 7, ey - 4, '#03141a');
-    if (P.glow) glowMouth(s, ex + 20, ey + 4 + j * .5);
-  }, glows: [[65, 20, '#ffb02a', 3], [56, 9, '#7ee7ff', 5]], emit: [{ x: 36, y: 72, type: 'mist', rate: 5 }, { x: 70, y: 30, type: 'drop', rate: 2 }, { x: 56, y: 9, type: 'glint', rate: 2 }, { x: 18, y: 76, type: 'bubble', rate: 3 }], mouth: [80, 27] },
+    s.P([[ex - 1, ey - 4], [ex - 14, ey - 13], [ex - 8, ey - 4], [ex - 16, ey - 1], [ex - 7, ey + 1], [ex - 13, ey + 7], [ex - 2, ey + 3]], 'finglass');
+    s.line([[ex - 2, ey - 4], [ex - 13, ey - 12]], '#4ad4ff').line([[ex - 3, ey], [ex - 15, ey - 1]], '#4ad4ff');
+    s.L(ex + 1, ey - 5, ex - 9, ey - 13, 1.6, 'ice', .5); s.L(ex + 5, ey - 6, ex - 3, ey - 16, 1.4, 'ice', .4);
+    s.E(ex + 3, ey, 8, 6.6, 'serp');
+    s.P([[ex + 6, ey - 4], [ex + 23, ey - 1], [ex + 23, ey + 3], [ex + 6, ey + 4]], 'serp');
+    s.E(ex + 6, ey - 5, 6.5, 2, 'serp2');
+    s.line([[ex + 1, ey - 6], [ex + 10, ey - 5], [ex + 22, ey - 2]], '#86dce0');
+    s.P([[ex + 2, ey + 4], [ex + 22, ey + 4 + j], [ex + 19, ey + 8 + j], [ex + 4, ey + 8]], 'serp2');
+    s.P([[ex + 4, ey + 6], [ex + 19, ey + 6 + j], [ex + 17, ey + 8 + j], [ex + 5, ey + 8]], 'serpb');
+    if (j > 1) s.P([[ex + 4, ey + 3.5], [ex + 21, ey + 3.5], [ex + 19, ey + 3 + j], [ex + 5, ey + 4 + j * .7]], 'maw');
+    for (const x of [7, 11, 15, 19]) s.d(ex + x, ey + 3, '#ffffff').d(ex + x, ey + 4, '#ffffff');
+    for (const x of [9, 13, 17]) s.d(ex + x, ey + 3 + j, '#ffffff').d(ex + x, ey + 2 + j, '#ffffff');
+    s.d(ex + 22, ey - 1, '#03141a');
+    s.P([[ex, ey + 2], [ex - 6, ey + 7], [ex + 2, ey + 6]], 'finglass');
+    s.line([[ex + 18, ey + 1], [ex + 22, ey + 6], [ex + 22, ey + 14], [ex + 19, ey + 19]], '#7ee7ff').line([[ex + 15, ey + 2], [ex + 16, ey + 9], [ex + 13, ey + 15]], '#7ee7ff');
+    s.d(ex + 5, ey - 3, '#fff3a8').d(ex + 6, ey - 3, '#ffb02a').d(ex + 7, ey - 3, '#ffb02a').d(ex + 4, ey - 4, '#03141a').d(ex + 5, ey - 4, '#03141a').d(ex + 6, ey - 4, '#03141a').d(ex + 7, ey - 4, '#03141a').d(ex + 8, ey - 4, '#03141a');
+    if (P.glow) glowMouth(s, ex + 22, ey + 4 + j * .5);
+  }, glows: [[64, 18, '#ffb02a', 3], [49, 7, '#7ee7ff', 3]], emit: [{ x: 34, y: 74, type: 'mist', rate: 5 }, { x: 72, y: 30, type: 'drop', rate: 2 }, { x: 49, y: 7, type: 'glint', rate: 2 }, { x: 14, y: 78, type: 'bubble', rate: 3 }], mouth: [80, 25] },
   turtle: { size: 96, rig: QUAD, aura: { type: 'bossw', x: 46, y: 84, r: 36 }, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, j = P.jaw * 4;
     const m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);

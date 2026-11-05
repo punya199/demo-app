@@ -47,7 +47,7 @@ asked for this more than once.
 | Water line, 11 forms | Done (v2, more detail) |
 | Water ultimate | The owner chose option C, adjusted: crystal-horn whale, whale flippers instead of "hands", thick armour plates on the back. Working name ราชาวาฬผลึก (replaces วาฬราชันตรีศูล). Options A and B remain on the page for comparison |
 | Water skills, all 8 | Done: shields, cleanse and regen work in the prototype |
-| Water fused (สมุทรผู้ตื่น) | Done: original roaring sea-serpent dragon, S-curve, gold belly, crystal horns |
+| Water fused (สมุทรผู้ตื่น) | Done, redrawn once: original roaring sea dragon in an S-curve. The gold belly always faces the front and bottom: the belly is on the right of the tail-to-head direction, the back on the left. It has a continuous see-through dorsal sail, shoulder fin-wings, a glowing lateral line, a long-snouted roaring head and swept-back crystal horns |
 | Water world boss (เต่ายักษ์วารี) | Done |
 | Plan table for all 8 lines | On the page: which forms to keep and which to replace, with reasons |
 | Leaf, earth, lightning, holy, dark, shadow lines | Not started |

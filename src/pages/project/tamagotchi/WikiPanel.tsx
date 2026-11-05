@@ -23,6 +23,7 @@ import {
 } from './tamagotchi-interface'
 import { useGetWiki } from './tamagotchi-service'
 import { describeCareBonus, isCraftSet, percent, times } from './wiki-helper'
+import { ArenaBattleSection } from './WikiArena'
 import { CraftWikiTab } from './WikiCraft'
 import { Heading, List, Table } from './WikiParts'
 import { StatusEffectsSection } from './WikiStatus'
@@ -347,47 +348,7 @@ const buildSections = (wiki: IWikiData) => {
               `น้ำหนักเกิน ${battle.overweightRatio} เท่าของขั้นต่ำ: SPD ${times(battle.overweightSpdMultiplier)}`,
             ]}
           />
-          <Heading>ลำดับการต่อสู้</Heading>
-          <List
-            items={[
-              'ผลัดกันตีรอบละครั้ง SPD สูงกว่าตีก่อน (เท่ากันสุ่ม)',
-              `ทุกรอบที่ ${battle.skillEveryRounds} ใช้สกิล รอบอื่นโจมตีธรรมดา (${times(1)})`,
-              `เกิน ${battle.maxRounds} รอบยังไม่จบ นับว่าแพ้`,
-              'ผลการต่อสู้ตัดสินที่เซิร์ฟเวอร์ หน้าจอแค่เล่นภาพตามผล',
-            ]}
-          />
-          <Heading>สูตรดาเมจ</Heading>
-          <div className="rounded-lg bg-slate-100 p-2 font-mono text-xs dark:bg-slate-800">
-            (ATK × พลังท่า × ธาตุ × (1 − min({battle.maxDefenseReduction * 100}%, DEF/(DEF+
-            {battle.defenseK})))) × สุ่ม {1 - battle.damageVariance}–{1 + battle.damageVariance} ×
-            คริติคอล
-          </div>
-          <List
-            items={[
-              `คริติคอล: โอกาส ${percent(battle.criticalChance)} ดาเมจ ${times(battle.criticalMultiplier)}`,
-              'ดาเมจขั้นต่ำ 1',
-            ]}
-          />
-          <Heading>ธาตุ</Heading>
-          <Table
-            head={['ธาตุ', 'ได้เปรียบ', 'เสียเปรียบ']}
-            rows={(Object.keys(battle.beats) as EnumMonsterLine[]).map((element) => {
-              const losesTo = (Object.keys(battle.beats) as EnumMonsterLine[]).filter((other) =>
-                battle.beats[other].includes(element)
-              )
-              return [
-                elementLabel[element],
-                battle.beats[element]
-                  .map((target) => `${elementLabel[target]} ${times(battle.strongMultiplier)}`)
-                  .join(' · '),
-                losesTo.length
-                  ? losesTo
-                      .map((other) => `${elementLabel[other]} ${times(battle.weakMultiplier)}`)
-                      .join(' · ')
-                  : '–',
-              ]
-            })}
-          />
+          <ArenaBattleSection wiki={wiki} />
           <Heading>ค่าใช้จ่าย</Heading>
           <List items={[`สู้ 1 ครั้ง: น้ำหนัก −${battle.weightLoss}`, 'ป่วยอยู่สู้ไม่ได้']} />
           <StatusEffectsSection arena={wiki.arena} />

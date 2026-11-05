@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   filterBag,
   getAdventureBlocker,
+  skipRunsAffordable,
   getMinigameBlocker,
   getStaminaRefillBlocker,
   isInZone,
@@ -61,7 +62,6 @@ import {
   getDefenseBlocker,
   getPvpBlocker,
   getRaidBlocker,
-  getAutoBattleDelayMs,
   getEnhanceBlocker,
   getEquipBlocker,
   pickRefineTier,
@@ -120,7 +120,6 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   trainReadyAt: null,
   battleStats: null,
   potentialView: { isLegacy: true, grade: null, average: null, stats: {} as never },
-  autoBattleReadyAt: null,
   minigameReadyAt: null,
   expeditionAreaId: null,
   expeditionMinutes: 0,
@@ -356,20 +355,6 @@ describe('getExpeditionBlocker', () => {
   })
 })
 
-describe('getAutoBattleDelayMs', () => {
-  it('waits for the cooldown and never goes negative', () => {
-    const now = new Date('2026-01-01T00:00:30Z').getTime()
-    expect(getAutoBattleDelayMs(monster({ autoBattleReadyAt: '2026-01-01T00:01:00Z' }), now)).toBe(
-      30_000
-    )
-    expect(getAutoBattleDelayMs(monster({ autoBattleReadyAt: '2026-01-01T00:00:00Z' }), now)).toBe(
-      0
-    )
-    expect(getAutoBattleDelayMs(monster(), now)).toBe(0)
-    expect(getAutoBattleDelayMs(null, now)).toBe(0)
-  })
-})
-
 describe('describeStats', () => {
   it('lists only the non-zero stats', () => {
     expect(describeStats({ hp: 0, atk: 3, def: 0, spd: 2 })).toBe('+3 ATK · +2 SPD')
@@ -537,8 +522,18 @@ describe('set effects in replays', () => {
   })
 
   it('writes effects and percent bonuses in Thai', () => {
-    expect(describeSetEffect({ burnTurns: 3 })).toBe('สกิลทำให้ศัตรูติดเผาไหม้ 3 เทิร์น')
-    expect(describeSetEffect({ shieldPct: 0.15 })).toContain('15%')
+    expect(describeSetEffect({ burnTurns: 1.6, burnBonus: 0.1 })).toBe(
+      'ตีปกติมีโอกาส 30% ทำให้ติดเผาไหม้ 1.6 วิ · ตีศัตรูที่ติดเผาไหม้แรงขึ้น 10%'
+    )
+    expect(describeSetEffect({ shieldPct: 0.04, shieldRefresh: 0.04 })).toBe(
+      'เริ่มสู้ด้วยโล่ 4% ของ HP · ได้โล่ 4% ของ HP ทุก 12 วิ'
+    )
+    expect(describeSetEffect({ regenPct: 0.045 })).toBe('ฟื้น HP 0.14% ของ HP สูงสุดทุกวินาที')
+    expect(describeSetEffect({ evasion: 0.15, dodgeCdCutSec: 4, afterDodgeBonus: 0.85 })).toBe(
+      'EVA +15 · คูลดาวน์สกิลหลบลดลง 4 วิ · หลบได้แล้ว การโจมตีครั้งถัดไปติดคริและแรงขึ้น 85%'
+    )
+    expect(describeSetEffect({ lastStandShield: 0.14 })).toContain('ต่ำกว่า 35% ได้โล่ 14%')
+    expect(describeSetEffect({ cooldownCut: 0.18 })).toBe('คูลดาวน์สกิลสั้นลง 18%')
     expect(describeSetEffect({})).toBe('')
     expect(describePctBonus({ atk: 0.15, def: 0 })).toBe('ATK +15%')
   })
@@ -979,7 +974,7 @@ describe('set progress labels', () => {
   it('describes a tier by its stat bonus and its effect', () => {
     const [two, four] = set(4).tiers
     expect(describeSetTier(two)).toBe('ATK +15%')
-    expect(describeSetTier(four)).toBe('สกิลทำให้ศัตรูติดเผาไหม้ 3 เทิร์น')
+    expect(describeSetTier(four)).toBe('ตีปกติมีโอกาส 30% ทำให้ติดเผาไหม้ 3 วิ')
   })
 
   it('also words crit effects', () => {
@@ -1211,5 +1206,14 @@ describe('passive draft and save', () => {
     expect(getAscendancyPathOf([])).toBeNull()
     expect(canDropAscendancyNode(nodes, ids, 'v2-asc-warden-02')).toBe(true)
     expect(canDropAscendancyNode(nodes, ids, 'v2-asc-warden-01')).toBe(false)
+  })
+})
+
+describe('skipRunsAffordable', () => {
+  it('counts the runs the stamina pays for, up to the cap', () => {
+    expect(skipRunsAffordable(100, 10, 10)).toBe(10)
+    expect(skipRunsAffordable(35.6, 10, 10)).toBe(3)
+    expect(skipRunsAffordable(9, 10, 10)).toBe(0)
+    expect(skipRunsAffordable(500, 10, 10)).toBe(10)
   })
 })

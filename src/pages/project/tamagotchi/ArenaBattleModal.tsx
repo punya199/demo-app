@@ -19,8 +19,6 @@ interface IArenaBattleModalProps {
   statuses: StatusMap | undefined
   catalog: IArenaSkill[] | undefined
   onClose: () => void
-  // Close by itself this long after the replay ends (auto-battle); omit to wait for the player.
-  autoCloseMs?: number
   title?: string
   // Replaces the result block once the replay ends.
   summary?: string
@@ -68,22 +66,19 @@ const CooldownChip = ({ cooldown }: { cooldown: IArenaCooldown }) => {
 
 // Plays the server's recorded arena fight, then shows the result.
 export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
-  const { battle, statuses, catalog, onClose, autoCloseMs, title, summary } = props
+  const { battle, statuses, catalog, onClose, title, summary } = props
   const [tick, setTick] = useState(0)
   const [speed, setSpeed] = useState(1)
+  // "Skip" fast-forwards this fight only; the chosen 1x/2x/4x carries over to the next fight.
+  const [skipping, setSkipping] = useState(false)
   const replay = battle?.replay ?? null
   const lastTick = replay ? (replay.frames.length - 1) * replay.step : 0
   const isFinished = !replay || tick >= lastTick
 
   useEffect(() => {
     setTick(0)
+    setSkipping(false)
   }, [battle])
-
-  useEffect(() => {
-    if (!battle || !isFinished || autoCloseMs === undefined) return
-    const timer = setTimeout(onClose, autoCloseMs)
-    return () => clearTimeout(timer)
-  }, [battle, isFinished, autoCloseMs, onClose])
 
   const skills = useMemo(() => {
     const map: Record<string, IArenaSkill> = {}
@@ -135,7 +130,7 @@ export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
                 { label: '4x', value: 4 },
               ]}
             />
-            <Button size="small" onClick={() => setSpeed(1000)}>
+            <Button size="small" onClick={() => setSkipping(true)}>
               ข้าม
             </Button>
           </div>
@@ -188,7 +183,7 @@ export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
             replay={replay}
             statuses={statuses}
             skills={skills}
-            speed={speed}
+            speed={skipping ? 1000 : speed}
             onTick={setTick}
           />
           <div className="text-right text-xs text-slate-500 tabular-nums dark:text-slate-400">

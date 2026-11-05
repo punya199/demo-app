@@ -1,14 +1,10 @@
 import { Button, Card, Spin, Tag, Tooltip } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
+import { AdventureSkipModal } from './AdventureSkipModal'
 import { ArenaBattleModal } from './ArenaBattleModal'
 import { StaminaCard } from './StaminaCard'
-import {
-  elementLabel,
-  getAdventureBlocker,
-  getAutoBattleDelayMs,
-  stageLabel,
-} from './tamagotchi-helper'
-import { EnumMonsterStage, IMonsterData } from './tamagotchi-interface'
+import { elementLabel, getAdventureBlocker, stageLabel } from './tamagotchi-helper'
+import { EnumMonsterStage, IAdventureStage, IMonsterData } from './tamagotchi-interface'
 import {
   IAdventureBattleResponse,
   useAdventureBattle,
@@ -31,12 +27,11 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
   const applyBattleResult = useApplyBattleResult()
   const [replay, setReplay] = useState<IAdventureBattleResponse | null>(null)
   const { data: skillState } = useGetSkills()
-  // Stage being auto-battled; the loop runs while this page is open and visible.
-  const [autoStageId, setAutoStageId] = useState<string | null>(null)
+  // The cleared stage whose skip window is open.
+  const [skipStage, setSkipStage] = useState<IAdventureStage | null>(null)
   const { data: wiki } = useGetWiki()
   const { data: wallet } = useGetWallet()
   const blocker = getAdventureBlocker(monster, wiki?.stamina.adventureCost ?? 0)
-  const autoReadyAt = monster?.autoBattleReadyAt
 
   const closeReplay = useCallback(() => {
     if (replay) {
@@ -44,40 +39,6 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
     }
     setReplay(null)
   }, [replay, applyBattleResult])
-
-  // One fight at a time: wait out the server's cooldown, fight, replay, repeat. Any refusal
-  // (daily cap, hidden tab...) stops the loop.
-  useEffect(() => {
-    if (!autoStageId || replay || isPending) {
-      return
-    }
-    if (blocker) {
-      setAutoStageId(null)
-      return
-    }
-    const timer = setTimeout(
-      () => {
-        if (document.hidden) {
-          setAutoStageId(null)
-          return
-        }
-        battle(
-          { stageId: autoStageId, auto: true },
-          {
-            onSuccess: setReplay,
-            onError: (error) => {
-              setAutoStageId(null)
-              onError(error)
-            },
-          }
-        )
-      },
-      getAutoBattleDelayMs(monster, Date.now()) + 500
-    )
-    return () => clearTimeout(timer)
-    // `monster` is read through autoReadyAt: a new fight changes it, and that restarts the timer.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoStageId, replay, isPending, blocker, autoReadyAt])
 
   if (isLoading) {
     return <Spin />
@@ -97,7 +58,8 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
         สู้แต่ละครั้งใช้ stamina {wiki?.stamina.adventureCost} · ชนะครั้งแรกได้เหรียญ x2 ·
         บอสครั้งแรกได้เพชร
         <br />
-        ด่านที่ชนะแล้ว (ไม่ใช่บอส) ตั้งต่อสู้อัตโนมัติได้ ต้องเปิดหน้านี้ค้างไว้
+        ด่านที่ชนะแล้วกด "ข้าม" ได้ ใช้ stamina รับรางวัลทันทีโดยไม่ต้องสู้ (ครั้งละ 1–
+        {wiki?.adventure.skipMaxRuns} รอบ)
       </p>
       {data?.areas.map((area) => (
         <Card
@@ -149,16 +111,14 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
                           } (ครั้งแรก)`}
                     </div>
                   </div>
-                  {stage.autoReward !== null && stage.clearCount > 0 && (
-                    <Tooltip title={`อัตโนมัติ: 🪙 ${stage.autoReward} ต่อการชนะ`}>
+                  {stage.clearCount > 0 && (
+                    <Tooltip title={blocker ?? 'ไม่ต้องสู้ ใช้ stamina รับรางวัลทันที'}>
                       <Button
                         size="small"
-                        type={autoStageId === stage.id ? 'primary' : 'default'}
-                        danger={autoStageId === stage.id}
-                        disabled={!!blocker && autoStageId !== stage.id}
-                        onClick={() => setAutoStageId(autoStageId === stage.id ? null : stage.id)}
+                        disabled={!!blocker || isPending}
+                        onClick={() => setSkipStage(stage)}
                       >
-                        {autoStageId === stage.id ? 'หยุด' : 'อัตโนมัติ'}
+                        ข้าม
                       </Button>
                     </Tooltip>
                   )}
@@ -191,7 +151,14 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
         statuses={skillState?.statuses}
         catalog={skillState?.catalog}
         onClose={closeReplay}
-        autoCloseMs={autoStageId ? 1500 : undefined}
+      />
+      <AdventureSkipModal
+        stage={skipStage}
+        stamina={monster?.stamina ?? 0}
+        staminaCost={wiki?.stamina.adventureCost ?? 0}
+        maxRuns={wiki?.adventure.skipMaxRuns ?? 10}
+        onClose={() => setSkipStage(null)}
+        onError={onError}
       />
     </div>
   )

@@ -288,7 +288,7 @@ const buildSections = (wiki: IWikiData) => {
         <>
           <List
             items={[
-              `มอนแต่ละตัวมี stamina ของตัวเอง 0–${wiki.stamina.max} ใช้กับการผจญภัยเท่านั้น (สู้เองและสู้อัตโนมัติ) ครั้งละ ${wiki.stamina.adventureCost}`,
+              `มอนแต่ละตัวมี stamina ของตัวเอง 0–${wiki.stamina.max} ใช้กับการผจญภัยเท่านั้น (สู้เองและข้ามด่าน) ครั้งละ ${wiki.stamina.adventureCost}`,
               `stamina ไม่พอ ${wiki.stamina.adventureCost} สู้ผจญภัยไม่ได้ · บอส บอสโลก สนามประลอง และการสำรวจ ไม่ใช้ stamina`,
               `ฟื้นเอง +${wiki.stamina.regenPerHour} ต่อชั่วโมง (เต็มใน ${formatAge(Math.ceil((wiki.stamina.max / wiki.stamina.regenPerHour) * 60))}) · เปิดเกมไว้ฟื้นเร็วขึ้น ${times(wiki.stamina.onlineRegenMultiplier)}`,
               `มินิเกม: หยุดแถบให้ตรงโซนเขียว ${wiki.stamina.minigameRounds} รอบ เล่นได้ทุก ${formatAge(wiki.stamina.minigameCooldownMinutes)}`,
@@ -443,6 +443,7 @@ const buildSections = (wiki: IWikiData) => {
               'ปลดล็อกทีละด่าน ชนะบอสท้ายพื้นที่เพื่อเปิดพื้นที่ถัดไป',
               `ชนะครั้งแรกได้เหรียญ ${times(adventure.firstClearMultiplier)} · บอสครั้งแรกได้เพชร`,
               'ความคืบหน้าผูกกับบัญชี ไม่หายเมื่อเปลี่ยนมอน',
+              `ด่านที่ชนะแล้ว (รวมบอส) กด "ข้าม" ได้ ไม่ต้องสู้ ใช้ stamina รอบละเท่าการสู้ ได้เหรียญและโอกาสดรอปอุปกรณ์เหมือนชนะ เลือกได้ครั้งละ 1–${adventure.skipMaxRuns} รอบ`,
             ]}
           />
           {adventure.areas.map((area) => (
@@ -487,24 +488,6 @@ const buildSections = (wiki: IWikiData) => {
               `${area.emoji} ${area.name}`,
               `🪙 ${area.baseRatePerHour}`,
             ])}
-          />
-          <Heading>ต่อสู้อัตโนมัติ (ออนไลน์)</Heading>
-          <List
-            items={[
-              'เปิดหน้าผจญภัยค้างไว้ มอนสู้ด่านที่ชนะแล้ว (ไม่ใช่บอส) วนไปเรื่อย ๆ ปิดหน้าหรือสลับแท็บแล้วหยุด',
-              `สู้ได้ทุก ${idle.autoBattleCooldownSeconds} วินาที จ่ายเหรียญตามตารางด้านล่าง`,
-              `เพดานรางวัลต่อสู้อัตโนมัติ 🪙 ${idle.autoBattleDailyCoinCap} ต่อวัน (รีเซ็ตเที่ยงคืนเวลาไทย)`,
-              'ต่อชั่วโมงได้มากกว่าการสำรวจเล็กน้อย เป็นแรงจูงใจให้เปิดเกมค้างไว้',
-            ]}
-          />
-          <Table
-            head={['ด่าน', 'เหรียญต่อการชนะ']}
-            rows={idle.expeditionAreas.flatMap((area) =>
-              area.autoBattleRewards.map((reward) => [
-                `${area.emoji} ${reward.name}`,
-                `🪙 ${reward.coins}`,
-              ])
-            )}
           />
         </>
       ),
@@ -582,7 +565,7 @@ const buildSections = (wiki: IWikiData) => {
               `กล่องสุ่มในร้าน 🪙 ${equipment.boxPrice}: ${Object.entries(equipment.boxGradeRates)
                 .map(([grade, rate]) => `${gradeLabel[grade as keyof typeof gradeLabel]} ${rate}%`)
                 .join(' · ')}`,
-              `ชนะด่านผจญภัยด้วยตัวเองมีโอกาสดรอป ${equipment.dropChancePercent}% (ต่อสู้อัตโนมัติและสำรวจไม่ดรอป) เกรดตามพื้นที่`,
+              `ชนะด่านผจญภัยด้วยตัวเองมีโอกาสดรอป ${equipment.dropChancePercent}% (ข้ามด่านก็มีโอกาสดรอปทุกรอบ ส่วนการสำรวจไม่ดรอป) เกรดตามพื้นที่`,
               'หินตีบวกและหินรีไฟน์ธรรมดาซื้อได้ในร้านค้า ส่วนหินอื่นต้องแยกชิ้นส่วนหรือได้จากบอส (การสำรวจไม่ให้หินแล้ว)',
               `แยกชิ้นส่วนได้หินตามเกรด (${Object.entries(equipment.dismantleStones)
                 .map(

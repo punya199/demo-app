@@ -304,9 +304,9 @@ export const getExpeditionBlocker = (
   return isAreaUnlocked ? null : 'ชนะบอสพื้นที่ก่อนหน้าก่อน'
 }
 
-// Milliseconds until the next auto-battle may start (0 = now).
-export const getAutoBattleDelayMs = (monster: IMonsterData | null, now: number) =>
-  monster?.autoBattleReadyAt ? Math.max(0, new Date(monster.autoBattleReadyAt).getTime() - now) : 0
+// How many runs the stamina pays for, up to the per-request cap.
+export const skipRunsAffordable = (stamina: number, staminaCost: number, maxRuns: number) =>
+  staminaCost > 0 ? Math.min(maxRuns, Math.floor(stamina / staminaCost)) : maxRuns
 
 // Buying fills the bag, so it needs no monster - only enough coins.
 export const getShopBlocker = (
@@ -452,10 +452,8 @@ const serverMessageLabel: Record<string, string> = {
   'Monster is too unwell to explore': 'มอนป่วยหรือหิว ออกสำรวจไม่ได้',
   'Monster is not on an expedition': 'มอนไม่ได้ออกสำรวจ',
   'Area is locked': 'พื้นที่นี้ยังไม่ปลดล็อก',
-  'Auto-battle is not ready yet': 'ต่อสู้อัตโนมัติยังไม่พร้อม รออีกสักครู่',
-  'Daily auto-battle reward limit reached': 'ครบเพดานรางวัลต่อสู้อัตโนมัติของวันนี้แล้ว',
-  'Clear this stage once before auto-battling it': 'ต้องชนะด่านนี้ด้วยตัวเองก่อน',
-  'Auto-battle is not available on boss stages': 'บอสต่อสู้อัตโนมัติไม่ได้',
+  'Clear this stage once before skipping it': 'ต้องชนะด่านนี้ด้วยตัวเองก่อนจึงจะข้ามได้',
+  'Skip 1 to 10 runs at a time': 'ข้ามได้ครั้งละ 1–10 รอบ',
   'You do not have this item': 'ไม่มีไอเทมนี้ในกระเป๋า',
   'Login reward was already claimed today': 'วันนี้รับรางวัลเข้าสู่ระบบไปแล้ว',
   'Quest is not complete or was already claimed': 'ภารกิจยังไม่สำเร็จ หรือรับรางวัลไปแล้ว',
@@ -665,14 +663,33 @@ export const getDefenseBlocker = (
 export const formatRatingChange = (before: number, after: number) =>
   `${before} → ${after} (${after >= before ? '+' : ''}${after - before})`
 
+// Mirrors the server's arena rules for set effects (arena-rules.ts).
+const SET_BURN_CHANCE = 0.3
+const SET_REGEN_PER_SEC = 3
+const SET_SHIELD_REFRESH_SEC = 12
+const SET_LAST_STAND_BELOW = 0.35
+
+// Set effects as they play in the real-time arena.
 export const describeSetEffect = (effect: IFighterEffects) =>
   [
-    effect.burnTurns && `สกิลทำให้ศัตรูติดเผาไหม้ ${effect.burnTurns} เทิร์น`,
+    effect.burnTurns &&
+      `ตีปกติมีโอกาส ${toPercent(SET_BURN_CHANCE)} ทำให้ติดเผาไหม้ ${effect.burnTurns} วิ`,
+    effect.burnBonus && `ตีศัตรูที่ติดเผาไหม้แรงขึ้น ${toPercent(effect.burnBonus)}`,
     effect.shieldPct && `เริ่มสู้ด้วยโล่ ${toPercent(effect.shieldPct)} ของ HP`,
-    effect.regenPct && `ฟื้น HP ${toPercent(effect.regenPct)} ทุกเทิร์น`,
-    effect.doubleStrikeChance && `โจมตีซ้ำ ${toPercent(effect.doubleStrikeChance)}`,
+    effect.shieldRefresh &&
+      `ได้โล่ ${toPercent(effect.shieldRefresh)} ของ HP ทุก ${SET_SHIELD_REFRESH_SEC} วิ`,
+    effect.regenPct &&
+      `ฟื้น HP ${Math.round(effect.regenPct * SET_REGEN_PER_SEC * 100) / 100}% ของ HP สูงสุดทุกวินาที`,
+    effect.doubleStrikeChance && `ตีปกติมีโอกาสตีซ้ำ ${toPercent(effect.doubleStrikeChance)}`,
+    effect.cooldownCut && `คูลดาวน์สกิลสั้นลง ${toPercent(effect.cooldownCut)}`,
+    effect.lastStandShield &&
+      `เมื่อ HP ต่ำกว่า ${toPercent(SET_LAST_STAND_BELOW)} ได้โล่ ${toPercent(effect.lastStandShield)} ของ HP ล้างสถานะผิดปกติ และกันการควบคุม 2 วิ (ครั้งเดียวต่อไฟต์)`,
     effect.critChance && `อัตราคริติคอล +${toPercent(effect.critChance)}`,
     effect.critDamage && `ดาเมจคริติคอล +${toPercent(effect.critDamage)}`,
+    effect.evasion && `EVA +${Math.round(effect.evasion * 100)}`,
+    effect.dodgeCdCutSec && `คูลดาวน์สกิลหลบลดลง ${effect.dodgeCdCutSec} วิ`,
+    effect.afterDodgeBonus &&
+      `หลบได้แล้ว การโจมตีครั้งถัดไปติดคริและแรงขึ้น ${toPercent(effect.afterDodgeBonus)}`,
   ]
     .filter(Boolean)
     .join(' · ')

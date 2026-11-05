@@ -121,7 +121,6 @@ export interface IMonsterData {
   battleStats: IBattleStats | null
   potentialView: IPotentialView
   trainReadyAt: string | null
-  autoBattleReadyAt: string | null
   minigameReadyAt: string | null
   // Set while out on an expedition; `expeditionReturned` = back home, waiting to be collected.
   expeditionAreaId: string | null
@@ -248,6 +247,14 @@ export interface IFighterEffects {
   doubleStrikeChance?: number
   critChance?: number
   critDamage?: number
+  evasion?: number
+  // Boss-set effects made for the real-time arena.
+  burnBonus?: number
+  shieldRefresh?: number
+  cooldownCut?: number
+  lastStandShield?: number
+  dodgeCdCutSec?: number
+  afterDodgeBonus?: number
 }
 
 // One equipment set with how many of its pieces the shown pet wears (GET /equipment).
@@ -311,8 +318,6 @@ export interface IAdventureStage {
   reward: number
   firstClearReward: number
   firstClearGems: number
-  // Coins one auto-battle win pays; null for bosses, which can't be auto-battled.
-  autoReward: number | null
   clearCount: number
   unlocked: boolean
 }
@@ -770,6 +775,8 @@ export interface IWikiData {
   }
   adventure: {
     firstClearMultiplier: number
+    // Most runs one skip may sweep.
+    skipMaxRuns: number
     areas: {
       id: string
       name: string
@@ -795,10 +802,7 @@ export interface IWikiData {
       name: string
       emoji: string
       baseRatePerHour: number
-      autoBattleRewards: { name: string; coins: number }[]
     }[]
-    autoBattleCooldownSeconds: number
-    autoBattleDailyCoinCap: number
   }
   equipment: {
     capacity: number

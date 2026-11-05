@@ -2,7 +2,7 @@
 
 ต่อยอดจาก [item-rank.md](./item-rank.md) (เกรด/ค่ารอง/Special) · [refine-stone.md](./refine-stone.md) (รีไฟน์) · [phase-5.md](./phase-5.md) (เซ็ตบอส, World Boss, Raid)
 
-> **สถานะ: 🚧 กำลังทำ** · ตัวเลขทุกตัวในเอกสารนี้เป็น **ค่าเริ่มต้นที่เสนอ** (provisional) ค่าต่อสู้ของ 4 ชิ้นจะถูกจูนด้วย balance gate (หัวข้อ 9) ส่วนราคา/เวลาต้องตรวจกับรายได้ Coin จริงของ Adventure/Expedition ก่อนล็อก
+> **สถานะ: ✅ ทำแล้ว (backend + frontend)** · ตัวเลข 4 ชิ้นในตารางด้านล่างเป็นค่าหลังจูนด้วย balance gate แล้ว · ราคา/เวลา/อัตราดรอปยังเป็นค่าเริ่มต้นที่ต้องตรวจกับรายได้ Coin จริงของ Adventure/Expedition ก่อนล็อก
 
 ## เป้าหมาย
 
@@ -58,22 +58,29 @@
 
 | # | `setId` | ชื่อ | สไตล์ | ระดับ | 2 ชิ้น | 4 ชิ้น (effects) |
 |---|---|---|---|---|---|---|
-| 1 | `bulwark` | ชุดปราการศิลา | แทงก์ | Standard | def +10% | `damageCut` 0.12, `shieldPct` 0.03 |
+| 1 | `bulwark` | ชุดปราการศิลา | แทงก์ | Standard | def +10% | `damageCut` 0.11, `shieldPct` 0.03 |
 | 2 | `evergreen` | ชุดพนาอมตะ | ฟื้นฟู | **Flagship** | hp +10% | `lifesteal` 0.10, `regenPct` 0.03 |
-| 3 | `executioner` | ชุดเพชฌฆาต | เบิร์สต์ | **Flagship** | atk +8% | `executeBonus` 0.35, `critDamage` 0.10 |
-| 4 | `marksman` | ชุดพลแม่นปืน | คริ | Standard | atk +6% | `critChance` 0.08, `defDownOnBasic` 30 |
-| 5 | `tempo` | ชุดจังหวะลม | ความเร็ว | Standard | spd +8% | `firstStrike` 1, `slowOnBasic` 25 |
-| 6 | `mirage` | ชุดมายาภาพ | หลบ | Standard | spd +6% | `evasion` 0.10, `retort` 0.6 (ทำให้ผู้ตีบอด) |
+| 3 | `executioner` | ชุดเพชฌฆาต | เบิร์สต์ | **Flagship** | atk +8% | `executeBonus` 0.4, `critDamage` 0.10 |
+| 4 | `marksman` | ชุดพลแม่นปืน | คริ | Standard | atk +6% | `critChance` 0.15, `defDownOnBasic` 45 |
+| 5 | `tempo` | ชุดจังหวะลม | ความเร็ว | Standard | spd +8% | `firstStrike` 1, `slowOnBasic` 50, `cooldownCut` 0.3 |
+| 6 | `mirage` | ชุดมายาภาพ | หลบ | Standard | spd +6% | `evasion` 0.10, `retort` 0.5 (ทำให้ผู้ตีบอดอย่างเดียว ไม่สวนดาเมจ) |
 | 7 | `venomancer` | ชุดพิษพรายน้ำ | Damage over time | Standard | atk +6% | `poisonOnBasic` 35, `poisonBonus` 0.12 |
-| 8 | `tempest_binder` | ชุดพันธนาการพายุ | คุมเกม | **Flagship** | spd +8% | `slowOnBasic` 30, `stunOnBasic` 8, `cooldownCut` 0.12 |
-| 9 | `thornmail` | ชุดเกราะหนาม | สะท้อน | Standard | def +8% | `thorns` 0.25, `shieldPct` 0.04 |
+| 8 | `tempest_binder` | ชุดพันธนาการพายุ | คุมเกม | **Flagship** | spd +8% | `slowOnBasic` 40, `stunOnBasic` 14, `cooldownCut` 0.2 |
+| 9 | `thornmail` | ชุดเกราะหนาม | สะท้อน | Standard | def +8% | `thorns` 0.15, `shieldPct` 0.03 |
 | 10 | `aegis_oracle` | ชุดโหราผู้พิทักษ์ | ซัพพอร์ต | Standard | hp +8% | `shieldRefresh` 0.05, `curseOnBasic` 25 |
-| 11 | `caretaker` | ชุดผู้ดูแล | ดูแลสัตว์เลี้ยง | Standard | hp +5% · care: `slowHunger` 10, `tidyPet` 15 | `regenPct` 0.01 |
-| 12 | `wayfarer` | ชุดนักเดินทาง | ดูแล/สำรวจ | Standard | hp +5% · care: `staminaSaver` 10, `treasureNose` 10 | `shieldPct` 0.02 |
+| 11 | `caretaker` | ชุดผู้ดูแล | ดูแลสัตว์เลี้ยง | Standard | hp +5% · care: `slowHunger` 10, `tidyPet` 15 | `regenPct` 0.13 |
+| 12 | `wayfarer` | ชุดนักเดินทาง | ดูแล/สำรวจ | Standard | hp +5% · care: `staminaSaver` 10, `treasureNose` 10 | `shieldPct` 0.14 |
 
 - โบนัส care ของ 2 ชิ้นไปบวกเข้า `calcSpecialBonuses` (ฟิลด์ใหม่ `care` ใน `ISetBonus`) ทำงานภายใต้เพดาน 2× เดิม
 - ชื่อไทยเป็นชื่อชั่วคราว เปลี่ยนได้ใน `SET_DEFINITIONS` ที่เดียว
 - เซ็ตเดิม 7 เซ็ต (`blazing`, `tidal_guard`, `deep_root`, `swift_thunder`, `radiant`, `nightfall`, `shadow_veil`) ไม่เปลี่ยน
+
+### ผลจูนจริง (ต่างจากค่าตั้งต้นของสเปกแรก)
+
+- **Tempo** ต้องเพิ่ม `cooldownCut`: มีแค่ firstStrike + slow แล้วชนะได้ไม่เกิน ~33%
+- **Mirage** `retort` ทำแค่ทำให้บอด (power 0): ถ้าสวนดาเมจทุกครั้ง ชนะ ~75% ที่ทุกค่าโอกาส
+- **เซ็ตดูแล (11, 12)** ต้องแรงกว่าที่ตั้งใจไว้มากถึงจะแตะ 45% เพราะ 2 ชิ้นให้แค่ hp +5% — ตัวเลขนี้ตัดสินใจทางดีไซน์ได้ (ดู PR) ไม่ใช่ข้อบังคับ
+- อัตราชนะที่วัดได้ (seed 1–2, ทุกสาย, ทั้งสองฝั่ง, Ultimate + Epic +10, 224 แมตช์ต่อเซ็ต) อยู่ในคอมเมนต์ของ `craft-balance.spec.ts` · bulwark 48.2 · evergreen 50.4 · executioner 49.6 · marksman 49.6 · tempo 52.7 · mirage 47.3 · venomancer 49.6 · tempest_binder 48.2 · thornmail 49.6 · aegis_oracle 51.8 · caretaker 45.1 · wayfarer 46.4 (%) · ขยับ ±3 จุดตาม seed, tempest_binder แตะ 56% ในชุด seed นอกตัวอย่าง
 
 ## เอฟเฟกต์ใหม่ (arena เท่านั้น)
 
@@ -99,9 +106,9 @@
 
 | ระดับ | itemId | ได้จาก (ค่าเริ่มต้น) |
 |---|---|---|
-| Common ×6 | `craft_essence_flame` / `_tide` / `_leaf` / `_earth` / `_lightning` / `_holy` | ชนะ Adventure: โอกาส 6% ได้ 1–2 ชิ้น ของธาตุที่ตรงกับพื้นที่ (พื้นที่ไม่มีธาตุ = สุ่ม 1 ใน 6) · Expedition: เพิ่มเข้า `EXPEDITION_DROP_ITEMS` (สุ่ม 1 ชิ้นทุก 4 ชม. เหมือนของเดิม) |
+| Common ×6 | `craft_essence_flame` / `_tide` / `_leaf` / `_earth` / `_lightning` / `_holy` | ชนะ Adventure: โอกาส 6% ได้ 1–2 ชิ้น ของธาตุที่ตรงกับพื้นที่ (พื้นที่ไม่มีธาตุ = สุ่ม 1 ใน 6 · ที่ใช้จริง: coast = tide, volcano = flame, cavern = earth, storm_peak = lightning, meadow = สุ่ม) · Expedition: เพิ่มเข้า `EXPEDITION_DROP_ITEMS` (สุ่ม 1 ชิ้นทุก 4 ชม. เหมือนของเดิม; ตอนนี้เอสเซนซ์เป็น 6 ใน 8 ของพูล = 75%) |
 | Rare ×2 | `craft_forge_core` (สายบุก) · `craft_rune_shard` (สายรับ/ดูแล) | Raid ชนะ: Normal 1 ก้อน · Hard 2 · Nightmare 3 (ก้อนแรกเป็น forge_core ก้อนที่เหลือสลับ rune_shard) |
-| Unique ×3 | `craft_unique_verdant_heart` (Evergreen) · `craft_unique_reaper_edge` (Executioner) · `craft_unique_storm_sigil` (Tempest Binder) | World Boss รับรางวัลรายสัปดาห์: ผู้รับทุกคน 1 ชิ้น (ชนิดสุ่มด้วย `claimRolls` เหมือนการสุ่มชิ้นเซ็ต retry แล้วไม่เปลี่ยน) · อันดับ 1–3 ได้เพิ่มอีก 1 |
+| Unique ×3 | `craft_unique_verdant_heart` (Evergreen) · `craft_unique_reaper_edge` (Executioner) · `craft_unique_storm_sigil` (Tempest Binder) | World Boss รับรางวัลรายสัปดาห์: ผู้รับทุกคน 1 ชิ้น (ชนิดสุ่มด้วย `claimRolls` เหมือนการสุ่มชิ้นเซ็ต retry แล้วไม่เปลี่ยน) · อันดับ 1–3 ได้เพิ่มอีก 1 (ได้ชนิดเดียวกันซ้ำ) |
 | Catalyst ×1 | `craft_catalyst` | World Boss รับรางวัลรายสัปดาห์: ผู้รับทุกคน 1 · อันดับ 1–3 เพิ่มอีก 1 |
 
 ธาตุของเอสเซนซ์ต่อเซ็ต: flame = executioner, thornmail · tide = tempest_binder, mirage · leaf = evergreen, venomancer · earth = bulwark, wayfarer · lightning = tempo, marksman · holy = aegis_oracle, caretaker
@@ -227,6 +234,11 @@ Frontend: `yarn lint:ci`, `yarn build`, `yarn test` · test ของ helper (�
 6. อัปเดต roadmap เป็น ✅, เปิด PR เข้า `main` ทั้งสอง repo
 
 ## ที่ยังไม่รู้/ความเสี่ยง
+
+- เอสเซนซ์ดรอปจาก Adventure skip ทุกรอบ (6%/รอบ) และยังไม่มีเพดานรายวัน
+- ดรอป unique/Catalyst ของ World Boss ยังไม่มี integration test เฉพาะ (ตรวจแค่ว่า suite เดิมยังผ่าน)
+- สกิลที่มี `meleeRetort` ของตัวเองจะทับ retort ของ Mirage (`Object.assign` ใส่ passive ของสกิลทีหลัง)
+- wiki frontend ยังไม่แสดงค่าคงที่ craft จาก `wiki.craft`
 
 - ตัวเลขทั้งหมดยังไม่ผ่านการเล่นจริง: เกณฑ์ balance gate เป็นเพียงตัวแทนของ "ไม่พัง" ไม่ใช่ "สนุก"
 - ราคา/เวลา/อัตราดรอปต้องเทียบกับ Coin ต่อชั่วโมงจริงก่อนปล่อย

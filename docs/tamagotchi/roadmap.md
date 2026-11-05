@@ -4,7 +4,7 @@
 
 > มอนสเตอร์ ชื่อ ธาตุ ศัพท์ และภาพในเกมออกแบบเองทั้งหมด ใช้แนวเกม V-Pet เป็นแรงบันดาลใจเท่านั้น
 
-แผนละเอียดแต่ละเฟส: [phase-1.md](./phase-1.md) (เสร็จแล้ว) · [phase-2.md](./phase-2.md) (เสร็จแล้ว: 2a, 2b, 2c) · [phase-3.md](./phase-3.md) (เสร็จแล้ว: 3a, 3b) · [phase-4.md](./phase-4.md) (เสร็จแล้ว: 4a, 4b) · [phase-5.md](./phase-5.md) (เสร็จแล้ว: 5a, 5b, 5c) · [craft.md](./craft.md) (เฟส 5.6 กำลังทำ)
+แผนละเอียดแต่ละเฟส: [phase-1.md](./phase-1.md) (เสร็จแล้ว) · [phase-2.md](./phase-2.md) (เสร็จแล้ว: 2a, 2b, 2c) · [phase-3.md](./phase-3.md) (เสร็จแล้ว: 3a, 3b) · [phase-4.md](./phase-4.md) (เสร็จแล้ว: 4a, 4b) · [phase-5.md](./phase-5.md) (เสร็จแล้ว: 5a, 5b, 5c) · [craft.md](./craft.md) (เฟส 5.6 เสร็จแล้ว)
 
 ## หลักการออกแบบ
 
@@ -157,7 +157,7 @@
 - **Special Option** เฉพาะมอนเลี้ยง 4 แบบ: ลดความหิว, ลด stamina ผจญภัย, เพิ่มดรอปอุปกรณ์, ลดอึ โอกาสมีตามเกรด ตำนานมีแน่นอน
 - คำนวณใหม่จากชิ้นที่สวมอยู่ทุกครั้ง บวกกันมีเพดาน · สุ่มบนเซิร์ฟเวอร์พร้อม log
 
-## คราฟต์อุปกรณ์ + Mythic + 12 เซ็ตใหม่ 🚧 (เฟส 5.6)
+## คราฟต์อุปกรณ์ + Mythic + 12 เซ็ตใหม่ ✅ (เฟส 5.6)
 
 รายละเอียด: [craft.md](./craft.md)
 
@@ -179,6 +179,6 @@
 | 4 ✅ | Async PvP (ทีมป้องกัน snapshot, ELO, ซีซันรายเดือน, NPC) | `pvp` (ในโมดูล `monster`) | – |
 | 5 ✅ | Boss Raid + ชุดเซ็ต · World Boss · ระบบเพื่อน + เช่าตัว | `raid`, `world-boss`, `friend` (ในโมดูล `monster`) | – |
 | 5.5 ✅ | เกรดอุปกรณ์ + ค่ารองสุ่ม + Special Option ([item-rank.md](./item-rank.md)) | `equipment` (ต่อยอด), `calcSpecialBonuses` | – |
-| 5.6 🚧 | คราฟต์อุปกรณ์ + เกรด Mythic + 12 เซ็ตใหม่ ([craft.md](./craft.md)) | `craft` (ในโมดูล `monster`), arena effects, `equipment` (ต่อยอด) | – |
+| 5.6 ✅ | คราฟต์อุปกรณ์ + เกรด Mythic + 12 เซ็ตใหม่ ([craft.md](./craft.md)) | `craft` (ในโมดูล `monster`), arena effects, `equipment` (ต่อยอด) | – |
 | 6 | Realtime PvP | WebSocket gateway | ✓ |
 | 7 | Party Boss Raid | lobby, room state | ✓ |

@@ -374,7 +374,7 @@ td.st { white-space: nowrap; color: var(--muted) }
         <div class="act" id="act-bfused"></div>
         <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
         <h3>อสนีผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
-        <p class="hint">ร่างผสมอสนี+อสนี เดิมเป็นอีโมจิเมฆฟ้าผ่า 🌩️ ใหม่เป็นมังกรสายฟ้า ตัวยาวขดเป็นรูปตัว S ลอยอยู่บนเมฆพายุ แผงคอและสันหลังเป็นสายฟ้า หนวดเป็นสายฟ้า เขาทองแตกกิ่ง มีเกราะทองที่หน้าผากและรอบตัว ท้องสีขาวเมฆ ขาสี่ขามีกรงเล็บทอง และวงสายฟ้าสองวง (เหลืองกับฟ้า) หมุนสวนกันตามแบบร่างผสม</p>
+        <p class="hint">ร่างผสมอสนี+อสนี เดิมเป็นอีโมจิเมฆฟ้าผ่า 🌩️ ใหม่เป็นมังกรสายฟ้าตามรูปที่เลือก (ไม่มีเมฆ): มังกรสีน้ำเงินปีกค้างคาวใหญ่ โครงปีกสีทองขอบขาว เขาทองแตกกิ่ง แผ่นทองที่อกและคอ หนามเรืองเหลืองตามสันหลัง หนวดเป็นสายฟ้า หางยาวโค้งลงใต้ตัวแล้วปลายเป็นพู่มีประกายไฟ การ์ดนี้ขยับให้ดูแล้ว: บินด้วยปีก ตอนยืนกระพือช้าและตัวลอยขึ้นทุกครั้งที่ตีปีกลง ตอนเคลื่อนที่กระพือเร็วขึ้นสองเท่า ตอนโจมตีหุบปีกพุ่งลงไปกัด ตอนใช้สกิลกางปีกขึ้นสุด ขาห้อยอยู่ใต้ตัว</p>
       </div>
       <div class="show boss bolt">
         <canvas id="show-bison" width="128" height="112" aria-label="บอสโลกธาตุอสนี กระทิงพายุคำราม"></canvas>
@@ -561,6 +561,7 @@ const MATS = {
   stormc:['#141824', '#3e4660', '#5a6488', '#8a94b8', '#c8d0ec'],
   storm2:['#0e111a', '#2c3248', '#40486a', '#5e688e', '#8e98bc'],
   tbird: ['#060c22', '#14306e', '#1e4aa0', '#3a72d4', '#9cc4ff'],
+  wingb: ['#0a1840', '#1e4aa0', '#2e64c4', '#4a86e4', '#a8ccff'],
   tbird2:['#050a1a', '#102454', '#18387a', '#2a56a6', '#6a94d8'],
   cat:   ['#2a2210', '#b09a4a', '#e0c870', '#f8e8a8', '#fffbe0'],
   cat2:  ['#221a0c', '#8e7a38', '#b8a052', '#d8c47e', '#f0e4b4'],
@@ -714,6 +715,13 @@ const SWIM = {
   attack: [{ head: [-2, 0], body: [-2, 0], tail: 2, wing: .5 }, { head: [3, 0], body: [3, 0], jaw: 1, tail: -2, wing: -.5 }, { head: [1, 0], body: [1, 0], jaw: .4 }],
   cast: [{ body: [-1, -1], head: [-1, -1], jaw: .4, wing: 1, glow: 1, tail: 1.5 }, { body: [1, 0], head: [2, 0], jaw: 1, wing: -1, glow: 1, tail: -1.5 }],
   hurt: [{ body: [-2, 0], head: [-2, -1], jaw: .3 }],
+};
+// Flyers move on their wings: idle is a slow flap with the body rising on each downstroke, walking flaps
+// twice as fast, attack dives in with the wings swept back, cast throws the wings up.
+const FLY = {
+  attack: [{ head: [-2, -2], body: [-2, -1], wing: -1, tail: 1 }, { head: [2, 2], body: [2, 1], jaw: 1, wing: .9, tail: -1, fl: [2, -1], ff: [2, -1] }, { head: [1, 0], jaw: .4, wing: .2 }],
+  cast: [{ head: [-1, -2], body: [-1, -1], jaw: .5, wing: -1, glow: 1, tail: 1 }, { head: [2, 0], body: [1, 0], jaw: 1, wing: .7, glow: 1, tail: -1 }],
+  hurt: [{ head: [-2, -1], body: [-2, 0], jaw: .3, wing: .5 }],
 };
 const BLOB = {
   idle: [{}, { body: [0, .5] }],
@@ -1953,52 +1961,56 @@ const SPRITES = {
     s.d(79 + hx, 47.5 + hy, '#0a0c1a'); s.line(m([[63, 44.5], [68, 45.5]], hx, hy), '#0a0c1a'); s.d(66 + hx, 45.5 + hy, '#fffac0').d(67 + hx, 45.5 + hy, '#ffe14a');
     for (const x of [70, 73]) s.d(x + hx, 51 + hy, '#ffffff');
   }, glows: [[14, 26, '#ffe14a', 5], [23, 27, '#ffe14a', 4], [-3, 44, '#ffe14a', 4], [66, 40, '#ffe14a', 3]], emit: [], mouth: [79, 49] },
-  /* ----- Lightning fused form (อสนีผู้ตื่น): a long storm dragon riding the clouds, lightning mane and whiskers,
-     branching gold horns and gold armour ----- */
-  bfused: { size: 88, rig: SWIM, hover: 6, aura: { type: 'twinb', x: 44, y: 82, r: 34 }, draw(s, P) {
-    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 3.4;
-    const C = [[4, 62], [12, 72], [26, 74], [36, 64], [32, 52], [38, 42], [50, 40], [58, 44], [64, 38]];
-    const raw = [];
-    for (let i = 0; i < C.length - 1; i++) {
-      const p0 = C[Math.max(0, i - 1)], p1 = C[i], p2 = C[i + 1], p3 = C[Math.min(C.length - 1, i + 2)];
-      for (let k = 0; k < 6; k++) { const u = k / 6, u2 = u * u, u3 = u2 * u, f = (a, b, c, d) => .5 * (2 * b + (-a + c) * u + (2 * a - 5 * b + 4 * c - d) * u2 + (-a + 3 * b - 3 * c + d) * u3); raw.push([f(p0[0], p1[0], p2[0], p3[0]), f(p0[1], p1[1], p2[1], p3[1])]); }
-    }
-    raw.push(C[C.length - 1]);
-    const n = raw.length, pts = raw.map(([x, y], i) => { const q = i / (n - 1); return [x + bx * (1 - q) + hx * q + Math.sin(q * Math.PI * 3 + t * .6) * 1.6 * (1 - q), y + by * (1 - q) + hy * q]; });
-    const rad = (q) => q < .2 ? 1.4 + q / .2 * 3.6 : q < .8 ? 5 + Math.sin((q - .2) / .6 * Math.PI) * 1.2 : 5 - (q - .8) / .2 * .8;
-    const back = (i) => { const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)]; const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1; return [dy / L, -dx / L]; };
-    // clouds it rides on (behind)
-    for (const [x, y, r] of [[18, 78, 7], [30, 80, 6], [8, 74, 5]]) s.E(x + bx * .5, y + by * .5, r, r * .7, 'stormc');
-    // far legs
-    const legAt = (q, len, k, dxl) => { const i = Math.round(q * (n - 1)), [x, y] = pts[i], [bxn, byn] = back(i), r = rad(q); const sx = x - bxn * r * .5, sy = y - byn * r * .5, fx = sx + dxl, fy = sy + len; s.L(sx, sy, fx, fy, 1.6, k, 1.2); for (const a of [-.6, 0, .6]) s.L(fx, fy, fx + 2.5 * Math.cos(a + .4), fy + 2.5 * Math.sin(a + .4) + .5, .5, 'gold'); };
-    legAt(.42, 7, 'tbird2', -3); legAt(.74, 6, 'tbird2', 3);
-    // lightning mane along the back
-    pts.forEach(([x, y], i) => { const q = i / (n - 1); if (q < .18 || q > .97 || i % 2) return; const [bxn, byn] = back(i), r = rad(q), h = r + 3 + (i % 4 === 0 ? 3 : 1); s.P([[x + bxn * (r - 1) - byn * 1.4, y + byn * (r - 1) + bxn * 1.4], [x + bxn * h, y + byn * h], [x + bxn * (r - 1) + byn * 1.4, y + byn * (r - 1) - bxn * 1.4]], 'volt'); });
-    pts.forEach(([x, y], i) => { const r = rad(i / (n - 1)); s.E(x, y, r, r, 'tbird'); });
-    // pale belly scutes on the belly side, scale marks and a glowing line on the back
-    pts.forEach(([x, y], i) => { const q = i / (n - 1); if (q < .12 || q > .96) return; const [bxn, byn] = back(i), r = rad(q); s.E(x - bxn * r * .55, y - byn * r * .55, r * .45, r * .45, 'cloudw'); if (i % 2 === 0) s.d(x - bxn * r * .85, y - byn * r * .85, '#a8b4cc'); if (i % 3 === 0) s.d(x + bxn * r * .3, y + byn * r * .3, '#9cc4ff'); });
-    // near legs
-    legAt(.5, 8, 'tbird', 3); legAt(.82, 7, 'tbird', 4);
-    // gold armour bands
-    for (const q of [.58, .66]) { const i = Math.round(q * (n - 1)), [x, y] = pts[i], [bxn, byn] = back(i), r = rad(q); s.L(x + bxn * r, y + byn * r, x - bxn * r, y - byn * r, 1, 'gold'); }
-    // head: long snout, branching gold horns, lightning whiskers, roaring jaw
-    const [ex, ey] = pts[n - 1];
-    s.L(ex - 1, ey - 4, ex - 9, ey - 13, 1.2, 'gold', .8); s.L(ex - 5, ey - 8, ex - 2, ey - 14, .9, 'gold', .5); s.L(ex - 9, ey - 13, ex - 14, ey - 14, .8, 'gold', .4);
-    s.L(ex + 3, ey - 5, ex - 3, ey - 16, 1.1, 'gold', .7); s.L(ex, ey - 11, ex + 4, ey - 15, .8, 'gold', .4);
-    s.E(ex + 3, ey, 7, 5.6, 'tbird');
-    s.P([[ex + 6, ey - 4], [ex + 20, ey - 1], [ex + 20, ey + 3], [ex + 6, ey + 3]], 'tbird');
-    s.P([[ex + 3, ey - 6], [ex + 12, ey - 4.5], [ex + 13, ey - 2], [ex + 4, ey - 2]], 'gold');
-    s.P([[ex + 4, ey + 3], [ex + 19, ey + 3 + j], [ex + 16, ey + 6.5 + j], [ex + 5, ey + 6.5]], 'tbird2');
-    if (j > 1) s.P([[ex + 6, ey + 3], [ex + 19, ey + 3], [ex + 16, ey + 3 + j], [ex + 6, ey + 4 + j * .6]], 'maw');
-    for (const x of [9, 13, 17]) s.d(ex + x, ey + 3, '#ffffff'); if (j > 1) for (const x of [11, 15]) s.d(ex + x, ey + 2 + j, '#ffffff');
-    s.d(ex + 20, ey - 1, '#060c22');
-    s.line([[ex + 17, ey + 1], [ex + 21, ey + 5], [ex + 18, ey + 9], [ex + 22, ey + 13]], '#ffe14a', '#fffac0').line([[ex + 14, ey + 2], [ex + 14, ey + 8], [ex + 11, ey + 12]], '#ffe14a');
-    for (let k = 0; k < 5; k++) s.spike(ex - 3 - k * 2.4, ey - 1 + k * 1.4, 5, 1.2, 'volt', -3);
-    s.d(ex + 6, ey - 1, '#fffac0').d(ex + 7, ey - 1, '#ffe14a').d(ex + 5, ey - 2, '#060c22').d(ex + 6, ey - 2, '#060c22').d(ex + 7, ey - 2, '#060c22').d(ex + 8, ey - 2, '#060c22');
-    // clouds in front
-    for (const [x, y, r] of [[40, 82, 6], [52, 80, 5]]) s.E(x + bx * .5, y + by * .5, r, r * .6, 'stormc');
-    if (P.glow) glowSap(s, ex + 20, ey + 3 + j * .5);
-  }, glows: [[70, 37, '#ffe14a', 4], [40, 34, '#ffe14a', 5], [25, 62, '#ffe14a', 4]], emit: [], mouth: [84, 41] },
+  /* ----- Lightning fused form (อสนีผู้ตื่น), from the owner's reference: a blue storm dragon on great bat wings with
+     gold spars, branching gold horns, gold chest plates, glowing spikes down the back, lightning whiskers, and a long
+     tail ending in a crackling tuft. It flies: the FLY rig flaps the wings and bobs the body; legs hang below. ----- */
+  bfused: { size: 88, rig: FLY, hover: 10, fly: true, aura: { type: 'twinb', x: 44, y: 84, r: 30 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 3, w = P.wing > 0 ? 8 * P.wing : 17 * P.wing;
+    // a bat wing: arm spar to the wrist, finger spars to the tips, scalloped membrane back to the body
+    const wing = (sx, sy, wx, wy, tips, back, k) => {
+      const poly = [[sx, sy], [wx, wy], ...tips.flatMap((p, i) => i < tips.length - 1 ? [p, [(p[0] + tips[i + 1][0]) / 2 + (sx - p[0]) * .12, (p[1] + tips[i + 1][1]) / 2 + (sy - p[1]) * .12]] : [p]), back];
+      s.P(poly, k);
+      s.L(sx, sy, wx, wy, 1.4, 'gold', 1.1); for (const p of tips) s.L(wx, wy, p[0], p[1], .9, 'gold', .5);
+      s.line([[sx, sy - 1], [wx, wy - 1]], '#fff4c0'); s.line([[wx, wy - 1], [tips[0][0], tips[0][1] - 1]], '#fff4c0');
+      s.spike(wx, wy, 3, 1, 'gold', (wx - sx) * .08);
+    };
+    // far wing (behind)
+    wing(54 + bx, 46 + by, 62 + bx, 18 + by - w * .7, [[84, 8 - w], [86, 22 - w * .8], [78, 32 - w * .5]].map(([x, y]) => [x + bx, y + by]), [62 + bx, 50 + by], 'tbird2');
+    // tail: down from the rump, then sweeping right below the body, ending in a crackling tuft
+    const C = [[42, 62], [34, 70], [36, 78], [48, 82], [62, 80], [74, 76], [82, 74]], tail = [];
+    for (let i = 0; i < C.length - 1; i++) for (let k = 0; k < 5; k++) { const u = k / 5; tail.push([lerp(C[i][0], C[i + 1][0], u), lerp(C[i][1], C[i + 1][1], u)]); }
+    tail.push(C[C.length - 1]);
+    const n = tail.length, tp = tail.map(([x, y], i) => { const q = i / (n - 1); return [x + bx * (1 - q * .6), y + by * (1 - q * .6) + Math.sin(q * Math.PI * 2 + t * .8) * 2 * q, 4.6 - q * 3.4]; });
+    tp.forEach(([x, y, r]) => s.E(x, y, r, r, 'tbird'));
+    tp.forEach(([x, y, r], i) => { if (i % 2 === 0 && i < n - 2) s.d(x, y + r - .5, '#f2c13a'); if (i % 3 === 0 && i > 1 && i < n - 4) s.spike(x, y - r + 1, 2.6, 1, 'volt', -1); });
+    { const [ex, ey] = tp[n - 1]; for (const [dx, dy] of [[4, -4], [6, 0], [4, 4], [1, -6], [1, 6]]) s.L(ex, ey, ex + dx, ey + dy, .9, 'cloudw', .4); s.line([[ex, ey], [ex + 5, ey - 1]], '#ffe14a'); }
+    // hind legs, hanging
+    s.L(44 + bx, 64 + by, 42 + P.bl[0], 72 + P.bl[1], 2.4, 'tbird2', 1.8); for (const a of [-.4, .2, .8]) s.L(42 + P.bl[0], 72 + P.bl[1], 42 + P.bl[0] + 2.6 * Math.cos(a), 74 + P.bl[1] + 1.4 * Math.sin(a), .5, 'gold');
+    s.L(50 + bx, 64 + by, 51 + P.fl[0] * .5, 71 + P.fl[1], 2.6, 'tbird', 2); for (const a of [-.4, .2, .8]) s.L(51 + P.fl[0] * .5, 71 + P.fl[1], 51 + P.fl[0] * .5 + 2.8 * Math.cos(a), 73 + P.fl[1] + 1.4 * Math.sin(a), .5, 'gold');
+    // body and neck, gold chest plates
+    s.E(48 + bx, 58 + by, 11, 8, 'tbird'); s.L(54 + bx, 54 + by, 64 + hx, 46 + hy, 5.4, 'tbird', 4.4);
+    for (const [x, y, r] of [[44, 63, 3.2], [49, 64, 3.4], [55, 62, 3.4], [60, 57, 3], [64, 52, 2.6]]) { s.E(x + bx * (x < 58 ? 1 : .5) + (x >= 58 ? hx * .5 : 0), y + by * (x < 58 ? 1 : .5) + (x >= 58 ? hy * .5 : 0), r, r * .7, 'gold'); }
+    // glowing spikes down the back
+    for (const [x, y, h, l] of [[38, 58, 4, -2], [42, 52, 5, -1.5], [47, 50, 5, -1], [53, 48, 4.5, -.5], [58, 46, 4, 0]]) s.spike(x + bx, y + by, h, 1.4, 'volt', l);
+    // front legs, hanging forward with gold claws
+    s.L(58 + bx, 60 + by, 62 + P.ff[0] * .5, 68 + P.ff[1], 2.4, 'tbird', 1.8); for (const a of [-.2, .4, 1]) s.L(62 + P.ff[0] * .5, 68 + P.ff[1], 62 + P.ff[0] * .5 + 2.6 * Math.cos(a), 70 + P.ff[1] + 1.4 * Math.sin(a), .5, 'gold');
+    // near wing (in front), the big one
+    wing(46 + bx, 48 + by, 30 + bx, 16 + by - w * .8, [[4, 8 - w], [6, 26 - w * .8], [18, 38 - w * .55]].map(([x, y]) => [x + bx, y + by]), [42 + bx, 56 + by], 'wingb');
+    // head: branching gold horns, long snout, roaring jaw, lightning whiskers
+    const ex = 66 + hx, ey = 43 + hy;
+    s.L(ex - 2, ey - 3, ex - 8, ey - 13, 1.2, 'gold', .8); s.L(ex - 5, ey - 8, ex - 2, ey - 14, .9, 'gold', .5); s.L(ex - 8, ey - 13, ex - 13, ey - 15, .8, 'gold', .4); s.L(ex - 7, ey - 11, ex - 11, ey - 9, .7, 'gold', .4);
+    s.L(ex + 2, ey - 4, ex - 1, ey - 15, 1.1, 'gold', .7); s.L(ex, ey - 10, ex + 4, ey - 15, .8, 'gold', .4);
+    s.E(ex + 2, ey, 6.5, 5.2, 'tbird');
+    s.P([[ex + 4, ey - 4], [ex + 18, ey - 1.5], [ex + 18, ey + 2], [ex + 4, ey + 3]], 'tbird');
+    s.P([[ex + 2, ey - 5], [ex + 11, ey - 3.5], [ex + 12, ey - 1.5], [ex + 3, ey - 1.5]], 'gold');
+    s.P([[ex + 3, ey + 2.5], [ex + 17, ey + 2.5 + j], [ex + 14, ey + 5.5 + j], [ex + 4, ey + 5.5]], 'tbird2');
+    if (j > 1) s.P([[ex + 5, ey + 2.5], [ex + 17, ey + 2.5], [ex + 14, ey + 2.5 + j], [ex + 5, ey + 3.5 + j * .6]], 'maw');
+    for (const x of [8, 12, 16]) s.d(ex + x, ey + 2.5, '#ffffff'); if (j > 1) for (const x of [10, 14]) s.d(ex + x, ey + 1.5 + j, '#ffffff');
+    s.d(ex + 18, ey - 1, '#060c22');
+    s.line([[ex + 16, ey + 1], [ex + 20, ey + 4], [ex + 17, ey + 8], [ex + 21, ey + 12]], '#ffe14a', '#fffac0').line([[ex + 12, ey + 3], [ex + 13, ey + 8], [ex + 10, ey + 12]], '#ffe14a').line([[ex + 17, ey - 1], [ex + 21, ey - 3]], '#ffe14a');
+    s.d(ex + 5, ey - 1, '#fffac0').d(ex + 6, ey - 1, '#ffe14a').d(ex + 4, ey - 2, '#060c22').d(ex + 5, ey - 2, '#060c22').d(ex + 6, ey - 2, '#060c22').d(ex + 7, ey - 2, '#060c22');
+    if (P.glow) glowSap(s, ex + 18, ey + 2 + j * .5);
+  }, glows: [[72, 42, '#ffe14a', 3], [86, 52, '#ffe14a', 4], [83, 74, '#ffe14a', 4]], emit: [{ x: 82, y: 74, type: 'zap', rate: 3 }, { x: 84, y: 48, type: 'zap', rate: 2 }], mouth: [84, 45] },
   /* ----- Lightning world boss (game: จักรกลพายุ, a machine): a storm bison with a thundercloud mane ----- */
   stormbison: { size: 96, rig: QUAD, aura: { type: 'bossb', x: 48, y: 88, r: 36 }, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
@@ -2065,10 +2077,12 @@ function keyed(keys, t) {
 }
 const ANIM = {
   idle: { n: 12, loop: true, pose(rig, f) { const s = Math.sin(TAU * f), c = Math.cos(TAU * f);
+    if (rig === FLY) return { wing: Math.sin(TAU * f), body: [0, -1.2 * Math.sin(TAU * f + .6)], head: [0, -.8 * Math.sin(TAU * f + 1.2)], tail: 1.2 * Math.sin(TAU * f + 2), fl: [0, .6 * Math.sin(TAU * f + 2)], bl: [0, .6 * Math.sin(TAU * f + 2.4)], ff: [0, .6 * Math.sin(TAU * f + 2.2)] };
     if (rig === SWIM) return { body: [0, -.6 * s], head: [0, -.3 * Math.sin(TAU * f + .5)], tail: 1.2 * Math.sin(TAU * f + 1), wing: .3 * s, fl: [0, .9 * s], bl: [0, -.9 * s], ff: [.8 * c, 0], bf: [-.8 * c, 0] };
     return { body: [0, .45 * s], head: [0, .35 * Math.sin(TAU * f + .6)], tail: .9 * Math.sin(TAU * f + 1), wing: .25 * s, arm: [0, .3 * s], arm2: [0, -.3 * s] }; } },
   walk: { n: 12, loop: true, pose(rig, f) {
     const s = Math.sin(TAU * f), c = Math.cos(TAU * f), lift = (v) => -2.2 * Math.max(0, v), up = 1 - Math.abs(s);
+    if (rig === FLY) return { wing: Math.sin(2 * TAU * f), body: [1, -1.2 * Math.sin(2 * TAU * f + .6)], head: [1.5, -.6 * Math.sin(2 * TAU * f + 1.2)], tail: 2 * Math.sin(TAU * f + 2), fl: [-1.5, 1], bl: [-1.5, 1], ff: [-1, 1] };
     if (rig === BLOB) return { body: [0, -2 * Math.abs(s)], bl: [0, lift(c) * .6], fl: [0, lift(-c) * .6] };
     if (rig === SWIM) return { body: [0, -1.2 * s], head: [0, -.6 * Math.sin(TAU * f + .5)], tail: 2.4 * Math.sin(TAU * f + 1), wing: .6 * Math.sin(TAU * f + 1), fl: [0, 1.7 * s], bl: [0, -1.7 * s], ff: [1.5 * c, 0], bf: [-1.5 * c, 0] };
     if (rig === BIPED) return { bl: [2.4 * s, lift(c)], bf: [-2.4 * s, lift(-c)], arm: [-1.4 * s, 0], arm2: [1.4 * s, 0], body: [0, -.8 * up], head: [0, -.4 * up], tail: Math.sin(TAU * f + 1), wing: .2 * s };
@@ -2449,7 +2463,7 @@ addCard(document.getElementById('show-fused'), 'avatar', document.getElementById
 addCard(document.getElementById('show-boss'), 'boss', document.getElementById('act-boss'));
 addCard(document.getElementById('show-turtle'), 'turtle', document.getElementById('act-turtle'));
 addCard(document.getElementById('show-wfused'), 'wfused', document.getElementById('act-wfused'));
-addCard(document.getElementById('show-bfused'), 'bfused', document.getElementById('act-bfused'), 8, true);
+addCard(document.getElementById('show-bfused'), 'bfused', document.getElementById('act-bfused'));
 addCard(document.getElementById('show-bison'), 'stormbison', document.getElementById('act-bison'), 8, true);
 addCard(document.getElementById('show-efused'), 'efused', document.getElementById('act-efused'));
 addCard(document.getElementById('show-pangolin'), 'pangolin', document.getElementById('act-pangolin'));
@@ -2613,12 +2627,14 @@ const ROSTER = {
   mountturtle: { sprite: 'mountturtle', name: 'เต่าภูเขา', el: 'earth', hp: 1000 }, crystalrhino: { sprite: 'crystalrhino', name: 'ไททันแรดคริสตัล', el: 'earth', hp: 960 },
   efused: { sprite: 'efused', name: 'ธรณีผู้ตื่น', el: 'earth', hp: 1300 }, clay: { sprite: 'clay', name: 'ก้อนดินเหนียว', el: 'earth', hp: 170 }, pebble: { sprite: 'pebble', name: 'ก้อนกรวด', el: 'earth', hp: 100 },
   pangolin: { sprite: 'pangolin', name: 'ตัวนิ่มศิลาโบราณ', el: 'earth', hp: 7500, boss: true },
+  bfused: { sprite: 'bfused', name: 'อสนีผู้ตื่น', el: 'bolt', hp: 1250 },
 };
 const pickMe = document.getElementById('pick-me'), pickFoe = document.getElementById('pick-foe');
 { const gf = document.createElement('optgroup'); gf.label = 'สายเพลิง'; for (const id of ['sunking', 'phoenix', 'avatar', 'dragon', 'frill', 'lava', 'raptor', 'gecko', 'coal', 'wisp']) gf.append(new Option(ROSTER[id].name, id)); pickMe.append(gf);
   const gw = document.createElement('optgroup'); gw.label = 'สายวารี'; for (const id of ['wfused', 'whaleking', 'leviathan', 'seadragon', 'armorwhale', 'octopus', 'shark', 'swordwhale', 'jelly', 'bubble', 'drop']) gw.append(new Option(ROSTER[id].name, id)); pickMe.append(gw);
   const gl = document.createElement('optgroup'); gl.label = 'สายพฤกษ์'; for (const id of ['lfused', 'forestdeer', 'wolfking', 'stag', 'barkwolf', 'stump', 'leafdeer', 'wolf', 'mushroom', 'sprout', 'seed']) gl.append(new Option(ROSTER[id].name, id)); pickMe.append(gl);
-  const ge = document.createElement('optgroup'); ge.label = 'สายศิลา'; for (const id of ['efused', 'mountturtle', 'crystalrhino', 'pillarturtle', 'orerhino', 'boulder', 'tortoise', 'rhino', 'worm', 'clay', 'pebble']) ge.append(new Option(ROSTER[id].name, id)); pickMe.append(ge); }
+  const ge = document.createElement('optgroup'); ge.label = 'สายศิลา'; for (const id of ['efused', 'mountturtle', 'crystalrhino', 'pillarturtle', 'orerhino', 'boulder', 'tortoise', 'rhino', 'worm', 'clay', 'pebble']) ge.append(new Option(ROSTER[id].name, id)); pickMe.append(ge);
+  const gb = document.createElement('optgroup'); gb.label = 'สายอสนี (ร่างผสม ลองบิน)'; gb.append(new Option(ROSTER.bfused.name, 'bfused')); pickMe.append(gb); }
 for (const id of ['shark', 'dragon', 'armorwhale', 'wolf', 'barkwolf', 'rhino', 'orerhino', 'boss', 'turtle', 'flora', 'pangolin']) pickFoe.add(new Option(ROSTER[id].boss ? 'บอส · ' + ROSTER[id].name : ROSTER[id].name, id));
 
 function makeEnt(rid, side) {
@@ -2702,7 +2718,8 @@ function stepWalk(e, dt) {
     e.walkPhase = (e.walkPhase || 0) + mv / (e.def.size * .55);
     if (Math.floor(e.walkPhase * 2) !== before) {
       if (e.boss) shake = Math.max(shake, 1.6);
-      if (e.def.hover) { ripple(e.x, e.y, 10, .5); ps.add(makeParticle('drop', e.x + (Math.random() - .5) * 10, e.y - 4)); }
+      if (e.def.fly) ps.burst(3, () => makeParticle('dust', e.x + (Math.random() - .5) * e.def.size * .5, e.y - 1));
+      else if (e.def.hover) { ripple(e.x, e.y, 10, .5); ps.add(makeParticle('drop', e.x + (Math.random() - .5) * 10, e.y - 4)); }
       else ps.burst(e.boss ? 6 : 3, () => ({ x: e.x + (Math.random() - .5) * e.def.size * .4, y: e.y - 1, vx: (Math.random() - .5) * 16, vy: -5 - Math.random() * 6, g: 20, life: .45, size: 1, cols: ['#8a8098', '#5a5268'], alpha: .6 }));
     }
   } else if (!e.goal) e.v = Math.max(0, e.v - dt * 200);

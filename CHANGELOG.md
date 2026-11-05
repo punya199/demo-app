@@ -1,3 +1,10 @@
+# [1.46.0](https://github.com/punya199/demo-app/compare/v1.45.0...v1.46.0) (2026-11-05)
+
+
+### New
+
+* show materials in the bag with a materials tab ([050d106](https://github.com/punya199/demo-app/commit/050d1062c50510836d189529d61e9f54a1e9677f))
+
 # [1.45.0](https://github.com/punya199/demo-app/compare/v1.44.1...v1.45.0) (2026-11-05)
 
 

@@ -1712,7 +1712,11 @@ const SPRITES = {
     s.L(68 + bx, 70 + by, 70 + P.ff[0], 81 + P.ff[1], 4, 'basalt2'); s.E(71 + P.ff[0], 83.5 + P.ff[1], 4.4, 1.8, 'amberB2');
     // body: low crouching barrel, round amber belly under the chest
     s.E(48 + bx, 63 + by, 24, 13, 'basalt'); s.E(62 + bx, 58 + by, 11, 11, 'basalt');
-    s.E(53 + bx, 70.5 + by, 11, 5, 'amberB'); s.line([[45 + bx, 72 + by], [50 + bx, 75 + by], [57 + bx, 75 + by], [62 + bx, 72 + by]], '#f8c08a');
+    { // a long belly strip along the underside: widest at the chest, tapering back between the hind legs
+      const yb = (x) => 63 + 13 * Math.sqrt(Math.max(0, 1 - ((x - 48) / 24) ** 2)) + .8, wd = (x) => 1.6 + (x - 24) / 42 * 7.5, lo = [], up = [];
+      for (let x = 24; x <= 66; x += 2) { lo.push([x + bx, yb(x) + by]); up.push([x + bx, yb(x) - wd(x) + by]); }
+      s.P([...lo, ...up.reverse()], 'amberB'); s.line(lo.slice(4).map(([x, y]) => [x, y - 1]), '#f8c08a');
+    }
     // scale tufts: a ragged outline along the back and rows of tufts with amber stripes
     for (let i = 0; i < 12; i++) { const a = Math.PI * (1.02 + i * .085), x = 48 + Math.cos(a) * 24, y = 63 + Math.sin(a) * 13.5; s.E(x + bx, y + by, 3, 2.6, 'basalt'); }
     for (const [x, y] of [[57, 46], [63, 47], [68, 50], [71, 55]]) s.E(x + bx, y + by, 3.2, 2.8, 'basalt');

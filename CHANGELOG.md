@@ -1,3 +1,20 @@
+# [1.45.0](https://github.com/punya199/demo-app/compare/v1.44.1...v1.45.0) (2026-11-05)
+
+
+### Fix
+
+* show craft material names in the expedition summary ([8c13caa](https://github.com/punya199/demo-app/commit/8c13caa192c646abc72e270e516a23287aef3c1c))
+
+### New
+
+* add craft items plan spec and roadmap entry ([ff0a917](https://github.com/punya199/demo-app/commit/ff0a917d1c3ae65d5962029abea66be1efa19c0b))
+* craft panel with queue, catalyst and recipes by set ([f578d20](https://github.com/punya199/demo-app/commit/f578d206399943fc41eabb6eb7d17d133aebb41c))
+* Mythic grade, craft-set effect labels and bag set filter ([ced6a95](https://github.com/punya199/demo-app/commit/ced6a950726639f650a6cc7d5da0d50119375f9b))
+
+### Update
+
+* record tuned craft set numbers and mark phase 5.6 done ([a38accb](https://github.com/punya199/demo-app/commit/a38accb66a40af17433a532c9ff34fc27ac21d5b))
+
 ## [1.44.1](https://github.com/punya199/demo-app/compare/v1.44.0...v1.44.1) (2026-11-05)
 
 

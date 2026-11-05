@@ -25,6 +25,7 @@ import { useGetWiki } from './tamagotchi-service'
 import { describeCareBonus, isCraftSet, percent, times } from './wiki-helper'
 import { ArenaBattleSection } from './WikiArena'
 import { CraftWikiTab } from './WikiCraft'
+import { SkillsWikiTab } from './WikiSkills'
 import { Heading, List, Table } from './WikiParts'
 import { StatusEffectsSection } from './WikiStatus'
 
@@ -354,6 +355,11 @@ const buildSections = (wiki: IWikiData) => {
           <StatusEffectsSection arena={wiki.arena} />
         </>
       ),
+    },
+    {
+      key: 'skills',
+      label: '🌀 สกิล',
+      children: <SkillsWikiTab wiki={wiki} />,
     },
     {
       key: 'adventure',

@@ -821,6 +821,9 @@ export interface IWikiData {
   // The real-time arena: only what the guide shows (statuses and crowd-control rules).
   arena: {
     timeLimitSec: number
+    // Forms that fight with skills, and the wait every skill has after any cast (seconds).
+    skilledStages: EnumMonsterStage[]
+    skillDelaySec: number
     defenseK: number
     maxDefenseReduction: number
     damageVarianceMin: number

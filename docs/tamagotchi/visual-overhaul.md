@@ -60,7 +60,10 @@ asked for this more than once.
 | Leaf skills, all 8 | Done. New statuses in the prototype: root (`rootT`, can't walk, vines round the feet), silence (`silenceT`, crossed speech bubble, auto mode only basic-attacks), poison (`poisonT`, 2% HP a second), lifesteal (กรงเล็บไพร heals 30% of each hit), and the ent passive (`ent`: 1.2% regen a second, 8% less damage, bark flash) |
 | Leaf fused (พนาผู้ตื่น) | Done: the awakened elk, mint-white body, gold armour on face/chest/back, gold branch antlers with glowing leaves, twin green/gold leaf rings |
 | Leaf boss (พฤกษาโบราณ) | Done. The leaf line has no world boss (ต้นไม้โบราณ is earth), so this is the leaf raid boss `ancient_flora`: an ancient moss bear with a blossom tree and a small grove on its back. Choosing it switches the arena to the new forest theme, and the HUD says บอสเรด |
-| Earth line, 11 forms + fused + boss | **Still drafts only, waiting for the owner to choose.** The owner asked for pictures first, no animation or skills until the designs are approved. Tortoise main branch (เต่าศิลา → เต่าผาหิน with basalt pillars → เต่าภูเขา carrying a snowy mountain with pines and a stream), rhino branch (แรดผา → แรดเกราะแร่ with iron plates and copper veins → ไททันแรดคริสตัล with a glowing topaz horn and back crystals). Poor forms: หนอนดินเกียจคร้าน (sleeping fat earthworm), ก้อนหินขี้เกียจ (sleeping boulder with moss and a flower, drooling). Fused ธรณีผู้ตื่น: the mountain tortoise with gold armour and topaz peaks. World boss: the game's ต้นไม้โบราณ is earth but a tree, so the draft is an ancient stone pangolin with thorned scale rows (matches its reflect-damage ability); the name ตัวนิ่มศิลาโบราณ is only a proposal. The sprites are drawn with the pose rig, so they can be animated once approved |
+| Earth line, 11 forms | Done and animated (the owner approved the still drafts). Tortoise branch (เต่าศิลา → เต่าผาหิน with basalt pillars → เต่าภูเขา carrying a snowy mountain), rhino branch (แรดผา → แรดเกราะแร่ → ไททันแรดคริสตัล with a topaz horn). Poor forms: หนอนดินเกียจคร้าน, ก้อนหินขี้เกียจ |
+| Earth skills, all 8 | Done. New statuses in the prototype: stun (`stunT`, spinning stars, can't walk, auto mode waits), stone shield (`bubbleStone` on the shared bubble shield), attack up (`atkUpT`, ×1.2 outgoing damage, orange arrow), and the boulder's stone skin (`stoneSkin`: 12% less damage, crowd control 40% shorter, 15% slower). Heavy forms walk up close before ธรณีสั่น because they are slow |
+| Earth fused (ธรณีผู้ตื่น) | Done, redrawn to the owner's reference picture: a crouching rock beast in charcoal scale tufts with rust stripes, a round amber belly, a three-lobed bone mask with one glowing cyan eye, and a heavy tail curled up over its back. The reference looked like existing game art, so this is an original drawing in that direction, not a copy |
+| Earth world boss | Done: ตัวนิ่มศิลาโบราณ, a stone pangolin with thorned scale rows (the game's ต้นไม้โบราณ is earth; the new name is only a proposal). Choosing it switches the arena to the new canyon theme |
 | Lightning, holy, dark, shadow lines | Not started |
 | The other 17 fused forms and 9 bosses | Not started |
 | Putting the art into the real game | Not started |
@@ -73,6 +76,8 @@ asked for this more than once.
 - New names (ราชาวาฬผลึก and the names in the plan table) are proposals only. The game data in
   `demo-app-backend` `species-data.ts` is unchanged.
 - The skill name "ตรีศูลสมุทร" is still the game's name. Ask the owner before renaming it.
+- Earth skill names that still name old animals: อุ้งตีนผา (bear paw, now the pillar tortoise's
+  stamp), ขนแร่ (hedgehog quills, now ore spines fired from the ore rhino's armour).
 - Leaf skill names still name the old animals: กรงเล็บไพร (tiger claw, now the stag's three antler
   slashes), งวงพฤกษา (elephant trunk, now a thick vine that rears up from the bark wolf's back),
   พิทักษ์พนา (ent, now the wolf king's passive). Ask the owner before renaming them.
@@ -85,9 +90,9 @@ asked for this more than once.
 
 ## Next steps (suggested order)
 
-1. Get the owner's choice on the earth drafts, then animate them and do the 8 earth skills
-   (`earth_*` in `arena-data.ts`). For the next lines (lightning, holy, dark, shadow) the owner
-   wants still pictures first too: draw the models, let them choose, then animate.
+1. Lightning line next. The owner wants still pictures first: draw the 11 forms, the fused form
+   and the boss as still drafts (`buildBoard(…, true)` etc.), let them choose, then animate and do
+   the 8 skills. Then holy, dark, shadow the same way.
 3. Integration plan for the real game: replace the emoji in `ArenaReplay.tsx` with sprite frames.
    Positions come from the server replay, so poses map to replay events (walk while moving,
    attack/cast at skill events, the parry pose on dodge events with `parry`). Combat results stay

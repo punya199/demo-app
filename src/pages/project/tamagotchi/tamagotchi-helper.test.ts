@@ -537,8 +537,18 @@ describe('set effects in replays', () => {
   })
 
   it('writes effects and percent bonuses in Thai', () => {
-    expect(describeSetEffect({ burnTurns: 3 })).toBe('สกิลทำให้ศัตรูติดเผาไหม้ 3 เทิร์น')
-    expect(describeSetEffect({ shieldPct: 0.15 })).toContain('15%')
+    expect(describeSetEffect({ burnTurns: 1.6, burnBonus: 0.1 })).toBe(
+      'ตีปกติมีโอกาส 30% ทำให้ติดเผาไหม้ 1.6 วิ · ตีศัตรูที่ติดเผาไหม้แรงขึ้น 10%'
+    )
+    expect(describeSetEffect({ shieldPct: 0.04, shieldRefresh: 0.04 })).toBe(
+      'เริ่มสู้ด้วยโล่ 4% ของ HP · ได้โล่ 4% ของ HP ทุก 12 วิ'
+    )
+    expect(describeSetEffect({ regenPct: 0.045 })).toBe('ฟื้น HP 0.14% ของ HP สูงสุดทุกวินาที')
+    expect(describeSetEffect({ evasion: 0.15, dodgeCdCutSec: 4, afterDodgeBonus: 0.85 })).toBe(
+      'EVA +15 · คูลดาวน์สกิลหลบลดลง 4 วิ · หลบได้แล้ว การโจมตีครั้งถัดไปติดคริและแรงขึ้น 85%'
+    )
+    expect(describeSetEffect({ lastStandShield: 0.14 })).toContain('ต่ำกว่า 35% ได้โล่ 14%')
+    expect(describeSetEffect({ cooldownCut: 0.18 })).toBe('คูลดาวน์สกิลสั้นลง 18%')
     expect(describeSetEffect({})).toBe('')
     expect(describePctBonus({ atk: 0.15, def: 0 })).toBe('ATK +15%')
   })
@@ -979,7 +989,7 @@ describe('set progress labels', () => {
   it('describes a tier by its stat bonus and its effect', () => {
     const [two, four] = set(4).tiers
     expect(describeSetTier(two)).toBe('ATK +15%')
-    expect(describeSetTier(four)).toBe('สกิลทำให้ศัตรูติดเผาไหม้ 3 เทิร์น')
+    expect(describeSetTier(four)).toBe('ตีปกติมีโอกาส 30% ทำให้ติดเผาไหม้ 3 วิ')
   })
 
   it('also words crit effects', () => {

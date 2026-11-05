@@ -248,6 +248,14 @@ export interface IFighterEffects {
   doubleStrikeChance?: number
   critChance?: number
   critDamage?: number
+  evasion?: number
+  // Boss-set effects made for the real-time arena.
+  burnBonus?: number
+  shieldRefresh?: number
+  cooldownCut?: number
+  lastStandShield?: number
+  dodgeCdCutSec?: number
+  afterDodgeBonus?: number
 }
 
 // One equipment set with how many of its pieces the shown pet wears (GET /equipment).

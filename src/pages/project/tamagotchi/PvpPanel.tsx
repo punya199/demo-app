@@ -1,6 +1,8 @@
 import { Alert, Button, Card, Collapse, Input, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
+import { ArenaBattleModal } from './ArenaBattleModal'
 import { BattleModal } from './BattleModal'
+import { IArenaFight } from './arena-interface'
 import { PetAvatar } from './PetAvatar'
 import { PvpLeaderboard } from './PvpLeaderboard'
 import {
@@ -24,6 +26,7 @@ import {
   useGetPvpHistory,
   useGetPvpOpponents,
   useGetPvpReplay,
+  useGetSkills,
   useGetPvpStatus,
   usePvpBattle,
   useSetPvpDefense,
@@ -35,7 +38,7 @@ interface IPvpPanelProps {
 }
 
 interface IModalState {
-  battle: IBattleData
+  battle: IArenaFight | IBattleData
   summary: string
   title: string
   // Set for a fresh fight: applied to the cache when the player closes the replay.
@@ -74,11 +77,15 @@ export const PvpPanel = (props: IPvpPanelProps) => {
   const { data: history } = useGetPvpHistory()
   const { mutate: setDefense, isPending: isSettingDefense } = useSetPvpDefense()
   const { mutate: fight, isPending: isFighting } = usePvpBattle()
+  const { data: skillState } = useGetSkills()
   const { mutate: loadReplay, isPending: isLoadingReplay } = useGetPvpReplay()
   const { mutate: claim, isPending: isClaiming } = useClaimPvpSeason()
   const applyResult = useApplyPvpResult()
   const [name, setName] = useState('')
   const [modal, setModal] = useState<IModalState | null>(null)
+  const shown = modal?.battle ?? null
+  const arenaFight = shown && 'kind' in shown ? shown : null
+  const turnFight = shown && !('kind' in shown) ? shown : null
 
   const blocker = getPvpBlocker(monster, status)
   const defenseBlocker = getDefenseBlocker(monster, status, new Date())
@@ -211,14 +218,7 @@ export const PvpPanel = (props: IPvpPanelProps) => {
                   fight(opponent.id, {
                     onSuccess: (result) =>
                       setModal({
-                        battle: toBattleData(
-                          result.battle.won,
-                          result.battle.rounds,
-                          result.battle.events,
-                          result.battle.player,
-                          result.battle.enemy,
-                          result.battle.reward
-                        ),
+                        battle: result.battle,
                         title: `ท้า ${opponent.displayName}`,
                         summary: `${result.battle.won ? 'ชนะ!' : 'แพ้...'} เรตติ้ง ${formatRatingChange(
                           result.rating.before,
@@ -270,13 +270,16 @@ export const PvpPanel = (props: IPvpPanelProps) => {
                         loadReplay(entry.id, {
                           onSuccess: (replay) =>
                             setModal({
-                              battle: toBattleData(
-                                replay.attackerWon,
-                                replay.rounds,
-                                replay.events,
-                                replay.attacker,
-                                replay.defender
-                              ),
+                              battle:
+                                replay.kind === 'arena'
+                                  ? replay
+                                  : toBattleData(
+                                      replay.attackerWon,
+                                      replay.rounds,
+                                      replay.events,
+                                      replay.attacker,
+                                      replay.defender
+                                    ),
                               title: 'ดูย้อนหลัง',
                               summary: describeReplay(entry, replay),
                               result: null,
@@ -296,8 +299,16 @@ export const PvpPanel = (props: IPvpPanelProps) => {
         ]}
       />
 
+      <ArenaBattleModal
+        battle={arenaFight}
+        statuses={skillState?.statuses}
+        catalog={skillState?.catalog}
+        onClose={closeModal}
+        summary={modal?.summary}
+        title={modal?.title}
+      />
       <BattleModal
-        battle={modal?.battle ?? null}
+        battle={turnFight}
         onClose={closeModal}
         summary={modal?.summary}
         title={modal?.title}

@@ -1,5 +1,6 @@
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../../../utils/api-client'
+import { IArenaBattleData, IArenaLoadout, ISkillState } from './arena-interface'
 import { foldSelectedMonster } from './tamagotchi-helper'
 import {
   EnumMonsterAction,
@@ -52,6 +53,13 @@ interface IGetMonsterHistoryResponse {
 export interface IBattleResponse {
   monster: IMonsterData
   battle: IBattleData
+  wallet: IWallet
+}
+
+// Adventure fights run in the real-time arena.
+export interface IAdventureBattleResponse {
+  monster: IMonsterData
+  battle: IArenaBattleData
   wallet: IWallet
 }
 
@@ -210,7 +218,7 @@ export const useAdventureBattle = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (input: { stageId: string; auto?: boolean }) => {
-      const { data } = await apiClient.post<IBattleResponse>(`/adventure/battle`, input)
+      const { data } = await apiClient.post<IAdventureBattleResponse>(`/adventure/battle`, input)
       return data
     },
     onError: () => {
@@ -221,7 +229,7 @@ export const useAdventureBattle = () => {
 
 export const useApplyBattleResult = () => {
   const queryClient = useQueryClient()
-  return (data: IBattleResponse) => {
+  return (data: { monster: IMonsterData; wallet: IWallet }) => {
     setSelectedMonster(queryClient, data.monster)
     queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
     queryClient.invalidateQueries({ queryKey: ['adventure'] })
@@ -1124,6 +1132,32 @@ export const useGetEvolutionPath = (monsterId: string | null) => {
         `/monster/${monsterId}/evolution-path`
       )
       return data
+    },
+  })
+}
+
+const SKILLS_KEY = ['skills']
+
+// Skill catalog, unlocks (from the Dex) and each living pet's innate skill and slots.
+export const useGetSkills = () => {
+  return useQuery({
+    queryKey: SKILLS_KEY,
+    queryFn: async () => {
+      const { data } = await apiClient.get<ISkillState>(`/skills`)
+      return data
+    },
+  })
+}
+
+export const useSetSkillLoadout = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: IArenaLoadout & { monsterId?: string }) => {
+      const { data } = await apiClient.post<ISkillState>(`/skills/loadout`, input)
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(SKILLS_KEY, data)
     },
   })
 }

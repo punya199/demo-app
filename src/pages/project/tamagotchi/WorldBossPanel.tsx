@@ -2,7 +2,7 @@ import { PetAvatar } from './PetAvatar'
 import { ResetCountdown } from './ResetCountdown'
 import { Alert, Button, Card, Collapse, Progress, Select, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
-import { BattleModal } from './BattleModal'
+import { ArenaBattleModal } from './ArenaBattleModal'
 import {
   describeWorldBossReward,
   elementLabel,
@@ -15,7 +15,6 @@ import {
 import {
   EnumEquipmentGrade,
   EnumEquipmentSlot,
-  IBattleData,
   IMonsterData,
   IWorldBossAttackResponse,
   IWorldBossStatus,
@@ -26,6 +25,7 @@ import {
   useExchangeWorldBoss,
   useGetInventory,
   useGetRentable,
+  useGetSkills,
   useGetWiki,
   useGetWorldBoss,
   useGetWorldBossRanking,
@@ -37,28 +37,13 @@ interface IWorldBossPanelProps {
   onError: (error: unknown) => void
 }
 
-const toBattleData = (result: IWorldBossAttackResponse): IBattleData => ({
-  stageId: 'world-boss',
-  team: result.battle.team,
-  won: result.isKillingBlow,
-  rounds: result.battle.rounds,
-  events: result.battle.events,
-  player: result.battle.player,
-  enemy: result.battle.enemy,
-  reward: 0,
-  gemReward: 0,
-  isFirstClear: false,
-  drop: null,
-  dropBagFull: false,
-})
-
 const describeAttack = (result: IWorldBossAttackResponse) =>
   [
     result.ally &&
       `${result.ally.emoji} ${result.ally.name} ช่วยตี ${result.ally.damage} (ค่าเช่า 🪙 ${result.ally.fee})`,
     result.isKillingBlow ? 'ปลิดชีพบอส! 🎉' : `ทำดาเมจ ${result.damage}`,
     result.isKillingBlow && `ทำดาเมจ ${result.damage}`,
-    result.battle.survived ? 'มอนยังรอดครบรอบ' : 'มอนล้มก่อนครบรอบ',
+    result.battle.survived ? 'มอนยังรอดจนจบไฟต์' : 'มอนล้มก่อนจบไฟต์',
     `บอสเหลือ ${result.bossHp}/${result.maxHp}`,
   ]
     .filter(Boolean)
@@ -100,8 +85,11 @@ const RankingList = () => {
 // What makes this week's boss different, shown under its name.
 const bossTraits = (boss: IWorldBossStatus['boss']) => [
   `ธาตุ${elementLabel[boss.element]}`,
+  boss.ability,
   ...(boss.shield > 0 ? [`🛡️ เกราะ ${boss.shield} ต่อการตี`] : []),
-  ...(boss.enrage ? [`😡 โกรธตั้งแต่รอบ ${boss.enrage.round} (โจมตี ×${boss.enrage.mult})`] : []),
+  ...(boss.enrage
+    ? [`😡 โกรธตั้งแต่วินาทีที่ ${boss.enrage.sec} (โจมตี ×${boss.enrage.mult})`]
+    : []),
 ]
 
 export const WorldBossPanel = (props: IWorldBossPanelProps) => {
@@ -115,6 +103,7 @@ export const WorldBossPanel = (props: IWorldBossPanelProps) => {
   const { mutate: exchange, isPending: isExchanging } = useExchangeWorldBoss()
   const applyResult = useApplyWorldBossResult()
   const [replay, setReplay] = useState<IWorldBossAttackResponse | null>(null)
+  const { data: skillState } = useGetSkills()
   // A friend's support unit to rent for the next hit; none = fight alone.
   const [supportId, setSupportId] = useState<string | undefined>()
   const [slot, setSlot] = useState<EnumEquipmentSlot>(EnumEquipmentSlot.WEAPON)
@@ -281,9 +270,11 @@ export const WorldBossPanel = (props: IWorldBossPanelProps) => {
         ]}
       />
 
-      <BattleModal
-        battle={replay ? toBattleData(replay) : null}
-        title={replay ? `ตี ${replay.battle.enemy.name}` : undefined}
+      <ArenaBattleModal
+        battle={replay?.battle ?? null}
+        statuses={skillState?.statuses}
+        catalog={skillState?.catalog}
+        title={replay ? `ตี ${replay.battle.enemy?.name}` : undefined}
         summary={replay ? describeAttack(replay) : undefined}
         onClose={() => {
           if (replay) {

@@ -4,6 +4,7 @@
 export type GameMenuKey =
   | 'care'
   | 'equipment'
+  | 'skills'
   | 'passive'
   | 'costume'
   | 'shop'
@@ -35,6 +36,7 @@ export const GAME_MENU: IGameMenuGroup[] = [
     items: [
       { key: 'care', label: 'เลี้ยง', emoji: '🍖' },
       { key: 'equipment', label: 'อุปกรณ์', emoji: '🛡️' },
+      { key: 'skills', label: 'สกิล', emoji: '🌀' },
       { key: 'passive', label: 'ต้นไม้', emoji: '🌿' },
       { key: 'costume', label: 'ชุดแต่งตัว', emoji: '👕' },
       { key: 'shop', label: 'ร้านค้า', emoji: '🛒' },

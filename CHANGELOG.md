@@ -1,3 +1,10 @@
+## [1.44.1](https://github.com/punya199/demo-app/compare/v1.44.0...v1.44.1) (2026-11-05)
+
+
+### Fix
+
+* show the real release time on the 1.44.0 patch note ([7808439](https://github.com/punya199/demo-app/commit/780843993e88cf79ad2c925fae749ac708d9900f))
+
 # [1.44.0](https://github.com/punya199/demo-app/compare/v1.43.0...v1.44.0) (2026-11-05)
 
 

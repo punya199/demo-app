@@ -1,10 +1,14 @@
-import { Button, Card, Checkbox, Popconfirm, Segmented, Spin, Tag, Tooltip } from 'antd'
+import { Button, Card, Checkbox, Popconfirm, Segmented, Select, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { EnhanceModal } from './EnhanceModal'
 import { RefineModal } from './RefineModal'
 import { CompareLine, ItemLine } from './EquipmentParts'
 import {
+  BAG_SET_ALL,
+  BAG_SET_NONE,
+  BagFilterSet,
   BagFilterSlot,
+  countBagBySet,
   describeSetEffect,
   filterBag,
   describeSetTier,
@@ -26,6 +30,7 @@ import {
   useDismantleMany,
   useEquip,
   useGetEquipment,
+  useGetWiki,
   useUnequip,
 } from './tamagotchi-service'
 
@@ -38,6 +43,7 @@ interface IEquipmentPanelProps {
 export const EquipmentPanel = (props: IEquipmentPanelProps) => {
   const { monster, coin, onError } = props
   const { data, isLoading } = useGetEquipment()
+  const { data: wiki } = useGetWiki()
   const { mutate: equip, isPending: isEquipping } = useEquip()
   const { mutate: unequip, isPending: isUnequipping } = useUnequip()
   const { mutate: dismantle, isPending: isDismantling } = useDismantle()
@@ -47,6 +53,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
   const [refiningId, setRefiningId] = useState<string | null>(null)
   const [bagSlot, setBagSlot] = useState<BagFilterSlot>('all')
   const [freeOnly, setFreeOnly] = useState(false)
+  const [bagSet, setBagSet] = useState<BagFilterSet>(BAG_SET_ALL)
 
   if (isLoading || !data) {
     return <Spin />
@@ -56,8 +63,20 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
   const isWorn = (item: IEquipmentItem) => isWornBy(item, data.monsterId)
   const worn = new Map(data.items.filter(isWorn).map((item) => [item.slot, item]))
   const bag = data.items.filter((item) => !isWorn(item))
-  const shownBag = filterBag(bag, { slot: bagSlot, freeOnly })
+  const shownBag = filterBag(bag, { slot: bagSlot, freeOnly, setId: bagSet })
   const countIn = (slot: BagFilterSlot) => filterBag(bag, { slot, freeOnly }).length
+  const setCounts = countBagBySet(bag, { slot: bagSlot, freeOnly })
+  const setOptions = [
+    {
+      value: BAG_SET_ALL,
+      label: `ทุกเซ็ต (${Object.values(setCounts).reduce((a, b) => a + b, 0)})`,
+    },
+    ...Object.entries(wiki?.equipment.sets ?? {}).map(([setId, set]) => ({
+      value: setId,
+      label: `${set.name} (${setCounts[setId] ?? 0})`,
+    })),
+    { value: BAG_SET_NONE, label: `ไม่มีเซ็ต (${setCounts[BAG_SET_NONE] ?? 0})` },
+  ]
   const petOf = (item: IEquipmentItem) => data.pets.find((pet) => pet.id === item.monsterId)
   const pet = data.pets.find((row) => row.id === data.monsterId)
   const setOf = (item: IEquipmentItem) => data.sets.find((set) => set.setId === item.setId)
@@ -181,6 +200,14 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
           ]}
         />
       </div>
+      <Select<BagFilterSet>
+        value={bagSet}
+        onChange={setBagSet}
+        options={setOptions}
+        className="w-full"
+        showSearch
+        optionFilterProp="label"
+      />
       <Checkbox checked={freeOnly} onChange={(event) => setFreeOnly(event.target.checked)}>
         เฉพาะชิ้นที่ยังไม่มีใครใส่
       </Checkbox>
@@ -209,6 +236,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
                   selected.includes(item.id) &&
                   (item.grade === EnumEquipmentGrade.EPIC ||
                     item.grade === EnumEquipmentGrade.LEGENDARY ||
+                    item.grade === EnumEquipmentGrade.MYTHIC ||
                     item.enhanceLevel > 0)
               ).length
               return risky > 0

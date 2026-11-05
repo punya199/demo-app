@@ -9,13 +9,19 @@ import {
   setPieceLabel,
   statLabel,
 } from './tamagotchi-helper'
-import { IEquipmentItem, ISetProgress } from './tamagotchi-interface'
+import { EnumEquipmentGrade, IEquipmentItem, ISetProgress } from './tamagotchi-interface'
 
 export const ItemLine = (props: { item: IEquipmentItem; set?: ISetProgress }) => {
   const { item, set } = props
   return (
     <div className="min-w-0 flex-1">
-      <div className="font-medium text-slate-900 dark:text-slate-100">
+      <div
+        className={`font-medium ${
+          item.grade === EnumEquipmentGrade.MYTHIC
+            ? 'bg-gradient-to-r from-fuchsia-500 via-rose-500 to-amber-500 bg-clip-text font-bold text-transparent'
+            : 'text-slate-900 dark:text-slate-100'
+        }`}
+      >
         {item.emoji} {item.name} <Tag color={gradeColor[item.grade]}>{gradeLabel[item.grade]}</Tag>
         {item.enhanceLevel > 0 && <Tag color="orange">+{item.enhanceLevel}</Tag>}
       </div>

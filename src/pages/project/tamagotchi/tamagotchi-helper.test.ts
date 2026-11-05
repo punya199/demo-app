@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
   filterBag,
+  countBagBySet,
+  formatCountdown,
+  missingMaterials,
+  gradeLabel,
+  gradeColor,
   getAdventureBlocker,
   skipRunsAffordable,
   getMinigameBlocker,
@@ -1058,6 +1063,82 @@ describe('filterBag', () => {
     expect(
       filterBag(bag, { slot: EnumEquipmentSlot.WEAPON, freeOnly: true }).map((i) => i.id)
     ).toEqual(['axe', 'sword'])
+  })
+})
+
+describe('bag set filter', () => {
+  const piece = (id: string, setId: string | null, slot = EnumEquipmentSlot.WEAPON) =>
+    ({
+      id,
+      setId,
+      slot,
+      grade: EnumEquipmentGrade.EPIC,
+      enhanceLevel: 0,
+      equipped: false,
+    }) as IEquipmentItem
+  const bag = [
+    piece('a', 'bulwark'),
+    piece('b', 'bulwark', EnumEquipmentSlot.HELMET),
+    piece('c', 'blazing'),
+    piece('d', null),
+  ]
+
+  it('keeps one set, or the pieces without a set, together with the slot filter', () => {
+    const base = { slot: 'all' as const, freeOnly: false }
+    expect(filterBag(bag, { ...base, setId: 'bulwark' }).map((i) => i.id)).toEqual(['a', 'b'])
+    expect(filterBag(bag, { ...base, setId: 'none' }).map((i) => i.id)).toEqual(['d'])
+    expect(filterBag(bag, { ...base, setId: 'all' })).toHaveLength(4)
+    expect(
+      filterBag(bag, { slot: EnumEquipmentSlot.HELMET, freeOnly: false, setId: 'bulwark' })
+    ).toHaveLength(1)
+  })
+
+  it('counts pieces per set under the other filters', () => {
+    expect(countBagBySet(bag, { slot: 'all', freeOnly: false })).toEqual({
+      bulwark: 2,
+      blazing: 1,
+      none: 1,
+    })
+    expect(countBagBySet(bag, { slot: EnumEquipmentSlot.HELMET, freeOnly: false })).toEqual({
+      bulwark: 1,
+    })
+  })
+})
+
+describe('craft helpers', () => {
+  it('labels the Mythic grade', () => {
+    expect(gradeLabel[EnumEquipmentGrade.MYTHIC]).toBeTruthy()
+    expect(gradeColor[EnumEquipmentGrade.MYTHIC]).not.toBe(gradeColor[EnumEquipmentGrade.LEGENDARY])
+  })
+
+  it('describes the craft-set effects', () => {
+    const text = describeSetEffect({
+      damageCut: 0.12,
+      executeBonus: 0.35,
+      stunOnBasic: 8,
+      poisonBonus: 0.12,
+      retort: 0.6,
+    })
+    expect(text).toContain('12%')
+    expect(text).toContain('35%')
+    expect(text).toContain('8%')
+    expect(text).toContain('สวนกลับ')
+  })
+
+  it('formats a countdown and never goes negative', () => {
+    const now = new Date('2026-01-01T00:00:00Z')
+    expect(formatCountdown('2026-01-01T01:02:03Z', now)).toBe('1:02:03')
+    expect(formatCountdown('2026-01-01T00:12:03Z', now)).toBe('12:03')
+    expect(formatCountdown('2025-12-31T23:00:00Z', now)).toBe('00:00')
+  })
+
+  it('lists what a recipe is short of', () => {
+    expect(
+      missingMaterials([
+        { itemId: 'a', qty: 3, owned: 1 },
+        { itemId: 'b', qty: 1, owned: 1 },
+      ])
+    ).toEqual([{ itemId: 'a', missing: 2 }])
   })
 })
 

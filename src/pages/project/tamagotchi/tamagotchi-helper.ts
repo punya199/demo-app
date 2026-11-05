@@ -270,21 +270,45 @@ export const isInZone = (position: number, zone: { start: number; width: number 
   position >= zone.start && position <= zone.start + zone.width
 
 export type BagFilterSlot = EnumEquipmentSlot | 'all'
+// One set id, 'none' (pieces without a set) or 'all'.
+export type BagFilterSet = string
 
-// The bag as the gear screen lists it: one slot type (or all), optionally only pieces nobody
-// wears, highest grade first then highest level.
+export const BAG_SET_ALL = 'all'
+export const BAG_SET_NONE = 'none'
+
+// The bag as the gear screen lists it: one slot type (or all), one set (or all), optionally only
+// pieces nobody wears, highest grade first then highest level.
 export const filterBag = (
   items: IEquipmentItem[],
-  filter: { slot: BagFilterSlot; freeOnly: boolean }
+  filter: { slot: BagFilterSlot; freeOnly: boolean; setId?: BagFilterSet }
 ) => {
   const gradeOrder = Object.values(EnumEquipmentGrade)
+  const setId = filter.setId ?? BAG_SET_ALL
   return items
     .filter((item) => filter.slot === 'all' || item.slot === filter.slot)
     .filter((item) => !filter.freeOnly || !item.equipped)
+    .filter(
+      (item) =>
+        setId === BAG_SET_ALL || (setId === BAG_SET_NONE ? !item.setId : item.setId === setId)
+    )
     .sort(
       (a, b) =>
         gradeOrder.indexOf(b.grade) - gradeOrder.indexOf(a.grade) || b.enhanceLevel - a.enhanceLevel
     )
+}
+
+// Pieces per set for the set dropdown, under the other filters (slot, free only); the key
+// BAG_SET_NONE counts pieces without a set.
+export const countBagBySet = (
+  items: IEquipmentItem[],
+  filter: { slot: BagFilterSlot; freeOnly: boolean }
+) => {
+  const counts: Record<string, number> = {}
+  for (const item of filterBag(items, filter)) {
+    const key = item.setId ?? BAG_SET_NONE
+    counts[key] = (counts[key] ?? 0) + 1
+  }
+  return counts
 }
 
 // Mirrors startExpedition's checks so the button explains itself.
@@ -531,6 +555,7 @@ export const gradeLabel: Record<EnumEquipmentGrade, string> = {
   [EnumEquipmentGrade.RARE]: 'หายาก',
   [EnumEquipmentGrade.EPIC]: 'มหากาพย์',
   [EnumEquipmentGrade.LEGENDARY]: 'ตำนาน',
+  [EnumEquipmentGrade.MYTHIC]: 'มิธิก',
 }
 
 export const gradeColor: Record<EnumEquipmentGrade, string> = {
@@ -538,6 +563,7 @@ export const gradeColor: Record<EnumEquipmentGrade, string> = {
   [EnumEquipmentGrade.RARE]: 'blue',
   [EnumEquipmentGrade.EPIC]: 'purple',
   [EnumEquipmentGrade.LEGENDARY]: 'gold',
+  [EnumEquipmentGrade.MYTHIC]: 'magenta',
 }
 
 export const statLabel: Record<StatKey, string> = { hp: 'HP', atk: 'ATK', def: 'DEF', spd: 'SPD' }
@@ -687,6 +713,19 @@ export const describeSetEffect = (effect: IFighterEffects) =>
     effect.critChance && `อัตราคริติคอล +${toPercent(effect.critChance)}`,
     effect.critDamage && `ดาเมจคริติคอล +${toPercent(effect.critDamage)}`,
     effect.evasion && `EVA +${Math.round(effect.evasion * 100)}`,
+    effect.damageCut && `ลดดาเมจที่ได้รับ ${toPercent(effect.damageCut)}`,
+    effect.executeBonus && `โจมตีศัตรูที่ HP ต่ำกว่า 30% แรงขึ้น ${toPercent(effect.executeBonus)}`,
+    effect.slowOnBasic && `ตีปกติมีโอกาส ${effect.slowOnBasic}% ทำให้ช้าลง`,
+    effect.defDownOnBasic && `ตีปกติมีโอกาส ${effect.defDownOnBasic}% ลด DEF ศัตรู`,
+    effect.poisonOnBasic && `ตีปกติมีโอกาส ${effect.poisonOnBasic}% ทำให้ติดพิษ`,
+    effect.curseOnBasic && `ตีปกติมีโอกาส ${effect.curseOnBasic}% ทำให้ติดคำสาป`,
+    effect.stunOnBasic && `ตีปกติมีโอกาส ${effect.stunOnBasic}% ทำให้สตัน`,
+    effect.poisonBonus && `ตีศัตรูที่ติดพิษแรงขึ้น ${toPercent(effect.poisonBonus)}`,
+    effect.retort &&
+      `โดนตีระยะประชิดแล้วสวนกลับ ${toPercent(effect.retort)} ของดาเมจ และทำให้ผู้ตีบอด`,
+    effect.lifesteal && `ดูดเลือด ${toPercent(effect.lifesteal)} ของดาเมจ`,
+    effect.firstStrike && `ได้ตีก่อนในไฟต์`,
+    effect.thorns && `สะท้อนดาเมจ ${toPercent(effect.thorns)}`,
     effect.dodgeCdCutSec && `คูลดาวน์สกิลหลบลดลง ${effect.dodgeCdCutSec} วิ`,
     effect.afterDodgeBonus &&
       `หลบได้แล้ว การโจมตีครั้งถัดไปติดคริและแรงขึ้น ${toPercent(effect.afterDodgeBonus)}`,
@@ -1226,3 +1265,50 @@ export const describeSetTier = (tier: ISetProgress['tiers'][number]) =>
 // Whether a bonus tier is on for this many worn pieces.
 export const isSetTierActive = (set: ISetProgress, tier: ISetProgress['tiers'][number]) =>
   set.worn >= tier.pieces
+
+// The 12 craft-only materials (ids as the server's EnumMaterialId).
+export const craftMaterialLabel: Record<string, string> = {
+  craft_essence_flame: '🔥 เอสเซนซ์เปลวไฟ',
+  craft_essence_tide: '🌊 เอสเซนซ์กระแสน้ำ',
+  craft_essence_leaf: '🍃 เอสเซนซ์ใบไม้',
+  craft_essence_earth: '⛰️ เอสเซนซ์ผืนดิน',
+  craft_essence_lightning: '⚡ เอสเซนซ์สายฟ้า',
+  craft_essence_holy: '✨ เอสเซนซ์แสงศักดิ์สิทธิ์',
+  craft_forge_core: '🔨 แกนหลอม',
+  craft_rune_shard: '🔷 เศษรูน',
+  craft_unique_verdant_heart: '💚 หัวใจพนา',
+  craft_unique_reaper_edge: '🗡️ คมเกี่ยววิญญาณ',
+  craft_unique_storm_sigil: '🌀 ตราพายุ',
+  craft_catalyst: '💎 Catalyst',
+}
+
+// Where each craft material drops (display text only).
+export const craftMaterialSource: Record<string, string> = {
+  craft_essence_flame: 'ผจญภัย / สำรวจ',
+  craft_essence_tide: 'ผจญภัย / สำรวจ',
+  craft_essence_leaf: 'ผจญภัย / สำรวจ',
+  craft_essence_earth: 'ผจญภัย / สำรวจ',
+  craft_essence_lightning: 'ผจญภัย / สำรวจ',
+  craft_essence_holy: 'ผจญภัย / สำรวจ',
+  craft_forge_core: 'บอส (Raid)',
+  craft_rune_shard: 'บอส (Raid)',
+  craft_unique_verdant_heart: 'บอสโลก (รางวัลรายสัปดาห์)',
+  craft_unique_reaper_edge: 'บอสโลก (รางวัลรายสัปดาห์)',
+  craft_unique_storm_sigil: 'บอสโลก (รางวัลรายสัปดาห์)',
+  craft_catalyst: 'บอสโลก (รางวัลรายสัปดาห์)',
+}
+
+// "1:02:03" / "12:03" until `finishAt` (empty-safe: never negative).
+export const formatCountdown = (finishAt: string, now: Date) => {
+  const total = Math.max(0, Math.ceil((new Date(finishAt).getTime() - now.getTime()) / 1000))
+  const hours = Math.floor(total / 3600)
+  const minutes = String(Math.floor((total % 3600) / 60)).padStart(2, '0')
+  const seconds = String(total % 60).padStart(2, '0')
+  return hours > 0 ? `${hours}:${minutes}:${seconds}` : `${minutes}:${seconds}`
+}
+
+// Materials a recipe is short of: [{ itemId, missing }].
+export const missingMaterials = (materials: { itemId: string; qty: number; owned: number }[]) =>
+  materials
+    .filter((material) => material.owned < material.qty)
+    .map((material) => ({ itemId: material.itemId, missing: material.qty - material.owned }))

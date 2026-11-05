@@ -1,5 +1,5 @@
 import { Button, Card, Modal, Progress, Spin, Tooltip } from 'antd'
-import { formatAge, getExpeditionBlocker } from './tamagotchi-helper'
+import { craftMaterialLabel, formatAge, getExpeditionBlocker } from './tamagotchi-helper'
 import { IMonsterData } from './tamagotchi-interface'
 import {
   useClaimExpedition,
@@ -31,7 +31,8 @@ export const ExpeditionPanel = (props: IExpeditionPanelProps) => {
     const item = shop?.items.find((candidate) => candidate.id === itemId)
     const material = wiki?.equipment.materials.find((candidate) => candidate.id === itemId)
     const found = item ?? material
-    return found ? `${found.emoji} ${found.name}` : itemId
+    // Craft materials are not sellable, so the server leaves them out of wiki.equipment.materials.
+    return found ? `${found.emoji} ${found.name}` : (craftMaterialLabel[itemId] ?? itemId)
   }
 
   const showSummary = (summary: { minutes: number; coins: number; items: string[] }) =>

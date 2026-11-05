@@ -204,6 +204,7 @@ export enum EnumEquipmentGrade {
   RARE = 'rare',
   EPIC = 'epic',
   LEGENDARY = 'legendary',
+  MYTHIC = 'mythic',
 }
 
 export type StatKey = keyof IBattleStats
@@ -255,6 +256,19 @@ export interface IFighterEffects {
   lastStandShield?: number
   dodgeCdCutSec?: number
   afterDodgeBonus?: number
+  // Craft-set effects (arena only). `*OnBasic` are chances in percent.
+  damageCut?: number
+  executeBonus?: number
+  slowOnBasic?: number
+  defDownOnBasic?: number
+  poisonOnBasic?: number
+  curseOnBasic?: number
+  stunOnBasic?: number
+  poisonBonus?: number
+  retort?: number
+  lifesteal?: number
+  firstStrike?: number
+  thorns?: number
 }
 
 // One equipment set with how many of its pieces the shown pet wears (GET /equipment).
@@ -1063,4 +1077,47 @@ export interface ICostumeState {
   selectedId: string | null
   pets: { id: string; costume: ILoadout }[]
   showCostume: boolean
+}
+
+// Craft queue (GET/POST /monster/craft*). Every number comes from the server.
+export type CraftPityStep = 'epic_legendary' | 'legendary_mythic'
+
+export interface ICraftRecipeView {
+  id: string
+  setId: string
+  slot: EnumEquipmentSlot
+  name: string
+  flagship: boolean
+  baseGrade: EnumEquipmentGrade.EPIC | EnumEquipmentGrade.LEGENDARY
+  maxGrade: EnumEquipmentGrade.LEGENDARY | EnumEquipmentGrade.MYTHIC
+  coin: number
+  minutes: number
+  materials: { itemId: string; qty: number; owned: number }[]
+  canStart: boolean
+}
+
+export interface ICraftQueue {
+  recipeId: string
+  useCatalyst: boolean
+  startedAt: string
+  finishAt: string
+  status: 'running' | 'ready'
+  skipCoin: number
+}
+
+export interface ICraftOverview {
+  recipes: ICraftRecipeView[]
+  queue: ICraftQueue | null
+  catalyst: {
+    owned: number
+    chance: number
+    pity: { step: CraftPityStep; fails: number; guaranteeAfter: number }[]
+  }
+  coin: number
+}
+
+export interface ICraftClaimResult {
+  item: IEquipmentItem
+  upgraded: boolean
+  overview: ICraftOverview
 }

@@ -20,6 +20,7 @@ import { StatusPanel } from './StatusPanel'
 import { FriendsPanel } from './FriendsPanel'
 import { WorldBossPanel } from './WorldBossPanel'
 import { RaidPanel } from './RaidPanel'
+import { CraftPanel } from './CraftPanel'
 import { PvpPanel } from './PvpPanel'
 import { QuestPanel } from './QuestPanel'
 import { ShopPanel } from './ShopPanel'
@@ -599,6 +600,7 @@ const GameShell = () => {
     passive: <PassivePanel onError={showError} />,
     costume: <CostumePanel monster={monster} onError={showError} />,
     shop: <ShopPanel monster={monster} coin={coin} onError={showError} />,
+    craft: <CraftPanel onError={showError} />,
     adventure: <AdventurePanel monster={monster} onError={showError} />,
     expedition: <ExpeditionPanel monster={monster} onError={showError} />,
     raid: <RaidPanel monster={monster} onError={showError} />,

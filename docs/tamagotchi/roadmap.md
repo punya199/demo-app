@@ -4,7 +4,7 @@
 
 > มอนสเตอร์ ชื่อ ธาตุ ศัพท์ และภาพในเกมออกแบบเองทั้งหมด ใช้แนวเกม V-Pet เป็นแรงบันดาลใจเท่านั้น
 
-แผนละเอียดแต่ละเฟส: [phase-1.md](./phase-1.md) (เสร็จแล้ว) · [phase-2.md](./phase-2.md) (เสร็จแล้ว: 2a, 2b, 2c) · [phase-3.md](./phase-3.md) (เสร็จแล้ว: 3a, 3b) · [phase-4.md](./phase-4.md) (เสร็จแล้ว: 4a, 4b) · [phase-5.md](./phase-5.md) (เสร็จแล้ว: 5a, 5b, 5c)
+แผนละเอียดแต่ละเฟส: [phase-1.md](./phase-1.md) (เสร็จแล้ว) · [phase-2.md](./phase-2.md) (เสร็จแล้ว: 2a, 2b, 2c) · [phase-3.md](./phase-3.md) (เสร็จแล้ว: 3a, 3b) · [phase-4.md](./phase-4.md) (เสร็จแล้ว: 4a, 4b) · [phase-5.md](./phase-5.md) (เสร็จแล้ว: 5a, 5b, 5c) · [craft.md](./craft.md) (เฟส 5.6 เสร็จแล้ว)
 
 ## หลักการออกแบบ
 
@@ -157,6 +157,16 @@
 - **Special Option** เฉพาะมอนเลี้ยง 4 แบบ: ลดความหิว, ลด stamina ผจญภัย, เพิ่มดรอปอุปกรณ์, ลดอึ โอกาสมีตามเกรด ตำนานมีแน่นอน
 - คำนวณใหม่จากชิ้นที่สวมอยู่ทุกครั้ง บวกกันมีเพดาน · สุ่มบนเซิร์ฟเวอร์พร้อม log
 
+## คราฟต์อุปกรณ์ + Mythic + 12 เซ็ตใหม่ ✅ (เฟส 5.6)
+
+รายละเอียด: [craft.md](./craft.md)
+
+- **คราฟต์** อุปกรณ์จากวัตถุดิบที่ดรอป (Adventure, Expedition, Raid, World Boss) · คิวเดียว มี timer จ่าย Coin ข้ามได้ · สูตรตายตัว ค่ารองยังสุ่ม
+- **12 เซ็ตคราฟต์อย่างเดียว** (48 ชิ้น) ธีมตามสไตล์การเล่น ใช้เอฟเฟกต์ใหม่ใน arena (damageCut, execute, ติดสถานะจากตีปกติ ฯลฯ) · 3 เซ็ต flagship ต้องใช้วัตถุดิบ World Boss
+- **เกรด Mythic** เกรดสูงสุด main stat ×3 เท่าตำนาน แต่ค่ารอง/Special มากกว่า · ได้จาก Catalyst (15% + pity) เฉพาะเซ็ต flagship
+- กระเป๋าอุปกรณ์ 100 → 200 ช่อง + ตัวกรองตามชื่อเซ็ต
+- เปิด PvE และ PvP พร้อมกัน ผ่าน balance gate (`craft-balance.spec.ts`)
+
 ## Roadmap
 
 | เฟส | เนื้อหา | งาน backend หลัก | Realtime |
@@ -169,5 +179,6 @@
 | 4 ✅ | Async PvP (ทีมป้องกัน snapshot, ELO, ซีซันรายเดือน, NPC) | `pvp` (ในโมดูล `monster`) | – |
 | 5 ✅ | Boss Raid + ชุดเซ็ต · World Boss · ระบบเพื่อน + เช่าตัว | `raid`, `world-boss`, `friend` (ในโมดูล `monster`) | – |
 | 5.5 ✅ | เกรดอุปกรณ์ + ค่ารองสุ่ม + Special Option ([item-rank.md](./item-rank.md)) | `equipment` (ต่อยอด), `calcSpecialBonuses` | – |
+| 5.6 ✅ | คราฟต์อุปกรณ์ + เกรด Mythic + 12 เซ็ตใหม่ ([craft.md](./craft.md)) | `craft` (ในโมดูล `monster`), arena effects, `equipment` (ต่อยอด) | – |
 | 6 | Realtime PvP | WebSocket gateway | ✓ |
 | 7 | Party Boss Raid | lobby, room state | ✓ |

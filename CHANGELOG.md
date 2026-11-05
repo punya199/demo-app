@@ -1,3 +1,18 @@
+# [1.44.0](https://github.com/punya199/demo-app/compare/v1.43.0...v1.44.0) (2026-11-05)
+
+
+### Fix
+
+* stop "skip" from fast-forwarding every later arena fight ([ec97e97](https://github.com/punya199/demo-app/commit/ec97e97c622186c51c8c6afa5de92e72cc7d1e70))
+
+### New
+
+* replace auto-battle with a skip button in the adventure ([50b1e3f](https://github.com/punya199/demo-app/commit/50b1e3f0cfdd0b17e87669c9d22ec94ed061ab7d))
+
+### Update
+
+* describe boss-set effects as they play in the real-time arena ([c7306e8](https://github.com/punya199/demo-app/commit/c7306e8f7858d3bdce290c05c4383f2099054219))
+
 # [1.43.0](https://github.com/punya199/demo-app/compare/v1.42.0...v1.43.0) (2026-11-05)
 
 

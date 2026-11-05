@@ -65,3 +65,18 @@ export const craftSetsUsing = (wiki: IWikiData, materialId: string) =>
       materialId === (set.rare === 'forge' ? FORGE_CORE_ID : RUNE_SHARD_ID) ||
       materialId === `craft_unique_${set.unique}`
   )
+
+// What each kind of skill does in a fight (the labels are arena-helper's SKILL_KIND_LABEL).
+export const skillKindMeaning: Record<string, string> = {
+  melee: 'ตีในระยะประชิด',
+  multi: 'ตีประชิดหลายครั้งรวด',
+  shot: 'ยิงกระสุนไปหาเป้าหมาย',
+  spread: 'ยิงกระจายออกหลายทิศ โดนได้หลายตัว',
+  charge: 'พุ่งเข้าชนเป้าหมาย',
+  burst: 'ระเบิดพลังรอบตัว โดนทุกตัวที่อยู่ใกล้',
+  zone: 'ปักวงบนพื้น ตัวที่อยู่ในวงโดนผลของสกิล (ถอยออกจากวงได้)',
+  beam: 'ลำแสงเป็นแนวตรง ทะลุโดนหลายตัว',
+  self: 'เสริมตัวเอง เช่น ฟื้น HP โล่ หรือบัฟ',
+  passive: 'ผลถาวรตลอดไฟต์ ไม่ต้องร่าย',
+  dodge: 'ท่าหลบ มีคูลดาวน์ บางท่ามีผลพิเศษเมื่อหลบสำเร็จ',
+}

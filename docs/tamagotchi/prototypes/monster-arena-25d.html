@@ -360,7 +360,7 @@ td.st { white-space: nowrap; color: var(--muted) }
   <section aria-labelledby="bline-h" data-group="bolt" style="order:15">
     <div class="eyebrow">สายที่ห้า · ภาพนิ่งให้เลือกแบบก่อน</div>
     <h2 id="bline-h">สายอสนี 11 ร่าง</h2>
-    <p class="lede">ตระกูลสัตว์พายุ สายหลักเป็นนก (นกฟ้าผ่า → เหยี่ยวพายุ → วิหคราชาอสนีที่ปีกเป็นเมฆพายุ) สายรองเป็นเสือ (เสือพายุ → เสือดาวสายฟ้า → วัชรพยัคฆ์) สีหลักเป็นน้ำเงินกรมท่ากับเหลืองสายฟ้า ร่างแย่ (แมวไฟสถิตขนพอง เมฆหม่นขี้เกียจ) ยังตลก รอบนี้เป็นภาพนิ่ง บอกได้เลยว่าตัวไหนชอบ ตัวไหนอยากแก้ แล้วค่อยทำท่าทางกับสกิล</p>
+    <p class="lede">ตระกูลสัตว์พายุ สายหลักเป็นนก (นกฟ้าผ่า → เหยี่ยวพายุ → วิหคราชาอสนีที่ปีกเป็นเมฆพายุ) สายรองเป็นจิ้งจอก (จิ้งจอกพายุ → จิ้งจอกอสนี สองหาง → ราชาจิ้งจอกอสนี ห้าหาง) สีหลักเป็นน้ำเงินกรมท่ากับเหลืองสายฟ้า ร่างแย่ (แมวไฟสถิตขนพอง เมฆหม่นขี้เกียจ) ยังตลก รอบนี้เป็นภาพนิ่ง บอกได้เลยว่าตัวไหนชอบ ตัวไหนอยากแก้ แล้วค่อยทำท่าทางกับสกิล</p>
     <div class="lineup" id="lineup-bolt"></div>
     <div class="evo" id="evo-bolt"></div>
   </section>
@@ -374,7 +374,7 @@ td.st { white-space: nowrap; color: var(--muted) }
         <div class="act" id="act-bfused"></div>
         <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
         <h3>อสนีผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
-        <p class="hint">ร่างผสมอสนี+อสนี เดิมเป็นอีโมจิเมฆฟ้าผ่า 🌩️ ใหม่เป็นวิหคราชาอสนีที่ตื่นแล้ว ปีกเมฆพายุใหญ่ขึ้น มีเกราะทองที่อก ปีก และหน้า หงอนสายฟ้าสี่แฉก และวงสายฟ้าสองวง (เหลืองกับฟ้า) หมุนสวนกันตามแบบร่างผสม</p>
+        <p class="hint">ร่างผสมอสนี+อสนี เดิมเป็นอีโมจิเมฆฟ้าผ่า 🌩️ ใหม่เป็นมังกรสายฟ้า ตัวยาวขดเป็นรูปตัว S ลอยอยู่บนเมฆพายุ แผงคอและสันหลังเป็นสายฟ้า หนวดเป็นสายฟ้า เขาทองแตกกิ่ง มีเกราะทองที่หน้าผากและรอบตัว ท้องสีขาวเมฆ ขาสี่ขามีกรงเล็บทอง และวงสายฟ้าสองวง (เหลืองกับฟ้า) หมุนสวนกันตามแบบร่างผสม</p>
       </div>
       <div class="show boss bolt">
         <canvas id="show-bison" width="128" height="112" aria-label="บอสโลกธาตุอสนี กระทิงพายุคำราม"></canvas>
@@ -729,6 +729,15 @@ function scalePose(p, k) {
   return out;
 }
 const glowMouth = (s, x, y) => s.d(x, y, '#fff6b0').d(x + 1, y, '#ffd04a').d(x, y - 1, '#ffd04a').d(x, y + 1, '#ff8a24').d(x - 1, y, '#ffd04a').d(x + 2, y, '#ff8a24');
+// A bushy tail that zigzags like a lightning bolt from (x0, y0) along relative points, tapering to a glowing tip.
+function boltTail(s, x0, y0, path, r, k, sway = 0) {
+  r *= 1.5;
+  const pts = [[x0, y0], ...path.map(([dx, dy], i) => [x0 + dx + sway * (i + 1) / path.length * 1.4, y0 + dy - Math.abs(sway) * (i + 1) / path.length * .4])];
+  for (let i = 0; i < pts.length - 1; i++) s.L(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], r * (1 - i / pts.length * .55), k, r * (1 - (i + 1) / pts.length * .7));
+  const [a, b] = [pts[pts.length - 2], pts[pts.length - 1]], ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+  s.P([[b[0] - Math.sin(ang) * r * .6, b[1] + Math.cos(ang) * r * .6], [b[0] + Math.cos(ang) * r * 1.6, b[1] + Math.sin(ang) * r * 1.6], [b[0] + Math.sin(ang) * r * .6, b[1] - Math.cos(ang) * r * .6]], 'volt');
+  s.line(pts.slice(1), '#ffe14a', '#fffac0');
+}
 // A broad bird wing from the shoulder (sx, sy): leading edge up and back to the tip, finger feathers along the
 // trailing edge. dir -1 = near wing (sweeps back over the body), 1 = far wing (behind, toward the front).
 // lift raises the tip; vein draws a lightning line along it; puff adds storm-cloud lumps on the trailing edge.
@@ -1857,20 +1866,19 @@ const SPRITES = {
     s.line([[30 + hx, 33 + hy], [32 + hx, 32 + hy], [34 + hx, 33 + hy]], '#5a4a20'); s.line([[25 + hx, 31 + hy], [22 + hx, 30 + hy]], '#5a4a20').line([[38 + hx, 31 + hy], [41 + hx, 30 + hy]], '#5a4a20');
     for (const [x, y] of [[12, 30], [20, 26], [36, 37], [14, 40]]) s.line([[x + bx, y + by], [x + 1 + bx, y + 1 + by], [x + bx, y + 2 + by]], '#fff07a');
   }, glows: [[20, 30, '#ffe14a', 4], [36, 37, '#ffe14a', 3]], emit: [], mouth: [33, 33] },
-  stormtiger: { size: 56, rig: QUAD, draw(s, P) {
+  stormfox: { size: 56, rig: QUAD, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
-    s.L(13 + bx, 38 + by, 5 + bx, 31 + by - t, 1.8, 'navyT', 1.4); s.P(m([[4, 26], [7, 30], [4, 31], [7, 35], [2, 31], [4, 30]], bx, by - t), 'volt');
-    s.L(18 + bx, 43 + by, 17 + P.bf[0], 50 + P.bf[1], 2, 'navyT2'); s.L(34 + bx, 43 + by, 35 + P.ff[0], 50 + P.ff[1], 2, 'navyT2');
-    s.E(25 + bx, 40 + by, 12.5, 6.5, 'navyT'); s.E(27 + bx, 44.5 + by, 8, 2, 'cloudw');
-    for (const x of [16, 21, 26, 31]) s.P(m([[x, 34], [x + 2, 38], [x, 38.5], [x + 2.5, 42]], bx, by), 'volt');
-    s.L(21 + bx, 44 + by, 21 + P.bl[0], 51 + P.bl[1], 2.4, 'navyT'); s.L(32 + bx, 44 + by, 33 + P.fl[0], 51 + P.fl[1], 2.4, 'navyT');
-    s.E(21 + P.bl[0], 52 + P.bl[1], 3, 1.3, 'navyT'); s.E(33 + P.fl[0], 52 + P.fl[1], 3, 1.3, 'navyT');
-    s.spike(38 + hx, 28 + hy, 4, 1.8, 'navyT', -1); s.spike(43 + hx, 28.5 + hy, 4, 1.8, 'navyT');
-    s.E(41 + hx, 33 + hy, 7, 6, 'navyT'); s.E(46 + hx, 35.5 + hy, 4, 3, 'navyT'); s.E(45 + hx, 37.5 + hy + P.jaw, 3.6, 1.6, 'cloudw');
-    for (const [x, y] of [[36, 32], [38, 35]]) s.line(m([[x, y], [x - 4, y - 1]], hx, hy), '#c8d0ec');
-    s.line(m([[40, 28.5], [41, 31], [40, 33]], hx, hy), '#ffe14a');
-    s.d(43 + hx, 31 + hy, '#0a0c1a').d(44 + hx, 31 + hy, '#fff07a').d(45 + hx, 31 + hy, '#0a0c1a').d(49 + hx, 34 + hy, '#0a0c1a');
-  }, glows: [[4, 30, '#ffe14a', 4], [44, 31, '#ffe14a', 2]], emit: [], mouth: [49, 36] },
+    boltTail(s, 15 + bx, 40 + by, [[-6, -4], [-4, -10], [-9, -15], [-6, -22]], 3.2, 'navyT', t);
+    s.L(18 + bx, 43 + by, 17 + P.bf[0], 50 + P.bf[1], 1.6, 'navyT2', 1.3); s.L(33 + bx, 43 + by, 34 + P.ff[0], 50 + P.ff[1], 1.6, 'navyT2', 1.3);
+    s.E(25 + bx, 40 + by, 11, 5.5, 'navyT'); s.E(27 + bx, 44 + by, 7, 1.8, 'cloudw');
+    for (const x of [18, 24, 30]) s.line(m([[x, 36], [x + 2, 38.5], [x, 39], [x + 2, 41.5]], bx, by), '#ffe14a');
+    s.L(21 + bx, 43 + by, 21 + P.bl[0], 51 + P.bl[1], 1.9, 'navyT', 1.5); s.L(31 + bx, 43 + by, 32 + P.fl[0], 51 + P.fl[1], 1.9, 'navyT', 1.5);
+    s.E(21 + P.bl[0], 51.5 + P.bl[1], 2.2, 1.1, 'cloudw'); s.E(32 + P.fl[0], 51.5 + P.fl[1], 2.2, 1.1, 'cloudw');
+    s.L(33 + bx, 39 + by, 38 + hx, 34 + hy, 3.2, 'navyT', 2.8); s.E(36 + bx, 41 + by, 3, 2.6, 'cloudw');
+    s.spike(37 + hx, 30 + hy, 8, 2.2, 'navyT', -2); s.spike(42 + hx, 30.5 + hy, 7.5, 2.1, 'navyT', 1); s.spike(37 + hx, 30 + hy, 5, 1, 'volt', -1.5);
+    s.E(40 + hx, 33 + hy, 5.2, 4.2, 'navyT'); s.P(m([[42, 31], [50, 34.5], [43, 37]], hx, hy), 'navyT'); s.E(44 + hx, 36 + hy + P.jaw, 3.6, 1.3, 'cloudw');
+    s.d(50 + hx, 34 + hy, '#0a0c1a'); s.line(m([[40, 31.5], [43, 32.5]], hx, hy), '#0a0c1a'); s.d(42 + hx, 33 + hy, '#ffe14a');
+  }, glows: [[9, 20, '#ffe14a', 4]], emit: [], mouth: [50, 35] },
   hawk: { size: 64, rig: BIPED, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, w = -5 * P.wing, m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
     birdWing(s, 38 + bx, 36 + by, .78, 1, w, 'hawk2');
@@ -1895,21 +1903,21 @@ const SPRITES = {
     for (const [x, y] of [[20, 53], [28, 55], [36, 54], [44, 52]]) s.line([[x + bx, y + by], [x - 1 + bx, y + 2 + by]], '#7ac8f0');
     s.line([[47 + bx, 50 + by], [45 + bx, 53 + by], [48 + bx, 54 + by], [46 + bx, 57 + by]], '#ffe14a');
   }, glows: [[46, 54, '#ffe14a', 3]], emit: [], mouth: [34, 46] },
-  leopard: { size: 64, rig: QUAD, draw(s, P) {
-    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail;
-    s.L(14 + bx, 44 + by, 7 + bx, 42 + by - t * .5, 2.2, 'cat', 1.8); s.L(7 + bx, 42 + by - t * .5, 4 + bx, 32 + by - t, 1.8, 'cat', 1.3); s.d(4 + bx, 32 + by - t, '#24284e');
-    s.L(20 + bx, 49 + by, 17 + P.bf[0], 59 + P.bf[1], 1.9, 'cat2', 1.5); s.L(43 + bx, 48 + by, 45 + P.ff[0], 59 + P.ff[1], 1.9, 'cat2', 1.5);
-    s.E(30 + bx, 45 + by, 16, 7.5, 'cat'); s.E(32 + bx, 50.5 + by, 11, 2, 'cloudw');
-    for (const [x, y] of [[18, 42], [24, 40], [30, 41], [36, 40], [42, 42], [21, 46], [28, 46], [35, 45], [14, 45]]) { s.d(x + bx, y + by, '#24284e').d(x + 2 + bx, y + by, '#24284e').d(x + bx, y + 1 + by, '#24284e').d(x + 2 + bx, y + 1 + by, '#24284e').d(x + 1 + bx, y + by, '#ffd23a').d(x + 1 + bx, y + 1 + by, '#ffd23a'); }
-    s.L(23 + bx, 49 + by, 22 + P.bl[0], 60 + P.bl[1], 2.3, 'cat', 1.7); s.L(40 + bx, 49 + by, 41 + P.fl[0], 60 + P.fl[1], 2.3, 'cat', 1.7);
-    s.E(22 + P.bl[0], 61 + P.bl[1], 2.6, 1.1, 'cat'); s.E(42 + P.fl[0], 61 + P.fl[1], 2.6, 1.1, 'cat');
-    s.L(42 + bx, 43 + by, 48 + hx, 38 + hy, 3.6, 'cat', 3.2);
-    s.spike(47 + hx, 33 + hy, 4.5, 1.7, 'cat', -1.5); s.spike(52 + hx, 33.5 + hy, 4, 1.6, 'cat', 1);
-    s.E(51 + hx, 38 + hy, 6, 5, 'cat'); s.E(56 + hx, 40.5 + hy, 3.8, 2.8, 'cat'); s.E(55 + hx, 42.5 + hy + P.jaw, 3, 1.2, 'cloudw');
-    s.line([[49 + hx, 36.5 + hy], [53 + hx, 36 + hy]], '#24284e'); s.d(51 + hx, 37.5 + hy, '#24284e').d(52 + hx, 37.5 + hy, '#9cc4ff').d(59 + hx, 39 + hy, '#24284e');
-    s.line([[49 + hx, 39 + hy], [47 + hx, 42 + hy]], '#24284e');
-    s.line([[26 + bx, 38 + by], [29 + bx, 36 + by], [28 + bx, 38.5 + by], [32 + bx, 36.5 + by]], '#fffac0');
-  }, glows: [[29, 37, '#ffe14a', 4]], emit: [], mouth: [59, 41] },
+  boltfox: { size: 64, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
+    boltTail(s, 16 + bx, 44 + by, [[-7, -3], [-6, -10], [-12, -14], [-10, -22]], 3.4, 'cat', t * .8);
+    boltTail(s, 16 + bx, 45 + by, [[-8, 1], [-10, -5], [-16, -6], [-17, -13]], 3, 'cat2', t);
+    s.L(20 + bx, 49 + by, 18 + P.bf[0], 59 + P.bf[1], 1.8, 'navyT2', 1.4); s.L(41 + bx, 48 + by, 43 + P.ff[0], 59 + P.ff[1], 1.8, 'navyT2', 1.4);
+    s.E(30 + bx, 45 + by, 14, 6.5, 'cat'); s.E(32 + bx, 50 + by, 9, 1.8, 'cloudw');
+    for (const x of [20, 27, 34]) s.line(m([[x, 40], [x + 2.5, 43], [x, 43.5], [x + 2.5, 47]], bx, by), '#24284e');
+    s.L(23 + bx, 49 + by, 22 + P.bl[0], 60 + P.bl[1], 2.2, 'cat', 1.4); s.L(39 + bx, 49 + by, 40 + P.fl[0], 60 + P.fl[1], 2.2, 'cat', 1.4);
+    s.L(22 + P.bl[0] * .6, 55 + P.bl[1] * .6, 22 + P.bl[0], 60 + P.bl[1], 1.6, 'navyT'); s.L(40 + P.fl[0] * .6, 55 + P.fl[1] * .6, 40 + P.fl[0], 60 + P.fl[1], 1.6, 'navyT');
+    s.L(41 + bx, 44 + by, 47 + hx, 38 + hy, 3.6, 'cat', 3); s.E(44 + bx, 46 + by, 3.6, 3, 'cloudw');
+    s.spike(46 + hx, 34 + hy, 9, 2.4, 'cat', -2.5); s.spike(51 + hx, 34.5 + hy, 8.5, 2.3, 'cat', 1); s.spike(46 + hx, 34 + hy, 5, 1.1, 'navyT', -2); s.spike(51 + hx, 34.5 + hy, 4.5, 1, 'navyT', .5);
+    s.E(49 + hx, 37.5 + hy, 5.6, 4.6, 'cat'); s.P(m([[51, 35.5], [61, 39], [52, 42]], hx, hy), 'cat'); s.E(54 + hx, 41 + hy + P.jaw, 4, 1.4, 'cloudw');
+    s.d(61 + hx, 38.5 + hy, '#0a0c1a'); s.line(m([[48, 35.5], [52, 36.5]], hx, hy), '#24284e'); s.d(51 + hx, 37 + hy, '#9cc4ff');
+    s.line(m([[45, 39], [43, 42]], hx, hy), '#24284e');
+  }, glows: [[6, 22, '#ffe14a', 4], [-1, 31, '#ffe14a', 3]], emit: [], mouth: [61, 40] },
   thunderking: { size: 80, rig: BIPED, aura: { type: 'sparks', x: 40, y: 70, r: 30 }, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, w = -6 * P.wing, m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
     birdWing(s, 48 + bx, 44 + by, .95, 1, w, 'storm2', null, 'storm2');
@@ -1925,48 +1933,72 @@ const SPRITES = {
     s.P(m([[63, 30], [72, 33], [70, 37], [64, 35]], hx, hy), 'gold');
     s.line(m([[56, 30], [62, 30.5]], hx, hy), '#060c22'); s.d(60 + hx, 31 + hy, '#fffac0').d(61 + hx, 31 + hy, '#ffe14a').d(59 + hx, 31 + hy, '#060c22');
   }, glows: [[56, 17, '#ffe14a', 6], [22, 26, '#ffe14a', 6]], emit: [], mouth: [72, 34] },
-  vajratiger: { size: 80, rig: QUAD, aura: { type: 'sparks', x: 40, y: 72, r: 30 }, draw(s, P) {
+  foxking: { size: 80, rig: QUAD, aura: { type: 'sparks', x: 40, y: 72, r: 30 }, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
-    s.L(17 + bx, 58 + by, 8 + bx, 54 + by - t * .5, 2.8, 'tigw', 2.4); s.L(8 + bx, 54 + by - t * .5, 4 + bx, 44 + by - t, 2.4, 'tigw', 1.6); s.P(m([[2, 38], [6, 43], [3, 44], [7, 48], [1, 44], [3, 43]], bx, by - t), 'volt');
-    s.L(25 + bx, 63 + by, 22 + P.bf[0], 74 + P.bf[1], 3.2, 'tigw2', 2.4); s.L(52 + bx, 61 + by, 55 + P.ff[0], 74 + P.ff[1], 3.2, 'tigw2', 2.4);
-    s.E(22 + P.bf[0], 76 + P.bf[1], 3.6, 1.5, 'tigw2'); s.E(55 + P.ff[0], 76 + P.ff[1], 3.6, 1.5, 'tigw2');
-    s.E(36 + bx, 58 + by, 19, 9, 'tigw'); s.E(52 + bx, 55 + by, 10, 10, 'tigw'); s.E(38 + bx, 64 + by, 12, 2.2, 'cloudw');
-    for (const x of [20, 26, 32, 38, 44, 50]) s.P(m([[x, 49 + Math.abs(x - 44) * .1], [x + 2.5, 54], [x, 54.5], [x + 3, 60]], bx, by), 'navyT');
-    // the thunder spire on its back: twin gold prongs round a crackling crystal, struck by lightning
-    s.L(36 + bx, 50 + by, 36 + bx, 36 + by, 1.4, 'gold', 1);
-    s.P(m([[31, 49], [29, 39], [33, 43], [36, 31], [39, 43], [43, 39], [41, 49]], bx, by), 'gold');
-    s.E(36 + bx, 42 + by, 2.4, 3.2, 'volt');
-    s.line(m([[36, 31], [34, 25], [38, 21], [35, 15], [38, 9]], bx, by), '#ffe14a', '#ffffff');
-    s.L(28 + bx, 63 + by, 27 + P.bl[0], 75 + P.bl[1], 3.8, 'tigw', 2.8); s.L(48 + bx, 63 + by, 50 + P.fl[0], 75 + P.fl[1], 3.8, 'tigw', 2.8);
-    s.E(27 + P.bl[0], 77 + P.bl[1], 4, 1.6, 'tigw'); s.E(50 + P.fl[0], 77 + P.fl[1], 4, 1.6, 'tigw');
-    for (const x of [24, 27, 30]) s.d(x + P.bl[0], 78 + P.bl[1], '#6a7294'); for (const x of [47, 50, 53]) s.d(x + P.fl[0], 78 + P.fl[1], '#6a7294');
-    s.spike(57 + hx, 41 + hy, 5.5, 2.4, 'tigw', -1.5); s.spike(64 + hx, 41.5 + hy, 5.5, 2.4, 'tigw', 1);
-    s.E(61 + hx, 48 + hy, 9, 8, 'tigw'); s.E(69 + hx, 51.5 + hy, 5.5, 4.2, 'tigw'); s.E(68 + hx, 55 + hy + P.jaw * 2, 4.6, 1.8, 'cloudw');
-    s.E(54 + hx, 52 + hy, 3.5, 4, 'cloudw');
-    for (const [x, y] of [[55, 46], [56, 49], [58, 43]]) s.line(m([[x, y], [x - 4, y + 1]], hx, hy), '#24284e');
-    s.line(m([[61, 42], [62, 45], [60, 47]], hx, hy), '#24284e');
-    s.line(m([[63, 46.5], [67, 46]], hx, hy), '#24284e'); s.d(65 + hx, 47.5 + hy, '#24284e').d(66 + hx, 47.5 + hy, '#fff07a').d(74 + hx, 50.5 + hy, '#24284e').d(73 + hx, 50.5 + hy, '#24284e');
-    for (const x of [66, 69]) s.d(x + hx, 56 + hy, '#ffffff');
-  }, glows: [[36, 42, '#ffe14a', 6], [37, 14, '#ffe14a', 5]], emit: [], mouth: [74, 54] },
-  /* ----- Lightning fused form (อสนีผู้ตื่น): the thunderbird king awakened, gold armour, twin rings of lightning ----- */
-  bfused: { size: 88, rig: BIPED, aura: { type: 'twinb', x: 44, y: 80, r: 34 }, draw(s, P) {
-    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, w = -6 * P.wing, m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
-    birdWing(s, 52 + bx, 50 + by, 1.02, 1, w, 'storm2', null, 'storm2');
-    s.P(m([[30, 66], [8, 76], [14, 70], [2, 70], [14, 64], [6, 58], [28, 61]], bx, by), 'tbird2');
-    s.line(m([[26, 64], [8, 73]], bx, by), '#ffe14a').line(m([[24, 62], [8, 60]], bx, by), '#f2c13a');
-    s.L(42 + bx, 72 + by, 41 + P.bf[0], 82 + P.bf[1], 1.3, 'gold'); s.L(49 + bx, 72 + by, 50 + P.bl[0], 82 + P.bl[1], 1.3, 'gold');
-    for (const [x, l] of [[41, P.bf], [50, P.bl]]) { s.L(x + l[0], 82 + l[1], x - 3 + l[0], 85 + l[1], .8, 'gold'); s.L(x + l[0], 82 + l[1], x + 3 + l[0], 85 + l[1], .8, 'gold'); }
-    s.E(45 + bx, 61 + by, 14, 12, 'tbird'); s.E(49 + bx, 65 + by, 8.5, 6.5, 'cloudw');
-    s.P(m([[44, 54], [56, 52], [58, 62], [50, 68], [44, 64]], bx, by), 'gold'); s.E(51 + bx, 59 + by, 2, 2, 'volt');
-    birdWing(s, 42 + bx, 54 + by, 1.38, -1, w, 'stormc', '#ffe14a', 'stormc');
-    s.P(m([[38, 54], [30, 42], [36, 44], [32, 34], [40, 46]], bx, by + w * .3), 'gold');
-    s.L(53 + bx, 52 + by, 60 + hx, 40 + hy, 5, 'tbird', 4.2);
-    s.E(62 + hx, 36 + hy, 7.5, 6.5, 'tbird');
-    for (const [x, y, h, l] of [[55, 30, 11, -4], [59, 29, 13, -1], [63, 30, 11, 2], [66, 32, 8, 3]]) s.spike(x + hx, y + hy, h, 1.8, 'volt', l);
-    s.P(m([[56, 32], [66, 30.5], [70, 34], [63, 36], [56, 36]], hx, hy), 'gold');
-    s.P(m([[68, 34], [78, 37], [75, 42], [68, 39]], hx, hy), 'gold');
-    s.d(64 + hx, 35 + hy, '#ffffff').d(65 + hx, 35 + hy, '#ffe14a').d(63 + hx, 35 + hy, '#060c22');
-  }, glows: [[60, 19, '#ffe14a', 7], [51, 59, '#ffe14a', 3], [22, 28, '#ffe14a', 6]], emit: [], mouth: [78, 38] },
+    // five lightning tails fanning up behind
+    for (const [i, path] of [[[-6, -6], [-4, -14], [-10, -20], [-6, -30]], [[-9, -3], [-10, -11], [-17, -15], [-16, -24]], [[-10, 1], [-14, -5], [-21, -6], [-23, -13]], [[-3, -8], [2, -15], [-2, -21], [3, -29]], [[-10, 4], [-17, 3], [-22, 7], [-28, 4]]].entries())
+      boltTail(s, 20 + bx, 56 + by, path, 3.6 - (i > 2 ? .6 : 0), i % 2 ? 'navyT2' : 'navyT', t * (1 - i * .1));
+    s.L(26 + bx, 63 + by, 23 + P.bf[0], 74 + P.bf[1], 2.6, 'navyT2', 2); s.L(52 + bx, 62 + by, 55 + P.ff[0], 74 + P.ff[1], 2.6, 'navyT2', 2);
+    s.E(37 + bx, 58 + by, 18, 8.5, 'navyT'); s.E(39 + bx, 64 + by, 12, 2.2, 'cloudw');
+    for (const x of [24, 32, 40, 48]) s.line(m([[x, 51], [x + 3, 55], [x, 55.5], [x + 3, 60]], bx, by), '#ffe14a', '#fffac0');
+    // storm-cloud ruff round the neck and shoulders, crackling
+    for (const [x, y, r] of [[52, 50, 7], [58, 54, 6], [50, 57, 6], [56, 46, 5]]) s.E(x + bx, y + by, r, r * .85, 'stormc');
+    s.E(54 + bx, 46 + by, 3, 1.8, 'cloudw'); s.line(m([[50, 49], [53, 52], [51, 53], [55, 57]], bx, by), '#ffe14a');
+    s.L(28 + bx, 63 + by, 27 + P.bl[0], 75 + P.bl[1], 3.2, 'navyT', 2); s.L(48 + bx, 63 + by, 50 + P.fl[0], 75 + P.fl[1], 3.2, 'navyT', 2);
+    s.E(27 + P.bl[0], 76.5 + P.bl[1], 3.4, 1.4, 'volt'); s.E(50 + P.fl[0], 76.5 + P.fl[1], 3.4, 1.4, 'volt');
+    s.L(58 + bx, 52 + by, 63 + hx, 46 + hy, 4.5, 'navyT', 4);
+    s.spike(61 + hx, 41 + hy, 12, 3, 'navyT', -3); s.spike(67 + hx, 41.5 + hy, 11, 2.8, 'navyT', 1.5); s.spike(61 + hx, 41 + hy, 7, 1.3, 'volt', -2.5); s.spike(67 + hx, 41.5 + hy, 6.5, 1.2, 'volt', 1);
+    s.E(64 + hx, 46 + hy, 7.5, 6, 'navyT'); s.P(m([[66, 43], [79, 48], [67, 52]], hx, hy), 'navyT'); s.E(71 + hx, 50 + hy + P.jaw * 2, 5, 1.8, 'cloudw');
+    s.P(m([[60, 42], [64, 37], [66, 41], [69, 37], [70, 43]], hx, hy), 'gold');
+    s.d(79 + hx, 47.5 + hy, '#0a0c1a'); s.line(m([[63, 44.5], [68, 45.5]], hx, hy), '#0a0c1a'); s.d(66 + hx, 45.5 + hy, '#fffac0').d(67 + hx, 45.5 + hy, '#ffe14a');
+    for (const x of [70, 73]) s.d(x + hx, 51 + hy, '#ffffff');
+  }, glows: [[14, 26, '#ffe14a', 5], [23, 27, '#ffe14a', 4], [-3, 44, '#ffe14a', 4], [66, 40, '#ffe14a', 3]], emit: [], mouth: [79, 49] },
+  /* ----- Lightning fused form (อสนีผู้ตื่น): a long storm dragon riding the clouds, lightning mane and whiskers,
+     branching gold horns and gold armour ----- */
+  bfused: { size: 88, rig: SWIM, hover: 6, aura: { type: 'twinb', x: 44, y: 82, r: 34 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 3.4;
+    const C = [[4, 62], [12, 72], [26, 74], [36, 64], [32, 52], [38, 42], [50, 40], [58, 44], [64, 38]];
+    const raw = [];
+    for (let i = 0; i < C.length - 1; i++) {
+      const p0 = C[Math.max(0, i - 1)], p1 = C[i], p2 = C[i + 1], p3 = C[Math.min(C.length - 1, i + 2)];
+      for (let k = 0; k < 6; k++) { const u = k / 6, u2 = u * u, u3 = u2 * u, f = (a, b, c, d) => .5 * (2 * b + (-a + c) * u + (2 * a - 5 * b + 4 * c - d) * u2 + (-a + 3 * b - 3 * c + d) * u3); raw.push([f(p0[0], p1[0], p2[0], p3[0]), f(p0[1], p1[1], p2[1], p3[1])]); }
+    }
+    raw.push(C[C.length - 1]);
+    const n = raw.length, pts = raw.map(([x, y], i) => { const q = i / (n - 1); return [x + bx * (1 - q) + hx * q + Math.sin(q * Math.PI * 3 + t * .6) * 1.6 * (1 - q), y + by * (1 - q) + hy * q]; });
+    const rad = (q) => q < .2 ? 1.4 + q / .2 * 3.6 : q < .8 ? 5 + Math.sin((q - .2) / .6 * Math.PI) * 1.2 : 5 - (q - .8) / .2 * .8;
+    const back = (i) => { const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)]; const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1; return [dy / L, -dx / L]; };
+    // clouds it rides on (behind)
+    for (const [x, y, r] of [[18, 78, 7], [30, 80, 6], [8, 74, 5]]) s.E(x + bx * .5, y + by * .5, r, r * .7, 'stormc');
+    // far legs
+    const legAt = (q, len, k, dxl) => { const i = Math.round(q * (n - 1)), [x, y] = pts[i], [bxn, byn] = back(i), r = rad(q); const sx = x - bxn * r * .5, sy = y - byn * r * .5, fx = sx + dxl, fy = sy + len; s.L(sx, sy, fx, fy, 1.6, k, 1.2); for (const a of [-.6, 0, .6]) s.L(fx, fy, fx + 2.5 * Math.cos(a + .4), fy + 2.5 * Math.sin(a + .4) + .5, .5, 'gold'); };
+    legAt(.42, 7, 'tbird2', -3); legAt(.74, 6, 'tbird2', 3);
+    // lightning mane along the back
+    pts.forEach(([x, y], i) => { const q = i / (n - 1); if (q < .18 || q > .97 || i % 2) return; const [bxn, byn] = back(i), r = rad(q), h = r + 3 + (i % 4 === 0 ? 3 : 1); s.P([[x + bxn * (r - 1) - byn * 1.4, y + byn * (r - 1) + bxn * 1.4], [x + bxn * h, y + byn * h], [x + bxn * (r - 1) + byn * 1.4, y + byn * (r - 1) - bxn * 1.4]], 'volt'); });
+    pts.forEach(([x, y], i) => { const r = rad(i / (n - 1)); s.E(x, y, r, r, 'tbird'); });
+    // pale belly scutes on the belly side, scale marks and a glowing line on the back
+    pts.forEach(([x, y], i) => { const q = i / (n - 1); if (q < .12 || q > .96) return; const [bxn, byn] = back(i), r = rad(q); s.E(x - bxn * r * .55, y - byn * r * .55, r * .45, r * .45, 'cloudw'); if (i % 2 === 0) s.d(x - bxn * r * .85, y - byn * r * .85, '#a8b4cc'); if (i % 3 === 0) s.d(x + bxn * r * .3, y + byn * r * .3, '#9cc4ff'); });
+    // near legs
+    legAt(.5, 8, 'tbird', 3); legAt(.82, 7, 'tbird', 4);
+    // gold armour bands
+    for (const q of [.58, .66]) { const i = Math.round(q * (n - 1)), [x, y] = pts[i], [bxn, byn] = back(i), r = rad(q); s.L(x + bxn * r, y + byn * r, x - bxn * r, y - byn * r, 1, 'gold'); }
+    // head: long snout, branching gold horns, lightning whiskers, roaring jaw
+    const [ex, ey] = pts[n - 1];
+    s.L(ex - 1, ey - 4, ex - 9, ey - 13, 1.2, 'gold', .8); s.L(ex - 5, ey - 8, ex - 2, ey - 14, .9, 'gold', .5); s.L(ex - 9, ey - 13, ex - 14, ey - 14, .8, 'gold', .4);
+    s.L(ex + 3, ey - 5, ex - 3, ey - 16, 1.1, 'gold', .7); s.L(ex, ey - 11, ex + 4, ey - 15, .8, 'gold', .4);
+    s.E(ex + 3, ey, 7, 5.6, 'tbird');
+    s.P([[ex + 6, ey - 4], [ex + 20, ey - 1], [ex + 20, ey + 3], [ex + 6, ey + 3]], 'tbird');
+    s.P([[ex + 3, ey - 6], [ex + 12, ey - 4.5], [ex + 13, ey - 2], [ex + 4, ey - 2]], 'gold');
+    s.P([[ex + 4, ey + 3], [ex + 19, ey + 3 + j], [ex + 16, ey + 6.5 + j], [ex + 5, ey + 6.5]], 'tbird2');
+    if (j > 1) s.P([[ex + 6, ey + 3], [ex + 19, ey + 3], [ex + 16, ey + 3 + j], [ex + 6, ey + 4 + j * .6]], 'maw');
+    for (const x of [9, 13, 17]) s.d(ex + x, ey + 3, '#ffffff'); if (j > 1) for (const x of [11, 15]) s.d(ex + x, ey + 2 + j, '#ffffff');
+    s.d(ex + 20, ey - 1, '#060c22');
+    s.line([[ex + 17, ey + 1], [ex + 21, ey + 5], [ex + 18, ey + 9], [ex + 22, ey + 13]], '#ffe14a', '#fffac0').line([[ex + 14, ey + 2], [ex + 14, ey + 8], [ex + 11, ey + 12]], '#ffe14a');
+    for (let k = 0; k < 5; k++) s.spike(ex - 3 - k * 2.4, ey - 1 + k * 1.4, 5, 1.2, 'volt', -3);
+    s.d(ex + 6, ey - 1, '#fffac0').d(ex + 7, ey - 1, '#ffe14a').d(ex + 5, ey - 2, '#060c22').d(ex + 6, ey - 2, '#060c22').d(ex + 7, ey - 2, '#060c22').d(ex + 8, ey - 2, '#060c22');
+    // clouds in front
+    for (const [x, y, r] of [[40, 82, 6], [52, 80, 5]]) s.E(x + bx * .5, y + by * .5, r, r * .6, 'stormc');
+    if (P.glow) glowSap(s, ex + 20, ey + 3 + j * .5);
+  }, glows: [[70, 37, '#ffe14a', 4], [40, 34, '#ffe14a', 5], [25, 62, '#ffe14a', 4]], emit: [], mouth: [84, 41] },
   /* ----- Lightning world boss (game: จักรกลพายุ, a machine): a storm bison with a thundercloud mane ----- */
   stormbison: { size: 96, rig: QUAD, aura: { type: 'bossb', x: 48, y: 88, r: 36 }, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
@@ -2058,7 +2090,7 @@ function getFrame(def, name, i) {
   }
   return list[i];
 }
-const BOLT_IDS = ['begg', 'spark', 'cloudpuff', 'tbird', 'staticcat', 'stormtiger', 'hawk', 'gloomcloud', 'leopard', 'thunderking', 'vajratiger', 'bfused', 'stormbison'];
+const BOLT_IDS = ['begg', 'spark', 'cloudpuff', 'tbird', 'staticcat', 'stormfox', 'hawk', 'gloomcloud', 'boltfox', 'thunderking', 'foxking', 'bfused', 'stormbison'];
 const EARTH_IDS = ['eegg', 'pebble', 'clay', 'tortoise', 'worm', 'rhino', 'pillarturtle', 'boulder', 'orerhino', 'mountturtle', 'crystalrhino', 'efused', 'pangolin'];
 const LEAF_IDS = ['legg', 'seed', 'sprout', 'leafdeer', 'mushroom', 'wolf', 'stag', 'stump', 'barkwolf', 'forestdeer', 'wolfking', 'lfused', 'flora'];
 for (const [id, def] of Object.entries(SPRITES)) {
@@ -2250,7 +2282,7 @@ const STAGES = {
 const STAGE_OF = {
   egg: 'egg', wisp: 'b1', coal: 'b2', gecko: 'adult', smoke: 'adult', raptor: 'adult', frill: 'perfect', lava: 'perfect', dragon: 'perfect', sunking: 'ultimate', phoenix: 'ultimate', avatar: 'fused', boss: 'boss',
   whaleA: 'ultimate', whaleB: 'ultimate', whaleC: 'ultimate', wfused: 'fused',
-  begg: 'egg', spark: 'b1', cloudpuff: 'b2', tbird: 'adult', staticcat: 'adult', stormtiger: 'adult', hawk: 'perfect', gloomcloud: 'perfect', leopard: 'perfect', thunderking: 'ultimate', vajratiger: 'ultimate', bfused: 'fused', stormbison: 'boss',
+  begg: 'egg', spark: 'b1', cloudpuff: 'b2', tbird: 'adult', staticcat: 'adult', stormfox: 'adult', hawk: 'perfect', gloomcloud: 'perfect', boltfox: 'perfect', thunderking: 'ultimate', foxking: 'ultimate', bfused: 'fused', stormbison: 'boss',
   eegg: 'egg', pebble: 'b1', clay: 'b2', tortoise: 'adult', worm: 'adult', rhino: 'adult', pillarturtle: 'perfect', boulder: 'perfect', orerhino: 'perfect', mountturtle: 'ultimate', crystalrhino: 'ultimate', efused: 'fused', pangolin: 'boss',
   legg: 'egg', seed: 'b1', sprout: 'b2', leafdeer: 'adult', mushroom: 'adult', wolf: 'adult', stag: 'perfect', stump: 'perfect', barkwolf: 'perfect', forestdeer: 'ultimate', wolfking: 'ultimate', lfused: 'fused', flora: 'boss',
   wegg: 'egg', drop: 'b1', bubble: 'b2', swordwhale: 'adult', jelly: 'adult', shark: 'adult', armorwhale: 'perfect', octopus: 'perfect', seadragon: 'perfect', whaleking: 'ultimate', leviathan: 'ultimate', turtle: 'boss',
@@ -2325,14 +2357,14 @@ const BOLT_LINE = [
   { stage: 'โตเต็มวัย', items: [
     { id: 'tbird', name: 'นกฟ้าผ่า', old: 'คงชื่อเดิม · นกสีน้ำเงิน หงอนเป็นสายฟ้า ปีกมีลายฟ้าผ่า', st: 'keep' },
     { id: 'staticcat', name: 'แมวไฟสถิต', old: 'คงชื่อเดิม · ร่างแย่ แมวขนฟูพองทั้งตัวเพราะไฟฟ้าสถิต ตาโตตกใจ มีประกายไฟรอบตัว', st: 'keep' },
-    { id: 'stormtiger', name: 'เสือพายุ', old: 'คงชื่อเดิม · ลูกเสือสีกรมท่า ลายเป็นสายฟ้าสีเหลือง ปลายหางเป็นสายฟ้า', st: 'keep' } ] },
+    { id: 'stormfox', name: 'จิ้งจอกพายุ', old: 'เดิม เสือพายุ 🐆 (เปลี่ยนสายเสือเป็นสายจิ้งจอก) · ลูกจิ้งจอกสีกรมท่า หูใหญ่ ลายสายฟ้าสีเหลือง หางฟูซิกแซกปลายเป็นสายฟ้า', st: 'new' } ] },
   { stage: 'สมบูรณ์', items: [
     { id: 'hawk', name: 'เหยี่ยวพายุ', old: 'เดิม ม้าอสนี 🦄 (ม้า ไม่ต่อจากนก) · เหยี่ยวสีม่วงคราม กางปีกมีเส้นฟ้าผ่า ปากและเล็บทอง', st: 'new' },
     { id: 'gloomcloud', name: 'เมฆหม่นขี้เกียจ', old: 'คงชื่อเดิม · ร่างแย่ ก้อนเมฆฝนสีเทาหลับ ฝนตกปรอยใต้ตัว ฟ้าแลบเล็กๆ', st: 'keep' },
-    { id: 'leopard', name: 'เสือดาวสายฟ้า', old: 'เดิม จิ้งจอกอสนี 🦊 (จิ้งจอก ไม่ต่อจากเสือ) · เสือดาวขาวเงิน ลายจุดมีแสงเหลืองกลางจุด ตัวเพรียว', st: 'new' } ] },
+    { id: 'boltfox', name: 'จิ้งจอกอสนี', old: 'คงชื่อเดิม 🦊 · จิ้งจอกสีทอง ขาและปลายหูกรมท่า สองหางซิกแซกเป็นสายฟ้า', st: 'keep' } ] },
   { stage: 'ร่างสุดท้าย', items: [
     { id: 'thunderking', name: 'วิหคราชาอสนี', old: 'เดิม ราชาอสนี 🌪️ (เป็นพายุหมุน) · นกยักษ์ ปีกเป็นเมฆพายุมีสายฟ้าวิ่ง หงอนเป็นสายฟ้า หางยาว', st: 'new' },
-    { id: 'vajratiger', name: 'วัชรพยัคฆ์', old: 'เดิม วัชรเทพ 🌀 (เป็นสัญลักษณ์) · เสือขาวยักษ์ลายกรมท่า แบกยอดทองสามง่ามบนหลัง ฟ้าผ่าลงที่ยอด', st: 'new' } ] },
+    { id: 'foxking', name: 'ราชาจิ้งจอกอสนี', old: 'เดิม วัชรเทพ 🌀 (เป็นสัญลักษณ์) · จิ้งจอกยักษ์สีกรมท่า ห้าหางเป็นสายฟ้าแผ่ขึ้นหลังตัว แผงคอเป็นเมฆพายุ มงกุฎทองบนหน้าผาก', st: 'new' } ] },
 ];
 buildBoard(document.getElementById('evo-bolt'), BOLT_LINE, true);
 const LEAF_LINE = [
@@ -3925,10 +3957,11 @@ const PLAN = [
     keep: 'ไข่ศิลา, ก้อนกรวด, ก้อนดินเหนียว, เต่าศิลา, หนอนดินเกียจคร้าน, แรดผา, ก้อนหินขี้เกียจ' },
   { line: 'สายอสนี', fam: 'สัตว์พายุ', sum: 'เปลี่ยน 4 (ภาพนิ่งด้านบน รอเลือก)', rows: [
     ['สมบูรณ์', 'ม้าอสนี 🦄', 'เหยี่ยวพายุ', 'ต่อจากนกฟ้าผ่า'],
-    ['สมบูรณ์', 'จิ้งจอกอสนี 🦊', 'เสือดาวสายฟ้า', 'ต่อจากเสือพายุ'],
+    ['โตเต็มวัย', 'เสือพายุ 🐆', 'จิ้งจอกพายุ', 'เปลี่ยนสายเสือเป็นสายจิ้งจอก ให้ต่อไปถึงจิ้งจอกอสนี'],
+    ['สมบูรณ์', 'จิ้งจอกอสนี 🦊', 'จิ้งจอกอสนี (คงไว้)', 'ต่อจากจิ้งจอกพายุ สองหางเป็นสายฟ้า'],
     ['ร่างสุดท้าย', 'ราชาอสนี 🌪️', 'วิหคราชาอสนี', 'พายุหมุนไม่ใช่สัตว์ เปลี่ยนเป็นนกยักษ์ที่ปีกเป็นเมฆพายุ'],
-    ['ร่างสุดท้าย', 'วัชรเทพ 🌀', 'วัชรพยัคฆ์', 'เสือยักษ์ที่แบกวัชระไว้บนหลัง ฟ้าผ่าลงที่วัชระ'] ],
-    keep: 'ไข่อสนี, ประกายไฟฟ้า, ลูกเมฆฟ้า, นกฟ้าผ่า, แมวไฟสถิต, เสือพายุ, เมฆหม่นขี้เกียจ' },
+    ['ร่างสุดท้าย', 'วัชรเทพ 🌀', 'ราชาจิ้งจอกอสนี', 'จิ้งจอกยักษ์ห้าหางเป็นสายฟ้า แผงคอเป็นเมฆพายุ'] ],
+    keep: 'ไข่อสนี, ประกายไฟฟ้า, ลูกเมฆฟ้า, นกฟ้าผ่า, แมวไฟสถิต, เมฆหม่นขี้เกียจ' },
   { line: 'สายรัศมี', fam: 'สัตว์เทพ', sum: 'เปลี่ยน 6 (มีคนและสิ่งของมากที่สุด)', rows: [
     ['โตเต็มวัย', 'นกพิราบทิพย์ 🕊️', 'แกะปีกทิพย์', 'ต่อจากลูกแกะแสง'],
     ['โตเต็มวัย', 'อัศวินรัศมี 🛡️', 'สิงห์น้อยรัศมี', 'อัศวินเป็นคนถือโล่ เปลี่ยนเป็นสิงห์ตัวเล็กมีแผงคอเป็นแสง'],

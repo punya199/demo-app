@@ -51,6 +51,12 @@ section { display: flex; flex-direction: column; gap: 18px }
 
 /* Battle stage */
 .stage { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: #000 }
+.skgroup { display: flex; flex-direction: column; gap: 10px }
+.skgroup[hidden] { display: none }
+/* On a phone the arena stays pinned under the section picker while the skill buttons scroll. */
+@media (max-width: 760px) { .stage { position: sticky; top: var(--navh, 64px); z-index: 4 } }
+.show.fused.earth canvas { background: radial-gradient(ellipse at 50% 75%, #3a2a14 0%, #14100a 72%) }
+.show.boss.earth canvas { background: radial-gradient(ellipse at 50% 75%, #3a2a12 0%, #140e08 72%) }
 .stage canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; aspect-ratio: 16 / 9 }
 .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px }
 .ctl { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0 }
@@ -146,6 +152,7 @@ td.st { white-space: nowrap; color: var(--muted) }
       <option value="fire">มอนธาตุไฟ + สกิล</option>
       <option value="water">มอนธาตุน้ำ + สกิล</option>
       <option value="leaf">มอนธาตุพฤกษ์ + สกิล</option>
+      <option value="earth">มอนธาตุศิลา (ภาพนิ่ง รอเลือกแบบ)</option>
       <option value="plan">แผนออกแบบทั้ง 8 สาย</option>
     </select>
     <span class="hint" id="jump-hint">ฉากต่อสู้อยู่บนสุดเสมอ</span>
@@ -153,7 +160,7 @@ td.st { white-space: nowrap; color: var(--muted) }
   <header style="order:0">
     <div class="eyebrow">ข้อเสนองานภาพ · ตัวอย่างให้ดูก่อน</div>
     <h1>มอนอารีนา <span class="tag">โฉมใหม่</span></h1>
-    <p class="lede">ตอนนี้ทำแล้ว 3 สาย: เพลิง วารี และพฤกษ์ สนามมุมเฉียงแบบ 2.5D สไตล์พิกเซลอาร์ต มอนมีเงาและแสงจากมุมซ้ายบน ท่าโจมตี หลบ ตั้งรับ และสกิลมีเอฟเฟกต์ของแต่ละธาตุ ทุกอย่างในหน้านี้วาดด้วยโค้ด ไม่มีรูปจากที่อื่น กดปุ่มด้านล่างฉากเพื่อลองได้เลย</p>
+    <p class="lede">ตอนนี้ทำแล้ว 3 สาย: เพลิง วารี และพฤกษ์ สายศิลามีภาพนิ่งให้เลือกแบบ สนามมุมเฉียงแบบ 2.5D สไตล์พิกเซลอาร์ต มอนมีเงาและแสงจากมุมซ้ายบน ท่าโจมตี หลบ ตั้งรับ และสกิลมีเอฟเฟกต์ของแต่ละธาตุ ทุกอย่างในหน้านี้วาดด้วยโค้ด ไม่มีรูปจากที่อื่น กดปุ่มด้านล่างฉากเพื่อลองได้เลย</p>
   </header>
 
   <section aria-labelledby="battle-h" data-group="battle" style="order:1">
@@ -172,14 +179,16 @@ td.st { white-space: nowrap; color: var(--muted) }
         </div>
       </div>
       <div class="ctl">
-        <div class="ctl-title">สกิลธาตุไฟในเกม 8 ท่า (มอนของเราใช้)</div>
-        <div class="row" id="fire-skills"></div>
-        <div class="ctl-title">สกิลธาตุน้ำในเกม 8 ท่า</div>
-        <div class="row" id="water-skills"></div>
-        <div class="ctl-title">สกิลธาตุพฤกษ์ในเกม 8 ท่า</div>
-        <div class="row" id="leaf-skills"></div>
-        <div class="ctl-title">เอฟเฟกต์ธาตุอื่น (ร่างแรก รอออกแบบ)</div>
-        <div class="row" id="skills"></div>
+        <div class="skgroup" data-el="fire"><div class="ctl-title">สกิลธาตุไฟในเกม 8 ท่า (มอนของเราใช้)</div>
+        <div class="row" id="fire-skills"></div></div>
+        <div class="skgroup" data-el="water"><div class="ctl-title">สกิลธาตุน้ำในเกม 8 ท่า</div>
+        <div class="row" id="water-skills"></div></div>
+        <div class="skgroup" data-el="leaf"><div class="ctl-title">สกิลธาตุพฤกษ์ในเกม 8 ท่า</div>
+        <div class="row" id="leaf-skills"></div></div>
+        <div class="skgroup" data-el="earth"><div class="ctl-title">สกิลธาตุศิลา</div>
+        <div class="hint">ยังไม่ได้ทำ รอเลือกแบบมอนสายศิลาก่อน แล้วค่อยทำท่าทางและสกิล</div></div>
+        <div class="skgroup" data-el="other"><div class="ctl-title">เอฟเฟกต์ธาตุอื่น (ร่างแรก รอออกแบบ)</div>
+        <div class="row" id="skills"></div></div>
       </div>
       <div class="ctl">
         <div class="ctl-title">เลือกตัวละคร</div>
@@ -307,7 +316,36 @@ td.st { white-space: nowrap; color: var(--muted) }
     <div class="skills-grid" id="leaf-cards"></div>
   </section>
 
-  <section aria-labelledby="plan-h" data-group="plan" style="order:12">
+  <section aria-labelledby="eline-h" data-group="earth" style="order:12">
+    <div class="eyebrow">สายที่สี่ · ภาพนิ่งให้เลือกแบบก่อน</div>
+    <h2 id="eline-h">สายศิลา 11 ร่าง</h2>
+    <p class="lede">ตระกูลสัตว์เกราะหิน สายหลักเป็นเต่าบก (เต่าศิลา → เต่าผาหิน → เต่าภูเขา) สายรองเป็นแรด (แรดผา → แรดเกราะแร่ → ไททันแรดคริสตัล) ยิ่งโตยิ่งมีหินและแร่มากขึ้น ร่างแย่ (หนอนดินเกียจคร้าน ก้อนหินขี้เกียจ) ยังตลกและหลับ รอบนี้เป็นภาพนิ่ง ยังไม่มีท่าขยับและสกิล บอกได้เลยว่าตัวไหนชอบ ตัวไหนอยากแก้ แล้วค่อยทำท่าทางกับสกิลทีเดียว</p>
+    <div class="lineup" id="lineup-earth"></div>
+    <div class="evo" id="evo-earth"></div>
+  </section>
+
+  <section aria-labelledby="eshow-h" data-group="earth" style="order:13">
+    <div class="eyebrow">ร่างผสมและบอสสายศิลา · ภาพนิ่ง</div>
+    <h2 id="eshow-h">ธรณีผู้ตื่น และบอสโลกธาตุศิลา</h2>
+    <div class="showcase">
+      <div class="show fused earth">
+        <canvas id="show-efused" width="112" height="112" aria-label="ร่างผสม ธรณีผู้ตื่น"></canvas>
+        <div class="act" id="act-efused"></div>
+        <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
+        <h3>ธรณีผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ร่างผสมศิลา+ศิลา เดิมเป็นอีโมจิภูเขา ⛰️ ใหม่เป็นเต่าภูเขาที่ตื่นแล้ว ยอดเขาบนกระดองกลายเป็นผลึกบุษราคัมเรืองแสง ขอบกระดอง หน้า และขาใส่เกราะทอง และมีวงฝุ่นทองสองวงหมุนสวนกันตามแบบร่างผสม</p>
+      </div>
+      <div class="show boss earth">
+        <canvas id="show-pangolin" width="128" height="112" aria-label="บอสโลกธาตุศิลา ตัวนิ่มศิลาโบราณ"></canvas>
+        <div class="act" id="act-pangolin"></div>
+        <span class="rank" style="--c:#ff5a5a">บอส</span>
+        <h3>บอสโลก · ตัวนิ่มศิลาโบราณ <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ในเกมคือ "ต้นไม้โบราณ" 🌳 ซึ่งเป็นธาตุศิลา แต่ต้นไม้ไม่ใช่สัตว์และซ้ำกับสายพฤกษ์ จึงเสนอเป็นตัวนิ่มยักษ์ เกล็ดเป็นแผ่นหินซ้อนกัน แถวบนมีหนามหิน หางม้วนรอบตัว กรงเล็บยาว ตาเรืองสีอำพัน หนามบนเกล็ดเข้ากับความสามารถในเกม (สะท้อนดาเมจกลับ) ชื่อใหม่เป็นแค่ข้อเสนอ</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="plan-h" data-group="plan" style="order:14">
     <div class="eyebrow">แผนทั้งเกม</div>
     <h2 id="plan-h">ออกแบบมอนใหม่ทั้ง 8 สาย</h2>
     <p class="lede">มอนที่ดูไม่สมเหตุสมผลส่วนใหญ่มีปัญหาแบบเดียวกัน คือเป็นสิ่งของหรือคนแทนที่จะเป็นสัตว์ (ดวงอาทิตย์ ตรีศูล ภูเขา หน้ากาก นินจา) หรือเปลี่ยนชนิดสัตว์กลางสาย (กิ้งก่ากลายเป็นเสือ หมาป่ากลายเป็นช้าง) แผนนี้ใช้กติกา 4 ข้อ</p>
@@ -320,7 +358,7 @@ td.st { white-space: nowrap; color: var(--muted) }
     <div class="lines" id="lines"></div>
   </section>
 
-  <section aria-labelledby="next-h" data-group="plan" style="order:13">
+  <section aria-labelledby="next-h" data-group="plan" style="order:15">
     <h2 id="next-h">ต้องตัดสินใจก่อนลงมือ</h2>
     <div class="next">
       <div class="q"><b>1. สไตล์ภาพนี้ใช้ได้ไหม</b><span>พิกเซลอาร์ตมุมเฉียงแบบในหน้านี้ หรืออยากลองแบบอื่น เช่น ภาพวาดเส้นเรียบความละเอียดสูง</span></div>
@@ -456,6 +494,20 @@ const MATS = {
   wolfk: ['#06080e', '#1a2030', '#2a3448', '#445272', '#8a9cc0'],
   wolfk2:['#05060a', '#141826', '#202838', '#323e58', '#5a6a8c'],
   wolfm: ['#0e1218', '#3a4656', '#5a6a80', '#8496ae', '#c8d4e4'],
+  // earth line
+  stone: ['#141210', '#4a4238', '#6e6456', '#968a78', '#c8bca6'],
+  stone2:['#100e0c', '#3a342c', '#544c42', '#706658', '#9a8e7c'],
+  sand:  ['#2a1e10', '#9a7a4a', '#c4a06a', '#e2c492', '#fff0cc'],
+  clay:  ['#2a1008', '#8a3e22', '#b85a34', '#d8804e', '#f4b48a'],
+  tort:  ['#1a140c', '#5a4a30', '#7e6a46', '#a68e62', '#d4c096'],
+  tort2: ['#140f08', '#46381f', '#5e4c30', '#7c6844', '#a6906a'],
+  shellE:['#1e1206', '#6a4214', '#94602a', '#bc8440', '#e8b878'],
+  ore:   ['#0c0e12', '#343a46', '#566070', '#8490a4', '#d0daea'],
+  rhino: ['#121010', '#3e3632', '#5e5450', '#857a74', '#bcb2aa'],
+  rhino2:['#0e0c0c', '#2e2826', '#463e3a', '#625854', '#8a807a'],
+  worm:  ['#2a0e10', '#8a4a4a', '#b8706a', '#dc9a8e', '#ffd0c4'],
+  snow:  ['#2a3440', '#a8b8c8', '#d4e0ec', '#f0f6fc', '#ffffff'],
+  topaz: ['#5a2a04', '#ffa02a', '#ffc45a', '#ffe4a0', '#ffffff'],
   spirit:['#14241c', '#7aa892', '#b0d8c2', '#dcf4e6', '#ffffff'],
   spirit2:['#101c16', '#5e8a76', '#88b49e', '#acd2bc', '#d8f0e2'],
   antler:['#1e140a', '#6e5236', '#9a7a52', '#c8a87a', '#f4e0b8'],
@@ -465,7 +517,7 @@ const MATS = {
   sap:   ['#0a3a10', '#6aff6a', '#a8ffa0', '#e0ffd8', '#ffffff'],
   bloom: ['#5a4a04', '#ffd84a', '#ffe88a', '#fff6c8', '#ffffff'],
 };
-const GLOW = new Set(['fire', 'core', 'glowfin', 'foam', 'jglow', 'magglow', 'ice', 'sap', 'bloom']);
+const GLOW = new Set(['fire', 'core', 'glowfin', 'foam', 'jglow', 'magglow', 'ice', 'sap', 'bloom', 'topaz']);
 const hexRgb = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16), h.length > 7 ? parseInt(h.slice(7, 9), 16) : 255];
 const MAT_RGB = Object.fromEntries(Object.entries(MATS).map(([k, v]) => [k, v.map(hexRgb)]));
 
@@ -1490,6 +1542,194 @@ const SPRITES = {
     s.d(80 + hx, 53 + hy, '#fff6b0').d(81 + hx, 53 + hy, '#ffb02a').d(82 + hx, 53 + hy, '#ffb02a').d(79 + hx, 52 + hy, '#120a06').d(80 + hx, 52 + hy, '#120a06').d(81 + hx, 52 + hy, '#120a06').d(82 + hx, 52 + hy, '#120a06');
     if (P.glow) glowSap(s, 92 + hx, 64 + hy + j * .5);
   }, glows: [[81, 53, '#ffb02a', 4], [37, 14, '#ffb0d0', 9]], emit: [{ x: 37, y: 12, type: 'petal', rate: 4 }, { x: 40, y: 50, type: 'leaf', rate: 2 }, { x: 60, y: 46, type: 'firefly', rate: 2 }, { x: 24, y: 48, type: 'spore', rate: 1.5 }], mouth: [92, 64] },
+  /* ----- Earth line (static drafts for the owner to choose from): stone-armoured animals, tortoise and rhino ----- */
+  eegg: { size: 48, rig: BLOB, draw(s, P) {
+    const bx = P.body[0] * .6, by = P.body[1] * .3, m = (pts) => pts.map(([x, y]) => [x + bx, y + by]);
+    s.E(24 + bx, 31 + by, 9, 12, 'sand');
+    s.E(20 + bx, 25 + by, 2.2, 1.6, 'stone'); s.E(28.5 + bx, 34 + by, 2.6, 1.9, 'stone'); s.E(21 + bx, 39 + by, 1.6, 1.2, 'stone2'); s.E(29 + bx, 24 + by, 1.3, 1, 'stone');
+    s.line(m([[16, 31], [19, 33], [21, 31], [24, 34], [27, 31], [30, 33], [32, 31]]), '#ffa02a', '#ffe4a0');
+    s.d(20 + bx, 21 + by, '#ffffff').d(19 + bx, 22 + by, '#fff0cc');
+  }, glows: [[24, 32, '#ffa02a', 6]], emit: [], mouth: [24, 28] },
+  pebble: { size: 48, rig: BLOB, draw(s, P) {
+    const [bx, by] = P.body;
+    s.E(19, 42 + P.bl[1], 2.6, 1.5, 'stone2'); s.E(29, 42 + P.fl[1], 2.6, 1.5, 'stone2');
+    s.E(24 + bx, 35 + by, 9.5, 7.5, 'stone'); s.E(27.5 + bx, 27.5 + by, 2.6, 1.6, 'stone2');
+    for (const [x, y, c] of [[17, 31, '#c8bca6'], [30, 38, '#6e6456'], [16, 37, '#6e6456'], [31, 31, '#c8bca6'], [23, 40, '#6e6456']]) s.d(x + bx, y + by, c);
+    s.eye(20 + bx, 33 + by, 'big').eye(26 + bx, 33 + by, 'big');
+    s.d(18 + bx, 37 + by, '#ff9a80').d(29 + bx, 37 + by, '#ff9a80').d(23 + bx, 38 + by, '#2a2016').d(24 + bx, 38 + by, '#2a2016');
+  }, emit: [], mouth: [30, 36] },
+  clay: { size: 48, rig: BLOB, draw(s, P) {
+    const [bx, by] = P.body;
+    s.E(13 + bx, 37 + by, 2.2, 1.7, 'clay'); s.E(35 + bx, 36 + by, 2.2, 1.7, 'clay');
+    s.E(24 + bx, 37 + by, 10, 7, 'clay'); s.E(23 + bx, 30.5 + by, 7, 5.5, 'clay'); s.E(31 + bx, 42 + by, 2, 2.2, 'clay');
+    for (const [x, y] of [[17, 40], [27, 41], [21, 27], [30, 34]]) s.d(x + bx, y + by, '#8a3e22').d(x + 1 + bx, y + by, '#8a3e22');
+    s.line([[15 + bx, 33 + by], [16 + bx, 35 + by], [15 + bx, 37 + by]], '#f4b48a');
+    s.E(28 + bx, 28 + by, 1.6, 1.2, 'stone');
+    s.eye(19 + bx, 33 + by, 'big').eye(26 + bx, 33 + by, 'big');
+    s.d(22 + bx, 38 + by, '#4a1a0c').d(23 + bx, 38 + by, '#4a1a0c').d(22 + bx, 39 + by, '#4a1a0c').d(23 + bx, 39 + by, '#4a1a0c');
+  }, emit: [], mouth: [30, 36] },
+  tortoise: { size: 56, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by;
+    s.E(17 + P.bf[0], 47 + P.bf[1], 3, 3.5, 'tort2'); s.E(35 + P.ff[0], 47 + P.ff[1], 3, 3.5, 'tort2');
+    s.P([[10 + bx, 43 + by], [6 + bx, 45 + by], [11 + bx, 46 + by]], 'tort');
+    s.E(26 + bx, 38 + by, 14, 9.5, 'shellE'); s.E(26 + bx, 44 + by, 14.5, 2.6, 'stone2');
+    for (const [x, y] of [[19, 37], [26, 33], [33, 37], [26, 40]]) { s.P([[x - 3.5, y], [x - 1.8, y - 3], [x + 1.8, y - 3], [x + 3.5, y], [x + 1.8, y + 3], [x - 1.8, y + 3]].map(([a, b]) => [a + bx, b + by]), 'stone'); s.d(x - 1 + bx, y - 2 + by, '#c8bca6'); }
+    s.E(19 + P.bl[0], 48 + P.bl[1], 3.4, 4, 'tort'); s.E(33 + P.fl[0], 48 + P.fl[1], 3.4, 4, 'tort');
+    for (const x of [17, 19, 21]) s.d(x + P.bl[0], 51 + P.bl[1], '#f4ede0'); for (const x of [31, 33, 35]) s.d(x + P.fl[0], 51 + P.fl[1], '#f4ede0');
+    s.L(38 + bx, 42 + by, 43 + hx, 38 + hy, 3, 'tort', 2.6);
+    s.E(45 + hx, 37 + hy, 4.8, 3.8, 'tort'); s.P([[48 + hx, 36 + hy], [51 + hx, 38 + hy], [48 + hx, 40 + hy]], 'stone2');
+    s.eye(45 + hx, 35 + hy, 'cute'); s.line([[44 + hx, 39 + hy], [48 + hx, 39 + hy]], '#2a2016');
+  }, emit: [], mouth: [50, 38] },
+  worm: { size: 48, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, pts = [];
+    for (let i = 0; i <= 10; i++) { const q = i / 10; pts.push([7 + q * 30 + bx, 42 - Math.sin(q * Math.PI) * 5 + by + (q > .8 ? (q - .8) * -10 : 0), 3.6 + Math.sin(q * Math.PI) * 1.6]); }
+    pts.forEach(([x, y, r]) => s.E(x, y, r, r, 'worm'));
+    s.E(pts[7][0], pts[7][1], pts[7][2] + .4, pts[7][2] + .4, 'clay');
+    pts.forEach(([x, y, r], i) => { if (i > 0 && i < 10) s.line([[x, y - r + 1], [x, y + r - 1]], '#8a4a4a'); });
+    for (const [x, y, r] of [[5, 45, 2.4], [20, 46, 1.6], [42, 45, 2]]) s.E(x + bx, y + by, r, r * .6, 'sand');
+    s.E(18 + bx, 34 + by, 1.8, 1.4, 'stone');
+    const [ex, ey] = pts[10];
+    s.eye(ex - 1, ey - 1, 'sleepy').eye(ex + 2, ey - 1, 'sleepy'); s.d(ex + 1, ey + 1.5, '#4a1a1a');
+  }, emit: [{ x: 40, y: 30, type: 'zz', rate: .5 }], mouth: [40, 37] },
+  rhino: { size: 56, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by;
+    s.L(18 + bx, 44 + by, 17 + P.bf[0], 51 + P.bf[1], 3, 'rhino2'); s.L(33 + bx, 44 + by, 34 + P.ff[0], 51 + P.ff[1], 3, 'rhino2');
+    s.L(13 + bx, 39 + by, 9 + bx, 43 + by, 1, 'rhino');
+    s.E(25 + bx, 40 + by, 13, 8, 'rhino'); s.E(26 + bx, 45 + by, 9, 2, 'rhino2');
+    for (const [x, y, w] of [[15, 35, 4], [22, 33, 4.5], [29, 33, 4.5]]) { s.P([[x - w, y + 3], [x - w + 1, y - 1.5], [x + w - 1, y - 2], [x + w, y + 3]].map(([a, b]) => [a + bx, b + by]), 'stone'); s.line([[x - 1 + bx, y - 1 + by], [x + bx, y + 2 + by]], '#4a4238'); }
+    s.L(20 + bx, 45 + by, 20 + P.bl[0], 52 + P.bl[1], 3.4, 'rhino'); s.L(31 + bx, 45 + by, 32 + P.fl[0], 52 + P.fl[1], 3.4, 'rhino');
+    for (const x of [18, 20, 22]) s.d(x + P.bl[0], 54 + P.bl[1], '#f4ede0'); for (const x of [30, 32, 34]) s.d(x + P.fl[0], 54 + P.fl[1], '#f4ede0');
+    s.E(40 + hx, 39 + hy, 6.5, 5.5, 'rhino'); s.P([[42 + hx, 35 + hy], [51 + hx, 39 + hy], [50 + hx, 45 + hy], [42 + hx, 45 + hy]], 'rhino');
+    s.P([[45 + hx, 37 + hy], [49 + hx, 26 + hy], [51.5 + hx, 38 + hy]], 'stone'); s.P([[41.5 + hx, 35.5 + hy], [43 + hx, 30 + hy], [45 + hx, 36 + hy]], 'stone');
+    s.spike(37 + hx, 35 + hy, 4, 1.4, 'rhino', -1); s.d(43 + hx, 38 + hy, '#160806').d(44 + hx, 38 + hy, '#160806');
+    s.line([[45 + hx, 43 + hy], [50 + hx, 43 + hy]], '#2e2826');
+  }, emit: [], mouth: [51, 42] },
+  pillarturtle: { size: 64, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by;
+    s.L(19 + bx, 50 + by, 19 + P.bf[0], 58 + P.bf[1], 3.4, 'tort2'); s.L(41 + bx, 50 + by, 41 + P.ff[0], 58 + P.ff[1], 3.4, 'tort2');
+    s.E(30 + bx, 45 + by, 17, 10.5, 'shellE'); s.E(30 + bx, 52 + by, 17.5, 3, 'stone2');
+    for (const [x, h] of [[21, 9], [27, 14], [33, 11], [39, 7], [24, 6]]) {
+      const top = 40 - h;
+      s.P([[x - 2.6 + bx, 41 + by], [x - 2.6 + bx, top + by], [x + 2.6 + bx, top + by], [x + 2.6 + bx, 41 + by]], 'stone');
+      s.E(x + bx, top + by, 2.6, 1.1, 'sand'); s.line([[x + 1.5 + bx, top + 2 + by], [x + 1.5 + bx, 40 + by]], '#4a4238');
+    }
+    s.E(25 + bx, 41 + by, 4, 1.5, 'moss');
+    s.L(22 + bx, 52 + by, 22 + P.bl[0], 58.5 + P.bl[1], 3.9, 'tort'); s.L(38 + bx, 52 + by, 38 + P.fl[0], 58.5 + P.fl[1], 3.9, 'tort');
+    for (const x of [19, 22, 25]) s.d(x + P.bl[0], 60 + P.bl[1], '#f4ede0'); for (const x of [35, 38, 41]) s.d(x + P.fl[0], 60 + P.fl[1], '#f4ede0');
+    s.L(45 + bx, 50 + by, 51 + hx, 45 + hy, 3.8, 'tort', 3.2);
+    s.E(53 + hx, 44 + hy, 5.6, 4.6, 'tort'); s.P([[50 + hx, 40 + hy], [57 + hx, 40.5 + hy], [55 + hx, 42 + hy], [50 + hx, 42 + hy]], 'stone');
+    s.P([[57 + hx, 43 + hy], [61 + hx, 45 + hy], [57 + hx, 47.5 + hy]], 'stone2');
+    s.eye(54 + hx, 43 + hy, 'fierce'); s.line([[52 + hx, 47 + hy], [57 + hx, 47 + hy]], '#2a2016');
+  }, emit: [], mouth: [60, 45] },
+  boulder: { size: 64, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body;
+    s.E(20 + P.bf[0], 57 + P.bf[1], 3.6, 2, 'stone2'); s.E(44 + P.ff[0], 57 + P.ff[1], 3.6, 2, 'stone2');
+    s.E(32 + bx, 44 + by, 17, 13.5, 'stone');
+    s.E(29 + bx, 32.5 + by, 12, 4.4, 'moss');
+    for (const x of [22, 26, 31, 36]) s.line([[x + bx, 30 + by], [x + 1 + bx, 27 + by]], '#6e9a2c');
+    s.L(37 + bx, 30 + by, 37 + bx, 25 + by, .6, 'vine'); flower(s, 37 + bx, 24 + by);
+    s.line([[18 + bx, 40 + by], [21 + bx, 44 + by], [19 + bx, 49 + by]], '#4a4238').line([[26 + bx, 52 + by], [30 + bx, 54 + by]], '#4a4238');
+    s.d(20 + bx, 36 + by, '#c8bca6').d(22 + bx, 35 + by, '#c8bca6');
+    s.E(24 + P.bl[0], 58 + P.bl[1], 4, 2.2, 'stone'); s.E(40 + P.fl[0], 58 + P.fl[1], 4, 2.2, 'stone');
+    s.eye(36 + bx, 45 + by, 'sleepy').eye(43 + bx, 45 + by, 'sleepy');
+    s.line([[38 + bx, 49 + by], [41 + bx, 49 + by]], '#2a2016'); s.d(41 + bx, 50 + by, '#86d4ff').d(41 + bx, 51 + by, '#86d4ff');
+  }, emit: [{ x: 44, y: 36, type: 'zz', rate: .4 }], mouth: [42, 49] },
+  orerhino: { size: 64, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by;
+    s.L(20 + bx, 52 + by, 19 + P.bf[0], 59 + P.bf[1], 3.6, 'rhino2'); s.L(39 + bx, 52 + by, 40 + P.ff[0], 59 + P.ff[1], 3.6, 'rhino2');
+    s.L(15 + bx, 46 + by, 10 + bx, 50 + by, 1.2, 'rhino');
+    s.E(29 + bx, 47 + by, 15, 9, 'rhino');
+    for (const [x, y, w] of [[17, 41, 5], [25, 38.5, 5.5], [33, 38, 5.5], [41, 40, 5]]) { s.P([[x - w, y + 4], [x - w + 1, y - 2], [x + w - 1, y - 2.5], [x + w, y + 4]].map(([a, b]) => [a + bx, b + by]), 'ore'); s.line([[x - w + 2 + bx, y - 1 + by], [x + w - 2 + bx, y - 1.5 + by]], '#d0daea'); s.line([[x - 1 + bx, y + 1 + by], [x + 1 + bx, y + 3 + by]], '#c46a34'); }
+    s.L(23 + bx, 53 + by, 23 + P.bl[0], 60 + P.bl[1], 3.8, 'rhino'); s.L(37 + bx, 53 + by, 38 + P.fl[0], 60 + P.fl[1], 3.8, 'rhino');
+    s.E(23 + bx + P.bl[0] * .5, 56 + by, 3.6, 1.4, 'ore'); s.E(37.5 + bx + P.fl[0] * .5, 56 + by, 3.6, 1.4, 'ore');
+    for (const x of [21, 23, 25]) s.d(x + P.bl[0], 62 + P.bl[1], '#f4ede0'); for (const x of [36, 38, 40]) s.d(x + P.fl[0], 62 + P.fl[1], '#f4ede0');
+    s.E(47 + hx, 45 + hy, 7, 6, 'rhino'); s.P([[49 + hx, 41 + hy], [60 + hx, 45 + hy], [59 + hx, 52 + hy], [49 + hx, 52 + hy]], 'rhino');
+    s.P([[44 + hx, 41 + hy], [49 + hx, 38 + hy], [53 + hx, 41 + hy], [48 + hx, 43 + hy]], 'ore');
+    s.P([[53 + hx, 43 + hy], [58 + hx, 27 + hy], [61 + hx, 44 + hy]], 'ore'); s.line([[55 + hx, 41 + hy], [58 + hx, 29 + hy]], '#d0daea');
+    s.P([[49.5 + hx, 41.5 + hy], [51.5 + hx, 34 + hy], [54 + hx, 42 + hy]], 'ore');
+    s.spike(44 + hx, 40 + hy, 5, 1.6, 'rhino', -1.5);
+    s.eye(50 + hx, 44 + hy, 'fierce'); s.line([[53 + hx, 50 + hy], [59 + hx, 50 + hy]], '#2e2826');
+  }, glows: [[58, 30, '#d0daea', 2]], emit: [], mouth: [60, 49] },
+  mountturtle: { size: 80, rig: QUAD, aura: { type: 'dust', x: 38, y: 74, r: 30 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, m = (pts) => pts.map(([x, y]) => [x + bx, y + by]);
+    s.L(20 + bx, 64 + by, 20 + P.bf[0], 74 + P.bf[1], 4.4, 'tort2'); s.L(52 + bx, 64 + by, 52 + P.ff[0], 74 + P.ff[1], 4.4, 'tort2');
+    s.E(36 + bx, 58 + by, 23, 11, 'shellE'); s.E(36 + bx, 65 + by, 23.5, 3.4, 'stone2');
+    s.P(m([[14, 56], [22, 42], [26, 46], [36, 24], [44, 38], [49, 33], [59, 56]]), 'stone');
+    s.P(m([[32, 31.5], [36, 24], [40, 31], [38, 30], [36, 32], [34, 30]]), 'snow'); s.P(m([[47, 35.5], [49, 33], [51, 36], [49, 36.5]]), 'snow');
+    s.line(m([[36, 25], [33, 36], [30, 44]]), '#4a4238').line(m([[44, 39], [40, 48]]), '#4a4238').line(m([[24, 46], [22, 52]]), '#4a4238');
+    for (const [x, y] of [[19, 52], [23, 50], [52, 50], [55, 53], [29, 50], [45, 47]]) s.P(m([[x - 2, y + 2], [x, y - 3], [x + 2, y + 2]]), 'canopy');
+    s.line(m([[41, 42], [41, 47], [42, 52]]), '#a0dcff', '#ffffff');
+    s.L(25 + bx, 66 + by, 25 + P.bl[0], 75 + P.bl[1], 5, 'tort'); s.L(48 + bx, 66 + by, 48 + P.fl[0], 75 + P.fl[1], 5, 'tort');
+    for (const [x, l] of [[25, P.bl], [48, P.fl]]) s.line([[x - 4 + l[0], 70 + l[1]], [x + 4 + l[0], 70 + l[1]]], '#5a4a30');
+    for (const x of [21, 25, 29]) s.d(x + P.bl[0], 78 + P.bl[1], '#f4ede0'); for (const x of [44, 48, 52]) s.d(x + P.fl[0], 78 + P.fl[1], '#f4ede0');
+    s.L(57 + bx, 62 + by, 65 + hx, 56 + hy, 5.2, 'tort', 4.4);
+    s.E(68 + hx, 54 + hy, 7.4, 6, 'tort'); s.P([[71 + hx, 52 + hy], [77 + hx, 55 + hy], [72 + hx, 59 + hy]], 'stone2');
+    s.P([[63 + hx, 49.5 + hy], [71 + hx, 49 + hy], [70 + hx, 51.5 + hy], [63 + hx, 52 + hy]], 'stone');
+    s.P([[63 + hx, 58 + hy], [70 + hx, 58 + hy], [67 + hx, 64 + hy], [65 + hx, 61 + hy]], 'moss');
+    s.d(68 + hx, 52.5 + hy, '#fff0a0').d(69 + hx, 52.5 + hy, '#ffa02a').d(67 + hx, 52.5 + hy, '#1a140c');
+  }, glows: [[69, 53, '#ffa02a', 2]], emit: [], mouth: [76, 56] },
+  crystalrhino: { size: 80, rig: QUAD, aura: { type: 'dust', x: 38, y: 74, r: 30 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by;
+    s.L(24 + bx, 64 + by, 23 + P.bf[0], 74 + P.bf[1], 4.4, 'rhino2'); s.L(50 + bx, 64 + by, 51 + P.ff[0], 74 + P.ff[1], 4.4, 'rhino2');
+    s.L(17 + bx, 56 + by, 11 + bx, 61 + by, 1.4, 'rhino');
+    s.E(36 + bx, 58 + by, 20, 11, 'rhino'); s.E(50 + bx, 53 + by, 9, 9.5, 'rhino');
+    for (const [x, y, h, l] of [[22, 50, 8, -2], [28, 48, 12, -2], [34, 46.5, 15, -3], [40, 46, 11, -1], [46, 45, 13, -2], [31, 49, 7, 2]]) { s.spike(x + bx, y + by, h, 2.4, 'topaz', l); s.line([[x + bx, y - 1 + by], [x + l + bx, y - h + 2 + by]], '#fff4cc'); }
+    s.line([[20 + bx, 58 + by], [27 + bx, 61 + by], [34 + bx, 58 + by], [42 + bx, 62 + by], [50 + bx, 58 + by]], '#ffa02a', '#ffe4a0');
+    s.L(28 + bx, 65 + by, 28 + P.bl[0], 75 + P.bl[1], 4.8, 'rhino'); s.L(47 + bx, 65 + by, 48 + P.fl[0], 75 + P.fl[1], 4.8, 'rhino');
+    for (const x of [25, 28, 31]) s.d(x + P.bl[0], 78 + P.bl[1], '#f4ede0'); for (const x of [45, 48, 51]) s.d(x + P.fl[0], 78 + P.fl[1], '#f4ede0');
+    s.E(61 + hx, 54 + hy, 8.5, 7, 'rhino'); s.P([[63 + hx, 49 + hy], [77 + hx, 54 + hy], [76 + hx, 61 + hy], [63 + hx, 61 + hy]], 'rhino');
+    s.P([[67 + hx, 51 + hy], [73 + hx, 27 + hy], [78 + hx, 53 + hy]], 'topaz'); s.line([[70 + hx, 49 + hy], [73 + hx, 30 + hy]], '#fff4cc');
+    s.P([[63 + hx, 50 + hy], [65.5 + hx, 41 + hy], [68.5 + hx, 50.5 + hy]], 'topaz');
+    s.spike(56 + hx, 49 + hy, 6, 2, 'rhino', -2);
+    s.eye(63 + hx, 53 + hy, 'fierce'); s.line([[67 + hx, 59 + hy], [76 + hx, 59 + hy]], '#2e2826');
+  }, glows: [[73, 32, '#ffc45a', 6], [34, 36, '#ffa02a', 5], [46, 36, '#ffa02a', 4]], emit: [], mouth: [77, 58] },
+  /* ----- Earth fused form (ธรณีผู้ตื่น): the mountain tortoise awakened, gold armour, glowing topaz peaks ----- */
+  efused: { size: 88, rig: QUAD, aura: { type: 'twine', x: 40, y: 80, r: 34 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, m = (pts) => pts.map(([x, y]) => [x + bx, y + by]);
+    s.L(22 + bx, 71 + by, 22 + P.bf[0], 81 + P.bf[1], 4.8, 'tort2'); s.L(57 + bx, 71 + by, 57 + P.ff[0], 81 + P.ff[1], 4.8, 'tort2');
+    s.E(39 + bx, 64 + by, 25, 12, 'shellE'); s.E(39 + bx, 72 + by, 25.5, 3.6, 'gold');
+    for (const x of [20, 30, 40, 50, 60]) s.d(x + bx, 72 + by, '#ffe4a0');
+    s.P(m([[16, 62], [24, 48], [28, 52], [38, 34], [46, 46], [52, 40], [62, 62]]), 'stone');
+    for (const [x, y, h, l] of [[38, 36, 22, -1], [33, 42, 12, -2], [43, 42, 14, 1], [24, 50, 11, -1], [52, 42, 12, 1], [57, 52, 8, 2]]) { s.spike(x + bx, y + by, h, 2.6, 'topaz', l); s.line([[x + bx, y - 1 + by], [x + l + bx, y - h + 2 + by]], '#fff4cc'); }
+    s.L(27 + bx, 73 + by, 27 + P.bl[0], 82 + P.bl[1], 5.4, 'tort'); s.L(52 + bx, 73 + by, 52 + P.fl[0], 82 + P.fl[1], 5.4, 'tort');
+    s.E(27 + P.bl[0], 78 + P.bl[1], 5.6, 1.6, 'gold'); s.E(52 + P.fl[0], 78 + P.fl[1], 5.6, 1.6, 'gold');
+    for (const x of [23, 27, 31]) s.d(x + P.bl[0], 85 + P.bl[1], '#f4ede0'); for (const x of [48, 52, 56]) s.d(x + P.fl[0], 85 + P.fl[1], '#f4ede0');
+    s.L(61 + bx, 68 + by, 70 + hx, 61 + hy, 5.6, 'tort', 4.6);
+    s.E(73 + hx, 59 + hy, 8, 6.4, 'tort'); s.P([[76 + hx, 57 + hy], [83 + hx, 60 + hy], [77 + hx, 64 + hy]], 'stone2');
+    s.P([[66 + hx, 53.5 + hy], [76 + hx, 52.5 + hy], [80 + hx, 56 + hy], [72 + hx, 57 + hy], [66 + hx, 57 + hy]], 'gold'); s.E(72 + hx, 54.5 + hy, 1.4, 1.2, 'topaz');
+    s.d(73 + hx, 58 + hy, '#ffffff').d(74 + hx, 58 + hy, '#ffc45a').d(72 + hx, 58 + hy, '#1a140c');
+  }, glows: [[37, 16, '#ffc45a', 6], [33, 32, '#ffa02a', 4], [44, 30, '#ffa02a', 4], [72, 55, '#ffc45a', 2], [74, 58, '#ffc45a', 2]], emit: [], mouth: [82, 61] },
+  /* ----- Earth world boss (game: ต้นไม้โบราณ, reflects damage): an ancient pangolin of thorned stone scales ----- */
+  pangolin: { size: 96, rig: QUAD, aura: { type: 'bosse', x: 46, y: 88, r: 36 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by;
+    // tail curling round the back, scaled
+    const tail = []; for (let i = 0; i <= 12; i++) { const q = i / 12, a = Math.PI * (.55 + q * 1.1); tail.push([18 + Math.cos(a) * 12 * (1 - q * .5) + bx, 70 + Math.sin(a) * 12 * (1 - q * .4) + by, 8 - q * 5]); }
+    tail.forEach(([x, y, r]) => s.E(x, y, r, r, 'stone'));
+    tail.forEach(([x, y, r], i) => { if (i % 2 === 0) s.line([[x - r * .7, y], [x + r * .7, y + 1]], '#3a342c'); });
+    s.L(32 + bx, 78 + by, 31 + P.bf[0], 88 + P.bf[1], 5, 'tort2'); s.E(32 + P.bf[0], 90 + P.bf[1], 5, 2, 'tort2');
+    s.L(60 + bx, 78 + by, 62 + P.ff[0], 88 + P.ff[1], 4.5, 'tort2'); s.E(63 + P.ff[0], 90 + P.ff[1], 5, 2, 'tort2');
+    s.E(46 + bx, 66 + by, 27, 17, 'stone2');
+    // neat rows of overlapping stone scales over the dome, each row tucked under the one above; thorns on the top row
+    for (let row = 0; row < 5; row++) {
+      const y = 50 + row * 5.5, half = 27 * Math.sqrt(Math.max(0, 1 - ((y + 3 - 66) / 17.5) ** 2)) - 3;
+      for (let x = 46 - half + (row % 2) * 4.5; x <= 46 + half; x += 9) {
+        s.P([[x - 4.6, y], [x + 4.6, y], [x + 4.6, y + 4], [x, y + 7], [x - 4.6, y + 4]].map(([p, q]) => [p + bx, q + by]), row % 2 ? 'stone2' : 'stone');
+        s.line([[x - 4 + bx, y + 4 + by], [x + bx, y + 7 + by], [x + 4 + bx, y + 4 + by]], '#1a140c');
+        s.line([[x - 3 + bx, y + 1 + by], [x + 2 + bx, y + 1 + by]], row % 2 ? '#9a8e7c' : '#c8bca6');
+        if (row === 0) s.spike(x + bx, y + 1 + by, 7, 1.8, 'stone', -2);
+      }
+    }
+    for (const [x, y] of [[33, 55], [52, 52], [42, 60]]) s.E(x + bx, y + by, 2.6, 1.2, 'moss');
+    s.L(38 + bx, 80 + by, 37 + P.bl[0], 89 + P.bl[1], 6, 'tort'); s.E(38 + P.bl[0], 91 + P.bl[1], 6.5, 2.4, 'tort');
+    s.L(66 + bx, 78 + by, 68 + P.fl[0], 89 + P.fl[1], 5.5, 'tort'); s.E(70 + P.fl[0], 91 + P.fl[1], 6, 2.4, 'tort');
+    for (const x of [41, 44]) s.L(x + P.bl[0], 91 + P.bl[1], x + 3 + P.bl[0], 93 + P.bl[1], .7, 'bone'); for (const x of [73, 76]) s.L(x + P.fl[0], 91 + P.fl[1], x + 3 + P.fl[0], 93 + P.fl[1], .7, 'bone');
+    s.L(66 + bx, 70 + by, 76 + hx, 73 + hy, 7, 'tort', 5.5);
+    s.E(78 + hx, 73 + hy, 6, 5, 'tort'); s.P([[80 + hx, 70 + hy], [93 + hx, 76 + hy], [92 + hx, 78.5 + hy], [80 + hx, 78 + hy]], 'tort');
+    s.E(75 + hx, 69 + hy, 1.8, 1.6, 'tort2');
+    for (const [x, y] of [[70, 66], [75, 65.5], [80, 67]]) s.P([[x - 3.5 + hx, y + 2 + hy], [x - 1 + hx, y - 3 + hy], [x + 3.5 + hx, y + 2 + hy]], 'stone');
+    s.d(81 + hx, 73 + hy, '#fff6b0').d(82 + hx, 73 + hy, '#ffa02a').d(80 + hx, 72 + hy, '#1a140c').d(81 + hx, 72 + hy, '#1a140c').d(82 + hx, 72 + hy, '#1a140c');
+    s.d(93 + hx, 78 + hy, '#1a140c');
+  }, glows: [[82, 73, '#ffa02a', 4]], emit: [], mouth: [92, 78] },
 };
 // Animations are sampled from continuous pose curves (many in-between frames) and baked lazily,
 // so every frame keeps crisp pixel shading. Walk/idle loop; attack/cast/hurt run once (0..1).
@@ -1527,12 +1767,13 @@ function getFrame(def, name, i) {
   }
   return list[i];
 }
+const EARTH_IDS = ['eegg', 'pebble', 'clay', 'tortoise', 'worm', 'rhino', 'pillarturtle', 'boulder', 'orerhino', 'mountturtle', 'crystalrhino', 'efused', 'pangolin'];
 const LEAF_IDS = ['legg', 'seed', 'sprout', 'leafdeer', 'mushroom', 'wolf', 'stag', 'stump', 'barkwolf', 'forestdeer', 'wolfking', 'lfused', 'flora'];
 for (const [id, def] of Object.entries(SPRITES)) {
   def.amp = (def.size >= 96 ? 2.2 : def.size >= 64 ? 1.3 : def.size >= 56 ? 1.15 : 1) * 1.6;
   def.frames = Object.fromEntries(Object.keys(ANIM).map((n) => [n, new Array(ANIM[n].n)]));
   def.img = getFrame(def, 'idle', 0); def.id = id;
-  def.el = LEAF_IDS.includes(id) ? 'leaf' : ['wfused', 'whaleA', 'whaleB', 'whaleC', 'wegg', 'drop', 'bubble', 'swordwhale', 'jelly', 'shark', 'armorwhale', 'octopus', 'seadragon', 'whaleking', 'leviathan', 'turtle'].includes(id) ? 'water' : 'fire';
+  def.el = EARTH_IDS.includes(id) ? 'earth' : LEAF_IDS.includes(id) ? 'leaf' : ['wfused', 'whaleA', 'whaleB', 'whaleC', 'wegg', 'drop', 'bubble', 'swordwhale', 'jelly', 'shark', 'armorwhale', 'octopus', 'seadragon', 'whaleking', 'leviathan', 'turtle'].includes(id) ? 'water' : 'fire';
 }
 // The frame an entity shows: an action wins, then walking (phase follows the distance walked), then idle.
 function frameOf(e, t) {
@@ -1653,6 +1894,17 @@ function drawAura(ctx, a, ox, oy, t, flip, w) {
     g.addColorStop(0, 'rgba(110,230,90,.38)'); g.addColorStop(1, 'rgba(40,160,40,0)');
     ctx.globalAlpha = .7 + .3 * Math.sin(t * 2); ctx.fillStyle = g;
     ctx.beginPath(); ctx.ellipse(x, y, a.r * 1.5, a.r * .5, 0, 0, Math.PI * 2); ctx.fill();
+  } else if (a.type === 'dust' || a.type === 'twine') {
+    const rings = a.type === 'twine' ? [[a.r, 1, ['#ffa02a', '#ffe4a0']], [a.r * .7, -1.5, ['#f4c85a', '#fff0a0']]] : [[a.r, 1, ['#c4a06a', '#e2c492', '#9a7a4a']]];
+    for (const [r, spd, cols] of rings) for (let i = 0; i < 24; i++) {
+      const an = t * .7 * spd + i * TAU / 24, px = Math.round(x + Math.cos(an) * r), py = Math.round(y + Math.sin(an) * r * .32 - (i % 3));
+      ctx.globalAlpha = .5 + .3 * Math.sin(an * 2 + t * 2); ctx.fillStyle = cols[i % cols.length]; ctx.fillRect(px, py, i % 4 ? 1 : 2, 1);
+    }
+  } else if (a.type === 'bosse') {
+    const g = ctx.createRadialGradient(x, y, 2, x, y, a.r * 1.4);
+    g.addColorStop(0, 'rgba(255,160,42,.36)'); g.addColorStop(1, 'rgba(150,90,30,0)');
+    ctx.globalAlpha = .75; ctx.fillStyle = g;
+    ctx.beginPath(); ctx.ellipse(x, y, a.r * 1.5, a.r * .5, 0, 0, Math.PI * 2); ctx.fill();
   } else if (a.type === 'bossw') {
     const g = ctx.createRadialGradient(x, y, 2, x, y, a.r * 1.4);
     g.addColorStop(0, 'rgba(60,180,255,.4)'); g.addColorStop(1, 'rgba(20,120,255,0)');
@@ -1692,6 +1944,7 @@ const STAGES = {
 const STAGE_OF = {
   egg: 'egg', wisp: 'b1', coal: 'b2', gecko: 'adult', smoke: 'adult', raptor: 'adult', frill: 'perfect', lava: 'perfect', dragon: 'perfect', sunking: 'ultimate', phoenix: 'ultimate', avatar: 'fused', boss: 'boss',
   whaleA: 'ultimate', whaleB: 'ultimate', whaleC: 'ultimate', wfused: 'fused',
+  eegg: 'egg', pebble: 'b1', clay: 'b2', tortoise: 'adult', worm: 'adult', rhino: 'adult', pillarturtle: 'perfect', boulder: 'perfect', orerhino: 'perfect', mountturtle: 'ultimate', crystalrhino: 'ultimate', efused: 'fused', pangolin: 'boss',
   legg: 'egg', seed: 'b1', sprout: 'b2', leafdeer: 'adult', mushroom: 'adult', wolf: 'adult', stag: 'perfect', stump: 'perfect', barkwolf: 'perfect', forestdeer: 'ultimate', wolfking: 'ultimate', lfused: 'fused', flora: 'boss',
   wegg: 'egg', drop: 'b1', bubble: 'b2', swordwhale: 'adult', jelly: 'adult', shark: 'adult', armorwhale: 'perfect', octopus: 'perfect', seadragon: 'perfect', whaleking: 'ultimate', leviathan: 'ultimate', turtle: 'boss',
 };
@@ -1699,14 +1952,16 @@ const rankHtml = (id) => { const [n, st, c] = STAGES[STAGE_OF[id]]; return `<spa
 const CARD_PX = 96; // every evolution card draws at the same pixel scale, so bigger forms look bigger
 const STATUS_LABEL = { keep: 'คงแนวเดิม', tweak: 'ปรับ', new: 'ออกแบบใหม่' };
 const cards = [];
-function addCard(canvas, id, label, pad = 8) {
+function addCard(canvas, id, label, pad = 8, still = false) {
   const def = SPRITES[id];
   const size = def.size + pad * 2;
   canvas.width = canvas.width || size; canvas.height = canvas.height || size;
-  cards.push({ canvas, ctx: canvas.getContext('2d'), def, ps: Object.assign(new PSys(), { snap: true }), acc: {}, t: Math.random() * 5, label, step: -1, stepT: 0 });
+  cards.push({ canvas, ctx: canvas.getContext('2d'), def, ps: Object.assign(new PSys(), { snap: true }), acc: {}, t: Math.random() * 5, label, step: -1, stepT: 0, still });
 }
 // Each card shows the moves in turn: stand, walk, attack, skill.
 const SHOW = [['idle', 1.4, 'ยืน'], ['walk', 1.8, 'เดิน'], ['attack', 1.1, 'โจมตี'], ['cast', 1.5, 'ใช้สกิล']];
+// Eggs cannot fight, so their cards only stand; still drafts show one frame.
+const EGG_SHOW = [['idle', 99, 'ไข่ยังไม่มีท่าต่อสู้']], STILL_SHOW = [['idle', 99, 'ภาพนิ่ง (รอเลือกแบบ)']];
 const WATER_LINE = [
   { stage: 'ไข่', items: [{ id: 'wegg', name: 'ไข่วารี', old: 'คงชื่อเดิม · ลายคลื่นสีฟ้า', st: 'keep' }] },
   { stage: 'ร่างเด็ก 1', items: [{ id: 'drop', name: 'หยดน้ำ', old: 'คงชื่อเดิม · หยดน้ำมีตา ลอยได้', st: 'keep' }] },
@@ -1723,7 +1978,7 @@ const WATER_LINE = [
     { id: 'whaleC', name: 'ราชาวาฬผลึก', old: 'เดิม เจ้าสมุทร 🔱 (เป็นอาวุธ) · วาฬสีม่วงคราม เขาผลึกเรืองแสง ครีบข้างลำตัว เกราะหนาบนหลัง', st: 'new' },
     { id: 'leviathan', name: 'เลวีอาธานคลื่นคลั่ง', old: 'เดิม เทพีสายน้ำ 🧜 (เป็นคน) · มังกรทะเลขดตัวในน้ำวน', st: 'new' } ] },
 ];
-function buildBoard(el, line) {
+function buildBoard(el, line, still = false) {
   for (const col of line) {
     const c = document.createElement('div'); c.className = 'evo-col';
     c.innerHTML = `<div class="evo-head">${col.stage}</div>`;
@@ -1733,12 +1988,29 @@ function buildBoard(el, line) {
       cv.setAttribute('aria-label', it.name); card.append(cv);
       const act = document.createElement('div'); act.className = 'act'; card.append(act);
       card.insertAdjacentHTML('beforeend', `${rankHtml(it.id)}<div class="nm">${it.name}</div><span class="chip ${it.st}">${STATUS_LABEL[it.st]}</span><div class="old">${it.old}</div>`);
-      c.append(card); addCard(cv, it.id, act);
+      c.append(card); addCard(cv, it.id, act, 8, still);
     }
     el.append(c);
   }
 }
 buildBoard(document.getElementById('evo-water'), WATER_LINE);
+const EARTH_LINE = [
+  { stage: 'ไข่', items: [{ id: 'eegg', name: 'ไข่ศิลา', old: 'คงชื่อเดิม · เปลือกสีทราย มีเศษหินติด รอยร้าวเรืองสีอำพัน', st: 'keep' }] },
+  { stage: 'ร่างเด็ก 1', items: [{ id: 'pebble', name: 'ก้อนกรวด', old: 'คงชื่อเดิม · ก้อนกรวดกลมมีตา เท้าเป็นกรวดเม็ดเล็ก', st: 'keep' }] },
+  { stage: 'ร่างเด็ก 2', items: [{ id: 'clay', name: 'ก้อนดินเหนียว', old: 'คงชื่อเดิม · ก้อนดินเหนียวสีอิฐ มีรอยนิ้วกด มีกรวดฝังหัว', st: 'keep' }] },
+  { stage: 'โตเต็มวัย', items: [
+    { id: 'tortoise', name: 'เต่าศิลา', old: 'คงชื่อเดิม · เต่าบก กระดองโดมมีแผ่นหินหกเหลี่ยม', st: 'keep' },
+    { id: 'worm', name: 'หนอนดินเกียจคร้าน', old: 'คงชื่อเดิม · ร่างแย่ ไส้เดือนอ้วนนอนหลับ มีก้อนดินรอบตัว', st: 'keep' },
+    { id: 'rhino', name: 'แรดผา', old: 'คงชื่อเดิม · แรดตัวป้อม เขาเป็นหิน มีแผ่นหินบนหลัง', st: 'keep' } ] },
+  { stage: 'สมบูรณ์', items: [
+    { id: 'pillarturtle', name: 'เต่าผาหิน', old: 'เดิม หมีหินผา 🐻 (หมี ไม่ต่อจากเต่า) · เต่าที่มีแท่งหินผาตั้งบนกระดอง', st: 'new' },
+    { id: 'boulder', name: 'ก้อนหินขี้เกียจ', old: 'คงชื่อเดิม · ร่างแย่ ก้อนหินกลมโตมีขา มอสและดอกไม้บนหัว หลับน้ำลายไหล', st: 'keep' },
+    { id: 'orerhino', name: 'แรดเกราะแร่', old: 'เดิม เม่นแร่เหล็ก 🦔 (เม่น ไม่ต่อจากแรด) · แรดเกราะแร่เหล็กเงา เส้นแร่ทองแดง เขาเหล็กสองเขา', st: 'new' } ] },
+  { stage: 'ร่างสุดท้าย', items: [
+    { id: 'mountturtle', name: 'เต่าภูเขา', old: 'เดิม เจ้าธรณี 🏔️ (เป็นภูเขา) · เต่ายักษ์แบกภูเขาหิมะ มีต้นสนและลำธาร', st: 'new' },
+    { id: 'crystalrhino', name: 'ไททันแรดคริสตัล', old: 'เดิม ไททันคริสตัล 💠 (เป็นผลึก) · แรดยักษ์ เขาเป็นผลึกบุษราคัมเรืองแสง มีผลึกงอกบนหลัง', st: 'new' } ] },
+];
+buildBoard(document.getElementById('evo-earth'), EARTH_LINE, true);
 const LEAF_LINE = [
   { stage: 'ไข่', items: [{ id: 'legg', name: 'ไข่พฤกษ์', old: 'คงชื่อเดิม · เปลือกเขียวอ่อนลายใบไม้ มีต้นกล้างอกบนยอด', st: 'keep' }] },
   { stage: 'ร่างเด็ก 1', items: [{ id: 'seed', name: 'เมล็ดจิ๋ว', old: 'คงชื่อเดิม · ลูกโอ๊กมีตา หมวกลายตาราง ใบอ่อนงอกบนหัว', st: 'keep' }] },
@@ -1773,7 +2045,7 @@ for (const col of FLAME_LINE) {
 }
 // Line-up: one form per stage, side by side on one floor at the same scale.
 const lineups = [];
-function buildLineup(el, ids, names) {
+function buildLineup(el, ids, names, still = false) {
   const gap = 10, W2 = ids.reduce((a, id) => a + SPRITES[id].size, 0) + gap * (ids.length + 1), H2 = 92;
   const cv = document.createElement('canvas'); cv.width = W2; cv.height = H2; cv.setAttribute('aria-label', 'เรียงร่างตั้งแต่ไข่ถึงร่างสูงสุด');
   el.append(cv);
@@ -1781,10 +2053,10 @@ function buildLineup(el, ids, names) {
   ids.forEach((id, i) => { const d = document.createElement('div'); d.style.flex = `0 0 ${(SPRITES[id].size + gap) / W2 * 100}%`; d.innerHTML = `${rankHtml(id)}<span class="nm2">${names[i]}</span>`; labels.append(d); });
   labels.style.paddingLeft = `${gap / 2 / W2 * 100}%`;
   el.append(labels);
-  lineups.push({ cv, ctx: cv.getContext('2d'), ids, gap, t: 0 });
+  lineups.push({ cv, ctx: cv.getContext('2d'), ids, gap, t: 0, still });
 }
 function drawLineup(L, dt) {
-  const { ctx, cv, ids, gap } = L; L.t += dt; ctx.clearRect(0, 0, cv.width, cv.height); ctx.imageSmoothingEnabled = false;
+  const { ctx, cv, ids, gap } = L; L.t = L.still ? 0 : L.t + dt; ctx.clearRect(0, 0, cv.width, cv.height); ctx.imageSmoothingEnabled = false;
   const ground = cv.height - 20; let x = gap;
   ids.forEach((id, i) => {
     const d = SPRITES[id], img = getFrame(d, 'idle', Math.floor((L.t * .75 + i * .21) * 12));
@@ -1798,6 +2070,7 @@ function drawLineup(L, dt) {
 }
 buildLineup(document.getElementById('lineup-fire'), ['egg', 'wisp', 'coal', 'gecko', 'frill', 'sunking', 'avatar'], ['ไข่เพลิง', 'ประกายจิ๋ว', 'ถ่านน้อย', 'เพลิงจอมซน', 'อัคนีแผงคอ', 'ราชันมังกรสุริยะ', 'อวตารสุริยะ']);
 buildLineup(document.getElementById('lineup-leaf'), ['legg', 'seed', 'sprout', 'leafdeer', 'stag', 'forestdeer', 'lfused'], ['ไข่พฤกษ์', 'เมล็ดจิ๋ว', 'ต้นอ่อน', 'กวางใบไม้', 'กวางเขาพฤกษา', 'เทพพนาลัย', 'พนาผู้ตื่น']);
+buildLineup(document.getElementById('lineup-earth'), ['eegg', 'pebble', 'clay', 'tortoise', 'pillarturtle', 'mountturtle', 'efused'], ['ไข่ศิลา', 'ก้อนกรวด', 'ก้อนดินเหนียว', 'เต่าศิลา', 'เต่าผาหิน', 'เต่าภูเขา', 'ธรณีผู้ตื่น'], true);
 buildLineup(document.getElementById('lineup-water'), ['wegg', 'drop', 'bubble', 'swordwhale', 'armorwhale', 'whaleC', 'wfused'], ['ไข่วารี', 'หยดน้ำ', 'ฟองจิ๋ว', 'ลูกวาฬดาบ', 'วาฬเกราะ', 'ราชาวาฬผลึก', 'สมุทรผู้ตื่น']);
 {
   const opts = [
@@ -1819,6 +2092,8 @@ addCard(document.getElementById('show-fused'), 'avatar', document.getElementById
 addCard(document.getElementById('show-boss'), 'boss', document.getElementById('act-boss'));
 addCard(document.getElementById('show-turtle'), 'turtle', document.getElementById('act-turtle'));
 addCard(document.getElementById('show-wfused'), 'wfused', document.getElementById('act-wfused'));
+addCard(document.getElementById('show-efused'), 'efused', document.getElementById('act-efused'), 8, true);
+addCard(document.getElementById('show-pangolin'), 'pangolin', document.getElementById('act-pangolin'), 8, true);
 addCard(document.getElementById('show-lfused'), 'lfused', document.getElementById('act-lfused'));
 addCard(document.getElementById('show-flora'), 'flora', document.getElementById('act-flora'));
 
@@ -1834,10 +2109,12 @@ function drawCard(c, dt) {
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H); ctx.imageSmoothingEnabled = false;
   // advance the move being shown
+  const seq = c.still ? STILL_SHOW : STAGE_OF[def.id] === 'egg' ? EGG_SHOW : SHOW;
   c.stepT -= dt;
-  if (c.stepT <= 0) { c.step = (c.step + 1) % SHOW.length; c.stepT = SHOW[c.step][1]; c.phaseT = 0; if (c.label) c.label.textContent = 'ท่า: ' + SHOW[c.step][2]; }
+  if (c.stepT <= 0) { c.step = (c.step + 1) % seq.length; c.stepT = seq[c.step][1]; c.phaseT = 0; if (c.label) c.label.textContent = (seq === SHOW ? 'ท่า: ' : '') + seq[c.step][2]; }
   c.phaseT += dt;
-  const [mode] = SHOW[c.step], F = def.frames, pt = c.phaseT;
+  const [mode] = seq[c.step], F = def.frames, pt = c.phaseT;
+  if (c.still) c.t = 0;
   void F;
   let img = getFrame(def, 'idle', Math.floor(c.t * .75 * 12)), lunge = 0;
   if (mode === 'walk') img = getFrame(def, 'walk', Math.floor(pt * 1.4 * 12));
@@ -1854,7 +2131,7 @@ function drawCard(c, dt) {
   if (def.aura) drawAura(ctx, def.aura, ox, oy, c.t, false, def.size);
   ctx.drawImage(img.cv, ox, oy);
   drawGlows(ctx, def, ox, oy, 1, 1, false, c.t);
-  emitFor(def, c.ps, c.acc, dt, ox, oy, false);
+  if (!c.still) emitFor(def, c.ps, c.acc, dt, ox, oy, false);
   c.ps.update(dt); c.ps.draw(ctx);
 }
 
@@ -2871,6 +3148,13 @@ for (const [k, v] of Object.entries(ELEM)) {
   const b = document.createElement('button'); b.className = 'el'; b.innerHTML = `<i style="background:${v.col}"></i>${v.name}`;
   b.addEventListener('click', () => run(() => SKILL[k](me, foe))); skillsRow.append(b);
 }
+// Bring the arena into view when an action button is pressed below it (on a phone the arena is pinned already).
+function showStage() {
+  const el = document.querySelector('.stage'), r = el.getBoundingClientRect(), navh = document.querySelector('.jump').getBoundingClientRect().bottom;
+  if (r.top < navh - 1 || r.bottom > window.innerHeight) el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+}
+document.querySelector('.controls').addEventListener('click', (ev) => { if (ev.target.closest('button') && ev.target.id !== 'b-auto') showStage(); });
+{ const nav = document.querySelector('.jump'), setNav = () => document.documentElement.style.setProperty('--navh', nav.getBoundingClientRect().height + 'px'); window.addEventListener('resize', setNav); setNav(); }
 document.getElementById('b-atk').addEventListener('click', () => run(() => lungeHit(me, foe)));
 document.getElementById('b-dodge').addEventListener('click', () => run(() => lungeHit(foe, me, 'dodge')));
 document.getElementById('b-guard').addEventListener('click', () => run(() => lungeHit(foe, me, 'guard')));
@@ -3156,7 +3440,7 @@ const PLAN = [
     ['ร่างสุดท้าย', 'เทพพนาลัย 🌳', 'เทพพนาลัย (ปรับ)', 'คงชื่อ วาดเป็นกวางยักษ์ที่แบกป่าทั้งผืนไว้บนหลัง'],
     ['ร่างสุดท้าย', 'เอนท์พิทักษ์ 🌲', 'ราชาหมาป่าพงไพร', 'ต้นไม้เดินได้ซ้ำกับร่างแรก เปลี่ยนเป็นหมาป่ายักษ์ขนคอหนา มีเถาวัลย์พันตัว'] ],
     keep: 'ไข่พฤกษ์, เมล็ดจิ๋ว, ต้นอ่อน, กวางใบไม้, เห็ดง่วง, หมาป่าไพร, ตอไม้แก่' },
-  { line: 'สายศิลา', fam: 'สัตว์เกราะหิน', sum: 'เปลี่ยน 4', rows: [
+  { line: 'สายศิลา', fam: 'สัตว์เกราะหิน', sum: 'เปลี่ยน 4 (ภาพนิ่งด้านบน รอเลือก)', rows: [
     ['สมบูรณ์', 'หมีหินผา 🐻', 'เต่าผาหิน', 'ต่อจากเต่าศิลา กระดองเป็นแท่งหินผา'],
     ['สมบูรณ์', 'เม่นแร่เหล็ก 🦔', 'แรดเกราะแร่', 'ต่อจากแรดผา เกราะเป็นแร่เหล็กเงา'],
     ['ร่างสุดท้าย', 'เจ้าธรณี 🏔️', 'เต่าภูเขา', 'ภูเขาไม่ใช่สัตว์ ย้ายภูเขาไปไว้บนกระดองเต่ายักษ์'],
@@ -3247,14 +3531,17 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
   b.addEventListener('click', () => { document.querySelector('.stage').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' }); run(() => useFire(id, me, foe)); });
   card.append(b); leafCards.append(card);
 }
-// Section picker: show one element at a time (the battle stays on top); remembered in the address (#fire, #water, #leaf, #plan).
+// Section picker: show one element at a time (the battle stays on top, with only that element's skills); remembered in the address (#fire, #water, #leaf, #earth, #plan).
 {
   const jump = document.getElementById('jump');
+  const ELS = ['fire', 'water', 'leaf', 'earth'], PICK = { fire: 'sunking', water: 'whaleking', leaf: 'forestdeer' };
   const apply = (v) => {
     document.querySelectorAll('section[data-group]').forEach((sec) => { const g = sec.dataset.group; sec.hidden = !(v === 'all' || g === 'battle' || g === v); });
+    document.querySelectorAll('.skgroup').forEach((g) => { g.hidden = ELS.includes(v) ? g.dataset.el !== v : g.dataset.el === 'earth'; });
+    if (PICK[v] && me.el !== v && !busy) { pickMe.value = PICK[v]; me = makeEnt(PICK[v], 0); showBanner('FIGHT!'); }
     jump.value = v;
   };
-  const fromHash = () => { const h = location.hash.slice(1); return ['fire', 'water', 'leaf', 'plan'].includes(h) ? h : 'all'; };
+  const fromHash = () => { const h = location.hash.slice(1); return ['fire', 'water', 'leaf', 'earth', 'plan'].includes(h) ? h : 'all'; };
   jump.addEventListener('change', () => { apply(jump.value); try { history.replaceState(null, '', jump.value === 'all' ? location.pathname : '#' + jump.value); } catch (e) { location.hash = jump.value === 'all' ? '' : jump.value; } document.getElementById('battle-h').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }); });
   window.addEventListener('hashchange', () => apply(fromHash()));
   apply(fromHash());

@@ -15,7 +15,13 @@ asked for this more than once.
 - Source copy: `docs/tamagotchi/prototypes/monster-arena-25d.html`. It is one self-contained page:
   open it in a browser to run it. Add a `<!doctype html>` wrapper if a browser renders it oddly.
 - The page has a "ดูส่วน" dropdown at the top: all / fire monsters + skills / water monsters +
-  skills / leaf monsters + skills / plan. The battle scene always stays on top.
+  skills / leaf monsters + skills / earth monsters (still drafts) / plan. The battle scene always
+  stays on top. Choosing an element also shows only that element's skill buttons under the arena
+  and puts one of its monsters in the arena. On a phone (≤ 760 px) the arena is pinned under the
+  picker so a skill button lower down still shows its action; on a wide screen pressing a button
+  scrolls the arena into view if it is off screen.
+- Egg cards only stand still (eggs cannot fight). Draft lines use still cards (`buildBoard(…,
+  true)`, `buildLineup(…, true)`, `addCard(…, 8, true)`): one idle frame, no particles.
 
 ## Direction the owner approved
 
@@ -54,8 +60,9 @@ asked for this more than once.
 | Leaf skills, all 8 | Done. New statuses in the prototype: root (`rootT`, can't walk, vines round the feet), silence (`silenceT`, crossed speech bubble, auto mode only basic-attacks), poison (`poisonT`, 2% HP a second), lifesteal (กรงเล็บไพร heals 30% of each hit), and the ent passive (`ent`: 1.2% regen a second, 8% less damage, bark flash) |
 | Leaf fused (พนาผู้ตื่น) | Done: the awakened elk, mint-white body, gold armour on face/chest/back, gold branch antlers with glowing leaves, twin green/gold leaf rings |
 | Leaf boss (พฤกษาโบราณ) | Done. The leaf line has no world boss (ต้นไม้โบราณ is earth), so this is the leaf raid boss `ancient_flora`: an ancient moss bear with a blossom tree and a small grove on its back. Choosing it switches the arena to the new forest theme, and the HUD says บอสเรด |
-| Earth, lightning, holy, dark, shadow lines | Not started |
-| The other 18 fused forms and 10 bosses | Not started |
+| Earth line, 11 forms + fused + boss | **Still drafts only, waiting for the owner to choose.** The owner asked for pictures first, no animation or skills until the designs are approved. Tortoise main branch (เต่าศิลา → เต่าผาหิน with basalt pillars → เต่าภูเขา carrying a snowy mountain with pines and a stream), rhino branch (แรดผา → แรดเกราะแร่ with iron plates and copper veins → ไททันแรดคริสตัล with a glowing topaz horn and back crystals). Poor forms: หนอนดินเกียจคร้าน (sleeping fat earthworm), ก้อนหินขี้เกียจ (sleeping boulder with moss and a flower, drooling). Fused ธรณีผู้ตื่น: the mountain tortoise with gold armour and topaz peaks. World boss: the game's ต้นไม้โบราณ is earth but a tree, so the draft is an ancient stone pangolin with thorned scale rows (matches its reflect-damage ability); the name ตัวนิ่มศิลาโบราณ is only a proposal. The sprites are drawn with the pose rig, so they can be animated once approved |
+| Lightning, holy, dark, shadow lines | Not started |
+| The other 17 fused forms and 9 bosses | Not started |
 | Putting the art into the real game | Not started |
 
 ## Open items and known gaps
@@ -78,8 +85,9 @@ asked for this more than once.
 
 ## Next steps (suggested order)
 
-1. Earth line with the same process as fire, water and leaf: plan table concept → sprites → rig →
-   its 8 skills → its fused form and boss. Then lightning, holy, dark, shadow.
+1. Get the owner's choice on the earth drafts, then animate them and do the 8 earth skills
+   (`earth_*` in `arena-data.ts`). For the next lines (lightning, holy, dark, shadow) the owner
+   wants still pictures first too: draw the models, let them choose, then animate.
 3. Integration plan for the real game: replace the emoji in `ArenaReplay.tsx` with sprite frames.
    Positions come from the server replay, so poses map to replay events (walk while moving,
    attack/cast at skill events, the parry pose on dodge events with `parry`). Combat results stay

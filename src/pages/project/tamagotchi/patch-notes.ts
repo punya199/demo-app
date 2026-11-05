@@ -12,7 +12,7 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
-    version: '1.49.0',
+    version: '1.47.1',
     // Provisional: set to the real release time once semantic-release publishes it.
     releasedAt: '2026-11-05T17:00:00Z',
     changes: [
@@ -23,9 +23,8 @@ export const PATCH_NOTES: IPatchNote[] = [
     ],
   },
   {
-    version: '1.48.0',
-    // Provisional: set to the real release time once semantic-release publishes it.
-    releasedAt: '2026-11-05T16:00:00Z',
+    version: '1.47.0',
+    releasedAt: '2026-11-05T16:02:52Z',
     changes: [
       {
         kind: 'new',

@@ -1,3 +1,16 @@
+# [1.43.0](https://github.com/punya199/demo-app/compare/v1.42.0...v1.43.0) (2026-11-05)
+
+
+### New
+
+* add the skills screen and arena replay for adventure fights ([ab99601](https://github.com/punya199/demo-app/commit/ab996016ac0593066f53bfa60cd196423b5b8a4f))
+* show each world boss ability and the weekly boss order ([29bdaae](https://github.com/punya199/demo-app/commit/29bdaae1dd2cd71f1e34295ee69e8433344aa9c2))
+* show raid, PvP and world boss fights in the arena replay ([e5bd6b5](https://github.com/punya199/demo-app/commit/e5bd6b56d816b601a6e4cc5b661c5df1842236bc))
+
+### Update
+
+* merge main and date the real-time modes patch note ([fd9358e](https://github.com/punya199/demo-app/commit/fd9358e9064a5b9a71ce3129f872d356518a5de2))
+
 # [1.42.0](https://github.com/punya199/demo-app/compare/v1.41.0...v1.42.0) (2026-11-04)
 
 

@@ -217,9 +217,42 @@ export const useGetAdventure = () => {
 export const useAdventureBattle = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (input: { stageId: string; auto?: boolean }) => {
+    mutationFn: async (input: { stageId: string }) => {
       const { data } = await apiClient.post<IAdventureBattleResponse>(`/adventure/battle`, input)
       return data
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })
+    },
+  })
+}
+
+export interface IAdventureSkipResponse {
+  monster: IMonsterData
+  wallet: IWallet
+  skip: {
+    stageId: string
+    runs: number
+    coins: number
+    drops: IEquipmentItem[]
+    // Pieces lost to a full bag.
+    dropsLost: number
+  }
+}
+
+// Skip pays out at once (no replay to wait for), so the result goes straight into the cache.
+export const useAdventureSkip = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { stageId: string; runs: number }) => {
+      const { data } = await apiClient.post<IAdventureSkipResponse>(`/adventure/skip`, input)
+      return data
+    },
+    onSuccess: (data) => {
+      setSelectedMonster(queryClient, data.monster)
+      queryClient.setQueryData<IWallet>(WALLET_KEY, data.wallet)
+      queryClient.invalidateQueries({ queryKey: ['adventure'] })
+      queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: MY_MONSTER_KEY })

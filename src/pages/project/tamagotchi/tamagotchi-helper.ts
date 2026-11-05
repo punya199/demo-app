@@ -304,9 +304,9 @@ export const getExpeditionBlocker = (
   return isAreaUnlocked ? null : 'ชนะบอสพื้นที่ก่อนหน้าก่อน'
 }
 
-// Milliseconds until the next auto-battle may start (0 = now).
-export const getAutoBattleDelayMs = (monster: IMonsterData | null, now: number) =>
-  monster?.autoBattleReadyAt ? Math.max(0, new Date(monster.autoBattleReadyAt).getTime() - now) : 0
+// How many runs the stamina pays for, up to the per-request cap.
+export const skipRunsAffordable = (stamina: number, staminaCost: number, maxRuns: number) =>
+  staminaCost > 0 ? Math.min(maxRuns, Math.floor(stamina / staminaCost)) : maxRuns
 
 // Buying fills the bag, so it needs no monster - only enough coins.
 export const getShopBlocker = (
@@ -452,10 +452,8 @@ const serverMessageLabel: Record<string, string> = {
   'Monster is too unwell to explore': 'มอนป่วยหรือหิว ออกสำรวจไม่ได้',
   'Monster is not on an expedition': 'มอนไม่ได้ออกสำรวจ',
   'Area is locked': 'พื้นที่นี้ยังไม่ปลดล็อก',
-  'Auto-battle is not ready yet': 'ต่อสู้อัตโนมัติยังไม่พร้อม รออีกสักครู่',
-  'Daily auto-battle reward limit reached': 'ครบเพดานรางวัลต่อสู้อัตโนมัติของวันนี้แล้ว',
-  'Clear this stage once before auto-battling it': 'ต้องชนะด่านนี้ด้วยตัวเองก่อน',
-  'Auto-battle is not available on boss stages': 'บอสต่อสู้อัตโนมัติไม่ได้',
+  'Clear this stage once before skipping it': 'ต้องชนะด่านนี้ด้วยตัวเองก่อนจึงจะข้ามได้',
+  'Skip 1 to 10 runs at a time': 'ข้ามได้ครั้งละ 1–10 รอบ',
   'You do not have this item': 'ไม่มีไอเทมนี้ในกระเป๋า',
   'Login reward was already claimed today': 'วันนี้รับรางวัลเข้าสู่ระบบไปแล้ว',
   'Quest is not complete or was already claimed': 'ภารกิจยังไม่สำเร็จ หรือรับรางวัลไปแล้ว',

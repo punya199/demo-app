@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   filterBag,
   getAdventureBlocker,
+  skipRunsAffordable,
   getMinigameBlocker,
   getStaminaRefillBlocker,
   isInZone,
@@ -61,7 +62,6 @@ import {
   getDefenseBlocker,
   getPvpBlocker,
   getRaidBlocker,
-  getAutoBattleDelayMs,
   getEnhanceBlocker,
   getEquipBlocker,
   pickRefineTier,
@@ -120,7 +120,6 @@ const monster = (overrides: Partial<IMonsterData> = {}): IMonsterData => ({
   trainReadyAt: null,
   battleStats: null,
   potentialView: { isLegacy: true, grade: null, average: null, stats: {} as never },
-  autoBattleReadyAt: null,
   minigameReadyAt: null,
   expeditionAreaId: null,
   expeditionMinutes: 0,
@@ -353,20 +352,6 @@ describe('getExpeditionBlocker', () => {
       'มอนออกสำรวจอยู่แล้ว'
     )
     expect(getExpeditionBlocker(null, true)).toBe('ต้องมีมอนที่ฟักแล้ว')
-  })
-})
-
-describe('getAutoBattleDelayMs', () => {
-  it('waits for the cooldown and never goes negative', () => {
-    const now = new Date('2026-01-01T00:00:30Z').getTime()
-    expect(getAutoBattleDelayMs(monster({ autoBattleReadyAt: '2026-01-01T00:01:00Z' }), now)).toBe(
-      30_000
-    )
-    expect(getAutoBattleDelayMs(monster({ autoBattleReadyAt: '2026-01-01T00:00:00Z' }), now)).toBe(
-      0
-    )
-    expect(getAutoBattleDelayMs(monster(), now)).toBe(0)
-    expect(getAutoBattleDelayMs(null, now)).toBe(0)
   })
 })
 
@@ -1221,5 +1206,14 @@ describe('passive draft and save', () => {
     expect(getAscendancyPathOf([])).toBeNull()
     expect(canDropAscendancyNode(nodes, ids, 'v2-asc-warden-02')).toBe(true)
     expect(canDropAscendancyNode(nodes, ids, 'v2-asc-warden-01')).toBe(false)
+  })
+})
+
+describe('skipRunsAffordable', () => {
+  it('counts the runs the stamina pays for, up to the cap', () => {
+    expect(skipRunsAffordable(100, 10, 10)).toBe(10)
+    expect(skipRunsAffordable(35.6, 10, 10)).toBe(3)
+    expect(skipRunsAffordable(9, 10, 10)).toBe(0)
+    expect(skipRunsAffordable(500, 10, 10)).toBe(10)
   })
 })

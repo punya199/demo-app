@@ -19,8 +19,6 @@ interface IArenaBattleModalProps {
   statuses: StatusMap | undefined
   catalog: IArenaSkill[] | undefined
   onClose: () => void
-  // Close by itself this long after the replay ends (auto-battle); omit to wait for the player.
-  autoCloseMs?: number
   title?: string
   // Replaces the result block once the replay ends.
   summary?: string
@@ -68,7 +66,7 @@ const CooldownChip = ({ cooldown }: { cooldown: IArenaCooldown }) => {
 
 // Plays the server's recorded arena fight, then shows the result.
 export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
-  const { battle, statuses, catalog, onClose, autoCloseMs, title, summary } = props
+  const { battle, statuses, catalog, onClose, title, summary } = props
   const [tick, setTick] = useState(0)
   const [speed, setSpeed] = useState(1)
   // "Skip" fast-forwards this fight only; the chosen 1x/2x/4x carries over to the next fight.
@@ -81,12 +79,6 @@ export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
     setTick(0)
     setSkipping(false)
   }, [battle])
-
-  useEffect(() => {
-    if (!battle || !isFinished || autoCloseMs === undefined) return
-    const timer = setTimeout(onClose, autoCloseMs)
-    return () => clearTimeout(timer)
-  }, [battle, isFinished, autoCloseMs, onClose])
 
   const skills = useMemo(() => {
     const map: Record<string, IArenaSkill> = {}

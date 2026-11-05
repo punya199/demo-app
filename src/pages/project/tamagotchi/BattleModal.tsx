@@ -9,8 +9,6 @@ const STEP_MS = 700
 interface IBattleModalProps {
   battle: IBattleData | null
   onClose: () => void
-  // Close by itself this long after the replay ends (auto-battle); omit to wait for the player.
-  autoCloseMs?: number
   // Replaces the result line once the replay ends (PvP shows rating instead of rewards).
   summary?: string
   title?: string
@@ -18,7 +16,7 @@ interface IBattleModalProps {
 
 // Replays the server's battle events one by one; the result is already decided.
 export const BattleModal = (props: IBattleModalProps) => {
-  const { battle, onClose, autoCloseMs, summary, title } = props
+  const { battle, onClose, summary, title } = props
   const [shown, setShown] = useState(0)
   const total = battle?.events.length ?? 0
   const isFinished = shown >= total
@@ -34,14 +32,6 @@ export const BattleModal = (props: IBattleModalProps) => {
     const timer = setTimeout(() => setShown((count) => count + 1), STEP_MS)
     return () => clearTimeout(timer)
   }, [battle, shown, isFinished])
-
-  useEffect(() => {
-    if (!battle || !isFinished || autoCloseMs === undefined) {
-      return
-    }
-    const timer = setTimeout(onClose, autoCloseMs)
-    return () => clearTimeout(timer)
-  }, [battle, isFinished, autoCloseMs, onClose])
 
   if (!battle) {
     return null

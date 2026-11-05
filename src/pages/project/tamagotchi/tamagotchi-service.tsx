@@ -44,6 +44,8 @@ import {
   IWallet,
   StatKey,
   IWikiData,
+  ICraftClaimResult,
+  ICraftOverview,
 } from './tamagotchi-interface'
 
 interface IGetMonsterHistoryResponse {
@@ -1194,3 +1196,64 @@ export const useSetSkillLoadout = () => {
     },
   })
 }
+
+const CRAFT_KEY = ['monster', 'craft']
+
+export const useGetCraft = () =>
+  useQuery({
+    queryKey: CRAFT_KEY,
+    queryFn: async () => {
+      const { data } = await apiClient.get<ICraftOverview>(`/monster/craft`)
+      return data
+    },
+  })
+
+// Start, skip and claim all change coin, materials and (on claim) the bag.
+const useCraftMutation = <TInput, TResult>(
+  request: (input: TInput) => Promise<TResult>,
+  overviewOf: (result: TResult) => ICraftOverview
+) => {
+  const queryClient = useQueryClient()
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: CRAFT_KEY })
+    queryClient.invalidateQueries({ queryKey: EQUIPMENT_KEY })
+    queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
+    queryClient.invalidateQueries({ queryKey: WALLET_KEY })
+  }
+  return useMutation({
+    mutationFn: request,
+    onSuccess: (result) => {
+      queryClient.setQueryData<ICraftOverview>(CRAFT_KEY, overviewOf(result))
+      refresh()
+    },
+    // A refused claim (409 bag full) or start leaves the server state as it was: re-read it.
+    onError: refresh,
+  })
+}
+
+export const useStartCraft = () =>
+  useCraftMutation(
+    async (input: { recipeId: string; useCatalyst: boolean }) => {
+      const { data } = await apiClient.post<ICraftOverview>(`/monster/craft/start`, input)
+      return data
+    },
+    (data) => data
+  )
+
+export const useSkipCraft = () =>
+  useCraftMutation(
+    async () => {
+      const { data } = await apiClient.post<ICraftOverview>(`/monster/craft/skip`)
+      return data
+    },
+    (data) => data
+  )
+
+export const useClaimCraft = () =>
+  useCraftMutation(
+    async () => {
+      const { data } = await apiClient.post<ICraftClaimResult>(`/monster/craft/claim`)
+      return data
+    },
+    (data) => data.overview
+  )

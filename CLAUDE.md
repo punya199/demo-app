@@ -72,6 +72,10 @@ Shared skills live in `.claude/skills/` and are committed (only `.claude/skills/
 
 Issues live in this repo's GitHub Issues (via `gh` CLI). See `docs/agents/issue-tracker.md`.
 
+### Monster visual overhaul (ongoing)
+
+The new 2.5D pixel-art look for the monster game is a standalone prototype, not yet in the game. Before any work on it, read `docs/tamagotchi/visual-overhaul.md`: it holds the owner's working rules (reply in Thai, still drafts before animation, three options after two rejections), the live Artifact URL, what each line's status is, and the skill/species renames still to apply to `demo-app-backend`.
+
 ### Domain docs
 
 Single-context: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.

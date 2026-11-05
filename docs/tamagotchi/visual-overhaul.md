@@ -14,14 +14,32 @@ asked for this more than once.
   URL.
 - Source copy: `docs/tamagotchi/prototypes/monster-arena-25d.html`. It is one self-contained page:
   open it in a browser to run it. Add a `<!doctype html>` wrapper if a browser renders it oddly.
-- The page has a "ดูส่วน" dropdown at the top: all / fire monsters + skills / water monsters +
-  skills / leaf monsters + skills / earth monsters (still drafts) / plan. The battle scene always
+- The page has a "ดูส่วน" dropdown at the top: all / fire / water / leaf / earth / lightning
+  (each "monsters + skills") / plan. The battle scene always
   stays on top. Choosing an element also shows only that element's skill buttons under the arena
   and puts one of its monsters in the arena. On a phone (≤ 760 px) the arena is pinned under the
   picker so a skill button lower down still shows its action; on a wide screen pressing a button
   scrolls the arena into view if it is off screen.
 - Egg cards only stand still (eggs cannot fight). Draft lines use still cards (`buildBoard(…,
   true)`, `buildLineup(…, true)`, `addCard(…, 8, true)`): one idle frame, no particles.
+
+## How the owner wants to work (read this first)
+
+- Reply in Thai, short and concrete. Say what changed and where to look on the page.
+- **New line = still pictures first.** Draw the 11 forms, the fused form and the boss as still
+  drafts (`buildBoard(…, true)`, `buildLineup(…, true)`, `addCard(…, 8, true)`), publish, and wait.
+  Only after the owner approves: drop the still flags, animate, and do the line's 8 skills.
+- When the owner rejects a design twice, stop guessing: offer **three options side by side** (as
+  for ราชาวาฬผลึก and อสนีผู้ตื่น) and let them pick. When they send a reference picture, follow
+  it closely (they may say "เป๊ะ"); if it faces the viewer, turn it to a side view facing right.
+- Small sketches on a screenshot (a red line, a circle) are exact limits: keep to them.
+- Flyers must move on their wings (the `FLY` rig), not walk.
+- After every change: render the sprite sheet / run the skills in Playwright, look at the
+  pictures, fix what looks wrong, then publish the Artifact, update this file, commit and push
+  (`Update:` / `New:` / `Fix:` tags only).
+- Renaming: the owner said to give skills new names that fit the new animals. Names on the page
+  are proposals for when the art goes into the game; `species-data.ts` / `arena-data.ts` in
+  `demo-app-backend` still have the old names (see "Names to apply in the game" below).
 
 ## Direction the owner approved
 
@@ -70,6 +88,20 @@ asked for this more than once.
 | The other 17 fused forms and 9 bosses | Not started |
 | Putting the art into the real game | Not started |
 
+## Names to apply in the game (when the art goes in)
+
+The prototype uses these; the game data still has the old ones.
+
+| Kind | Game id | Old name | New name |
+|---|---|---|---|
+| Skill | `ltn_claw` | เล็บพายุ | ข่วนสายฟ้า |
+| Skill | `ltn_hoof` | กีบอสนี | โฉบอสนี |
+| Skill | `ltn_vajra` | วัชระผ่าฟ้า | หางปาอสนี |
+| Species | see the plan table on the page | อัคนีพยัคฆ์, ราชาสุริยะ, … | อัคนีแผงคอ, ราชันมังกรสุริยะ, … |
+
+Still to ask the owner (old animal names left on skills): ตรีศูลสมุทร (water), กรงเล็บไพร /
+งวงพฤกษา / พิทักษ์พนา (leaf), อุ้งตีนผา / ขนแร่ (earth).
+
 ## Open items and known gaps
 
 - Weapon/equipment sets: the boss-set arena rebalance (backend PR #27) and the 12 craft sets with the Mythic grade (backend PR #29, frontend PRs #29 and #30) are merged, released (backend 1.38.0, frontend 1.46.0) and deployed (Cloud Run and Cloudflare Pages) as of 2026-11-05. Frontend PR #31 (craft patch notes) is still open.
@@ -80,9 +112,7 @@ asked for this more than once.
 - New names (ราชาวาฬผลึก and the names in the plan table) are proposals only. The game data in
   `demo-app-backend` `species-data.ts` is unchanged.
 - The skill name "ตรีศูลสมุทร" is still the game's name. Ask the owner before renaming it.
-- Lightning skill names that still name old animals: เล็บพายุ (tiger, now the storm fox's four swipes),
-  กีบอสนี (horse hoof, now the storm hawk's dive), วัชระผ่าฟ้า (vajra god, now the fox king's three ball
-  lightnings).
+- Lightning skills renamed on the owner's word (see the table above).
 - Earth skill names that still name old animals: อุ้งตีนผา (bear paw, now the pillar tortoise's
   stamp), ขนแร่ (hedgehog quills, now ore spines fired from the ore rhino's armour).
 - Leaf skill names still name the old animals: กรงเล็บไพร (tiger claw, now the stag's three antler

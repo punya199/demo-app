@@ -3703,8 +3703,8 @@ const BOLT = {
     await approach(def, att); await lungeHit(def, att);
     await wait(700); att.staticRetort = false;
   } },
-  // เล็บพายุ (4 hits, range 60): four lightning-fast claw swipes, a spark on every hit
-  ltn_claw: { name: 'เล็บพายุ', icon: '⚡', async run(att, def) {
+  // ข่วนสายฟ้า (was เล็บพายุ; 4 hits, range 60): four lightning-fast claw swipes, a spark on every hit
+  ltn_claw: { name: 'ข่วนสายฟ้า', icon: '🐾', async run(att, def) {
     await meleeStrike(att, def, { wind: 220, rush: 110, hits: 4, gap: 95, onHit(i, dir) {
       const t = centerOf(def), r = def.def.size * .26, sgn = i % 2 ? -1 : 1;
       for (let j = -1; j <= 1; j++) slashFx(t.x - dir * r + j * 2, t.y - sgn * r + j * 3, t.x + dir * r + j * 2, t.y + sgn * r * .7 + j * 3, .22, ['rgba(255,225,74,.5)', '#ffe14a', '#ffffff']);
@@ -3712,8 +3712,8 @@ const BOLT = {
       return damage(def, 22, { from: att, crit: i === 3 && Math.random() < .35 });
     } });
   } },
-  // กีบอสนี (charge, haste 3 s): a lightning dive straight through the target's guard, then it is faster for a while
-  ltn_hoof: { name: 'กีบอสนี', icon: '🦅', async run(att, def) {
+  // โฉบอสนี (was กีบอสนี; charge, haste 3 s): a lightning dive straight through the target's guard, then it is faster for a while
+  ltn_hoof: { name: 'โฉบอสนี', icon: '🦅', async run(att, def) {
     const vx = def.x - att.x, vy = def.y - att.y, len = Math.hypot(vx, vy) || 1, ux = vx / len, uy = vy / len, dir = Math.sign(vx) || 1;
     const A = (t) => { att.anim = { name: 'attack', t }; };
     await tween(300, (k) => { A(.3 * k); att.ox = -ux * 8 * ease(k); att.oy = -uy * 5 * ease(k) - 8 * ease(k); });
@@ -3771,8 +3771,8 @@ const BOLT = {
     const d = Math.hypot(t0.x - m0.x, t0.y - m0.y);
     if (d <= L + def.def.size * .3) { zapBurst(t0.x, t0.y, 40, 120); stunOn(def, .6); await damage(def, 130, { from: att, crit: true }); } else await wait(600);
   } },
-  // วัชระผ่าฟ้า (3 shots in a fan, static 60% each): the tails fling three balls of lightning
-  ltn_vajra: { name: 'วัชระผ่าฟ้า', icon: '⚡', reach: 230, async run(att, def) {
+  // หางปาอสนี (was วัชระผ่าฟ้า; 3 shots in a fan, static 60% each): the tails fling three balls of lightning
+  ltn_vajra: { name: 'หางปาอสนี', icon: '🦊', reach: 230, async run(att, def) {
     const p = castPose(att, 500, 600, 'bolt'); await p.charged; p.release();
     const m = centerOf(att), base = Math.atan2(centerOf(def).y - m.y, centerOf(def).x - m.x), start = { x: m.x - (att.flip ? -1 : 1) * att.def.size * .2, y: m.y - att.def.img.foot * .35 }, pending = [];
     for (let i = 0; i < 3; i++) {
@@ -4209,12 +4209,12 @@ const EARTH_INFO = {
 const BOLT_INFO = {
   ltn_wing: ['นกฟ้าผ่า', 'ยิง · พลัง 130 · ไฟฟ้าสถิต 3 วิ', 'ปีกมีประกายไฟวิ่ง แล้วยิงขนนกสายฟ้าเป็นวิถีโค้งไปปักเป้า สายฟ้าแตกกระจาย ศัตรูติดไฟฟ้าสถิต'],
   ltn_cat: ['แมวไฟสถิต', 'ติดตัว · ใครตีประชิด โอกาส 40% ติดไฟฟ้าสถิต 3 วิ', 'ขนพองขึ้นทันทีที่โดนตี สายฟ้าวิ่งกลับไปหาคนตีแล้วติดไฟฟ้าสถิต ปุ่มทดลองให้ศัตรูเดินมาตี (ในทดลองติดทุกครั้ง)'],
-  ltn_claw: ['จิ้งจอกพายุ', 'ตี 4 ครั้ง · ระยะ 60', 'พุ่งเข้าไปข่วนเร็วสี่ครั้งสลับบนล่าง รอยข่วนเป็นแสงไฟฟ้าสีเหลือง มีประกายทุกครั้ง ครั้งสุดท้ายอาจคริ (ชื่อท่าเดิมของเสือ ยังไม่เปลี่ยน)'],
-  ltn_hoof: ['เหยี่ยวพายุ', 'พุ่งชน · พลัง 160 · เร็วขึ้น 3 วิ', 'บินขึ้นสูงนิดหนึ่งแล้วโฉบลงพุ่งชน ทิ้งเงาเหลืองและเส้นสายฟ้าตามทาง ชนแล้วตัวเองเร็วขึ้น (ชื่อท่าเดิมของม้า ยังไม่เปลี่ยน)'],
+  ltn_claw: ['จิ้งจอกพายุ', 'ตี 4 ครั้ง · ระยะ 60', 'พุ่งเข้าไปข่วนเร็วสี่ครั้งสลับบนล่าง รอยข่วนเป็นแสงไฟฟ้าสีเหลือง มีประกายทุกครั้ง ครั้งสุดท้ายอาจคริ (ชื่อใหม่ เดิมชื่อเล็บพายุ)'],
+  ltn_hoof: ['เหยี่ยวพายุ', 'พุ่งชน · พลัง 160 · เร็วขึ้น 3 วิ', 'บินขึ้นสูงนิดหนึ่งแล้วโฉบลงพุ่งชน ทิ้งเงาเหลืองและเส้นสายฟ้าตามทาง ชนแล้วตัวเองเร็วขึ้น (ชื่อใหม่ เดิมชื่อกีบอสนี)'],
   ltn_roar: ['เมฆหม่นขี้เกียจ', 'โซน · รัศมี 90 · ฟาดหลัง 0.7 วิ · ไฟฟ้าสถิต 3 วิ', 'เมฆพายุก่อตัวเหนือศัตรู ฟ้าแลบในเมฆ วงเตือนสีเหลืองกะพริบ จอสั่นขึ้นเรื่อยๆ แล้วฟ้าผ่าลงกลางวงสามสาย ใครอยู่ในวงติดไฟฟ้าสถิต'],
   ltn_tail: ['จิ้งจอกอสนี', 'ใส่ตัวเอง · เร็วขึ้น + คริขึ้น 5 วิ', 'หางลุกเป็นสายฟ้าแผ่ออก ประกายลอยขึ้นรอบตัว แล้วเร็วขึ้น (มีเงาเหลืองตามหลังตอนเดิน) และคริขึ้น (มีเป้าเล็งเหนือหัว)'],
   ltn_bolt: ['วิหคราชาอสนี', 'ลำแสง · ยาว 320 กว้าง 30 · ง้างนาน · มึน 0.6 วิ', 'ท่าไม้ตาย: กางปีกขึ้น จอมืดลง สายฟ้าเล็กๆ ถูกดูดเข้าปาก แล้วยิงลำสายฟ้าสามเส้นพันกันเป็นแนวตรง จอแวบขาว ศัตรูที่อยู่ในแนวมึน'],
-  ltn_vajra: ['ราชาจิ้งจอกอสนี', 'กระจาย 3 ลูก · ไฟฟ้าสถิต 60% ต่อลูก', 'หางสะบัดปาลูกบอลสายฟ้าสามลูกเป็นวิถีโค้งต่างกัน เข้าเป้าทีละลูก แต่ละลูกมีโอกาสติดไฟฟ้าสถิต (ชื่อท่าเดิมของวัชรเทพ ยังไม่เปลี่ยน)'],
+  ltn_vajra: ['ราชาจิ้งจอกอสนี', 'กระจาย 3 ลูก · ไฟฟ้าสถิต 60% ต่อลูก', 'หางสะบัดปาลูกบอลสายฟ้าสามลูกเป็นวิถีโค้งต่างกัน เข้าเป้าทีละลูก แต่ละลูกมีโอกาสติดไฟฟ้าสถิต (ชื่อใหม่ เดิมชื่อวัชระผ่าฟ้า)'],
 };
 const boltCards = document.getElementById('bolt-cards');
 for (const [id, [from, meta, desc]] of Object.entries(BOLT_INFO)) {

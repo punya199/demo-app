@@ -1,3 +1,11 @@
+# [1.47.0](https://github.com/punya199/demo-app/compare/v1.46.0...v1.47.0) (2026-11-05)
+
+
+### Update
+
+* add the craft and materials-tab patch notes ([76dbe54](https://github.com/punya199/demo-app/commit/76dbe543e952478a08a1617858b6d4f7de9e8c79))
+* document craft, Mythic and arena statuses in the in-game wiki ([b1c4e83](https://github.com/punya199/demo-app/commit/b1c4e834dfa065f3dce6eb08e219452c5c555c29))
+
 # [1.46.0](https://github.com/punya199/demo-app/compare/v1.45.0...v1.46.0) (2026-11-05)
 
 

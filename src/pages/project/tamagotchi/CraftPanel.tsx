@@ -1,12 +1,13 @@
 import { Alert, Button, Card, Modal, Spin, Switch, Tag } from 'antd'
 import { useEffect, useState } from 'react'
 import { CraftRecipeCard } from './CraftRecipeCard'
-import { ItemLine } from './EquipmentParts'
+import { ItemLine, SetStatus } from './EquipmentParts'
 import { formatCountdown, toPercent } from './tamagotchi-helper'
 import { ICraftClaimResult, ICraftRecipeView } from './tamagotchi-interface'
 import {
   useClaimCraft,
   useGetCraft,
+  useGetEquipment,
   useGetWiki,
   useSkipCraft,
   useStartCraft,
@@ -33,6 +34,7 @@ export const CraftPanel = (props: ICraftPanelProps) => {
   const { onError } = props
   const { data, isLoading } = useGetCraft()
   const { data: wiki } = useGetWiki()
+  const { data: equipment } = useGetEquipment()
   const { mutate: start, isPending: isStarting } = useStartCraft()
   const { mutate: skip, isPending: isSkipping } = useSkipCraft()
   const { mutate: claim, isPending: isClaiming } = useClaimCraft()
@@ -168,34 +170,45 @@ export const CraftPanel = (props: ICraftPanelProps) => {
         </div>
       </Card>
 
-      {[...sets.entries()].map(([setId, recipes]) => (
-        <Card
-          key={setId}
-          size="small"
-          title={
-            <>
-              {wiki?.equipment.sets[setId]?.name ?? setId}
-              {recipes[0].flagship && (
-                <Tag color="magenta" className="ml-2">
-                  Flagship
-                </Tag>
+      {[...sets.entries()].map(([setId, recipes]) => {
+        const progress = equipment?.sets.find((set) => set.setId === setId)
+        return (
+          <Card
+            key={setId}
+            size="small"
+            title={
+              <>
+                {wiki?.equipment.sets[setId]?.name ?? setId}
+                {recipes[0].flagship && (
+                  <Tag color="magenta" className="ml-2">
+                    Flagship
+                  </Tag>
+                )}
+              </>
+            }
+            className="dark:border-slate-700 dark:bg-slate-900"
+          >
+            <div className="flex flex-col gap-2">
+              {progress && equipment && (
+                <div className="rounded bg-slate-50 p-2 dark:bg-slate-800">
+                  <div className="mb-1 text-xs text-slate-500 dark:text-slate-400">
+                    สถานะเซ็ต (ตัวที่เลือก)
+                  </div>
+                  <SetStatus set={progress} enhance={equipment.enhance} />
+                </div>
               )}
-            </>
-          }
-          className="dark:border-slate-700 dark:bg-slate-900"
-        >
-          <div className="flex flex-col gap-2">
-            {recipes.map((recipe) => (
-              <CraftRecipeCard
-                key={recipe.id}
-                recipe={recipe}
-                disabled={isBusy || !!queue}
-                onStart={onStart}
-              />
-            ))}
-          </div>
-        </Card>
-      ))}
+              {recipes.map((recipe) => (
+                <CraftRecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  disabled={isBusy || !!queue}
+                  onStart={onStart}
+                />
+              ))}
+            </div>
+          </Card>
+        )
+      })}
     </div>
   )
 }

@@ -135,16 +135,59 @@ export const actionOptions: IActionOption[] = [
 export const toHearts = (value: number) =>
   Math.min(MAX_HEARTS, Math.max(0, Math.ceil(Math.round(value * 1000) / 1000)))
 
-// "รีเซ็ตใน 2 ชม. 15 นาที (18:00 น.)": time left to `resetsAt` plus its clock time in Thailand.
-export const describeReset = (resetsAt: string, now: Date) => {
+const BANGKOK_ZONE = 'Asia/Bangkok'
+const BANGKOK_OFFSET_MS = 7 * 60 * 60 * 1000
+const DAY_MS = 24 * 60 * 60 * 1000
+
+// "18:00 น." in Thailand, with the weekday and date ("จ. 10 พ.ย. 00:00 น.") when `withDate`.
+export const formatResetAt = (resetsAt: string, withDate = true) => {
   const at = new Date(resetsAt)
   const clock = at.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
-    timeZone: 'Asia/Bangkok',
+    timeZone: BANGKOK_ZONE,
   })
-  return `รีเซ็ตใน ${formatAge(Math.ceil((at.getTime() - now.getTime()) / 60_000))} (${clock} น.)`
+  const date = withDate
+    ? `${at.toLocaleDateString('th-TH', { weekday: 'short', day: 'numeric', month: 'short', timeZone: BANGKOK_ZONE })} `
+    : ''
+  return `${date}${clock} น.`
+}
+
+// "รีเซ็ตใน 2 ชม. 15 นาที (18:00 น.)": time left to `resetsAt` plus its clock time in Thailand.
+// A reset a day or more away also names its weekday and date (a bare clock time would be ambiguous).
+export const describeReset = (resetsAt: string, now: Date) => {
+  const minutesLeft = Math.ceil((new Date(resetsAt).getTime() - now.getTime()) / 60_000)
+  return `รีเซ็ตใน ${formatAge(minutesLeft)} (${formatResetAt(resetsAt, minutesLeft >= 1440)})`
+}
+
+// How the server schedules a reset, all on the Thai clock (UTC+7, no DST): quest day and PvP
+// attempts at midnight, weekly quests and the world boss on Monday 00:00, PvP seasons on the 1st,
+// and boss attempts in `hours`-long windows counted from midnight (as daily-fights.ts).
+export type ResetSchedule =
+  | { kind: 'daily' }
+  | { kind: 'weekly' }
+  | { kind: 'monthly' }
+  | { kind: 'window'; hours: number }
+
+// The first reset strictly after `now`, as an ISO string.
+export const nextResetAt = (schedule: ResetSchedule, now: Date) => {
+  const shifted = now.getTime() + BANGKOK_OFFSET_MS
+  const dayStart = Math.floor(shifted / DAY_MS) * DAY_MS
+  let next: number
+  if (schedule.kind === 'daily') {
+    next = dayStart + DAY_MS
+  } else if (schedule.kind === 'weekly') {
+    const sinceMonday = (new Date(dayStart).getUTCDay() + 6) % 7
+    next = dayStart + (7 - sinceMonday) * DAY_MS
+  } else if (schedule.kind === 'monthly') {
+    const local = new Date(shifted)
+    next = Date.UTC(local.getUTCFullYear(), local.getUTCMonth() + 1, 1)
+  } else {
+    const windowMs = schedule.hours * 60 * 60 * 1000
+    next = dayStart + (Math.floor((shifted - dayStart) / windowMs) + 1) * windowMs
+  }
+  return new Date(next - BANGKOK_OFFSET_MS).toISOString()
 }
 
 export const formatAge = (ageMinutes: number) => {

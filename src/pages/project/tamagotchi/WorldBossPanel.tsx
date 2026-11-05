@@ -157,7 +157,10 @@ export const WorldBossPanel = (props: IWorldBossPanelProps) => {
               {status.hitsLeft} ครั้ง
             </div>
             <div className="text-xs text-slate-500">
-              🕒 <ResetCountdown resetsAt={status.resetsAt} />
+              🕒 ตีได้อีกครั้ง: <ResetCountdown resetsAt={status.resetsAt} />
+            </div>
+            <div className="text-xs text-slate-500">
+              🗓️ บอสใหม่: <ResetCountdown resetsAt={status.endsAt} />
             </div>
           </div>
           <Tooltip title={blocker}>

@@ -1,3 +1,5 @@
+import { ResetCountdown } from './ResetCountdown'
+import { nextResetAt } from './tamagotchi-helper'
 import { Alert, Button, Card, Collapse, Input, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { ArenaBattleModal } from './ArenaBattleModal'
@@ -109,6 +111,9 @@ export const PvpPanel = (props: IPvpPanelProps) => {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-xs text-slate-500">ซีซัน {status.season}</div>
+            <div className="text-xs text-slate-500">
+              🕒 ซีซันนี้จบ: <ResetCountdown resetsAt={status.resetsAt} />
+            </div>
             <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
               {status.rating}
               {status.rank && (
@@ -121,6 +126,10 @@ export const PvpPanel = (props: IPvpPanelProps) => {
               ชนะ {status.wins} · แพ้ {status.losses}
             </div>
             <div className="text-slate-500">ท้าได้อีก {status.attemptsLeft} ครั้งวันนี้</div>
+            <div className="text-xs text-slate-500">
+              🕒 จำนวนครั้ง:{' '}
+              <ResetCountdown resetsAt={nextResetAt({ kind: 'daily' }, new Date())} />
+            </div>
           </div>
         </div>
       </Card>

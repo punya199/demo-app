@@ -2,10 +2,12 @@ import { Tag } from 'antd'
 import {
   compareEquipment,
   describeSpecials,
+  describeSetTier,
   describeStats,
   gradeColor,
   gradeLabel,
   isSetComplete,
+  isSetTierActive,
   setPieceLabel,
   statLabel,
 } from './tamagotchi-helper'
@@ -14,7 +16,7 @@ import { EnumEquipmentGrade, IEquipmentItem, ISetProgress } from './tamagotchi-i
 export const ItemLine = (props: { item: IEquipmentItem; set?: ISetProgress }) => {
   const { item, set } = props
   return (
-    <div className="min-w-0 flex-1">
+    <div className="min-w-0 flex-1 break-words">
       <div
         className={`font-medium ${
           item.grade === EnumEquipmentGrade.MYTHIC
@@ -43,6 +45,34 @@ export const ItemLine = (props: { item: IEquipmentItem; set?: ISetProgress }) =>
           {setPieceLabel(set)}
         </div>
       )}
+    </div>
+  )
+}
+
+// Pieces worn of a set, each bonus tier (✔ when on) and the enhance multiplier state.
+export const SetStatus = (props: {
+  set: ISetProgress
+  enhance: { threshold: number; multiplier: number }
+}) => {
+  const { set, enhance } = props
+  const muted = 'text-slate-500 dark:text-slate-400'
+  return (
+    <div className="flex flex-col gap-1">
+      <div className={`text-sm font-medium ${isSetComplete(set) ? 'text-emerald-600' : ''}`}>
+        {setPieceLabel(set)}
+      </div>
+      {set.tiers.map((tier) => (
+        <div
+          key={tier.pieces}
+          className={`text-xs ${isSetTierActive(set, tier) ? 'text-emerald-600' : muted}`}
+        >
+          {isSetTierActive(set, tier) ? '✔' : '○'} {tier.pieces} ชิ้น: {describeSetTier(tier)}
+        </div>
+      ))}
+      <div className={`text-xs ${set.isEnhanced ? 'text-emerald-600' : muted}`}>
+        ตีบวกทุกชิ้นที่ใส่ถึง +{enhance.threshold} ขึ้นไป โบนัสเปอร์เซ็นต์คูณ ×{enhance.multiplier}{' '}
+        · {set.isEnhanced ? 'ถึงแล้ว ✔' : 'ยังไม่ถึง'}
+      </div>
     </div>
   )
 }

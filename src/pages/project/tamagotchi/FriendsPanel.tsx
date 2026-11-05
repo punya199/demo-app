@@ -1,10 +1,12 @@
 import { Alert, Button, Card, Input, Modal, Popconfirm, Select, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { PetAvatar } from './PetAvatar'
+import { ResetCountdown } from './ResetCountdown'
 import {
   formatFriendCode,
   getGiftBlocker,
   getSupportBlocker,
+  nextResetAt,
   petLabel,
   stageLabel,
   statLabel,
@@ -355,6 +357,10 @@ export const FriendsPanel = (props: IFriendsPanelProps) => {
         <span className="text-xs text-slate-500">
           {data.friends.length}/{data.friendLimit} · ส่งของขวัญได้อีก {data.giftsLeft} ชิ้นวันนี้
         </span>
+      </div>
+      <div className="-mt-2 text-right text-xs text-slate-500">
+        🕒 ของขวัญ ทักทาย และเพดานรายได้เช่าตัว:{' '}
+        <ResetCountdown resetsAt={nextResetAt({ kind: 'daily' }, new Date())} />
       </div>
       {data.friends.length === 0 && (
         <p className="text-center text-sm text-slate-500">

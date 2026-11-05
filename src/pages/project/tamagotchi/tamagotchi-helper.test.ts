@@ -43,6 +43,7 @@ import {
   searchPassiveNodes,
   describePassiveEffect,
   describeReset,
+  nextResetAt,
   foldSelectedMonster,
   elementLabel,
   lineOptions,
@@ -713,6 +714,45 @@ describe('describeReset', () => {
     // 11:00Z is 18:00 in Thailand
     expect(describeReset('2026-01-01T11:00:00Z', new Date('2026-01-01T08:45:00Z'))).toBe(
       'รีเซ็ตใน 2 ชม. 15 นาที (18:00 น.)'
+    )
+  })
+
+  it('adds the weekday and date once the reset is a day or more away', () => {
+    // Monday 2026-11-09 00:00 Thai time is Sunday 17:00Z
+    const text = describeReset('2026-11-08T17:00:00Z', new Date('2026-11-06T17:00:00Z'))
+    expect(text).toContain('รีเซ็ตใน 2 วัน')
+    expect(text).toMatch(/\(.+ 9 .+ 00:00 น\.\)/)
+  })
+})
+
+describe('nextResetAt', () => {
+  // Thursday 2026-11-05 14:30 Thai time
+  const now = new Date('2026-11-05T07:30:00Z')
+
+  it('daily: the next Thai midnight', () => {
+    expect(nextResetAt({ kind: 'daily' }, now)).toBe('2026-11-05T17:00:00.000Z')
+  })
+
+  it('weekly: the next Monday 00:00 Thai time, and a full week from Monday itself', () => {
+    expect(nextResetAt({ kind: 'weekly' }, now)).toBe('2026-11-08T17:00:00.000Z')
+    expect(nextResetAt({ kind: 'weekly' }, new Date('2026-11-08T17:00:00Z'))).toBe(
+      '2026-11-15T17:00:00.000Z'
+    )
+  })
+
+  it('monthly: 00:00 Thai time on the 1st, across a year end', () => {
+    expect(nextResetAt({ kind: 'monthly' }, now)).toBe('2026-11-30T17:00:00.000Z')
+    expect(nextResetAt({ kind: 'monthly' }, new Date('2026-12-20T00:00:00Z'))).toBe(
+      '2026-12-31T17:00:00.000Z'
+    )
+  })
+
+  it('window: the next boundary of N-hour windows counted from Thai midnight', () => {
+    // 14:30 -> next 3h boundary is 15:00 Thai = 08:00Z; next 1h boundary is 15:00 too
+    expect(nextResetAt({ kind: 'window', hours: 3 }, now)).toBe('2026-11-05T08:00:00.000Z')
+    expect(nextResetAt({ kind: 'window', hours: 1 }, now)).toBe('2026-11-05T08:00:00.000Z')
+    expect(nextResetAt({ kind: 'window', hours: 3 }, new Date('2026-11-05T08:00:00Z'))).toBe(
+      '2026-11-05T11:00:00.000Z'
     )
   })
 })

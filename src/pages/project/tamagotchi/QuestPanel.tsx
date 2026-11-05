@@ -1,4 +1,5 @@
 import { Button, Card, Progress, Spin } from 'antd'
+import { ResetCountdown } from './ResetCountdown'
 import { IQuest, IQuestsData } from './tamagotchi-interface'
 import { useClaimLogin, useClaimQuest, useGetQuests } from './tamagotchi-service'
 
@@ -108,10 +109,14 @@ export const QuestPanel = (props: IQuestPanelProps) => {
       <LoginCard login={data.login} onError={onError} />
       <p className="text-center text-sm text-slate-500 dark:text-slate-400">
         ภารกิจประจำวัน รีเซ็ตเที่ยงคืนเวลาไทย
+        <br />
+        🕒 <ResetCountdown resetsAt={data.resetsAt} />
       </p>
       {data.quests.map(renderQuest)}
       <p className="text-center text-sm text-slate-500 dark:text-slate-400">
         ภารกิจประจำสัปดาห์ รีเซ็ตเที่ยงคืนวันจันทร์เวลาไทย
+        <br />
+        🕒 <ResetCountdown resetsAt={data.weekly.resetsAt} />
       </p>
       {data.weekly.quests.map(renderQuest)}
     </div>

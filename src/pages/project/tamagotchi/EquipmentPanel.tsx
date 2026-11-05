@@ -2,7 +2,7 @@ import { Button, Card, Checkbox, Popconfirm, Segmented, Select, Spin, Tag, Toolt
 import { useState } from 'react'
 import { EnhanceModal } from './EnhanceModal'
 import { RefineModal } from './RefineModal'
-import { CompareLine, ItemLine } from './EquipmentParts'
+import { CompareLine, ItemLine, SetStatus } from './EquipmentParts'
 import { MaterialsBag } from './MaterialsBag'
 import {
   BAG_SET_ALL,
@@ -12,12 +12,8 @@ import {
   countBagBySet,
   describeSetEffect,
   filterBag,
-  describeSetTier,
   getEquipBlocker,
-  isSetComplete,
-  isSetTierActive,
   isWornBy,
-  setPieceLabel,
   slotLabel,
 } from './tamagotchi-helper'
 import {
@@ -107,34 +103,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
         <Card size="small" title="โบนัสเซ็ต" className="dark:border-slate-700 dark:bg-slate-900">
           <div className="flex flex-col gap-3">
             {wornSets.map((set) => (
-              <div key={set.setId} className="flex flex-col gap-1">
-                <div
-                  className={`text-sm font-medium ${isSetComplete(set) ? 'text-emerald-600' : ''}`}
-                >
-                  {setPieceLabel(set)}
-                </div>
-                {set.tiers.map((tier) => (
-                  <div
-                    key={tier.pieces}
-                    className={`text-xs ${
-                      isSetTierActive(set, tier)
-                        ? 'text-emerald-600'
-                        : 'text-slate-500 dark:text-slate-400'
-                    }`}
-                  >
-                    {isSetTierActive(set, tier) ? '✔' : '○'} {tier.pieces} ชิ้น:{' '}
-                    {describeSetTier(tier)}
-                  </div>
-                ))}
-                <div
-                  className={`text-xs ${
-                    set.isEnhanced ? 'text-emerald-600' : 'text-slate-500 dark:text-slate-400'
-                  }`}
-                >
-                  ตีบวกทุกชิ้นที่ใส่ถึง +{data.enhance.threshold} ขึ้นไป โบนัสเปอร์เซ็นต์คูณ ×
-                  {data.enhance.multiplier} · {set.isEnhanced ? 'ถึงแล้ว ✔' : 'ยังไม่ถึง'}
-                </div>
-              </div>
+              <SetStatus key={set.setId} set={set} enhance={data.enhance} />
             ))}
           </div>
         </Card>
@@ -284,76 +253,78 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
             const blocker = getEquipBlocker(monster, item)
             return (
               <Card key={item.id} size="small" className="dark:border-slate-700 dark:bg-slate-900">
-                <div className="flex flex-wrap items-center gap-2">
-                  {selected !== null && (
-                    <Checkbox
-                      checked={selected.includes(item.id)}
-                      disabled={!!petOf(item) || isBusy}
-                      onChange={(event) =>
-                        setSelected(
-                          event.target.checked
-                            ? [...selected, item.id]
-                            : selected.filter((id) => id !== item.id)
-                        )
-                      }
-                    />
-                  )}
-                  <span className="text-xs text-slate-500">{slotLabel[item.slot]}</span>
-                  <ItemLine item={item} set={setOf(item)} />
-                  {petOf(item) && (
-                    <Tag color="purple">
-                      ใส่อยู่กับ {petOf(item)!.emoji} {petOf(item)!.name}
-                    </Tag>
-                  )}
-                  {petOf(item) ? (
-                    // One pet at a time: a piece another pet wears only moves on an explicit confirm.
-                    <Tooltip title={blocker}>
-                      <Popconfirm
-                        title="ย้ายมาใส่ตัวนี้?"
-                        description={`ถอดจาก ${petOf(item)!.name} แล้วใส่ให้ ${pet?.name ?? 'ตัวนี้'}`}
-                        okText="ย้าย"
-                        cancelText="ยกเลิก"
-                        disabled={!!blocker || isBusy}
-                        onConfirm={() => equip({ equipmentId: item.id, move: true }, { onError })}
-                      >
-                        <Button size="small" disabled={!!blocker || isBusy}>
-                          ย้ายมาใส่ตัวนี้
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-start gap-2">
+                    {selected !== null && (
+                      <Checkbox
+                        className="mt-1"
+                        checked={selected.includes(item.id)}
+                        disabled={!!petOf(item) || isBusy}
+                        onChange={(event) =>
+                          setSelected(
+                            event.target.checked
+                              ? [...selected, item.id]
+                              : selected.filter((id) => id !== item.id)
+                          )
+                        }
+                      />
+                    )}
+                    <ItemLine item={item} set={setOf(item)} />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                    <span className="text-slate-500 dark:text-slate-400">
+                      {slotLabel[item.slot]}
+                    </span>
+                    {petOf(item) && (
+                      <Tag color="purple" className="!m-0">
+                        ใส่อยู่กับ {petOf(item)!.emoji} {petOf(item)!.name}
+                      </Tag>
+                    )}
+                  </div>
+                  <CompareLine item={item} worn={worn.get(item.slot)} />
+                  <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+                    {petOf(item) ? (
+                      // One pet at a time: a piece another pet wears only moves on an explicit confirm.
+                      <Tooltip title={blocker}>
+                        <Popconfirm
+                          title="ย้ายมาใส่ตัวนี้?"
+                          description={`ถอดจาก ${petOf(item)!.name} แล้วใส่ให้ ${pet?.name ?? 'ตัวนี้'}`}
+                          okText="ย้าย"
+                          cancelText="ยกเลิก"
+                          disabled={!!blocker || isBusy}
+                          onConfirm={() => equip({ equipmentId: item.id, move: true }, { onError })}
+                        >
+                          <Button disabled={!!blocker || isBusy}>ย้ายมาใส่ตัวนี้</Button>
+                        </Popconfirm>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title={blocker}>
+                        <Button
+                          type="primary"
+                          disabled={!!blocker || isBusy}
+                          onClick={() => equip({ equipmentId: item.id }, { onError })}
+                        >
+                          สวม
                         </Button>
-                      </Popconfirm>
-                    </Tooltip>
-                  ) : (
-                    <Tooltip title={blocker}>
-                      <Button
-                        size="small"
-                        type="primary"
-                        disabled={!!blocker || isBusy}
-                        onClick={() => equip({ equipmentId: item.id }, { onError })}
-                      >
-                        สวม
+                      </Tooltip>
+                    )}
+                    <Button onClick={() => setEnhancing(item)}>ตีบวก</Button>
+                    {Object.keys(item.subStats).length > 0 && (
+                      <Button onClick={() => setRefiningId(item.id)}>
+                        รีไฟน์{item.pendingRefine ? ' (รอเลือก)' : ''}
                       </Button>
-                    </Tooltip>
-                  )}
-                  <Button size="small" onClick={() => setEnhancing(item)}>
-                    ตีบวก
-                  </Button>
-                  {Object.keys(item.subStats).length > 0 && (
-                    <Button size="small" onClick={() => setRefiningId(item.id)}>
-                      รีไฟน์{item.pendingRefine ? ' (รอเลือก)' : ''}
-                    </Button>
-                  )}
-                  <Popconfirm
-                    title="แยกชิ้นส่วนเป็นหินตีบวก?"
-                    description="อุปกรณ์ชิ้นนี้จะหายไป"
-                    okText="แยก"
-                    cancelText="ยกเลิก"
-                    onConfirm={() => dismantle(item.id, { onError })}
-                  >
-                    <Button size="small" danger disabled={isBusy || !!petOf(item)}>
-                      แยก
-                    </Button>
-                  </Popconfirm>
-                  <div className="basis-full">
-                    <CompareLine item={item} worn={worn.get(item.slot)} />
+                    )}
+                    <Popconfirm
+                      title="แยกชิ้นส่วนเป็นหินตีบวก?"
+                      description="อุปกรณ์ชิ้นนี้จะหายไป"
+                      okText="แยก"
+                      cancelText="ยกเลิก"
+                      onConfirm={() => dismantle(item.id, { onError })}
+                    >
+                      <Button danger disabled={isBusy || !!petOf(item)}>
+                        แยก
+                      </Button>
+                    </Popconfirm>
                   </div>
                 </div>
               </Card>

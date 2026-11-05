@@ -12,6 +12,29 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: '1.49.0',
+    // Provisional: set to the real release time once semantic-release publishes it.
+    releasedAt: '2026-11-05T17:30:00Z',
+    changes: [
+      {
+        kind: 'new',
+        text: 'คู่มือมีแท็บ "ตารางรีเซ็ต": ภารกิจรายวัน/รายสัปดาห์ จำนวนครั้ง PvP ซีซัน Boss Raid บอสโลก และของเพื่อน รีเซ็ตเมื่อไหร่ (เวลาไทย) พร้อมวันและเวลารีเซ็ตครั้งถัดไป',
+      },
+      {
+        kind: 'update',
+        text: 'ภารกิจ PvP บอสโลก และหน้าเพื่อน แสดงเวลานับถอยหลังและวันเวลารีเซ็ตแล้ว (เดิมมีแค่ Boss Raid) รีเซ็ตที่อยู่ไกลเกินหนึ่งวันจะบอกวันและวันที่ด้วย',
+      },
+      {
+        kind: 'update',
+        text: 'หน้าคราฟต์: การ์ดของแต่ละเซ็ตแสดงสถานะเซ็ตของตัวที่เลือก (ใส่ครบกี่ชิ้น โบนัสแต่ละขั้นติดแล้วหรือยัง และตีบวกถึงเกณฑ์หรือไม่) จะได้รู้ว่าควรคราฟต์ชิ้นไหนต่อ',
+      },
+      {
+        kind: 'update',
+        text: 'การ์ดอุปกรณ์ในกระเป๋าออกแบบใหม่ให้อ่านง่ายบนมือถือ: ชื่อและค่าพลังอยู่บน ปุ่มสวม / ตีบวก / รีไฟน์ / แยก เรียงเป็นตารางปุ่มใหญ่กดง่าย',
+      },
+    ],
+  },
+  {
     version: '1.48.0',
     // Provisional: set to the real release time once semantic-release publishes it.
     releasedAt: '2026-11-05T17:00:00Z',

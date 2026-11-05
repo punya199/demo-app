@@ -455,6 +455,7 @@ const MATS = {
   canopy:['#061c0a', '#1a5a1e', '#2a8a2a', '#52b83e', '#bcec7a'],
   wolfk: ['#06080e', '#1a2030', '#2a3448', '#445272', '#8a9cc0'],
   wolfk2:['#05060a', '#141826', '#202838', '#323e58', '#5a6a8c'],
+  wolfm: ['#0e1218', '#3a4656', '#5a6a80', '#8496ae', '#c8d4e4'],
   spirit:['#14241c', '#7aa892', '#b0d8c2', '#dcf4e6', '#ffffff'],
   spirit2:['#101c16', '#5e8a76', '#88b49e', '#acd2bc', '#d8f0e2'],
   antler:['#1e140a', '#6e5236', '#9a7a52', '#c8a87a', '#f4e0b8'],
@@ -1371,35 +1372,62 @@ const SPRITES = {
     if (P.glow) glowSap(s, 75 + hx, 43 + hy);
   }, glows: [[32, 32, '#a8ff9a', 6], [64, 36, '#6aff9a', 3], [46, 4, '#c8ff8a', 3]], emit: [{ x: 32, y: 30, type: 'leaf', rate: 1.6 }, { x: 50, y: 10, type: 'firefly', rate: 1.4 }, { x: 22, y: 40, type: 'petal', rate: .8 }], mouth: [75, 43] },
   wolfking: { size: 80, rig: QUAD, aura: { type: 'leaves', x: 40, y: 72, r: 30 }, draw(s, P) {
-    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 3;
+    const bx = P.body[0], by = P.body[1] - 4, hx = P.head[0] + bx, hy = P.head[1] + by - 1, t = P.tail, j = P.jaw * 3.2;
     const m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
-    s.L(18 + bx, 58 + by, 6 + bx, 48 + by - t, 4, 'wolfk', 3.2); leafShape(s, 5 + bx, 47 + by - t, 8, -2.2, 2.6, 'leafg', '#b0f490');
-    s.L(24 + bx, 62 + by, 23 + P.bf[0], 73 + P.bf[1], 3, 'wolfk2'); s.E(24 + P.bf[0], 75 + P.bf[1], 4, 1.8, 'wolfk2');
-    s.L(50 + bx, 62 + by, 51 + P.ff[0], 73 + P.ff[1], 3, 'wolfk2'); s.E(52 + P.ff[0], 75 + P.ff[1], 4, 1.8, 'wolfk2');
-    s.E(36 + bx, 58 + by, 19, 9.5, 'wolfk'); s.E(38 + bx, 64 + by, 12, 2.6, 'wolfb');
-    // the tree growing from its shoulders, roots spreading over the back
-    s.L(36 + bx, 52 + by, 34 + bx, 26 + by, 3.4, 'bark', 2.2); s.L(35 + bx, 34 + by, 28 + bx, 26 + by, 1.4, 'bark', .8); s.L(35 + bx, 31 + by, 42 + bx, 24 + by, 1.3, 'bark', .7);
-    for (const [x1, y1] of [[22, 53], [27, 55], [46, 54], [50, 52]]) s.L(36 + bx, 51 + by, x1 + bx, y1 + by, 1.3, 'bark', .7);
-    s.E(34 + bx, 18 + by, 13, 8, 'canopy'); s.E(24 + bx, 23 + by, 7, 5.5, 'canopy'); s.E(45 + bx, 22 + by, 7, 5.5, 'canopy'); s.E(34 + bx, 11 + by, 8, 5, 'canopy');
-    for (const [x, y] of [[28, 14], [38, 9], [42, 18], [24, 21], [33, 20], [47, 23]]) { s.E(x + bx, y + by, 1.4, 1.3, 'bloom'); }
-    s.line(m([[22, 26], [26, 27], [30, 26]], bx, by), '#1a5a1e').line(m([[38, 25], [44, 26]], bx, by), '#1a5a1e');
-    s.L(48 + bx, 58 + by, 57 + hx * .6 + bx * .4, 49 + hy * .6 + by * .4, 7, 'wolfk', 6);
-    s.E(51 + bx, 53 + by, 6, 5, 'moss'); s.E(55 + bx, 58 + by, 4, 5, 'moss');
-    for (const [x, y, a] of [[45, 50, -2.3], [50, 48, -1.9], [55, 50, -1.4], [58, 56, -.9]]) leafShape(s, x + bx, y + by, 6, a, 2, 'leafg', '#b0f490');
-    s.L(28 + bx, 63 + by, 27 + P.bl[0], 75 + P.bl[1], 3.4, 'wolfk'); s.E(28 + P.bl[0], 77 + P.bl[1], 4.5, 2, 'wolfk');
-    s.L(46 + bx, 63 + by, 47 + P.fl[0], 75 + P.fl[1], 3.4, 'wolfk'); s.E(48 + P.fl[0], 77 + P.fl[1], 4.5, 2, 'wolfk');
-    for (const x of [25, 28, 31]) s.d(x + P.bl[0], 78 + P.bl[1], '#f4ede0'); for (const x of [45, 48, 51]) s.d(x + P.fl[0], 78 + P.fl[1], '#f4ede0');
-    s.spike(56 + hx, 40 + hy, 7, 2.4, 'wolfk', -1.5); s.spike(62 + hx, 40.5 + hy, 6, 2.2, 'wolfk');
-    s.E(61 + hx, 46 + hy, 8.5, 7, 'wolfk');
-    s.P(m([[63, 43], [77, 47], [77, 51], [63, 52]], hx, hy), 'wolfk');
-    s.P(m([[63, 51.5], [76, 51 + j], [73, 54.5 + j], [63, 55]], hx, hy), 'wolfb');
-    if (j > 1) s.P(m([[65, 51.5], [76, 51.5], [73, 51 + j], [65, 52.5 + j * .5]], hx, hy), 'maw');
-    for (const x of [68, 71, 74]) s.d(x + hx, 52 + hy, '#ffffff'); if (j > 1) for (const x of [69, 72]) s.d(x + hx, 51 + hy + j, '#ffffff');
-    s.d(77 + hx, 47 + hy, '#06080e').d(78 + hx, 48 + hy, '#06080e');
-    s.line(m([[55, 46], [59, 49], [58, 53]], hx, hy), '#4a9234');
-    s.d(64 + hx, 45 + hy, '#fff6b0').d(65 + hx, 45 + hy, '#ffd84a').d(63 + hx, 44 + hy, '#06080e').d(64 + hx, 44 + hy, '#06080e').d(65 + hx, 44 + hy, '#06080e').d(66 + hx, 44 + hy, '#06080e');
-    if (P.glow) glowSap(s, 77 + hx, 50 + hy);
-  }, glows: [[65, 45, '#ffd84a', 3], [34, 16, '#c8ff8a', 7]], emit: [{ x: 34, y: 12, type: 'leaf', rate: 1.6 }, { x: 34, y: 18, type: 'firefly', rate: 1.2 }, { x: 50, y: 50, type: 'pollen', rate: 1 }], mouth: [77, 50] },
+    // a vine wrapped across a part of the body: a curve with leaves and glowing buds on it
+    const vine = (pts, leaves = [], buds = []) => {
+      s.line(pts, '#2e6a24', '#5aa83a'); s.line(pts.map(([x, y]) => [x, y + 1]), '#16401a');
+      for (const [i, a] of leaves) leafShape(s, pts[i][0], pts[i][1], 5, a, 1.6, 'leafg', '#b0f490');
+      for (const i of buds) s.E(pts[i][0], pts[i][1], 1, 1, 'sap');
+    };
+    // long bushy tail sweeping back, fur tufts along it
+    s.L(19 + bx, 55 + by, 10 + bx, 57 + by - t * .5, 5, 'wolfk', 4.6); s.L(10 + bx, 57 + by - t * .5, 3 + bx, 51 + by - t, 4.6, 'wolfk', 1.6);
+    for (const [x, y, a] of [[14, 52, -2], [9, 53, -2.3], [5, 49, -2.5], [13, 60, 2.2], [8, 59, 2.5], [4, 55, 2.8]]) s.P(m([[x - 1.5, y], [x + Math.cos(a) * 5, y + Math.sin(a) * 4 - (x < 10 ? t : t * .5)], [x + 1.5, y]], bx, by), 'wolfk');
+    s.E(3.5 + bx, 50 + by - t, 2.2, 2, 'wolfm');
+    vine(m([[17, 52], [15, 59], [11, 59], [8, 53], [5, 51]], bx, by - t * .4), [[3, -2.4]], [1]);
+    // far legs
+    s.L(24 + bx, 62 + by, 21 + P.bf[0], 74 + P.bf[1], 2.6, 'wolfk2', 1.9); s.E(22 + P.bf[0], 76 + P.bf[1], 3.6, 1.6, 'wolfk2');
+    s.L(50 + bx, 62 + by, 53 + P.ff[0], 74 + P.ff[1], 2.6, 'wolfk2', 1.9); s.E(54 + P.ff[0], 76 + P.ff[1], 3.6, 1.6, 'wolfk2');
+    // lean body, deep chest, strong haunch
+    s.P(m([[18, 52], [30, 50], [44, 47], [54, 50], [56, 62], [44, 64], [28, 64], [17, 62]], bx, by), 'wolfk'); s.E(22 + bx, 57 + by, 7.5, 7.5, 'wolfk'); s.E(49 + bx, 56 + by, 9, 9.5, 'wolfk');
+    s.E(37 + bx, 63 + by, 9, 1.4, 'wolfm');
+    s.line(m([[18, 52], [22, 50], [27, 52]], bx, by), '#1a2030').line(m([[30, 50], [34, 49], [38, 51]], bx, by), '#1a2030').line(m([[16, 60], [19, 63]], bx, by), '#1a2030');
+    // vines wrapped round the barrel and haunch
+    vine(m([[22, 50], [25, 55], [24, 60], [27, 64]], bx, by), [[1, -.6]], [2]);
+    vine(m([[34, 48], [36, 54], [35, 59], [38, 64]], bx, by), [[0, -2.2], [3, .6]], [1]);
+    // near legs: hind leg with a bent hock, foreleg straight and planted
+    s.L(24 + bx, 60 + by, 29 + P.bl[0] * .5, 68 + P.bl[1] * .5, 4.6, 'wolfk', 2.4); s.L(29 + P.bl[0] * .5, 68 + P.bl[1] * .5, 26 + P.bl[0], 76 + P.bl[1], 2.2, 'wolfk', 2); s.E(27 + P.bl[0], 77 + P.bl[1], 4.5, 1.8, 'wolfk');
+    s.L(49 + bx, 62 + by, 50 + P.fl[0], 76 + P.fl[1], 3.4, 'wolfk', 2.1); s.E(51 + P.fl[0], 77 + P.fl[1], 4.5, 1.8, 'wolfk');
+    for (const x of [24, 27, 30]) s.d(x + P.bl[0], 79 + P.bl[1], '#f4ede0'); for (const x of [48, 51, 54]) s.d(x + P.fl[0], 79 + P.fl[1], '#f4ede0');
+    vine([[47 + P.fl[0] * .3, 66], [52 + P.fl[0] * .5, 68.5], [47 + P.fl[0] * .7, 71], [52 + P.fl[0] * .8, 73.5]], [[1, -.4]], [2]);
+    // thick shaggy ruff round the neck and shoulders, tufts flaring back and down
+    const nx = 56 + (hx - bx) * .55 + bx, ny = 48 + (hy - by) * .55 + by;
+    const cx = nx - 3, cy = ny + 1;
+    for (let i = 0; i < 17; i++) {
+      const a = 1.05 + i * .25, r0 = 8, r1 = (i % 2 ? 19 : 15.5) - Math.abs(i - 8) * .35, sw = .2;
+      s.P([[cx + Math.cos(a - sw) * r0, cy + Math.sin(a - sw) * r0], [cx + Math.cos(a + .12) * r1, cy + Math.sin(a + .12) * r1 * .9], [cx + Math.cos(a + sw) * r0, cy + Math.sin(a + sw) * r0]], 'wolfm');
+    }
+    s.E(cx, cy, 11, 12, 'wolfm');
+    for (let i = 0; i < 14; i++) { const a = 1.2 + i * .3, r = i % 2 ? 13 : 10; s.line([[cx + Math.cos(a) * 4, cy + Math.sin(a) * 4.5], [cx + Math.cos(a + .1) * r, cy + Math.sin(a + .1) * r * .9]], i % 3 ? '#3a4656' : '#c8d4e4'); }
+    vine([[nx - 11, ny - 4], [nx - 6, ny + 2], [nx - 3, ny + 8], [nx + 3, ny + 11], [nx + 7, ny + 9]], [[1, 2.4], [4, -.2]], [2, 3]);
+    // head: tall swept ears, long muzzle, heavy brow, slit eye
+    s.spike(59 + hx, 36 + hy, 10, 2.6, 'wolfk', -3); s.spike(64.5 + hx, 36.5 + hy, 9, 2.4, 'wolfk', -2);
+    s.d(58 + hx, 31 + hy, '#5a3a5a').d(58 + hx, 33 + hy, '#5a3a5a').d(63 + hx, 32 + hy, '#5a3a5a');
+    s.E(63 + hx, 41 + hy, 8, 6.5, 'wolfk');
+    s.P(m([[64, 37.5], [79, 42.5], [78.5, 45.5], [65, 47]], hx, hy), 'wolfk');
+    s.P(m([[58, 42], [51, 43], [56, 46], [50, 49], [60, 48]], hx, hy), 'wolfm');
+    s.P(m([[65, 46], [77, 45.5 + j], [74, 48.5 + j], [65, 49.5]], hx, hy), 'wolfk2');
+    s.line(m([[66, 46], [76, 45.5]], hx, hy), '#8a9cc0');
+    if (j > 1) s.P(m([[67, 46.5], [78, 46.5], [75, 46 + j], [67, 47.5 + j * .5]], hx, hy), 'maw');
+    for (const x of [70, 73, 76]) s.d(x + hx, 47 + hy, '#ffffff'); s.d(68 + hx, 48 + hy, '#ffffff').d(68 + hx, 49 + hy, '#ffffff');
+    if (j > 1) for (const x of [71, 74]) s.d(x + hx, 46 + hy + j, '#ffffff');
+    s.d(79 + hx, 42 + hy, '#06080e').d(80 + hx, 43 + hy, '#06080e').d(79 + hx, 43 + hy, '#06080e');
+    s.line(m([[62, 39.5], [66, 38.5], [70, 39.5]], hx, hy), '#06080e');
+    s.line(m([[68, 41], [74, 42.5]], hx, hy), '#1a2030');
+    s.d(64 + hx, 40.5 + hy, '#06080e').d(65 + hx, 40.5 + hy, '#e8ff8a').d(66 + hx, 40.5 + hy, '#b8ff4a').d(67 + hx, 40.5 + hy, '#06080e').d(65 + hx, 41.5 + hy, '#06080e').d(66 + hx, 41.5 + hy, '#06080e');
+    vine(m([[60, 36], [63, 37.5], [66, 36.5]], hx, hy), [[2, -1.2]], []);
+    if (P.glow) glowSap(s, 79 + hx, 46 + hy);
+  }, glows: [[66, 41, '#b8ff4a', 3], [36, 56, '#6aff6a', 2], [24, 62, '#6aff6a', 2], [55, 58, '#6aff6a', 2]], emit: [{ x: 40, y: 52, type: 'leaf', rate: 1.2 }, { x: 54, y: 56, type: 'pollen', rate: 1.2 }, { x: 66, y: 40, type: 'firefly', rate: .6 }], mouth: [79, 46] },
   /* ----- Leaf fused form (พนาผู้ตื่น): the forest elk awakened, gold armour, glowing world-tree antlers ----- */
   lfused: { size: 88, rig: QUAD, aura: { type: 'twinl', x: 40, y: 78, r: 34 }, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 2.2;
@@ -1725,7 +1753,7 @@ const LEAF_LINE = [
     { id: 'barkwolf', name: 'หมาป่าเปลือกไม้', old: 'เดิม ช้างพฤกษา 🐘 (หมาป่ากลายเป็นช้าง) · หมาป่าตัวใหญ่ เกราะเปลือกไม้บนหลังและหัว รอยแยกยางไม้เรืองเขียว', st: 'new' } ] },
   { stage: 'ร่างสุดท้าย', items: [
     { id: 'forestdeer', name: 'เทพพนาลัย', old: 'คงชื่อ ปรับร่าง เดิมเป็นต้นไม้ 🌳 · กวางยักษ์สีหยก แบกป่าเล็กไว้บนหลัง เขาเป็นกิ่งไม้ใหญ่', st: 'tweak' },
-    { id: 'wolfking', name: 'ราชาหมาป่าพงไพร', old: 'เดิม เอนท์พิทักษ์ 🌲 (ต้นไม้เดินได้ ซ้ำกับตอไม้แก่) · หมาป่ายักษ์สีคราม มีต้นไม้ออกดอกงอกจากไหล่', st: 'new' } ] },
+    { id: 'wolfking', name: 'ราชาหมาป่าพงไพร', old: 'เดิม เอนท์พิทักษ์ 🌲 (ต้นไม้เดินได้ ซ้ำกับตอไม้แก่) · หมาป่ายักษ์สีคราม ยืนสง่า ขนคอหนาฟูสีเงิน เถาวัลย์พันรอบตัว ขา และหาง ตาเรืองเขียว', st: 'new' } ] },
 ];
 buildBoard(document.getElementById('evo-leaf'), LEAF_LINE);
 const evo = document.getElementById('evo');
@@ -3126,7 +3154,7 @@ const PLAN = [
     ['สมบูรณ์', 'พยัคฆ์ไพร 🐅', 'กวางเขาพฤกษา', 'ต่อจากกวางใบไม้ เขาเป็นกิ่งไม้ใหญ่มีดอกไม้'],
     ['สมบูรณ์', 'ช้างพฤกษา 🐘', 'หมาป่าเปลือกไม้', 'ต่อจากหมาป่าไพร มีเกราะเปลือกไม้และเถาวัลย์'],
     ['ร่างสุดท้าย', 'เทพพนาลัย 🌳', 'เทพพนาลัย (ปรับ)', 'คงชื่อ วาดเป็นกวางยักษ์ที่แบกป่าทั้งผืนไว้บนหลัง'],
-    ['ร่างสุดท้าย', 'เอนท์พิทักษ์ 🌲', 'ราชาหมาป่าพงไพร', 'ต้นไม้เดินได้ซ้ำกับร่างแรก เปลี่ยนเป็นหมาป่ายักษ์มีต้นไม้งอกบนหลัง'] ],
+    ['ร่างสุดท้าย', 'เอนท์พิทักษ์ 🌲', 'ราชาหมาป่าพงไพร', 'ต้นไม้เดินได้ซ้ำกับร่างแรก เปลี่ยนเป็นหมาป่ายักษ์ขนคอหนา มีเถาวัลย์พันตัว'] ],
     keep: 'ไข่พฤกษ์, เมล็ดจิ๋ว, ต้นอ่อน, กวางใบไม้, เห็ดง่วง, หมาป่าไพร, ตอไม้แก่' },
   { line: 'สายศิลา', fam: 'สัตว์เกราะหิน', sum: 'เปลี่ยน 4', rows: [
     ['สมบูรณ์', 'หมีหินผา 🐻', 'เต่าผาหิน', 'ต่อจากเต่าศิลา กระดองเป็นแท่งหินผา'],

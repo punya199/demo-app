@@ -1,10 +1,10 @@
 import { Button, Card, Modal, Progress, Spin, Tooltip } from 'antd'
-import { craftMaterialLabel, formatAge, getExpeditionBlocker } from './tamagotchi-helper'
+import { itemLabel, itemSourcesOf } from './inventory-helper'
+import { formatAge, getExpeditionBlocker } from './tamagotchi-helper'
 import { IMonsterData } from './tamagotchi-interface'
 import {
   useClaimExpedition,
   useGetExpedition,
-  useGetShopItems,
   useGetWiki,
   useStartExpedition,
 } from './tamagotchi-service'
@@ -17,7 +17,6 @@ interface IExpeditionPanelProps {
 export const ExpeditionPanel = (props: IExpeditionPanelProps) => {
   const { monster, onError } = props
   const { data, isLoading } = useGetExpedition()
-  const { data: shop } = useGetShopItems()
   const { data: wiki } = useGetWiki()
   const { mutate: start, isPending: isStarting } = useStartExpedition()
   const { mutate: claim, isPending: isClaiming } = useClaimExpedition()
@@ -27,13 +26,7 @@ export const ExpeditionPanel = (props: IExpeditionPanelProps) => {
   }
 
   const area = data.areas.find((candidate) => candidate.id === monster?.expeditionAreaId)
-  const itemLabel = (itemId: string) => {
-    const item = shop?.items.find((candidate) => candidate.id === itemId)
-    const material = wiki?.equipment.materials.find((candidate) => candidate.id === itemId)
-    const found = item ?? material
-    // Craft materials are not sellable, so the server leaves them out of wiki.equipment.materials.
-    return found ? `${found.emoji} ${found.name}` : (craftMaterialLabel[itemId] ?? itemId)
-  }
+  const sources = itemSourcesOf(wiki)
 
   const showSummary = (summary: { minutes: number; coins: number; items: string[] }) =>
     Modal.success({
@@ -49,7 +42,7 @@ export const ExpeditionPanel = (props: IExpeditionPanelProps) => {
             )
           ).map(([itemId, count]) => (
             <div key={itemId}>
-              {itemLabel(itemId)} +{count}
+              {itemLabel(itemId, sources)} +{count}
             </div>
           ))}
         </div>

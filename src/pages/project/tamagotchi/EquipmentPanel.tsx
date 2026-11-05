@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { EnhanceModal } from './EnhanceModal'
 import { RefineModal } from './RefineModal'
 import { CompareLine, ItemLine } from './EquipmentParts'
+import { MaterialsBag } from './MaterialsBag'
 import {
   BAG_SET_ALL,
   BAG_SET_NONE,
@@ -54,6 +55,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
   const [bagSlot, setBagSlot] = useState<BagFilterSlot>('all')
   const [freeOnly, setFreeOnly] = useState(false)
   const [bagSet, setBagSet] = useState<BagFilterSet>(BAG_SET_ALL)
+  const [bagTab, setBagTab] = useState<'gear' | 'materials'>('gear')
 
   if (isLoading || !data) {
     return <Spin />
@@ -181,170 +183,184 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
         })}
       </div>
 
-      <div className="mt-2 flex items-center justify-between">
-        <span className="font-semibold text-slate-900 dark:text-slate-100">กระเป๋าอุปกรณ์</span>
-        <span className="text-xs text-slate-500">
-          {data.items.length}/{data.capacity}
-        </span>
-      </div>
-      <div className="overflow-x-auto">
-        <Segmented<BagFilterSlot>
-          value={bagSlot}
-          onChange={setBagSlot}
-          options={[
-            { value: 'all', label: `ทั้งหมด (${countIn('all')})` },
-            ...Object.values(EnumEquipmentSlot).map((slot) => ({
-              value: slot,
-              label: `${slotLabel[slot]} (${countIn(slot)})`,
-            })),
-          ]}
-        />
-      </div>
-      <Select<BagFilterSet>
-        value={bagSet}
-        onChange={setBagSet}
-        options={setOptions}
-        className="w-full"
-        showSearch
-        optionFilterProp="label"
+      <Segmented<'gear' | 'materials'>
+        value={bagTab}
+        onChange={setBagTab}
+        options={[
+          { value: 'gear', label: 'อุปกรณ์' },
+          { value: 'materials', label: 'วัตถุดิบ' },
+        ]}
       />
-      <Checkbox checked={freeOnly} onChange={(event) => setFreeOnly(event.target.checked)}>
-        เฉพาะชิ้นที่ยังไม่มีใครใส่
-      </Checkbox>
-      {selected === null ? (
-        <Button size="small" onClick={() => setSelected([])}>
-          เลือกแยกหลายชิ้น
-        </Button>
+      {bagTab === 'materials' ? (
+        <MaterialsBag onOpenGear={() => setBagTab('gear')} />
       ) : (
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            size="small"
-            onClick={() =>
-              setSelected(shownBag.filter((item) => !petOf(item)).map((item) => item.id))
-            }
-          >
-            เลือกทั้งหมดที่แสดง
-          </Button>
-          <Button size="small" onClick={() => setSelected([])}>
-            ล้าง
-          </Button>
-          <Popconfirm
-            title={`แยก ${selected.length} ชิ้นเป็นหินตีบวก?`}
-            description={(() => {
-              const risky = data.items.filter(
-                (item) =>
-                  selected.includes(item.id) &&
-                  (item.grade === EnumEquipmentGrade.EPIC ||
-                    item.grade === EnumEquipmentGrade.LEGENDARY ||
-                    item.grade === EnumEquipmentGrade.MYTHIC ||
-                    item.enhanceLevel > 0)
-              ).length
-              return risky > 0
-                ? `มีชิ้นเกรดสูงหรือตีบวกแล้ว ${risky} ชิ้น อุปกรณ์ทั้งหมดจะหายไป`
-                : 'อุปกรณ์ทั้งหมดจะหายไป'
-            })()}
-            okText="แยก"
-            cancelText="ยกเลิก"
-            disabled={selected.length === 0 || isBusy}
-            onConfirm={() =>
-              dismantleMany(selected, { onError, onSuccess: () => setSelected(null) })
-            }
-          >
-            <Button size="small" danger disabled={selected.length === 0 || isBusy}>
-              แยกที่เลือก ({selected.length})
+        <>
+          <div className="mt-2 flex items-center justify-between">
+            <span className="font-semibold text-slate-900 dark:text-slate-100">กระเป๋าอุปกรณ์</span>
+            <span className="text-xs text-slate-500">
+              {data.items.length}/{data.capacity}
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <Segmented<BagFilterSlot>
+              value={bagSlot}
+              onChange={setBagSlot}
+              options={[
+                { value: 'all', label: `ทั้งหมด (${countIn('all')})` },
+                ...Object.values(EnumEquipmentSlot).map((slot) => ({
+                  value: slot,
+                  label: `${slotLabel[slot]} (${countIn(slot)})`,
+                })),
+              ]}
+            />
+          </div>
+          <Select<BagFilterSet>
+            value={bagSet}
+            onChange={setBagSet}
+            options={setOptions}
+            className="w-full"
+            showSearch
+            optionFilterProp="label"
+          />
+          <Checkbox checked={freeOnly} onChange={(event) => setFreeOnly(event.target.checked)}>
+            เฉพาะชิ้นที่ยังไม่มีใครใส่
+          </Checkbox>
+          {selected === null ? (
+            <Button size="small" onClick={() => setSelected([])}>
+              เลือกแยกหลายชิ้น
             </Button>
-          </Popconfirm>
-          <Button size="small" type="link" onClick={() => setSelected(null)}>
-            เสร็จสิ้น
-          </Button>
-        </div>
-      )}
-      {shownBag.length === 0 && (
-        <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-          {bag.length === 0
-            ? 'ยังไม่มีอุปกรณ์ในกระเป๋า ซื้อกล่องสุ่มที่ร้านค้า หรือสู้ในผจญภัยเพื่อลุ้นดรอป'
-            : 'ไม่มีอุปกรณ์ประเภทนี้'}
-        </p>
-      )}
-      {shownBag.map((item) => {
-        const blocker = getEquipBlocker(monster, item)
-        return (
-          <Card key={item.id} size="small" className="dark:border-slate-700 dark:bg-slate-900">
+          ) : (
             <div className="flex flex-wrap items-center gap-2">
-              {selected !== null && (
-                <Checkbox
-                  checked={selected.includes(item.id)}
-                  disabled={!!petOf(item) || isBusy}
-                  onChange={(event) =>
-                    setSelected(
-                      event.target.checked
-                        ? [...selected, item.id]
-                        : selected.filter((id) => id !== item.id)
-                    )
-                  }
-                />
-              )}
-              <span className="text-xs text-slate-500">{slotLabel[item.slot]}</span>
-              <ItemLine item={item} set={setOf(item)} />
-              {petOf(item) && (
-                <Tag color="purple">
-                  ใส่อยู่กับ {petOf(item)!.emoji} {petOf(item)!.name}
-                </Tag>
-              )}
-              {petOf(item) ? (
-                // One pet at a time: a piece another pet wears only moves on an explicit confirm.
-                <Tooltip title={blocker}>
-                  <Popconfirm
-                    title="ย้ายมาใส่ตัวนี้?"
-                    description={`ถอดจาก ${petOf(item)!.name} แล้วใส่ให้ ${pet?.name ?? 'ตัวนี้'}`}
-                    okText="ย้าย"
-                    cancelText="ยกเลิก"
-                    disabled={!!blocker || isBusy}
-                    onConfirm={() => equip({ equipmentId: item.id, move: true }, { onError })}
-                  >
-                    <Button size="small" disabled={!!blocker || isBusy}>
-                      ย้ายมาใส่ตัวนี้
-                    </Button>
-                  </Popconfirm>
-                </Tooltip>
-              ) : (
-                <Tooltip title={blocker}>
-                  <Button
-                    size="small"
-                    type="primary"
-                    disabled={!!blocker || isBusy}
-                    onClick={() => equip({ equipmentId: item.id }, { onError })}
-                  >
-                    สวม
-                  </Button>
-                </Tooltip>
-              )}
-              <Button size="small" onClick={() => setEnhancing(item)}>
-                ตีบวก
+              <Button
+                size="small"
+                onClick={() =>
+                  setSelected(shownBag.filter((item) => !petOf(item)).map((item) => item.id))
+                }
+              >
+                เลือกทั้งหมดที่แสดง
               </Button>
-              {Object.keys(item.subStats).length > 0 && (
-                <Button size="small" onClick={() => setRefiningId(item.id)}>
-                  รีไฟน์{item.pendingRefine ? ' (รอเลือก)' : ''}
-                </Button>
-              )}
+              <Button size="small" onClick={() => setSelected([])}>
+                ล้าง
+              </Button>
               <Popconfirm
-                title="แยกชิ้นส่วนเป็นหินตีบวก?"
-                description="อุปกรณ์ชิ้นนี้จะหายไป"
+                title={`แยก ${selected.length} ชิ้นเป็นหินตีบวก?`}
+                description={(() => {
+                  const risky = data.items.filter(
+                    (item) =>
+                      selected.includes(item.id) &&
+                      (item.grade === EnumEquipmentGrade.EPIC ||
+                        item.grade === EnumEquipmentGrade.LEGENDARY ||
+                        item.grade === EnumEquipmentGrade.MYTHIC ||
+                        item.enhanceLevel > 0)
+                  ).length
+                  return risky > 0
+                    ? `มีชิ้นเกรดสูงหรือตีบวกแล้ว ${risky} ชิ้น อุปกรณ์ทั้งหมดจะหายไป`
+                    : 'อุปกรณ์ทั้งหมดจะหายไป'
+                })()}
                 okText="แยก"
                 cancelText="ยกเลิก"
-                onConfirm={() => dismantle(item.id, { onError })}
+                disabled={selected.length === 0 || isBusy}
+                onConfirm={() =>
+                  dismantleMany(selected, { onError, onSuccess: () => setSelected(null) })
+                }
               >
-                <Button size="small" danger disabled={isBusy || !!petOf(item)}>
-                  แยก
+                <Button size="small" danger disabled={selected.length === 0 || isBusy}>
+                  แยกที่เลือก ({selected.length})
                 </Button>
               </Popconfirm>
-              <div className="basis-full">
-                <CompareLine item={item} worn={worn.get(item.slot)} />
-              </div>
+              <Button size="small" type="link" onClick={() => setSelected(null)}>
+                เสร็จสิ้น
+              </Button>
             </div>
-          </Card>
-        )
-      })}
+          )}
+          {shownBag.length === 0 && (
+            <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+              {bag.length === 0
+                ? 'ยังไม่มีอุปกรณ์ในกระเป๋า ซื้อกล่องสุ่มที่ร้านค้า หรือสู้ในผจญภัยเพื่อลุ้นดรอป'
+                : 'ไม่มีอุปกรณ์ประเภทนี้'}
+            </p>
+          )}
+          {shownBag.map((item) => {
+            const blocker = getEquipBlocker(monster, item)
+            return (
+              <Card key={item.id} size="small" className="dark:border-slate-700 dark:bg-slate-900">
+                <div className="flex flex-wrap items-center gap-2">
+                  {selected !== null && (
+                    <Checkbox
+                      checked={selected.includes(item.id)}
+                      disabled={!!petOf(item) || isBusy}
+                      onChange={(event) =>
+                        setSelected(
+                          event.target.checked
+                            ? [...selected, item.id]
+                            : selected.filter((id) => id !== item.id)
+                        )
+                      }
+                    />
+                  )}
+                  <span className="text-xs text-slate-500">{slotLabel[item.slot]}</span>
+                  <ItemLine item={item} set={setOf(item)} />
+                  {petOf(item) && (
+                    <Tag color="purple">
+                      ใส่อยู่กับ {petOf(item)!.emoji} {petOf(item)!.name}
+                    </Tag>
+                  )}
+                  {petOf(item) ? (
+                    // One pet at a time: a piece another pet wears only moves on an explicit confirm.
+                    <Tooltip title={blocker}>
+                      <Popconfirm
+                        title="ย้ายมาใส่ตัวนี้?"
+                        description={`ถอดจาก ${petOf(item)!.name} แล้วใส่ให้ ${pet?.name ?? 'ตัวนี้'}`}
+                        okText="ย้าย"
+                        cancelText="ยกเลิก"
+                        disabled={!!blocker || isBusy}
+                        onConfirm={() => equip({ equipmentId: item.id, move: true }, { onError })}
+                      >
+                        <Button size="small" disabled={!!blocker || isBusy}>
+                          ย้ายมาใส่ตัวนี้
+                        </Button>
+                      </Popconfirm>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title={blocker}>
+                      <Button
+                        size="small"
+                        type="primary"
+                        disabled={!!blocker || isBusy}
+                        onClick={() => equip({ equipmentId: item.id }, { onError })}
+                      >
+                        สวม
+                      </Button>
+                    </Tooltip>
+                  )}
+                  <Button size="small" onClick={() => setEnhancing(item)}>
+                    ตีบวก
+                  </Button>
+                  {Object.keys(item.subStats).length > 0 && (
+                    <Button size="small" onClick={() => setRefiningId(item.id)}>
+                      รีไฟน์{item.pendingRefine ? ' (รอเลือก)' : ''}
+                    </Button>
+                  )}
+                  <Popconfirm
+                    title="แยกชิ้นส่วนเป็นหินตีบวก?"
+                    description="อุปกรณ์ชิ้นนี้จะหายไป"
+                    okText="แยก"
+                    cancelText="ยกเลิก"
+                    onConfirm={() => dismantle(item.id, { onError })}
+                  >
+                    <Button size="small" danger disabled={isBusy || !!petOf(item)}>
+                      แยก
+                    </Button>
+                  </Popconfirm>
+                  <div className="basis-full">
+                    <CompareLine item={item} worn={worn.get(item.slot)} />
+                  </div>
+                </div>
+              </Card>
+            )
+          })}
+        </>
+      )}
       <RefineModal
         item={data.items.find((row) => row.id === refiningId) ?? null}
         coin={coin}

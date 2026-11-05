@@ -158,7 +158,7 @@ td.st { white-space: nowrap; color: var(--muted) }
       <option value="leaf">มอนธาตุพฤกษ์ + สกิล</option>
       <option value="earth">มอนธาตุศิลา + สกิล</option>
       <option value="bolt">มอนธาตุอสนี + สกิล</option>
-      <option value="holy">มอนธาตุรัศมี (ภาพนิ่ง รอเลือกแบบ)</option>
+      <option value="holy">มอนธาตุรัศมี + สกิล</option>
       <option value="plan">แผนออกแบบทั้ง 8 สาย</option>
     </select>
     <span class="hint" id="jump-hint">ฉากต่อสู้อยู่บนสุดเสมอ</span>
@@ -166,7 +166,7 @@ td.st { white-space: nowrap; color: var(--muted) }
   <header style="order:0">
     <div class="eyebrow">ข้อเสนองานภาพ · ตัวอย่างให้ดูก่อน</div>
     <h1>มอนอารีนา <span class="tag">โฉมใหม่</span></h1>
-    <p class="lede">ตอนนี้ทำแล้ว 5 สาย: เพลิง วารี พฤกษ์ ศิลา และอสนี สายรัศมีมีภาพนิ่งให้เลือกแบบ สนามมุมเฉียงแบบ 2.5D สไตล์พิกเซลอาร์ต มอนมีเงาและแสงจากมุมซ้ายบน ท่าโจมตี หลบ ตั้งรับ และสกิลมีเอฟเฟกต์ของแต่ละธาตุ ทุกอย่างในหน้านี้วาดด้วยโค้ด ไม่มีรูปจากที่อื่น กดปุ่มด้านล่างฉากเพื่อลองได้เลย</p>
+    <p class="lede">ตอนนี้ทำแล้ว 6 สาย: เพลิง วารี พฤกษ์ ศิลา อสนี และรัศมี สนามมุมเฉียงแบบ 2.5D สไตล์พิกเซลอาร์ต มอนมีเงาและแสงจากมุมซ้ายบน ท่าโจมตี หลบ ตั้งรับ และสกิลมีเอฟเฟกต์ของแต่ละธาตุ ทุกอย่างในหน้านี้วาดด้วยโค้ด ไม่มีรูปจากที่อื่น กดปุ่มด้านล่างฉากเพื่อลองได้เลย</p>
   </header>
 
   <section aria-labelledby="battle-h" data-group="battle" style="order:1">
@@ -193,8 +193,8 @@ td.st { white-space: nowrap; color: var(--muted) }
         <div class="row" id="leaf-skills"></div></div>
         <div class="skgroup" data-el="bolt"><div class="ctl-title">สกิลธาตุอสนีในเกม 8 ท่า</div>
         <div class="row" id="bolt-skills"></div></div>
-        <div class="skgroup" data-el="holy"><div class="ctl-title">สกิลธาตุรัศมี</div>
-        <div class="hint">ยังไม่ได้ทำ รอเลือกแบบมอนสายรัศมีก่อน แล้วค่อยทำท่าทางและสกิล</div></div>
+        <div class="skgroup" data-el="holy"><div class="ctl-title">สกิลธาตุรัศมีในเกม 8 ท่า</div>
+        <div class="row" id="holy-skills"></div></div>
         <div class="skgroup" data-el="earth"><div class="ctl-title">สกิลธาตุศิลาในเกม 8 ท่า</div>
         <div class="row" id="earth-skills"></div></div>
         <div class="skgroup" data-el="other"><div class="ctl-title">เอฟเฟกต์ธาตุอื่น (ร่างแรก รอออกแบบ)</div>
@@ -206,7 +206,7 @@ td.st { white-space: nowrap; color: var(--muted) }
           <label class="sel">มอนของเรา<select id="pick-me"></select></label>
           <label class="sel">คู่ต่อสู้<select id="pick-foe"></select></label>
         </div>
-        <div class="hint">สนามกว้างกว่าจอสามเท่าทั้งสองด้าน กล้องเลื่อนตามการต่อสู้ ดูตำแหน่งได้จากแผนที่ย่อมุมขวาล่าง · ในโหมดสาธิต มอนจะเดินไปทั่วสนามเอง เข้าประชิดเพื่อตี และถอยไปยืนห่างเพื่อใช้สกิล · เลือกบอสไฟแล้วสนามเปลี่ยนเป็นธีมลาวา บอสพฤกษ์เป็นธีมป่า บอสศิลาเป็นธีมหุบผา</div>
+        <div class="hint">สนามกว้างกว่าจอสามเท่าทั้งสองด้าน กล้องเลื่อนตามการต่อสู้ ดูตำแหน่งได้จากแผนที่ย่อมุมขวาล่าง · ในโหมดสาธิต มอนจะเดินไปทั่วสนามเอง เข้าประชิดเพื่อตี และถอยไปยืนห่างเพื่อใช้สกิล · เลือกบอสไฟแล้วสนามเปลี่ยนเป็นธีมลาวา บอสพฤกษ์เป็นธีมป่า บอสศิลาเป็นธีมหุบผา บอสรัศมีเป็นธีมวิหาร</div>
       </div>
     </div>
   </section>
@@ -394,16 +394,17 @@ td.st { white-space: nowrap; color: var(--muted) }
   </section>
 
   <section aria-labelledby="hline-h" data-group="holy" style="order:18">
-    <div class="eyebrow">สายที่หก · ภาพนิ่งให้เลือกแบบก่อน</div>
+    <div class="eyebrow">สายที่หก</div>
     <h2 id="hline-h">สายรัศมี 11 ร่าง</h2>
-    <p class="lede">ตระกูลสัตว์เทพ สีหลักเป็นขาวงาช้าง ทอง และฟ้าอ่อน ทุกตัวมีแสงหรือวงรัศมี สายหลักเป็นแกะต่อไปถึงกิเลน (ลูกแกะแสง → แกะปีกทิพย์ → กิเลนรัศมี เกล็ดทองเขาเดียว → กิเลนสุริยเทพ มีวงแสงซ้อนหลังหัว) สายรองเป็นสิงห์ (สิงห์น้อยรัศมี แผงคอเป็นแสง → ราชสีห์ปีกขาว หกปีก → มหาราชสีห์เทวะ สวมมงกุฎทอง ปีกแสง) ร่างแย่ยังตลก: ทูตน้อยขี้เซาเป็นก้อนขนปุยมีปีกจิ๋ว หลับ วงรัศมีเอียงหลุด ระฆังแตกเป็นปูเสฉวนง่วงๆ ที่อาศัยในระฆังร้าว รอบนี้เป็นภาพนิ่ง บอกได้เลยว่าตัวไหนชอบ ตัวไหนอยากแก้ แล้วค่อยทำท่าทางกับสกิล</p>
+    <p class="lede">ตระกูลสัตว์เทพ สีหลักเป็นขาวงาช้าง ทอง และฟ้าอ่อน ทุกตัวมีแสงหรือวงรัศมี สายหลักเป็นแกะต่อไปถึงกิเลน (ลูกแกะแสง → แกะปีกทิพย์ → กิเลนรัศมี เกล็ดทองเขาเดียว → กิเลนสุริยเทพ มีวงแสงซ้อนหลังหัว) สายรองเป็นสิงห์ (สิงห์น้อยรัศมี แผงคอเป็นแสง → ราชสีห์ปีกขาว หกปีก → มหาราชสีห์เทวะ สวมมงกุฎทอง ปีกแสง) ร่างแย่ยังตลก: ทูตน้อยขี้เซาเป็นก้อนขนปุยมีปีกจิ๋ว หลับ วงรัศมีเอียงหลุด ระฆังแตกเป็นปูเสฉวนง่วงๆ ที่อาศัยในระฆังร้าว ตัวที่มีปีกขยับปีกตอนยืนและตอนใช้สกิล ตัวที่ลอยได้ (ประกายแสง ทูตน้อยขี้เซา) ลอยเหนือพื้น</p>
     <div class="lineup" id="lineup-holy"></div>
     <div class="evo" id="evo-holy"></div>
   </section>
 
   <section aria-labelledby="hshow-h" data-group="holy" style="order:19">
-    <div class="eyebrow">ร่างผสมและบอสสายรัศมี · ภาพนิ่ง</div>
+    <div class="eyebrow">ร่างผสมและบอสสายรัศมี</div>
     <h2 id="hshow-h">ศักดิ์สิทธิ์ผู้ตื่น และบอสโลกธาตุรัศมี</h2>
+    <p class="lede">ลองในฉากต่อสู้ได้ที่ช่องมอนของเรา "สายรัศมี" และเลือก "บอส · คชสารรัศมี" ที่ช่องคู่ต่อสู้ สนามจะเปลี่ยนเป็นธีมวิหารสีทอง</p>
     <div class="showcase">
       <div class="show fused holy">
         <canvas id="show-hfused" width="112" height="112" aria-label="ร่างผสม ศักดิ์สิทธิ์ผู้ตื่น"></canvas>
@@ -422,7 +423,14 @@ td.st { white-space: nowrap; color: var(--muted) }
     </div>
   </section>
 
-  <section aria-labelledby="plan-h" data-group="plan" style="order:20">
+  <section aria-labelledby="holy-h" data-group="holy" style="order:20">
+    <div class="eyebrow">สกิลธาตุรัศมีทุกท่าในเกม</div>
+    <h2 id="holy-h">อนิเมชันสกิลธาตุรัศมี</h2>
+    <p class="lede">ท่ารัศมีเน้นแสง ขนนก วงรัศมี และเสาแสงจากฟ้า มีสถานะใหม่: ตาพร่า (แสงจ้าเป็นประกายบนตา ตีธรรมดาพลาด 35%) โล่แสงสีทอง และติดตัวของราชสีห์ปีกขาว (เลือดต่ำกว่า 35% ครั้งแรก ได้โล่ 28% ล้างสถานะ และคุ้มกันสถานะ 2 วินาที มีวงแสงทองหมุนรอบเท้า) ท่าพิพากษาสวรรค์แรงขึ้น 60% ถ้าเป้าเลือดต่ำกว่า 35%</p>
+    <div class="skills-grid" id="holy-cards"></div>
+  </section>
+
+  <section aria-labelledby="plan-h" data-group="plan" style="order:21">
     <div class="eyebrow">แผนทั้งเกม</div>
     <h2 id="plan-h">ออกแบบมอนใหม่ทั้ง 8 สาย</h2>
     <p class="lede">มอนที่ดูไม่สมเหตุสมผลส่วนใหญ่มีปัญหาแบบเดียวกัน คือเป็นสิ่งของหรือคนแทนที่จะเป็นสัตว์ (ดวงอาทิตย์ ตรีศูล ภูเขา หน้ากาก นินจา) หรือเปลี่ยนชนิดสัตว์กลางสาย (กิ้งก่ากลายเป็นเสือ หมาป่ากลายเป็นช้าง) แผนนี้ใช้กติกา 4 ข้อ</p>
@@ -435,7 +443,7 @@ td.st { white-space: nowrap; color: var(--muted) }
     <div class="lines" id="lines"></div>
   </section>
 
-  <section aria-labelledby="next-h" data-group="plan" style="order:21">
+  <section aria-labelledby="next-h" data-group="plan" style="order:22">
     <h2 id="next-h">ต้องตัดสินใจก่อนลงมือ</h2>
     <div class="next">
       <div class="q"><b>1. สไตล์ภาพนี้ใช้ได้ไหม</b><span>พิกเซลอาร์ตมุมเฉียงแบบในหน้านี้ หรืออยากลองแบบอื่น เช่น ภาพวาดเส้นเรียบความละเอียดสูง</span></div>
@@ -2734,7 +2742,7 @@ const HOLY_LINE = [
     { id: 'sunqilin', name: 'กิเลนสุริยเทพ', old: 'เดิม เจ้าแห่งแสงสว่าง 🌞 (เป็นดวงอาทิตย์) · กิเลนยักษ์ เกล็ดทองเต็มหลัง เขาเรืองแสง แผงคอยาว วงแสงซ้อนสองชั้นหมุนอยู่หลังหัว', st: 'new' },
     { id: 'lionking', name: 'มหาราชสีห์เทวะ', old: 'เดิม มหาเทวทูต 👑 (เป็นคน) · สิงโตยักษ์ สวมมงกุฎทองฝังอัญมณี แผงคอแสงใหญ่ ปีกขนนกกับปีกแสงซ้อนกัน กำไลทองที่ขา', st: 'new' } ] },
 ];
-buildBoard(document.getElementById('evo-holy'), HOLY_LINE, true);
+buildBoard(document.getElementById('evo-holy'), HOLY_LINE);
 const LEAF_LINE = [
   { stage: 'ไข่', items: [{ id: 'legg', name: 'ไข่พฤกษ์', old: 'คงชื่อเดิม · เปลือกเขียวอ่อนลายใบไม้ มีต้นกล้างอกบนยอด', st: 'keep' }] },
   { stage: 'ร่างเด็ก 1', items: [{ id: 'seed', name: 'เมล็ดจิ๋ว', old: 'คงชื่อเดิม · ลูกโอ๊กมีตา หมวกลายตาราง ใบอ่อนงอกบนหัว', st: 'keep' }] },
@@ -2794,7 +2802,7 @@ function drawLineup(L, dt) {
 }
 buildLineup(document.getElementById('lineup-fire'), ['egg', 'wisp', 'coal', 'gecko', 'frill', 'sunking', 'avatar'], ['ไข่เพลิง', 'ประกายจิ๋ว', 'ถ่านน้อย', 'เพลิงจอมซน', 'อัคนีแผงคอ', 'ราชันมังกรสุริยะ', 'อวตารสุริยะ']);
 buildLineup(document.getElementById('lineup-leaf'), ['legg', 'seed', 'sprout', 'leafdeer', 'stag', 'forestdeer', 'lfused'], ['ไข่พฤกษ์', 'เมล็ดจิ๋ว', 'ต้นอ่อน', 'กวางใบไม้', 'กวางเขาพฤกษา', 'เทพพนาลัย', 'พนาผู้ตื่น']);
-buildLineup(document.getElementById('lineup-holy'), ['hegg', 'glint', 'lamb', 'wingsheep', 'qilin', 'sunqilin', 'hfused'], ['ไข่รัศมี', 'ประกายแสง', 'ลูกแกะแสง', 'แกะปีกทิพย์', 'กิเลนรัศมี', 'กิเลนสุริยเทพ', 'ศักดิ์สิทธิ์ผู้ตื่น'], true);
+buildLineup(document.getElementById('lineup-holy'), ['hegg', 'glint', 'lamb', 'wingsheep', 'qilin', 'sunqilin', 'hfused'], ['ไข่รัศมี', 'ประกายแสง', 'ลูกแกะแสง', 'แกะปีกทิพย์', 'กิเลนรัศมี', 'กิเลนสุริยเทพ', 'ศักดิ์สิทธิ์ผู้ตื่น']);
 buildLineup(document.getElementById('lineup-bolt'), ['begg', 'spark', 'cloudpuff', 'tbird', 'hawk', 'thunderking', 'bfused'], ['ไข่อสนี', 'ประกายไฟฟ้า', 'ลูกเมฆฟ้า', 'นกฟ้าผ่า', 'เหยี่ยวพายุ', 'วิหคราชาอสนี', 'อสนีผู้ตื่น']);
 buildLineup(document.getElementById('lineup-earth'), ['eegg', 'pebble', 'clay', 'tortoise', 'pillarturtle', 'mountturtle', 'efused'], ['ไข่ศิลา', 'ก้อนกรวด', 'ก้อนดินเหนียว', 'เต่าศิลา', 'เต่าผาหิน', 'เต่าภูเขา', 'ธรณีผู้ตื่น']);
 buildLineup(document.getElementById('lineup-water'), ['wegg', 'drop', 'bubble', 'swordwhale', 'armorwhale', 'whaleC', 'wfused'], ['ไข่วารี', 'หยดน้ำ', 'ฟองจิ๋ว', 'ลูกวาฬดาบ', 'วาฬเกราะ', 'ราชาวาฬผลึก', 'สมุทรผู้ตื่น']);
@@ -2832,8 +2840,8 @@ addCard(document.getElementById('show-wfused'), 'wfused', document.getElementByI
   }
 }
 addCard(document.getElementById('show-bison'), 'stormbison', document.getElementById('act-bison'));
-addCard(document.getElementById('show-hfused'), 'hfused', document.getElementById('act-hfused'), 8, true);
-addCard(document.getElementById('show-holyele'), 'holyele', document.getElementById('act-holyele'), 8, true);
+addCard(document.getElementById('show-hfused'), 'hfused', document.getElementById('act-hfused'));
+addCard(document.getElementById('show-holyele'), 'holyele', document.getElementById('act-holyele'));
 addCard(document.getElementById('show-efused'), 'efused', document.getElementById('act-efused'));
 addCard(document.getElementById('show-pangolin'), 'pangolin', document.getElementById('act-pangolin'));
 addCard(document.getElementById('show-lfused'), 'lfused', document.getElementById('act-lfused'));
@@ -2888,6 +2896,7 @@ const bx = sx;
 const THEMES = {
   cave: { rim: [57, 198, 255], rimDeep: [10, 60, 96], stone: [58, 54, 80], wall: [22, 19, 34], crystal: ['#7ee7ff', '#39c6ff', '#1a6fa0'] },
   lava: { rim: [255, 122, 26], rimDeep: [110, 26, 8], stone: [62, 46, 46], wall: [26, 14, 14], crystal: ['#ffd04a', '#ff7a1a', '#a3260f'] },
+  temple: { rim: [255, 216, 120], rimDeep: [90, 70, 30], stone: [88, 80, 70], wall: [30, 26, 22], crystal: ['#ffffff', '#ffe88a', '#c89a20'] },
   storm: { rim: [255, 225, 74], rimDeep: [40, 44, 90], stone: [52, 56, 78], wall: [16, 18, 32], crystal: ['#fffac0', '#ffe14a', '#3a72d4'] },
   canyon: { rim: [255, 176, 80], rimDeep: [86, 52, 20], stone: [78, 66, 52], wall: [30, 22, 16], crystal: ['#ffe4a0', '#ffa02a', '#a85a10'] },
   forest: { rim: [110, 230, 90], rimDeep: [14, 60, 20], stone: [50, 60, 44], wall: [16, 24, 16], crystal: ['#d8ff8a', '#5ad35a', '#1e6a2a'] },
@@ -2926,7 +2935,7 @@ function buildFloor(theme) {
   }
   c.putImageData(img, 0, 0);
   // Cracks
-  let seed = theme === 'lava' ? 99 : theme === 'forest' ? 41 : theme === 'canyon' ? 23 : theme === 'storm' ? 61 : 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let seed = theme === 'lava' ? 99 : theme === 'forest' ? 41 : theme === 'canyon' ? 23 : theme === 'storm' ? 61 : theme === 'temple' ? 83 : 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   for (let k = 0; k < 150; k++) {
     let x = 30 + rnd() * (WW - 60), y = FLOOR_TOP + 8 + rnd() * (FLOOR_BOT - FLOOR_TOP - 16), a = rnd() * Math.PI * 2;
     for (let s = 0; s < 22 + rnd() * 26; s++) {
@@ -2965,7 +2974,7 @@ function buildFloor(theme) {
   for (let y = FLOOR_TOP + 40; y < FLOOR_BOT; y += 50 + rnd() * 60) { crystal(edgeAt(y) - 12, y, .8 + rnd() * .5); crystal(WW - edgeAt(y) + 12, y, .8 + rnd() * .5); }
   return cv;
 }
-const floors = { cave: buildFloor('cave'), lava: buildFloor('lava'), forest: buildFloor('forest'), canyon: buildFloor('canyon'), storm: buildFloor('storm') };
+const floors = { cave: buildFloor('cave'), lava: buildFloor('lava'), forest: buildFloor('forest'), canyon: buildFloor('canyon'), storm: buildFloor('storm'), temple: buildFloor('temple') };
 
 const ELEM = {
   fire: { name: 'เพลิง', col: '#ff8a24' }, water: { name: 'วารี', col: '#3a90d2' }, leaf: { name: 'พฤกษ์', col: '#5ad35a' }, earth: { name: 'ศิลา', col: '#b98a52' },
@@ -3003,19 +3012,25 @@ const ROSTER = {
   thunderking: { sprite: 'thunderking', name: 'วิหคราชาอสนี', el: 'bolt', hp: 880 }, foxking: { sprite: 'foxking', name: 'ราชาจิ้งจอกอสนี', el: 'bolt', hp: 900 },
   cloudpuff: { sprite: 'cloudpuff', name: 'ลูกเมฆฟ้า', el: 'bolt', hp: 150 }, spark: { sprite: 'spark', name: 'ประกายไฟฟ้า', el: 'bolt', hp: 90 },
   stormbison: { sprite: 'stormbison', name: 'กระทิงพายุคำราม', el: 'bolt', hp: 7000, boss: true },
+  hfused: { sprite: 'hfused', name: 'ศักดิ์สิทธิ์ผู้ตื่น', el: 'holy', hp: 1280 }, sunqilin: { sprite: 'sunqilin', name: 'กิเลนสุริยเทพ', el: 'holy', hp: 900 }, lionking: { sprite: 'lionking', name: 'มหาราชสีห์เทวะ', el: 'holy', hp: 920 },
+  qilin: { sprite: 'qilin', name: 'กิเลนรัศมี', el: 'holy', hp: 600 }, bellcrab: { sprite: 'bellcrab', name: 'ระฆังแตก', el: 'holy', hp: 560 }, winglion: { sprite: 'winglion', name: 'ราชสีห์ปีกขาว', el: 'holy', hp: 620, lastStand: true },
+  wingsheep: { sprite: 'wingsheep', name: 'แกะปีกทิพย์', el: 'holy', hp: 420 }, cherub: { sprite: 'cherub', name: 'ทูตน้อยขี้เซา', el: 'holy', hp: 360 }, lioncub: { sprite: 'lioncub', name: 'สิงห์น้อยรัศมี', el: 'holy', hp: 440 },
+  lamb: { sprite: 'lamb', name: 'ลูกแกะแสง', el: 'holy', hp: 150 }, glint: { sprite: 'glint', name: 'ประกายแสง', el: 'holy', hp: 90 },
+  holyele: { sprite: 'holyele', name: 'คชสารรัศมี', el: 'holy', hp: 7200, boss: true },
 };
 const pickMe = document.getElementById('pick-me'), pickFoe = document.getElementById('pick-foe');
 { const gf = document.createElement('optgroup'); gf.label = 'สายเพลิง'; for (const id of ['sunking', 'phoenix', 'avatar', 'dragon', 'frill', 'lava', 'raptor', 'gecko', 'coal', 'wisp']) gf.append(new Option(ROSTER[id].name, id)); pickMe.append(gf);
   const gw = document.createElement('optgroup'); gw.label = 'สายวารี'; for (const id of ['wfused', 'whaleking', 'leviathan', 'seadragon', 'armorwhale', 'octopus', 'shark', 'swordwhale', 'jelly', 'bubble', 'drop']) gw.append(new Option(ROSTER[id].name, id)); pickMe.append(gw);
   const gl = document.createElement('optgroup'); gl.label = 'สายพฤกษ์'; for (const id of ['lfused', 'forestdeer', 'wolfking', 'stag', 'barkwolf', 'stump', 'leafdeer', 'wolf', 'mushroom', 'sprout', 'seed']) gl.append(new Option(ROSTER[id].name, id)); pickMe.append(gl);
   const ge = document.createElement('optgroup'); ge.label = 'สายศิลา'; for (const id of ['efused', 'mountturtle', 'crystalrhino', 'pillarturtle', 'orerhino', 'boulder', 'tortoise', 'rhino', 'worm', 'clay', 'pebble']) ge.append(new Option(ROSTER[id].name, id)); pickMe.append(ge);
-  const gb = document.createElement('optgroup'); gb.label = 'สายอสนี'; for (const id of ['bfused', 'thunderking', 'foxking', 'hawk', 'boltfox', 'gloomcloud', 'tbird', 'stormfox', 'staticcat', 'cloudpuff', 'spark']) gb.append(new Option(ROSTER[id].name, id)); pickMe.append(gb); }
-for (const id of ['shark', 'dragon', 'armorwhale', 'wolf', 'barkwolf', 'rhino', 'orerhino', 'stormfox', 'boss', 'turtle', 'flora', 'pangolin', 'stormbison']) pickFoe.add(new Option(ROSTER[id].boss ? 'บอส · ' + ROSTER[id].name : ROSTER[id].name, id));
+  const gb = document.createElement('optgroup'); gb.label = 'สายอสนี'; for (const id of ['bfused', 'thunderking', 'foxking', 'hawk', 'boltfox', 'gloomcloud', 'tbird', 'stormfox', 'staticcat', 'cloudpuff', 'spark']) gb.append(new Option(ROSTER[id].name, id)); pickMe.append(gb);
+  const gh = document.createElement('optgroup'); gh.label = 'สายรัศมี'; for (const id of ['hfused', 'sunqilin', 'lionking', 'qilin', 'winglion', 'bellcrab', 'wingsheep', 'lioncub', 'cherub', 'lamb', 'glint']) gh.append(new Option(ROSTER[id].name, id)); pickMe.append(gh); }
+for (const id of ['shark', 'dragon', 'armorwhale', 'wolf', 'barkwolf', 'rhino', 'orerhino', 'stormfox', 'lioncub', 'boss', 'turtle', 'flora', 'pangolin', 'stormbison', 'holyele']) pickFoe.add(new Option(ROSTER[id].boss ? 'บอส · ' + ROSTER[id].name : ROSTER[id].name, id));
 
 function makeEnt(rid, side) {
   const r = ROSTER[rid]; const def = SPRITES[r.sprite];
   const boss = !!r.boss;
-  return { rid, def, name: r.name, el: r.el, boss, bossKind: r.kind || 'บอสโลก', ent: !!r.ent, stoneSkin: !!r.stoneSkin, side, flip: side === 1, hpMax: r.hp, hp: r.hp, hpShown: r.hp,
+  return { rid, def, name: r.name, el: r.el, boss, bossKind: r.kind || 'บอสโลก', ent: !!r.ent, stoneSkin: !!r.stoneSkin, lastStand: !!r.lastStand, side, flip: side === 1, hpMax: r.hp, hp: r.hp, hpShown: r.hp,
     x: WW / 2 + (side === 0 ? -85 : (boss ? 90 : 82)), y: WH * .58 + (side === 0 ? 14 : (boss ? -6 : -14)),
     ox: 0, oy: 0, sx: 1, sy: 1, alpha: 1, flash: 0, shield: 0, ghosts: [], acc: {}, status: null, statusT: 0, hidden: false,
     goal: null, walking: 0, speed: (boss ? 34 : 50 + (def.size < 56 ? 12 : 0)) * (r.stoneSkin ? .85 : 1), stepT: 0 };
@@ -3043,6 +3058,7 @@ async function damage(def, amount, opts = {}) {
   let dmg = Math.round(amount * (opts.guard ? .35 : 1) * (opts.crit ? 1.6 : 1) * (def.defUpT > 0 ? .75 : 1) * (def.defT > 0 ? 1.25 : 1) * (def.ent ? .92 : 1) * (def.stoneSkin ? .88 : 1) * (opts.from && opts.from.atkUpT > 0 ? 1.2 : 1));
   if (def.bubbleHp > 0 && def.bubbleT > 0) { const ab = Math.min(def.bubbleHp, dmg); def.bubbleHp -= ab; dmg -= ab; sayAt(def, 'โล่ดูด ' + ab, '#9ad8ff'); def.bubbleHit = .25; }
   def.hp = Math.max(0, def.hp - dmg); def.flash = dmg > 0 ? 1 : .3;
+  if (def.lastStand && !def.lastStandUsed && def.hp > 0 && def.hp < def.hpMax * .35) { def.lastStandUsed = true; lastStandFx(def); }
   if (def.ent && dmg > 0) entBark(def);
   if (def.stoneSkin && dmg > 0) sayAt(def, '-12%', '#e2c492');
   if (def.staticRetort && opts.melee && opts.from && opts.from !== def) { const src = opts.from; def.sx = 1.12; def.sy = 1.12; wait(160).then(() => { def.sx = def.sy = 1; }); fxs.push({ age: 0, life: .3, draw(c, k) { c.globalAlpha = 1 - k; const a = centerOf(def), b = centerOf(src); boltLine(c, a.x, a.y, b.x, b.y, 8); } }); tag(def, '🐱 ขนพองช็อต', 'bolt'); staticOn(src, 3); }
@@ -3063,7 +3079,7 @@ async function knockout(e) {
   showBanner('K.O.!', '#ff6a4a', 1300);
   await tween(500, (k) => { e.sy = 1 - k * .5; e.sx = 1 + k * .25; e.alpha = 1 - k; });
   await wait(700);
-  e.hp = e.hpMax; e.status = null; e.rootT = e.silenceT = e.poisonT = e.stunT = e.staticT = 0;
+  e.hp = e.hpMax; e.status = null; e.rootT = e.silenceT = e.poisonT = e.stunT = e.staticT = e.immuneT = e.blindT = 0; e.lastStandUsed = false;
   await tween(400, (k) => { e.sy = .6 + k * .4; e.sx = 1.2 - k * .2; e.alpha = k; });
   e.sx = e.sy = 1; e.alpha = 1; showBanner('FIGHT!');
 }
@@ -3140,6 +3156,12 @@ async function lungeHit(att, def, react) {
   }
   if (react === 'guard') def.shield = 1;
   await dash; att.sx = att.sy = 1;
+  if (!react && !dodged && att.blindT > 0 && Math.random() < .35) {
+    sayAt(def, 'พลาด!', '#b8adab');
+    await tween(170, (k) => { A(.42 + .2 * k); put(att, dist + 10 * ease(k)); });
+    await tween(320, (k) => { A(.62 + .38 * k); put(att, (dist + 10) * (1 - ease(k))); });
+    att.ox = att.oy = 0; att.anim = null; return;
+  }
   if (dodged) {
     await tween(170, (k) => { A(.42 + .2 * k); put(att, dist + 16 * ease(k)); });
     await tween(320, (k) => { A(.62 + .38 * k); put(att, (dist + 16) * (1 - ease(k))); def.ox = (px + ux * 6) * (1 - ease(k)); def.oy = py * (1 - ease(k)); });
@@ -3378,7 +3400,7 @@ function slashFx(x0, y0, x1, y1, life = .32, cols = ['rgba(255,138,36,.55)', '#f
     [[5, cols[0]], [2.5, cols[1]], [1, cols[2]]].forEach(([w, col]) => { c.strokeStyle = col; c.lineWidth = w * (1 - k * .5); c.beginPath(); c.moveTo(x0, y0); c.lineTo(x, y); c.stroke(); });
   } });
 }
-function burnOn(e, sec) { e.status = 'burn'; e.statusT = sec; }
+function burnOn(e, sec) { if (e.immuneT > 0) return; e.status = 'burn'; e.statusT = sec; }
 function lavaSplash(x, y, n = 40) {
   ps.burst(n, () => { const a = -Math.PI * Math.random(), sp = 40 + Math.random() * 70; return { x: x + (Math.random() - .5) * 14, y, vx: Math.cos(a) * sp * .8, vy: Math.sin(a) * sp, g: 160, life: .7 + Math.random() * .4, size: Math.random() < .4 ? 2 : 1, cols: ['#fff3a8', '#ffb43a', '#ff5a14', '#7a2410'], glow: true }; });
 }
@@ -3607,7 +3629,7 @@ const WATER = {
     for (let i = 0; i < 3; i++) fxs.push({ age: -i * .12, life: .7, draw(c, k) { if (k < 0) return; const y = a.y - H0 * ease(k); c.globalAlpha = (1 - k) * .9; c.strokeStyle = '#a0dcff'; c.lineWidth = 2; c.beginPath(); c.ellipse(a.x, y, att.def.size * .38, att.def.size * .12, 0, 0, 7); c.stroke(); } });
     splash(a.x, a.y, 24, 40);
     await wait(380);
-    att.bubbleStone = false; att.bubbleMax = att.bubbleHp = Math.round(att.hpMax * .22); att.bubbleT = 5; att.defUpT = 5;
+    att.bubbleStone = false; att.bubbleHoly = false; att.bubbleMax = att.bubbleHp = Math.round(att.hpMax * .22); att.bubbleT = 5; att.defUpT = 5;
     sayAt(att, 'โล่ +' + att.bubbleHp, '#9ad8ff', true);
     await wait(300);
   } },
@@ -3694,9 +3716,9 @@ const WATER = {
    New statuses: root (can't move), silence (no skills), poison (damage every second), lifesteal, and the
    ent passive (regen 1.2%/s + 8% less damage). */
 const LEAF_COLS = ['#e0ffd8', '#b0f490', '#5ad35a', '#2e9a3e', '#16601e'];
-function rootOn(e, sec) { e.rootT = Math.max(e.rootT || 0, sec * (e.stoneSkin ? .6 : 1)); e.goal = null; sayAt(e, 'ติดราก', '#c8e07a'); }
+function rootOn(e, sec) { if (immune(e)) return; e.rootT = Math.max(e.rootT || 0, sec * (e.stoneSkin ? .6 : 1)); e.goal = null; sayAt(e, 'ติดราก', '#c8e07a'); }
 function poisonOn(e, sec) { if (!(e.poisonT > 0)) e.poisonAcc = 0; e.poisonT = sec; sayAt(e, 'ติดพิษ', '#9aff6a'); }
-function silenceOn(e, sec) { e.silenceT = sec; sayAt(e, 'ใบ้ ใช้สกิลไม่ได้', '#d8c8ff'); }
+function silenceOn(e, sec) { if (immune(e)) return; e.silenceT = sec; sayAt(e, 'ใบ้ ใช้สกิลไม่ได้', '#d8c8ff'); }
 function leafBurst(x, y, n = 20, sp = 60) {
   ps.burst(n, () => { const a = Math.random() * 7, v = sp * (.4 + Math.random() * .8); return { x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * .6 - 10, drag: 3, g: 30, life: .7 + Math.random() * .5, size: Math.random() < .5 ? 2 : 1, cols: LEAF_COLS, sway: 1 }; });
 }
@@ -3897,7 +3919,7 @@ function entBark(e) {
    New statuses: stun (stars over the head, no moving), a stone shield, attack up, and the boulder's
    stone skin (12% less damage, crowd control 40% shorter, 15% slower). */
 const EARTH_COLS = ['#fff0cc', '#e2c492', '#c4a06a', '#9a7a4a', '#5a4630'];
-function stunOn(e, sec) { e.stunT = Math.max(e.stunT || 0, sec * (e.stoneSkin ? .6 : 1)); e.goal = null; sayAt(e, 'มึน', '#ffe14a'); }
+function stunOn(e, sec) { if (immune(e)) return; e.stunT = Math.max(e.stunT || 0, sec * (e.stoneSkin ? .6 : 1)); e.goal = null; sayAt(e, 'มึน', '#ffe14a'); }
 function rockBurst(x, y, n = 24, sp = 70) {
   ps.burst(n, () => { const a = -Math.PI * Math.random(), v = sp * (.4 + Math.random() * .8); return { x: x + (Math.random() - .5) * 12, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: 180, life: .6 + Math.random() * .4, size: Math.random() < .45 ? 2 : 1, cols: ['#c8bca6', '#968a78', '#6e6456', '#4a4238'] }; });
   ps.burst(Math.round(n / 2), () => makeParticle('dust', x + (Math.random() - .5) * 20, y));
@@ -3928,7 +3950,7 @@ const EARTH = {
       for (const r of rocks) { const an = r.an + k * 3, rr = lerp(r.r, att.def.size * .4, g), x = cc.x + Math.cos(an) * rr, y = lerp(a.y, cc.y, g) + Math.sin(an) * rr * .45; c.fillStyle = '#6e6456'; c.fillRect(Math.round(x - r.s), Math.round(y - r.s), Math.round(r.s * 2), Math.round(r.s * 1.6)); c.fillStyle = '#c8bca6'; c.fillRect(Math.round(x - r.s), Math.round(y - r.s), Math.round(r.s), 1); }
     } });
     await wait(600); void H0;
-    att.bubbleStone = true; att.bubbleMax = att.bubbleHp = Math.round(att.hpMax * .25); att.bubbleT = 5;
+    att.bubbleStone = true; att.bubbleHoly = false; att.bubbleMax = att.bubbleHp = Math.round(att.hpMax * .25); att.bubbleT = 5;
     sayAt(att, 'โล่หิน +' + att.bubbleHp, '#e2c492', true);
     await wait(300);
   } },
@@ -4029,7 +4051,7 @@ const EARTH = {
    New statuses: static (crackles; 30% a second to seize up for 0.4 s), haste (faster, yellow after-images)
    and focus (crit chance up, a crosshair over the head). */
 const BOLT_COLS = ['#ffffff', '#fffac0', '#ffe14a', '#ffd23a', '#9cc4ff'];
-function staticOn(e, sec) { e.staticT = Math.max(e.staticT || 0, sec); sayAt(e, 'ไฟฟ้าสถิต', '#ffe14a'); }
+function staticOn(e, sec) { if (immune(e)) return; e.staticT = Math.max(e.staticT || 0, sec); sayAt(e, 'ไฟฟ้าสถิต', '#ffe14a'); }
 // A jagged lightning line between two points, redrawn every frame so it flickers.
 function boltLine(c, x0, y0, x1, y1, jag = 8, widths = [[5, 'rgba(255,225,74,.3)'], [2.5, '#ffe14a'], [1, '#ffffff']], seg = 7) {
   const pts = [[x0, y0]]; for (let i = 1; i < seg; i++) { const q = i / seg; pts.push([lerp(x0, x1, q) + (Math.random() - .5) * jag, lerp(y0, y1, q) + (Math.random() - .5) * jag]); } pts.push([x1, y1]);
@@ -4136,9 +4158,164 @@ const BOLT = {
     await Promise.all(pending);
   } },
 };
-function elCols(el) { return el === 'water' ? WATER_COLS : el === 'leaf' ? LEAF_COLS : el === 'earth' ? EARTH_COLS : el === 'bolt' ? BOLT_COLS : FLAME_COLS; }
-const skillEl = (id) => (id.startsWith('tide') ? 'water' : id.startsWith('leaf') ? 'leaf' : id.startsWith('earth') ? 'earth' : id.startsWith('ltn') ? 'bolt' : 'fire');
-const GAME_SKILLS = { ...FIRE, ...WATER, ...LEAF, ...EARTH, ...BOLT };
+
+/* ---------- Holy skills from the game, each with its own animation ----------
+   New statuses: blind from light (a white-gold glare over the eyes; 35% of basic attacks miss), the gold light
+   shield, and the seraph lion's last stand (below 35% HP once: shield, cleanse, immune to crowd control 2 s). */
+const HOLY_COLS = ['#ffffff', '#fff6c8', '#ffe88a', '#ffd84a', '#bcdcf8'];
+function immune(e) { if (e.immuneT > 0) { sayAt(e, 'คุ้มกัน', '#fff0a0'); return true; } return false; }
+function blindOn(e, sec) { if (immune(e)) return; e.blindT = Math.max(e.blindT || 0, sec); e.blindLight = true; sayAt(e, 'ตาพร่า', '#fff0a0'); }
+function cleanse(e) {
+  const had = e.status || e.blindT > 0 || e.slowT > 0 || e.defT > 0 || e.rootT > 0 || e.silenceT > 0 || e.poisonT > 0 || e.stunT > 0 || e.staticT > 0;
+  e.status = null; e.blindT = e.slowT = e.defT = e.rootT = e.silenceT = e.poisonT = e.stunT = e.staticT = 0;
+  if (had) sayAt(e, 'ล้างสถานะ', '#fff6c8');
+  return had;
+}
+function holyShield(e, pct, sec) { e.bubbleStone = false; e.bubbleHoly = true; e.bubbleMax = e.bubbleHp = Math.round(e.hpMax * pct); e.bubbleT = sec; sayAt(e, 'โล่ +' + e.bubbleHp, '#ffe88a', true); }
+function lightBurst(x, y, n = 18, sp = 70) { ps.burst(n, () => { const a = Math.random() * TAU, v = sp * (.4 + Math.random() * .8); return { x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * .7, drag: 4, life: .35 + Math.random() * .3, size: Math.random() < .3 ? 2 : 1, cols: HOLY_COLS, glow: true, twinkle: true }; }); }
+function featherFall(x, y, w, n = 12) { ps.burst(n, () => ({ x: x + (Math.random() - .5) * w, y: y - Math.random() * 16, vx: (Math.random() - .5) * 8, vy: 8 + Math.random() * 8, life: 1.1 + Math.random() * .5, size: Math.random() < .4 ? 2 : 1, cols: ['#ffffff', '#eef2fc', '#d0d8ec'], sway: 1 })); }
+// A column of light standing on (x, y): soft wide glow with a bright core.
+function lightPillar(x, y, w, h, life, alpha = 1) {
+  fxs.push({ age: 0, life, draw(c, k) {
+    const a = alpha * (k < .15 ? k / .15 : 1 - (k - .15) / .85), ww = w * (1 - k * .4);
+    c.globalCompositeOperation = 'lighter';
+    const g = c.createLinearGradient(x - ww, 0, x + ww, 0); g.addColorStop(0, 'rgba(255,216,74,0)'); g.addColorStop(.5, 'rgba(255,240,180,.7)'); g.addColorStop(1, 'rgba(255,216,74,0)');
+    c.globalAlpha = a; c.fillStyle = g; c.fillRect(x - ww, y - h, ww * 2, h);
+    c.fillStyle = '#ffffff'; c.globalAlpha = a * .8; c.fillRect(x - ww * .18, y - h, ww * .36, h);
+    c.globalAlpha = a * .7; c.strokeStyle = '#fff0a0'; c.lineWidth = 1; c.beginPath(); c.ellipse(x, y, ww * 1.3, ww * .45, 0, 0, 7); c.stroke();
+  } });
+}
+// The seraph lion's last stand: called from damage() the first time it drops below 35% HP.
+function lastStandFx(e) {
+  tag(e, '😇 ปีกขาวเจิดจ้า', 'holy'); flashScreen = .35; hitstop = .08;
+  cleanse(e); holyShield(e, .28, 6); e.immuneT = 2;
+  const a = anchor(e), cy = a.y - e.def.img.foot * .55;
+  fxs.push({ age: 0, life: 1.1, draw(c, k) {
+    c.globalCompositeOperation = 'lighter'; c.globalAlpha = 1 - k;
+    for (let i = 0; i < 6; i++) { const an = -Math.PI / 2 + (i - 2.5) * .42, L = 26 + 22 * ease(Math.min(1, k * 3)); c.strokeStyle = i % 2 ? '#fff6c8' : '#ffd84a'; c.lineWidth = 3; c.beginPath(); c.moveTo(a.x, cy); c.lineTo(a.x + Math.cos(an) * L, cy + Math.sin(an) * L * .9); c.stroke(); }
+  } });
+  lightBurst(a.x, cy, 40, 110); featherFall(a.x, cy - 20, e.def.size, 18); lightPillar(a.x, a.y, 16, 90, .9);
+  sayAt(e, 'คุ้มกันสถานะ 2 วิ', '#fff0a0', true);
+}
+const HOLY = {
+  // ปีกทิพย์ (self, heal 15% + cleanse): the wings open, feathers drift down, a ring of light settles over it
+  holy_wing: { name: 'ปีกทิพย์', icon: '🕊️', async run(att) {
+    const p = castPose(att, 450, 700, 'holy'), a = anchor(att), H0 = att.def.img.foot + 16;
+    featherFall(a.x, a.y - H0, att.def.size * .9, 16);
+    await p.charged; p.release();
+    fxs.push({ age: 0, life: .9, draw(c, k) { const y = a.y - H0 * (1 - ease(k)); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 1 - k * .7; c.strokeStyle = '#ffd84a'; c.lineWidth = 2; c.beginPath(); c.ellipse(a.x, y, att.def.size * .36, att.def.size * .1, 0, 0, 7); c.stroke(); c.strokeStyle = '#ffffff'; c.lineWidth = 1; c.stroke(); } });
+    lightPillar(a.x, a.y, att.def.size * .3, H0 + 10, 1, .7);
+    await wait(500);
+    cleanse(att);
+    const heal = Math.round(att.hpMax * .15); att.hp = Math.min(att.hpMax, att.hp + heal); sayAt(att, '+' + heal, '#5ad38a', true);
+    lightBurst(a.x, a.y - H0 * .5, 24, 50);
+    await wait(400);
+  } },
+  // พรหลับ (shot, silence 2.5 s): a sleepy glowing lullaby orb drifts over and a little halo settles on the target, which falls quiet
+  holy_lull: { name: 'พรหลับ', icon: '👼', async run(att, def) {
+    const p = castPose(att, 500, 500, 'holy'); await p.charged; p.release();
+    const m = mouthOf(att), c = centerOf(def);
+    await projectile(m, c, 760, (cx, x, y) => {
+      const yy = y - Math.sin(clock * 9) * 3; cx.globalCompositeOperation = 'lighter';
+      cx.fillStyle = 'rgba(255,240,200,.35)'; cx.beginPath(); cx.arc(x, yy, 6, 0, 7); cx.fill(); cx.fillStyle = '#ffffff'; cx.beginPath(); cx.arc(x, yy, 3, 0, 7); cx.fill();
+      cx.strokeStyle = '#ffd84a'; cx.lineWidth = 1; cx.beginPath(); cx.ellipse(x, yy - 7, 4, 1.3, 0, 0, 7); cx.stroke();
+    }, (x, y) => { if (Math.random() < .25) ps.add(makeParticle('zz', x, y)); if (Math.random() < .5) ps.add({ x, y, vx: 0, vy: -4, life: .5, size: 1, cols: HOLY_COLS, glow: true, twinkle: true }); });
+    lightBurst(c.x, c.y, 16, 40); featherFall(c.x, c.y - 10, 20, 8);
+    const top = () => { const a = anchor(def); return { x: a.x, y: a.y - def.def.img.foot - 4 }; };
+    fxs.push({ age: 0, life: 2.5, draw(cx, k) { const t = top(), drop = Math.min(1, k * 6); cx.globalCompositeOperation = 'lighter'; cx.globalAlpha = 1 - Math.max(0, k - .8) / .2; cx.strokeStyle = '#ffd84a'; cx.lineWidth = 1; cx.beginPath(); cx.ellipse(t.x, t.y - 10 * (1 - drop), 6, 1.8, 0, 0, 7); cx.stroke(); } });
+    for (let i = 0; i < 4; i++) wait(i * 450).then(() => { const t = centerOf(def); ps.add(makeParticle('zz', t.x + 4, t.y - def.def.img.foot * .4)); });
+    silenceOn(def, 2.5);
+    await damage(def, 45, { from: att });
+  } },
+  // ดาบรัศมี (melee, range 62, then a 10% shield for 3 s): a pounce with one wide crescent of light, then a gold shield
+  holy_blade: { name: 'ดาบรัศมี', icon: '🛡️', async run(att, def) {
+    if (!inRange(att, def, 62)) await approach(att, def);
+    await meleeStrike(att, def, { wind: 280, rush: 140, hits: 1, windFx(k) { if (Math.random() < .7) { const m = mouthOf(att); ps.add({ x: m.x + (Math.random() - .5) * 14, y: m.y + 6 + (Math.random() - .5) * 8, vx: 0, vy: -10, life: .3, size: 1, cols: HOLY_COLS, glow: true }); } }, onHit(i, dir) {
+      const t = centerOf(def), r = def.def.size * .34;
+      fxs.push({ age: 0, life: .35, draw(c, k) { c.globalCompositeOperation = 'lighter'; c.globalAlpha = 1 - k; for (const [w, col] of [[6, 'rgba(255,216,74,.45)'], [3, '#ffe88a'], [1, '#ffffff']]) { c.strokeStyle = col; c.lineWidth = w; c.beginPath(); const a0 = dir > 0 ? -1.9 : -1.25 + Math.PI, a1 = a0 + dir * 2.2 * ease(Math.min(1, k * 3)); c.ellipse(t.x - dir * 4, t.y, r, r * .9, 0, Math.min(a0, a1), Math.max(a0, a1)); c.stroke(); } } });
+      lightBurst(t.x, t.y, 18, 70); impactBurst(t.x, t.y, '#ffd84a', 10); shake = Math.max(shake, 3); hitstop = .06;
+      return damage(def, 95, { from: att, melee: true });
+    } });
+    holyShield(att, .1, 3); lightBurst(anchor(att).x, centerOf(att).y, 14, 40);
+    await wait(250);
+  } },
+  // ธนูรัศมี (shot, blind 2 s): the horn gathers light and fires one fast arrow of light; a glare bursts over the target's eyes
+  holy_arrow: { name: 'ธนูรัศมี', icon: '🏹', async run(att, def) {
+    const p = castPose(att, 420, 450, 'holy'); await p.charged; p.release();
+    const m = mouthOf(att), c = centerOf(def), ang = Math.atan2(c.y - m.y, c.x - m.x);
+    await tween(170, (k) => { const x = lerp(m.x, c.x, k), y = lerp(m.y, c.y, k); fxs.push({ age: 0, life: .1, draw(cx, q) { cx.globalCompositeOperation = 'lighter'; cx.globalAlpha = 1 - q; cx.strokeStyle = '#ffd84a'; cx.lineWidth = 3; cx.beginPath(); cx.moveTo(x - Math.cos(ang) * 22, y - Math.sin(ang) * 22); cx.lineTo(x, y); cx.stroke(); cx.strokeStyle = '#ffffff'; cx.lineWidth = 1; cx.stroke(); cx.fillStyle = '#ffffff'; cx.fillRect(x - 1, y - 1, 3, 3); } }); });
+    flashScreen = .25; lightBurst(c.x, c.y, 26, 90); shake = Math.max(shake, 2.5);
+    fxs.push({ age: 0, life: .45, draw(cx, k) { cx.globalCompositeOperation = 'lighter'; cx.globalAlpha = 1 - k; cx.strokeStyle = '#fff6c8'; cx.lineWidth = 1; for (let i = 0; i < 8; i++) { const an = i * Math.PI / 4, L = 6 + 16 * ease(k) * (i % 2 ? .6 : 1); cx.beginPath(); cx.moveTo(c.x + Math.cos(an) * 3, c.y + Math.sin(an) * 3); cx.lineTo(c.x + Math.cos(an) * L, c.y + Math.sin(an) * L); cx.stroke(); } } });
+    blindOn(def, 2);
+    await damage(def, 90, { from: att });
+  } },
+  // เสียงก้อง (burst r110, silence 1.5 s): it rings its cracked bell; gold sound rings roll out and hush everyone near
+  holy_bell: { name: 'เสียงก้อง', icon: '🔔', async run(att, def) {
+    for (let i = 0; i < 3 && !inRange(att, def, 110 * SCALE * .8); i++) await approach(att, def);
+    const p = castPose(att, 500, 600, 'holy');
+    await tween(500, (k) => { att.ox = Math.sin(k * 40) * 1.5 * k; });
+    await p.charged; p.release(); att.ox = 0;
+    const a = anchor(att), R = 110 * SCALE; sayAt(att, 'ก้อง~', '#ffe88a', true); shake = 3;
+    for (let i = 0; i < 3; i++) fxs.push({ age: -i * .16, life: .8, draw(c, k) { if (k < 0) return; c.globalCompositeOperation = 'lighter'; c.globalAlpha = (1 - k) * .9; c.strokeStyle = i ? '#ffe88a' : '#ffffff'; c.lineWidth = 2; c.beginPath(); c.ellipse(a.x, a.y - 6, R * ease(k), R * .42 * ease(k), 0, 0, 7); c.stroke(); for (let s = 0; s < 10; s++) { const an = s / 10 * TAU + k; c.fillStyle = '#fff6c8'; c.fillRect(a.x + Math.cos(an) * R * ease(k), a.y - 6 + Math.sin(an) * R * .42 * ease(k), 2, 1); } } });
+    lightBurst(a.x, a.y - att.def.img.foot * .6, 16, 40);
+    await wait(260);
+    if (inRange(att, def, R)) { silenceOn(def, 1.5); await damage(def, 50, { from: att }); } else await wait(400);
+  } },
+  // ปีกขาวเจิดจ้า (passive): the first time it drops below 35% HP the six wings flare: 28% shield, cleanse, immune to CC for 2 s
+  holy_seraph: { name: 'ปีกขาวเจิดจ้า', icon: '😇', passive: true, async run(att, def) {
+    att.lastStand = true; att.lastStandUsed = false; att.hp = Math.min(att.hp, Math.round(att.hpMax * .37));
+    tag(att, '😇 ปีกขาวเจิดจ้า (ติดตัว)', 'holy');
+    await approach(def, att); await lungeHit(def, att);
+    await wait(700);
+    if (!att.lastStandUsed) { await approach(def, att); await lungeHit(def, att); await wait(700); }
+  } },
+  // ตะวันชำระ (zone r100, lands after 1.6 s, blind 2 s): a small sun gathers in the sky over the target, then a pillar of sunlight crashes down
+  holy_sun: { name: 'ตะวันชำระ', icon: '🌞', reach: 230, async run(att, def) {
+    const p = castPose(att, 600, 600, 'holy'); await p.charged; p.release();
+    const z = { x: def.x, y: def.y }, R = 100 * SCALE, delay = 1600, sy = z.y - 86;
+    fxs.push({ age: 0, life: delay / 1000 + .1, draw(c, k) {
+      const g = Math.min(1, k * 1.6), r = 4 + 8 * g;
+      c.globalCompositeOperation = 'lighter';
+      const gr = c.createRadialGradient(z.x, sy, 0, z.x, sy, r * 2.4); gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(.4, 'rgba(255,216,74,.7)'); gr.addColorStop(1, 'rgba(255,160,40,0)');
+      c.globalAlpha = 1; c.fillStyle = gr; c.beginPath(); c.arc(z.x, sy, r * 2.4, 0, 7); c.fill();
+      for (let i = 0; i < 12; i++) { const an = clock * 1.5 + i * TAU / 12, L = r * (i % 2 ? 2 : 2.8); c.strokeStyle = '#ffe88a'; c.lineWidth = 1; c.globalAlpha = .7 * g; c.beginPath(); c.moveTo(z.x + Math.cos(an) * r * 1.3, sy + Math.sin(an) * r * 1.3); c.lineTo(z.x + Math.cos(an) * L, sy + Math.sin(an) * L); c.stroke(); }
+      const pulse = .5 + .5 * Math.sin(clock * (8 + k * 20)); c.globalAlpha = .15 + .2 * pulse; c.fillStyle = '#ffd84a'; c.beginPath(); c.ellipse(z.x, z.y, R * g, R * .4 * g, 0, 0, 7); c.fill();
+      c.globalAlpha = .9; c.strokeStyle = '#fff0a0'; c.lineWidth = 1; c.beginPath(); c.ellipse(z.x, z.y, R, R * .4, 0, 0, 7); c.stroke();
+      if (Math.random() < .6) { const an = Math.random() * TAU; ps.add({ x: z.x + Math.cos(an) * R, y: z.y + Math.sin(an) * R * .4, vx: -Math.cos(an) * 20, vy: -30, life: .6, size: 1, cols: HOLY_COLS, glow: true }); }
+    } });
+    await tween(delay, (k) => { darken = .25 * k; shake = Math.max(shake, k * 1.2); });
+    darken = 0; flashScreen = .8; shake = 6;
+    lightPillar(z.x, z.y, R * .55, 110, .7);
+    lightBurst(z.x, z.y, 50, 120);
+    fxs.push({ age: 0, life: 1.4, draw(c, k) { c.globalCompositeOperation = 'lighter'; c.globalAlpha = (1 - k) * .6; c.strokeStyle = '#ffd84a'; c.lineWidth = 2; c.beginPath(); c.ellipse(z.x, z.y, R * (.6 + .4 * ease(k)), R * .4 * (.6 + .4 * ease(k)), 0, 0, 7); c.stroke(); } });
+    if (Math.hypot(def.x - z.x, (def.y - z.y) * 2.4) <= R + 6) { blindOn(def, 2); await damage(def, 140, { from: att }); } else await wait(500);
+  } },
+  // พิพากษาสวรรค์ (beam 320 x 30, +60% on a target under 35% HP): a ring of light turns over the crown, then a beam of judgement
+  holy_judge: { name: 'พิพากษาสวรรค์', icon: '👑', reach: 320 * SCALE, async run(att, def) {
+    const p = castPose(att, 800, 900, 'holy');
+    fxs.push({ age: 0, life: 1.2, draw(c, k) { const a = anchor(att), y = a.y - att.def.img.foot - 12, g = Math.min(1, k * 2); c.globalCompositeOperation = 'lighter'; c.globalAlpha = g * (1 - Math.max(0, k - .75) / .25); c.strokeStyle = '#ffd84a'; c.lineWidth = 1; c.beginPath(); c.ellipse(a.x, y, 14 * g, 4 * g, 0, 0, 7); c.stroke(); for (let i = 0; i < 8; i++) { const an = clock * 3 + i * TAU / 8; c.fillStyle = i % 2 ? '#ffffff' : '#ffe88a'; c.fillRect(a.x + Math.cos(an) * 14 * g - 1, y + Math.sin(an) * 4 * g - 1, 3, 2); } } });
+    tween(800, (k) => { darken = .35 * k; });
+    await p.charged; p.release();
+    const L = 320 * SCALE, Wd = 30 * SCALE, m0 = mouthOf(att), t0 = centerOf(def), ang = Math.atan2(t0.y - m0.y, t0.x - m0.x), low = def.hp < def.hpMax * .35;
+    flashScreen = .7; shake = 6;
+    fxs.push({ age: 0, life: .7, draw(c, k) {
+      const m = mouthOf(att), ex = m.x + Math.cos(ang) * L, ey = m.y + Math.sin(ang) * L, nx = -Math.sin(ang), ny = Math.cos(ang), w = Wd / 2 * (1 - k * .5);
+      c.globalCompositeOperation = 'lighter';
+      for (const [f, col, al] of [[1, '#ffd84a', .4], [.55, '#fff0b0', .7], [.2, '#ffffff', 1]]) { c.globalAlpha = al * (1 - k); c.fillStyle = col; c.beginPath(); c.moveTo(m.x + nx * w * f * .4, m.y + ny * w * f * .4); c.lineTo(ex + nx * w * f, ey + ny * w * f); c.lineTo(ex - nx * w * f, ey - ny * w * f); c.lineTo(m.x - nx * w * f * .4, m.y - ny * w * f * .4); c.fill(); }
+      c.globalAlpha = 1 - k; for (let i = 0; i < 6; i++) { const q = ((clock * 2 + i / 6) % 1); c.fillStyle = '#ffffff'; c.fillRect(m.x + Math.cos(ang) * L * q + nx * (Math.random() - .5) * w * 2, m.y + Math.sin(ang) * L * q + ny * (Math.random() - .5) * w * 2, 2, 1); }
+    } });
+    tween(700, (k) => { darken = .35 * (1 - k); });
+    const d = Math.hypot(t0.x - m0.x, t0.y - m0.y);
+    if (d <= L + def.def.size * .3) {
+      lightBurst(t0.x, t0.y, 40, 120);
+      if (low) { sayAt(def, 'พิพากษา! +60%', '#ffd84a', true); lightPillar(def.x, def.y, 14, 100, .8); }
+      await damage(def, low ? 175 : 110, { from: att, crit: low });
+    } else await wait(600);
+  } },
+};
+function elCols(el) { return el === 'holy' ? HOLY_COLS : el === 'water' ? WATER_COLS : el === 'leaf' ? LEAF_COLS : el === 'earth' ? EARTH_COLS : el === 'bolt' ? BOLT_COLS : FLAME_COLS; }
+const skillEl = (id) => (id.startsWith('tide') ? 'water' : id.startsWith('leaf') ? 'leaf' : id.startsWith('earth') ? 'earth' : id.startsWith('ltn') ? 'bolt' : id.startsWith('holy') ? 'holy' : 'fire');
+const GAME_SKILLS = { ...FIRE, ...WATER, ...LEAF, ...EARTH, ...BOLT, ...HOLY };
 async function useFire(id, att, def) {
   const s = GAME_SKILLS[id];
   if (!s.passive) tag(att, s.icon + ' ' + s.name, skillEl(id));
@@ -4166,6 +4343,11 @@ const waterRow = document.getElementById('water-skills');
 for (const [id, sk] of Object.entries(WATER)) {
   const b = document.createElement('button'); b.className = 'el'; b.textContent = `${sk.icon} ${sk.name}${sk.passive ? ' (ติดตัว)' : ''}`;
   b.addEventListener('click', () => run(() => useFire(id, me, foe))); waterRow.append(b);
+}
+const holyRow = document.getElementById('holy-skills');
+for (const [id, sk] of Object.entries(HOLY)) {
+  const b = document.createElement('button'); b.className = 'el'; b.textContent = `${sk.icon} ${sk.name}${sk.passive ? ' (ติดตัว)' : ''}`;
+  b.addEventListener('click', () => run(() => useFire(id, me, foe))); holyRow.append(b);
 }
 const boltRow = document.getElementById('bolt-skills');
 for (const [id, sk] of Object.entries(BOLT)) {
@@ -4203,8 +4385,8 @@ async function autoLoop() {
       else if (r < .5) await run(async () => { await approach(foe, me); await lungeHit(foe, me, react()); });
       else if (me.stunT > 0) await wait(300);
       else if (r < .82 && me.silenceT > 0) await run(async () => { await approach(me, foe); await lungeHit(me, foe); });
-      else if (r < .82) { const set = me.el === 'water' ? WATER : me.el === 'leaf' ? LEAF : me.el === 'earth' ? EARTH : me.el === 'bolt' ? BOLT : FIRE; const fk = Object.keys(set).filter((k) => !set[k].passive); const k = fk[Math.floor(Math.random() * fk.length)]; await run(() => useFire(k, me, foe)); }
-      else { const list = foe.el === 'water' ? ['tide_whirl', 'tide_trident', 'tide_fang', 'tide_ink', 'tide_sword'] : foe.el === 'leaf' ? ['leaf_root', 'leaf_wrath', 'leaf_fang', 'leaf_spore', 'leaf_antler', 'leaf_trunk'] : foe.el === 'earth' ? ['earth_quake', 'earth_horn', 'earth_paw', 'earth_quill', 'earth_crawl'] : foe.el === 'bolt' ? ['ltn_bolt', 'ltn_roar', 'ltn_claw', 'ltn_wing', 'ltn_vajra'] : ['flame_breath', 'flame_lava', 'flame_claw', 'flame_sun']; const k = list[Math.floor(Math.random() * list.length)]; await run(() => useFire(k, foe, me)); }
+      else if (r < .82) { const set = me.el === 'water' ? WATER : me.el === 'leaf' ? LEAF : me.el === 'earth' ? EARTH : me.el === 'bolt' ? BOLT : me.el === 'holy' ? HOLY : FIRE; const fk = Object.keys(set).filter((k) => !set[k].passive); const k = fk[Math.floor(Math.random() * fk.length)]; await run(() => useFire(k, me, foe)); }
+      else { const list = foe.el === 'water' ? ['tide_whirl', 'tide_trident', 'tide_fang', 'tide_ink', 'tide_sword'] : foe.el === 'leaf' ? ['leaf_root', 'leaf_wrath', 'leaf_fang', 'leaf_spore', 'leaf_antler', 'leaf_trunk'] : foe.el === 'earth' ? ['earth_quake', 'earth_horn', 'earth_paw', 'earth_quill', 'earth_crawl'] : foe.el === 'bolt' ? ['ltn_bolt', 'ltn_roar', 'ltn_claw', 'ltn_wing', 'ltn_vajra'] : foe.el === 'holy' ? ['holy_sun', 'holy_judge', 'holy_arrow', 'holy_bell', 'holy_lull', 'holy_blade'] : ['flame_breath', 'flame_lava', 'flame_claw', 'flame_sun']; const k = list[Math.floor(Math.random() * list.length)]; await run(() => useFire(k, foe, me)); }
       if (autoOn) await roam(2600 + Math.random() * 1600);
     }
     await new Promise((res) => setTimeout(res, 120));
@@ -4229,7 +4411,8 @@ function drawEnt(c, e, t) {
   if (e.status === 'shock' && Math.random() < .5) { const cc = centerOf(e); ps.add({ x: cc.x + (Math.random() - .5) * d.size * .5, y: cc.y + (Math.random() - .5) * 20, vx: 0, vy: 0, life: .1, size: 1, cols: ['#ffe14a'], glow: true }); }
   if (e.status === 'burn' && Math.random() < .5) { const cc = centerOf(e); ps.add(makeParticle('flame', cc.x + (Math.random() - .5) * d.size * .4, cc.y + 6)); }
   const top = centerOf(e).y - e.def.img.foot * .5;
-  if (e.blindT > 0) for (let i = 0; i < 3; i++) { const an = t * 3 + i * 2.1, px = anchor(e).x + Math.cos(an) * 8, py = top + Math.sin(an) * 2; c.globalAlpha = .85; c.fillStyle = '#2e2830'; c.beginPath(); c.arc(px, py, 3, 0, 7); c.fill(); c.fillStyle = '#4a4048'; c.beginPath(); c.arc(px - 1, py - 1, 1.6, 0, 7); c.fill(); }
+  if (e.blindT > 0 && e.blindLight) { const px = anchor(e).x, py = top + 2; c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 3; i++) { const an = t * 2 + i * 2.1, gx = Math.round(px + Math.cos(an) * 7), gy = Math.round(py + Math.sin(an) * 2), L = 2 + Math.round(1.5 * (1 + Math.sin(t * 9 + i * 2))); c.globalAlpha = .95; c.fillStyle = '#fff6c8'; c.fillRect(gx - L, gy, L * 2 + 1, 1); c.fillRect(gx, gy - L, 1, L * 2 + 1); c.fillStyle = '#ffffff'; c.fillRect(gx, gy, 1, 1); } c.globalCompositeOperation = 'source-over'; }
+  else if (e.blindT > 0) for (let i = 0; i < 3; i++) { const an = t * 3 + i * 2.1, px = anchor(e).x + Math.cos(an) * 8, py = top + Math.sin(an) * 2; c.globalAlpha = .85; c.fillStyle = '#2e2830'; c.beginPath(); c.arc(px, py, 3, 0, 7); c.fill(); c.fillStyle = '#4a4048'; c.beginPath(); c.arc(px - 1, py - 1, 1.6, 0, 7); c.fill(); }
   if (e.defT > 0 && Math.floor(t * 4) % 2) { const px = anchor(e).x + 10, py = top - 6; c.globalAlpha = 1; c.fillStyle = '#8a8098'; c.fillRect(px - 3, py - 3, 7, 5); c.fillRect(px - 2, py + 2, 5, 2); c.fillRect(px - 1, py + 4, 3, 1); c.fillStyle = '#ff5d62'; c.fillRect(px, py - 3, 1, 3); c.fillRect(px + 1, py, 1, 3); }
   c.globalAlpha = 1;
   if (e.slowT > 0) { const px = anchor(e).x - 10, py = top - 4 + (t * 20 % 6); c.globalAlpha = 1; c.fillStyle = '#7ac8f0'; c.fillRect(px, py, 2, 3); c.fillRect(px + 4, py + 2, 2, 3); }
@@ -4237,9 +4420,9 @@ function drawEnt(c, e, t) {
   if (e.bubbleT > 0 && e.bubbleHp > 0) {
     const cc = centerOf(e), rx = d.size * .42, ry = d.size * .4, hvb = d.hover ? d.hover : 0;
     c.globalCompositeOperation = 'lighter'; c.globalAlpha = .28 + (e.bubbleHit > 0 ? .4 : 0) + .08 * Math.sin(t * 6);
-    c.fillStyle = e.bubbleStone ? '#8a6a3a' : '#3a90d2'; c.beginPath(); c.ellipse(cc.x, cc.y - hvb, rx, ry, 0, 0, 7); c.fill();
+    c.fillStyle = e.bubbleStone ? '#8a6a3a' : e.bubbleHoly ? '#c8981e' : '#3a90d2'; c.beginPath(); c.ellipse(cc.x, cc.y - hvb, rx, ry, 0, 0, 7); c.fill();
     if (e.bubbleStone) { c.globalCompositeOperation = 'source-over'; for (let i = 0; i < 12; i++) { const an = i / 12 * TAU + t * .4, px = cc.x + Math.cos(an) * rx, py = cc.y + Math.sin(an) * ry; c.globalAlpha = .9; c.fillStyle = '#6e6456'; c.fillRect(Math.round(px - 2), Math.round(py - 2), 4, 3); c.fillStyle = '#c8bca6'; c.fillRect(Math.round(px - 2), Math.round(py - 2), 2, 1); } c.globalCompositeOperation = 'lighter'; }
-    c.globalAlpha = .8; c.strokeStyle = e.bubbleStone ? '#e2c492' : '#c8eeff'; c.lineWidth = 1; c.beginPath(); c.ellipse(cc.x, cc.y - hvb, rx, ry, 0, 0, 7); c.stroke();
+    c.globalAlpha = .8; c.strokeStyle = e.bubbleStone ? '#e2c492' : e.bubbleHoly ? '#fff0a0' : '#c8eeff'; c.lineWidth = 1; c.beginPath(); c.ellipse(cc.x, cc.y - hvb, rx, ry, 0, 0, 7); c.stroke();
     c.fillStyle = '#ffffff'; c.fillRect(cc.x - rx * .5, cc.y - hvb - ry * .6, 3, 1); c.fillRect(cc.x - rx * .6, cc.y - hvb - ry * .45, 1, 2);
     c.globalCompositeOperation = 'source-over';
   }
@@ -4261,6 +4444,7 @@ function drawEnt(c, e, t) {
     c.fillStyle = '#5a5070'; c.fillRect(px + 2, py + 3, 1, 1); c.fillRect(px + 5, py + 3, 1, 1); c.fillRect(px + 8, py + 3, 1, 1);
     c.fillStyle = '#ff5d62'; for (let i = 0; i < 11; i++) c.fillRect(px + i, py + 6 - Math.round(i * .6), 1, 1);
   }
+  if (e.immuneT > 0) { const fa = anchor(e), rx = d.size * .3; c.globalCompositeOperation = 'lighter'; for (let i = 0; i < 16; i++) { const an = t * 3 + i * TAU / 16; c.globalAlpha = .5 + .4 * Math.sin(t * 8 + i); c.fillStyle = i % 2 ? '#ffffff' : '#ffd84a'; c.fillRect(Math.round(fa.x + Math.cos(an) * rx), Math.round(fa.y - 2 + Math.sin(an) * rx * .3), 2, 1); } c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1; }
   if (e.poisonT > 0 && Math.random() < .35) { const cc = centerOf(e); ps.add({ x: cc.x + (Math.random() - .5) * d.size * .4, y: cc.y + 4, vx: 0, vy: -12, life: .7, size: Math.random() < .3 ? 2 : 1, cols: ['#d8ff8a', '#7ad35a', '#3a6a2a'], glow: true, sway: 1 }); }
   if (e.shield > 0) {
     const cc = centerOf(e); c.globalCompositeOperation = 'lighter'; c.globalAlpha = .55 + .2 * Math.sin(t * 20);
@@ -4330,7 +4514,7 @@ function hud(t) {
     sx.globalAlpha = Math.max(0, a); sx.font = `700 ${15 * u}px "Chakra Petch", sans-serif`;
     const tw = sx.measureText(tg.text).width + 22 * u, px = right ? Wd - 14 * u - tw : 14 * u, py = (right && foe.boss ? 120 : 84) * u;
     const slide = (1 - Math.min(1, tg.age * 6)) * 20 * u * (right ? 1 : -1);
-    sx.fillStyle = tg.el === 'water' ? 'rgba(58,170,240,.92)' : tg.el === 'leaf' ? 'rgba(90,211,90,.92)' : tg.el === 'earth' ? 'rgba(212,170,110,.94)' : tg.el === 'bolt' ? 'rgba(255,225,74,.95)' : 'rgba(255,138,36,.92)'; sx.beginPath(); sx.roundRect(px + slide, py, tw, 26 * u, 13 * u); sx.fill();
+    sx.fillStyle = tg.el === 'water' ? 'rgba(58,170,240,.92)' : tg.el === 'leaf' ? 'rgba(90,211,90,.92)' : tg.el === 'earth' ? 'rgba(212,170,110,.94)' : tg.el === 'bolt' ? 'rgba(255,225,74,.95)' : tg.el === 'holy' ? 'rgba(255,240,190,.96)' : 'rgba(255,138,36,.92)'; sx.beginPath(); sx.roundRect(px + slide, py, tw, 26 * u, 13 * u); sx.fill();
     sx.fillStyle = '#1b0f02'; sx.textAlign = 'left'; sx.fillText(tg.text, px + slide + 11 * u, py + 18 * u);
   }
   skillTags = skillTags.filter((tg) => tg.age < tg.life); sx.globalAlpha = 1;
@@ -4370,7 +4554,7 @@ function frame(dt) {
     stepWalk(e, dt);
     if (e.charging && Math.random() < .9) {
       const m = mouthOf(e), a = Math.random() * 7, r = 12 + Math.random() * 10, col = ELEM[e.charging === 'fire' ? 'fire' : e.charging]?.col || '#fff';
-      ps.add({ x: m.x + Math.cos(a) * r, y: m.y + Math.sin(a) * r * .7, vx: -Math.cos(a) * r * 3.2, vy: -Math.sin(a) * r * 2.2, life: .3, size: 1, cols: ['fire', 'water', 'leaf', 'earth', 'bolt'].includes(e.charging) ? elCols(e.charging) : ['#ffffff', col], glow: true });
+      ps.add({ x: m.x + Math.cos(a) * r, y: m.y + Math.sin(a) * r * .7, vx: -Math.cos(a) * r * 3.2, vy: -Math.sin(a) * r * 2.2, life: .3, size: 1, cols: ['fire', 'water', 'leaf', 'earth', 'bolt', 'holy'].includes(e.charging) ? elCols(e.charging) : ['#ffffff', col], glow: true });
     }
     if (e.released > 0) { e.released -= dt; const m = mouthOf(e); if (e.released > .18) ps.burst(6, () => ({ x: m.x, y: m.y, vx: (e.flip ? -1 : 1) * (30 + Math.random() * 50), vy: (Math.random() - .5) * 30, drag: 3, life: .35, size: 1, cols: elCols(e.castEl), glow: true })); }
     e.flip = anchor(other(e)).x < anchor(e).x;
@@ -4378,7 +4562,7 @@ function frame(dt) {
     e.hpShown += (e.hp - e.hpShown) * Math.min(1, dt * 6);
     e.ghosts.forEach((g) => (g.a -= dt * 2.5)); e.ghosts = e.ghosts.filter((g) => g.a > 0);
     if (e.status) { e.statusT -= dt; if (e.statusT <= 0) e.status = null; }
-    if (e.blindT > 0) e.blindT -= dt; if (e.defT > 0) e.defT -= dt;
+    if (e.blindT > 0) e.blindT -= dt; else e.blindLight = false; if (e.defT > 0) e.defT -= dt; if (e.immuneT > 0) e.immuneT -= dt;
     if (e.rootT > 0) e.rootT -= dt; if (e.silenceT > 0) e.silenceT -= dt; if (e.stunT > 0) e.stunT -= dt; if (e.atkUpT > 0) e.atkUpT -= dt; if (e.hasteT > 0) e.hasteT -= dt; if (e.focusT > 0) e.focusT -= dt;
     if (e.staticT > 0) { e.staticT -= dt; e.staticAcc = (e.staticAcc || 0) + dt; if (e.staticAcc >= 1) { e.staticAcc -= 1; if (Math.random() < .3) { e.stunT = Math.max(e.stunT || 0, .4); e.goal = null; sayAt(e, 'ช็อต!', '#ffe14a'); const cc = centerOf(e); zapBurst(cc.x, cc.y, 12, 50); } } }
     if (e.hasteT > 0 && e.walking > .3 && Math.random() < .35) e.ghosts.push({ x: e.x + e.ox, y: e.y + e.oy, a: .4, img: frameOf(e, clock), tint: '#ffe14a' });
@@ -4398,7 +4582,7 @@ function frame(dt) {
   const follow = Math.min(1, dt * 2.5);
   cam.x = Math.max(0, Math.min(WW - W, cam.x + (tx - cam.x) * follow));
   cam.y = Math.max(0, Math.min(WH - H, cam.y + (ty - cam.y) * follow));
-  const theme = foe.boss ? ({ fire: 'lava', leaf: 'forest', earth: 'canyon', bolt: 'storm' }[foe.el] || 'cave') : 'cave';
+  const theme = foe.boss ? ({ fire: 'lava', leaf: 'forest', earth: 'canyon', bolt: 'storm', holy: 'temple' }[foe.el] || 'cave') : 'cave';
   const shx = reduceMotion ? 0 : (Math.random() - .5) * shake, shy = reduceMotion ? 0 : (Math.random() - .5) * shake;
   shake = Math.max(0, shake - dt * 18);
   const K = stage.width / W;
@@ -4475,7 +4659,7 @@ const PLAN = [
     ['ร่างสุดท้าย', 'ราชาอสนี 🌪️', 'วิหคราชาอสนี', 'พายุหมุนไม่ใช่สัตว์ เปลี่ยนเป็นนกยักษ์ที่ปีกเป็นเมฆพายุ'],
     ['ร่างสุดท้าย', 'วัชรเทพ 🌀', 'ราชาจิ้งจอกอสนี', 'จิ้งจอกยักษ์ห้าหางเป็นสายฟ้า แผงคอเป็นเมฆพายุ'] ],
     keep: 'ไข่อสนี, ประกายไฟฟ้า, ลูกเมฆฟ้า, นกฟ้าผ่า, แมวไฟสถิต, เมฆหม่นขี้เกียจ' },
-  { line: 'สายรัศมี', fam: 'สัตว์เทพ', sum: 'เปลี่ยน 6 (ภาพนิ่งด้านบน รอเลือก)', rows: [
+  { line: 'สายรัศมี', fam: 'สัตว์เทพ', sum: 'เปลี่ยน 6 (ทำครบแล้วด้านบน)', rows: [
     ['โตเต็มวัย', 'นกพิราบทิพย์ 🕊️', 'แกะปีกทิพย์', 'ต่อจากลูกแกะแสง'],
     ['โตเต็มวัย', 'อัศวินรัศมี 🛡️', 'สิงห์น้อยรัศมี', 'อัศวินเป็นคนถือโล่ เปลี่ยนเป็นสิงห์ตัวเล็กมีแผงคอเป็นแสง'],
     ['สมบูรณ์', 'เทพธิดารัศมี 👸', 'กิเลนรัศมี', 'สัตว์เทพมีเขาเดียว เกล็ดทอง'],
@@ -4566,6 +4750,24 @@ const BOLT_INFO = {
   ltn_bolt: ['วิหคราชาอสนี', 'ลำแสง · ยาว 320 กว้าง 30 · ง้างนาน · มึน 0.6 วิ', 'ท่าไม้ตาย: กางปีกขึ้น จอมืดลง สายฟ้าเล็กๆ ถูกดูดเข้าปาก แล้วยิงลำสายฟ้าสามเส้นพันกันเป็นแนวตรง จอแวบขาว ศัตรูที่อยู่ในแนวมึน'],
   ltn_vajra: ['ราชาจิ้งจอกอสนี', 'กระจาย 3 ลูก · ไฟฟ้าสถิต 60% ต่อลูก', 'หางสะบัดปาลูกบอลสายฟ้าสามลูกเป็นวิถีโค้งต่างกัน เข้าเป้าทีละลูก แต่ละลูกมีโอกาสติดไฟฟ้าสถิต (ชื่อใหม่ เดิมชื่อวัชระผ่าฟ้า)'],
 };
+const HOLY_INFO = {
+  holy_wing: ['แกะปีกทิพย์', 'ใส่ตัวเอง · ฟื้นเลือด 15% + ล้างสถานะ', 'กางปีก ขนนกขาวร่วงลงรอบตัว วงแสงทองค่อยๆ ลดลงมาครอบตัว มีเสาแสงอ่อนๆ แล้วล้างสถานะผิดปกติทั้งหมดและฟื้นเลือด'],
+  holy_lull: ['ทูตน้อยขี้เซา', 'ยิง · พลัง 80 · ใบ้ 2.5 วิ', 'เป่าลูกแสงง่วงๆ ลอยช้าๆ เป็นคลื่นไปหาเป้า มี Zz ลอยตาม ถึงแล้ววงรัศมีเล็กๆ ตกลงมาบนหัวศัตรู ศัตรูง่วงจนใช้สกิลไม่ได้'],
+  holy_blade: ['สิงห์น้อยรัศมี', 'ประชิด · ระยะ 62 · พลัง 170 · โล่ 10% 3 วิ', 'แสงรวมที่อุ้งเท้า แล้วตะครุบฟันเป็นเสี้ยวแสงทองกว้างหนึ่งครั้ง จากนั้นได้โล่แสงสีทองครอบตัว (ชื่อเดิมเป็นดาบของอัศวิน ตอนนี้เป็นกรงเล็บแสงของสิงห์)'],
+  holy_arrow: ['กิเลนรัศมี', 'ยิง · พลัง 160 · ตาพร่า 2 วิ', 'เขารวมแสง แล้วยิงลูกศรแสงเส้นเดียวเร็วมาก ถึงเป้าแล้วแตกเป็นแฉกแสงแปดทิศ จอแวบ ศัตรูตาพร่า (ตีธรรมดาพลาด 35%)'],
+  holy_bell: ['ระฆังแตก', 'ระเบิดรอบตัว · รัศมี 110 · ใบ้ 1.5 วิ', 'ตัวสั่นเขย่าระฆังจนดัง "ก้อง~" วงเสียงสีทองสามวงกระจายออกจากตัว ศัตรูที่อยู่ในวงใช้สกิลไม่ได้'],
+  holy_seraph: ['ราชสีห์ปีกขาว', 'ติดตัว · เลือดต่ำกว่า 35% ครั้งแรก: โล่ 28% + ล้างสถานะ + คุ้มกันสถานะ 2 วิ', 'ปุ่มทดลองลดเลือดให้เหลือ 37% แล้วให้ศัตรูเดินมาตี พอเลือดต่ำกว่า 35% ปีกหกปีกเปล่งแสงออก จอแวบ ขนนกร่วง ได้โล่แสงทอง และมีวงแสงทองหมุนรอบเท้าตอนคุ้มกัน'],
+  holy_sun: ['กิเลนสุริยเทพ', 'โซน · รัศมี 100 · ลงหลัง 1.6 วิ · พลัง 200 · ตาพร่า 2 วิ', 'ท่าไม้ตาย: ดวงตะวันเล็กๆ ก่อตัวบนฟ้าเหนือศัตรู วงเตือนสีทองกะพริบเร็วขึ้นเรื่อยๆ จอมืดลง แล้วเสาแสงตะวันกระแทกลงกลางวง จอขาว ใครอยู่ในวงตาพร่า หลบออกจากวงได้ถ้าเดินทัน'],
+  holy_judge: ['มหาราชสีห์เทวะ', 'ลำแสง · ยาว 320 กว้าง 30 · พลัง 180 · แรงขึ้น 60% ถ้าเป้าเลือดต่ำกว่า 35%', 'วงแสงหมุนเหนือมงกุฎ จอมืดลง แล้วปล่อยลำแสงพิพากษาสามชั้น (ทอง ขาวนวล ขาว) เป็นแนวตรง ถ้าเป้าเลือดน้อยจะขึ้น "พิพากษา!" มีเสาแสงลงที่ตัวเป้า'],
+};
+const holyCards = document.getElementById('holy-cards');
+for (const [id, [from, meta, desc]] of Object.entries(HOLY_INFO)) {
+  const sk = HOLY[id], card = document.createElement('div'); card.className = 'sk';
+  card.innerHTML = `<h3><span>${sk.icon}</span>${sk.name}</h3><div class="meta">${meta}</div><div class="hint">ได้จาก: ${from}</div><p>${desc}</p>`;
+  const b = document.createElement('button'); b.textContent = 'ลองท่านี้';
+  b.addEventListener('click', () => { document.querySelector('.stage').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' }); run(() => useFire(id, me, foe)); });
+  card.append(b); holyCards.append(card);
+}
 const boltCards = document.getElementById('bolt-cards');
 for (const [id, [from, meta, desc]] of Object.entries(BOLT_INFO)) {
   const sk = BOLT[id], card = document.createElement('div'); card.className = 'sk';
@@ -4593,7 +4795,7 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
 // Section picker: show one element at a time (the battle stays on top, with only that element's skills); remembered in the address (#fire, #water, #leaf, #earth, #plan).
 {
   const jump = document.getElementById('jump');
-  const ELS = ['fire', 'water', 'leaf', 'earth', 'bolt', 'holy'], PICK = { fire: 'sunking', water: 'whaleking', leaf: 'forestdeer', earth: 'mountturtle', bolt: 'thunderking' };
+  const ELS = ['fire', 'water', 'leaf', 'earth', 'bolt', 'holy'], PICK = { fire: 'sunking', water: 'whaleking', leaf: 'forestdeer', earth: 'mountturtle', bolt: 'thunderking', holy: 'sunqilin' };
   const apply = (v) => {
     document.querySelectorAll('section[data-group]').forEach((sec) => { const g = sec.dataset.group; sec.hidden = !(v === 'all' || g === 'battle' || g === v); });
     document.querySelectorAll('.skgroup').forEach((g) => { g.hidden = ELS.includes(v) ? g.dataset.el !== v : g.dataset.el === 'holy'; });

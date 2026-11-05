@@ -1,3 +1,14 @@
+# [1.49.0](https://github.com/punya199/demo-app/compare/v1.48.0...v1.49.0) (2026-11-05)
+
+
+### Fix
+
+* ignore local claude-flow state ([ea65b8a](https://github.com/punya199/demo-app/commit/ea65b8a9c7ab0407ac8fd3cb05dfd75bcb90ce2b))
+
+### Update
+
+* show reset times, craft set status and mobile bag cards ([55246c6](https://github.com/punya199/demo-app/commit/55246c65740d696178c15a748be3b6efa53fbb75))
+
 # [1.48.0](https://github.com/punya199/demo-app/compare/v1.47.0...v1.48.0) (2026-11-05)
 
 

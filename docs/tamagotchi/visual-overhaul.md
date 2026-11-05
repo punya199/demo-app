@@ -64,7 +64,8 @@ asked for this more than once.
 | Earth skills, all 8 | Done. New statuses in the prototype: stun (`stunT`, spinning stars, can't walk, auto mode waits), stone shield (`bubbleStone` on the shared bubble shield), attack up (`atkUpT`, ×1.2 outgoing damage, orange arrow), and the boulder's stone skin (`stoneSkin`: 12% less damage, crowd control 40% shorter, 15% slower). Heavy forms walk up close before ธรณีสั่น because they are slow |
 | Earth fused (ธรณีผู้ตื่น) | Done. After several rounds the owner picked the first redraw (a slim crouching rock beast in charcoal scale tufts with rust stripes, a tail curling up over its back, a three-lobed bone mask with one glowing cyan eye) and asked for it slimmer, with the amber belly kept to the lower part of the body (below y 66 in the 88 px grid) |
 | Earth world boss | Done: ตัวนิ่มศิลาโบราณ, a stone pangolin with thorned scale rows (the game's ต้นไม้โบราณ is earth; the new name is only a proposal). Choosing it switches the arena to the new canyon theme |
-| Lightning line, 11 forms + fused + boss | **Still drafts, waiting for the owner to choose** (section "มอนธาตุอสนี"). Bird branch (นกฟ้าผ่า → เหยี่ยวพายุ → วิหคราชาอสนี with storm-cloud wings), fox branch at the owner's request (จิ้งจอกพายุ → จิ้งจอกอสนี with two lightning tails → ราชาจิ้งจอกอสนี with five, a storm-cloud ruff and a gold crown; tails use `boltTail`). Poor forms: แมวไฟสถิต (puffed-up static cat), เมฆหม่นขี้เกียจ (sleeping rain cloud). Fused อสนีผู้ตื่น: the owner picked option C of three flying designs: a heavy storm wyvern whose arms are the wings (storm-cloud membranes on gold spars with gold wrist claws), two strong hind legs, a blunt head with a big jaw, a gold brow plate, a swept crest of lightning and a lightning tail tip. It flies on the `FLY` rig (wing flap and bob when idle, double-speed flaps when moving, dive attack, wings-up cast), uses the shared `dragonWing` / `claws` helpers, is animated on its card and selectable in the arena World boss: the game's จักรกลพายุ is a machine, so the draft is a storm bison with a thundercloud mane (name กระทิงพายุคำราม is a proposal). Wings use the shared `birdWing` helper |
+| Lightning line, 11 forms + fused + boss | Done and animated (owner approved, with the cat branch turned into foxes). Bird branch (นกฟ้าผ่า → เหยี่ยวพายุ → วิหคราชาอสนี) flies on the `FLY` rig like the fused form; fox branch (จิ้งจอกพายุ → จิ้งจอกอสนี two tails → ราชาจิ้งจอกอสนี five tails, `boltTail`). Fused อสนีผู้ตื่น is the storm wyvern (owner's option C). World boss: storm bison (the game's จักรกลพายุ is a machine; กระทิงพายุคำราม is a proposed name), with a new storm arena theme |
+| Lightning skills, all 8 | Done. New statuses in the prototype: static (`staticT`, crackling sparks, 30% a second to seize for 0.4 s, as `staticChance`/`staticStunSec` in the game), haste (`hasteT`, 30% faster walking, yellow after-images) and focus (`focusT`, basic-attack crit chance up, a crosshair over the head); `staticRetort` for แมวไฟสถิต's passive. Lightning is drawn with `boltLine`, a jagged line redrawn every frame so it flickers |
 | Holy, dark, shadow lines | Not started |
 | The other 17 fused forms and 9 bosses | Not started |
 | Putting the art into the real game | Not started |
@@ -79,6 +80,9 @@ asked for this more than once.
 - New names (ราชาวาฬผลึก and the names in the plan table) are proposals only. The game data in
   `demo-app-backend` `species-data.ts` is unchanged.
 - The skill name "ตรีศูลสมุทร" is still the game's name. Ask the owner before renaming it.
+- Lightning skill names that still name old animals: เล็บพายุ (tiger, now the storm fox's four swipes),
+  กีบอสนี (horse hoof, now the storm hawk's dive), วัชระผ่าฟ้า (vajra god, now the fox king's three ball
+  lightnings).
 - Earth skill names that still name old animals: อุ้งตีนผา (bear paw, now the pillar tortoise's
   stamp), ขนแร่ (hedgehog quills, now ore spines fired from the ore rhino's armour).
 - Leaf skill names still name the old animals: กรงเล็บไพร (tiger claw, now the stag's three antler
@@ -93,8 +97,8 @@ asked for this more than once.
 
 ## Next steps (suggested order)
 
-1. Get the owner's choice on the lightning drafts, then animate them (drop the `true` still flags) and do
-   the 8 skills (`ltn_*` in `arena-data.ts`). Then holy, dark, shadow the same way: still drafts first.
+1. Holy line next, then dark and shadow: still drafts first for the owner to choose, then animate them
+   and do their 8 skills.
 3. Integration plan for the real game: replace the emoji in `ArenaReplay.tsx` with sprite frames.
    Positions come from the server replay, so poses map to replay events (walk while moving,
    attack/cast at skill events, the parry pose on dodge events with `parry`). Combat results stay

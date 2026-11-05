@@ -15,7 +15,7 @@ asked for this more than once.
 - Source copy: `docs/tamagotchi/prototypes/monster-arena-25d.html`. It is one self-contained page:
   open it in a browser to run it. Add a `<!doctype html>` wrapper if a browser renders it oddly.
 - The page has a "ดูส่วน" dropdown at the top: all / fire monsters + skills / water monsters +
-  skills / plan. The battle scene always stays on top.
+  skills / leaf monsters + skills / plan. The battle scene always stays on top.
 
 ## Direction the owner approved
 
@@ -50,8 +50,12 @@ asked for this more than once.
 | Water fused (สมุทรผู้ตื่น) | Done, redrawn once: original roaring sea dragon in an S-curve. The gold belly always faces the front and bottom: the belly is on the right of the tail-to-head direction, the back on the left. It has a continuous see-through dorsal sail, shoulder fin-wings, a glowing lateral line, a long-snouted roaring head and swept-back crystal horns |
 | Water world boss (เต่ายักษ์วารี) | Done |
 | Plan table for all 8 lines | On the page: which forms to keep and which to replace, with reasons |
-| Leaf, earth, lightning, holy, dark, shadow lines | Not started |
-| The other 19 fused forms and 11 bosses | Not started |
+| Leaf line, 11 forms | Done. Deer main branch (กวางใบไม้ → กวางเขาพฤกษา → เทพพนาลัย, a jade elk carrying a small forest), wolf branch (หมาป่าไพร → หมาป่าเปลือกไม้ → ราชาหมาป่าพงไพร, a tree growing from its shoulders). Poor forms stay funny: เห็ดง่วง is a sleepy critter with a red mushroom cap on its back, ตอไม้แก่ a sleepy stump with a carved face and moss beard |
+| Leaf skills, all 8 | Done. New statuses in the prototype: root (`rootT`, can't walk, vines round the feet), silence (`silenceT`, crossed speech bubble, auto mode only basic-attacks), poison (`poisonT`, 2% HP a second), lifesteal (กรงเล็บไพร heals 30% of each hit), and the ent passive (`ent`: 1.2% regen a second, 8% less damage, bark flash) |
+| Leaf fused (พนาผู้ตื่น) | Done: the awakened elk, mint-white body, gold armour on face/chest/back, gold branch antlers with glowing leaves, twin green/gold leaf rings |
+| Leaf boss (พฤกษาโบราณ) | Done. The leaf line has no world boss (ต้นไม้โบราณ is earth), so this is the leaf raid boss `ancient_flora`: an ancient moss bear with a blossom tree and a small grove on its back. Choosing it switches the arena to the new forest theme, and the HUD says บอสเรด |
+| Earth, lightning, holy, dark, shadow lines | Not started |
+| The other 18 fused forms and 10 bosses | Not started |
 | Putting the art into the real game | Not started |
 
 ## Open items and known gaps
@@ -62,6 +66,11 @@ asked for this more than once.
 - New names (ราชาวาฬผลึก and the names in the plan table) are proposals only. The game data in
   `demo-app-backend` `species-data.ts` is unchanged.
 - The skill name "ตรีศูลสมุทร" is still the game's name. Ask the owner before renaming it.
+- Leaf skill names still name the old animals: กรงเล็บไพร (tiger claw, now the stag's three antler
+  slashes), งวงพฤกษา (elephant trunk, now a thick vine that rears up from the bark wolf's back),
+  พิทักษ์พนา (ent, now the wolf king's passive). Ask the owner before renaming them.
+- `ROSTER` in the prototype gives the wolf king the ent passive from the start, so it regenerates in
+  every fight there.
 - Perfect forms have no aura yet. The idea is a small sparkle at the feet to tell them from
   adult forms.
 - Guarding: the game has no manual guard. The prototype's guard pose stands for the "ปัดป้อง"
@@ -69,9 +78,8 @@ asked for this more than once.
 
 ## Next steps (suggested order)
 
-1. Leaf line with the same process: plan table concept → sprites → rig → its 8 skills → its fused
-   form and boss.
-2. Then earth, lightning, holy, dark, shadow lines.
+1. Earth line with the same process as fire, water and leaf: plan table concept → sprites → rig →
+   its 8 skills → its fused form and boss. Then lightning, holy, dark, shadow.
 3. Integration plan for the real game: replace the emoji in `ArenaReplay.tsx` with sprite frames.
    Positions come from the server replay, so poses map to replay events (walk while moving,
    attack/cast at skill events, the parry pose on dodge events with `parry`). Combat results stay
@@ -86,6 +94,10 @@ asked for this more than once.
 - `SPRITES[id]`: `size`, `rig` (QUAD / BIPED / BLOB / SWIM), `draw(s, P)` with pose offsets,
   `emit` particle emitters, `mouth`, optional `hover`, `aura`, and `glows`.
 - `ANIM` + `getFrame`: pose curves and lazy frame baking.
-- `FIRE` / `WATER`: game-skill animations (`useFire(id, att, def)` dispatches both).
+- `FIRE` / `WATER` / `LEAF`: game-skill animations (`useFire(id, att, def)` dispatches all of
+  them; `skillEl(id)` picks the tag colour, `elCols(el)` the particle colours).
+- Leaf helpers: `leafShape` (pointed leaf), `grove` (small tree), `flower`, `rootsUp` (ring of
+  roots bursting from the ground), `drawRazorLeaf`. `LEAF_IDS` marks which sprites are leaf.
+- `THEMES` / `floors`: cave, lava (fire boss) and forest (leaf boss) arenas.
 - `STAGES` / `STAGE_OF`: the stage badges.
 - `ROSTER`: what the battle selectors offer.

@@ -4,12 +4,15 @@ import { groupInventory, inventoryGroupOf, IItemSources, itemLabel } from './inv
 const sources: IItemSources = {
   shopItems: [{ id: 'meat', name: 'เนื้อ', emoji: '🍖' }],
   materials: [{ id: 'enhance_stone', name: 'หินตีบวก', emoji: '🪨' }],
+  craftMaterials: [{ id: 'craft_catalyst', name: 'ตัวเร่งคราฟต์', emoji: '🧿' }],
   bosses: [{ id: 'lava_king', name: 'ราชันย์ลาวา', emoji: '🔥' }],
 }
 
 describe('itemLabel', () => {
   it('names every kind of item, and falls back to the raw id', () => {
-    expect(itemLabel('craft_catalyst', sources)).toBe('💎 Catalyst')
+    expect(itemLabel('craft_catalyst', sources)).toBe('🧿 ตัวเร่งคราฟต์')
+    // Before the wiki loads, the built-in names (the same as the server's) are used.
+    expect(itemLabel('craft_forge_core', { ...sources, craftMaterials: [] })).toBe('⚒️ แกนหลอมศึก')
     expect(itemLabel('refine_stone_rare', sources)).toBe('💠 รีไฟน์หายาก')
     expect(itemLabel('meat', sources)).toBe('🍖 เนื้อ')
     expect(itemLabel('enhance_stone', sources)).toBe('🪨 หินตีบวก')

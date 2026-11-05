@@ -1266,20 +1266,21 @@ export const describeSetTier = (tier: ISetProgress['tiers'][number]) =>
 export const isSetTierActive = (set: ISetProgress, tier: ISetProgress['tiers'][number]) =>
   set.worn >= tier.pieces
 
-// The 12 craft-only materials (ids as the server's EnumMaterialId).
+// The 12 craft-only materials (ids and names as the server's craft-materials.ts; the wiki's
+// `craft.materials` is preferred when loaded, this is the fallback).
 export const craftMaterialLabel: Record<string, string> = {
-  craft_essence_flame: '🔥 เอสเซนซ์เปลวไฟ',
-  craft_essence_tide: '🌊 เอสเซนซ์กระแสน้ำ',
+  craft_essence_flame: '🔥 เอสเซนซ์ไฟ',
+  craft_essence_tide: '💧 เอสเซนซ์น้ำ',
   craft_essence_leaf: '🍃 เอสเซนซ์ใบไม้',
-  craft_essence_earth: '⛰️ เอสเซนซ์ผืนดิน',
+  craft_essence_earth: '🪨 เอสเซนซ์ดิน',
   craft_essence_lightning: '⚡ เอสเซนซ์สายฟ้า',
-  craft_essence_holy: '✨ เอสเซนซ์แสงศักดิ์สิทธิ์',
-  craft_forge_core: '🔨 แกนหลอม',
-  craft_rune_shard: '🔷 เศษรูน',
+  craft_essence_holy: '✨ เอสเซนซ์แสง',
+  craft_forge_core: '⚒️ แกนหลอมศึก',
+  craft_rune_shard: '🔷 เศษรูนพิทักษ์',
   craft_unique_verdant_heart: '💚 หัวใจพนา',
-  craft_unique_reaper_edge: '🗡️ คมเกี่ยววิญญาณ',
+  craft_unique_reaper_edge: '🗡️ คมเคียวเพชฌฆาต',
   craft_unique_storm_sigil: '🌀 ตราพายุ',
-  craft_catalyst: '💎 Catalyst',
+  craft_catalyst: '🧿 ตัวเร่งคราฟต์',
 }
 
 // Where each craft material drops (display text only).

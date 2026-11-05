@@ -13,6 +13,7 @@ interface INamed {
 export interface IItemSources {
   shopItems: INamed[]
   materials: INamed[]
+  craftMaterials: INamed[]
   bosses: INamed[]
 }
 
@@ -47,6 +48,7 @@ const GROUP_ORDER: InventoryGroupKey[] = ['craft', 'upgrade', 'token', 'consumab
 export const itemSourcesOf = (wiki: IWikiData | undefined): IItemSources => ({
   shopItems: wiki?.economy.shopItems ?? [],
   materials: wiki?.equipment.materials ?? [],
+  craftMaterials: wiki?.craft.materials ?? [],
   bosses: [...(wiki?.raid.bosses ?? []), ...(wiki?.worldBoss.bosses ?? [])],
 })
 
@@ -61,7 +63,9 @@ export const itemLabel = (itemId: string, sources: IItemSources): string => {
   }
   const shop = named(sources.shopItems, itemId)
   const material = named(sources.materials, itemId)
+  const craft = named(sources.craftMaterials, itemId)
   return (
+    (craft && show(craft)) ??
     craftMaterialLabel[itemId] ??
     refineStoneLabel[itemId] ??
     (shop && show(shop)) ??

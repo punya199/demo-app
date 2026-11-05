@@ -818,10 +818,72 @@ export interface IWikiData {
       baseRatePerHour: number
     }[]
   }
+  // The real-time arena: only what the guide shows (statuses and crowd-control rules).
+  arena: {
+    maxResist: number
+    statuses: Record<
+      string,
+      { label: string; icon: string; kind: 'buff' | 'debuff'; cc?: boolean; note: string }
+    >
+    statusNumbers: { ccWindowSec: number; ccSteps: number[]; poisonMaxStacks: number }
+  }
+  // Craft (phase 5.6): every number the craft screen and its guide page use.
+  craft: {
+    tiers: Record<
+      'standard' | 'flagship',
+      { coin: number; minutes: number; baseGrade: EnumEquipmentGrade; maxGrade: EnumEquipmentGrade }
+    >
+    catalystChance: number
+    pityAfterFails: number
+    skipCoinMultiplier: number
+    adventureEssence: {
+      chance: number
+      min: number
+      max: number
+      areaElement: Record<string, string | undefined>
+    }
+    raidCores: Record<string, number>
+    worldBoss: {
+      unique: number
+      catalyst: number
+      topRank: number
+      topUnique: number
+      topCatalyst: number
+    }
+    materials: {
+      id: string
+      name: string
+      emoji: string
+      description: string
+      source: 'adventure' | 'expedition' | 'raid' | 'world_boss'
+      tier: 'common' | 'rare' | 'unique' | 'catalyst'
+    }[]
+    sets: {
+      id: string
+      name: string
+      style: string
+      flagship: boolean
+      care: boolean
+      essence: string
+      rare: string
+      unique: string | null
+    }[]
+  }
   equipment: {
     capacity: number
     slots: Record<EnumEquipmentSlot, { stat: StatKey; base: number }>
     gradeMultiplier: Record<EnumEquipmentGrade, number>
+    subStatCount: Record<EnumEquipmentGrade, { min: number; max: number }>
+    minStageByGrade: Record<EnumEquipmentGrade, EnumMonsterStage | null>
+    special: {
+      // Per grade: chance to have any option, `guaranteed` options (default 1) before the bonus
+      // `secondChance` roll, and how far along each option's range the value rolls (lo-hi).
+      byGrade: Record<
+        EnumEquipmentGrade,
+        { chance: number; secondChance: number; lo: number; hi: number; guaranteed?: number }
+      >
+      totalCapMultiplier: number
+    }
     boxPrice: number
     boxGradeRates: Partial<Record<EnumEquipmentGrade, number>>
     dropChancePercent: number
@@ -845,6 +907,8 @@ export interface IWikiData {
           pieces: 2 | 4
           pct?: Partial<IBattleStats>
           effect?: IFighterEffects
+          // Craft care sets: perks (in percent) from the 2-piece bonus.
+          care?: Partial<Record<SpecialKey, number>>
         }[]
       }
     >

@@ -1,5 +1,5 @@
 import { Collapse, Spin, Tag } from 'antd'
-import { ReactNode, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { buildEvolutionTree } from './evolution-tree'
 import { EvolutionTree } from './EvolutionTree'
 import {
@@ -22,53 +22,13 @@ import {
   IWikiSpecies,
 } from './tamagotchi-interface'
 import { useGetWiki } from './tamagotchi-service'
+import { describeCareBonus, isCraftSet, percent, times } from './wiki-helper'
+import { CraftWikiTab } from './WikiCraft'
+import { Heading, List, Table } from './WikiParts'
+import { StatusEffectsSection } from './WikiStatus'
 
 // The in-game guide. Every number comes from GET /monster/wiki (the server's rule constants), so
 // this page explains the rules exactly as the server applies them.
-
-const percent = (value: number) => `${Math.round(value * 100)}%`
-const times = (value: number) => `×${value}`
-
-const Table = (props: { head: string[]; rows: ReactNode[][] }) => (
-  <div className="overflow-x-auto">
-    <table className="w-full text-left text-xs">
-      <thead>
-        <tr className="border-b border-slate-200 dark:border-slate-700">
-          {props.head.map((cell) => (
-            <th key={cell} className="py-1 pr-2 font-semibold">
-              {cell}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {props.rows.map((row, index) => (
-          <tr key={index} className="border-b border-slate-100 dark:border-slate-800">
-            {row.map((cell, cellIndex) => (
-              <td key={cellIndex} className="py-1 pr-2 align-top">
-                {cell}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)
-
-const List = (props: { items: ReactNode[] }) => (
-  <ul className="ml-4 list-disc space-y-1 text-sm">
-    {props.items.map((item, index) => (
-      <li key={index}>{item}</li>
-    ))}
-  </ul>
-)
-
-const Heading = (props: { children: ReactNode }) => (
-  <div className="mt-3 mb-1 font-semibold text-slate-900 first:mt-0 dark:text-slate-100">
-    {props.children}
-  </div>
-)
 
 const statsText = (stats: IBattleStats) =>
   `HP ${stats.hp} · ATK ${stats.atk} · DEF ${stats.def} · SPD ${stats.spd}`
@@ -430,6 +390,7 @@ const buildSections = (wiki: IWikiData) => {
           />
           <Heading>ค่าใช้จ่าย</Heading>
           <List items={[`สู้ 1 ครั้ง: น้ำหนัก −${battle.weightLoss}`, 'ป่วยอยู่สู้ไม่ได้']} />
+          <StatusEffectsSection arena={wiki.arena} />
         </>
       ),
     },
@@ -444,6 +405,7 @@ const buildSections = (wiki: IWikiData) => {
               `ชนะครั้งแรกได้เหรียญ ${times(adventure.firstClearMultiplier)} · บอสครั้งแรกได้เพชร`,
               'ความคืบหน้าผูกกับบัญชี ไม่หายเมื่อเปลี่ยนมอน',
               `ด่านที่ชนะแล้ว (รวมบอส) กด "ข้าม" ได้ ไม่ต้องสู้ ใช้ stamina รอบละเท่าการสู้ ได้เหรียญและโอกาสดรอปอุปกรณ์เหมือนชนะ เลือกได้ครั้งละ 1–${adventure.skipMaxRuns} รอบ`,
+              `ชนะมีโอกาส ${percent(wiki.craft.adventureEssence.chance)} ได้เอสเซนซ์วัตถุดิบคราฟต์ตามธาตุของพื้นที่ (ดูแท็บ คราฟต์)`,
             ]}
           />
           {adventure.areas.map((area) => (
@@ -476,10 +438,10 @@ const buildSections = (wiki: IWikiData) => {
               `กดส่งสำรวจแล้วปิดแอปได้ เก็บเหรียญตามเวลาจริงสูงสุด ${formatAge(idle.expeditionMaxMinutes)} แล้วต้องกลับมากดรับ`,
               `ระหว่างสำรวจ ความอิ่มและความแข็งแรงลดช้าลง ${times(idle.expeditionDrainMultiplier)} และอึไม่เพิ่ม`,
               'ถ้ามอนป่วยหรือความอิ่มเป็น 0 จะกลับบ้านเองและหยุดเก็บ ส่งสำรวจตอนป่วยหรือหิวไม่ได้',
-              `ทุก ${formatAge(idle.expeditionDropEveryMinutes)} ได้ไอเทมสะสม 1 ชิ้น (เนื้อชั้นดีหรือโปรตีนเชค)`,
+              `ทุก ${formatAge(idle.expeditionDropEveryMinutes)} ได้ไอเทมสะสม 1 ชิ้น (เนื้อชั้นดี โปรตีนเชค หรือเอสเซนซ์วัตถุดิบคราฟต์)`,
               `เหรียญต่อชั่วโมงขึ้นกับพื้นที่และค่าพลังของมอน (${times(idle.expeditionPowerMultiplierMin)}–${times(idle.expeditionPowerMultiplierMax)} เทียบร่างที่แนะนำ) ล็อกอัตราไว้ตอนออกเดินทาง`,
               'มอนที่ตายระหว่างสำรวจจะเสียรางวัลที่ยังไม่ได้รับ ระหว่างสำรวจสู้ในผจญภัยไม่ได้',
-              'ยังไม่มี EXP และวัตถุดิบ จะมาพร้อมระบบอุปกรณ์',
+              'ยังไม่มี EXP',
             ]}
           />
           <Table
@@ -555,7 +517,13 @@ const buildSections = (wiki: IWikiData) => {
                     `${gradeLabel[grade as keyof typeof gradeLabel]} ${times(value)}`
                 )
                 .join(' · ')}`,
-              'ไอเทมธรรมดามีค่ารองสุ่ม 1–3 ค่า ชุดเซ็ตจะมาพร้อมบอสในเฟสถัดไป',
+              `ค่ารองสุ่มตามเกรด: ${Object.entries(equipment.subStatCount)
+                .map(
+                  ([grade, range]) =>
+                    `${gradeLabel[grade as keyof typeof gradeLabel]} ${range.min}–${range.max}`
+                )
+                .join(' · ')}`,
+              `ชุดเซ็ตมี ${Object.keys(equipment.sets).length - wiki.craft.sets.length} ชุดจากบอส และ ${wiki.craft.sets.length} ชุดที่คราฟต์ได้อย่างเดียว (ดูแท็บ คราฟต์)`,
             ]}
           />
           <Table head={['ช่อง', 'ค่าหลัก']} rows={slotRows} />
@@ -578,6 +546,7 @@ const buildSections = (wiki: IWikiData) => {
                 .map((tier) => `${tier.name} ถึง +${tier.maxLevel} 🪙 ${tier.coin}`)
                 .join(' · ')}`,
               'หินรีไฟน์มหากาพย์/ตำนานได้จากบอสเท่านั้น: Boss Raid ระดับ Hard/Nightmare ชนะได้ 1 ก้อน และรางวัลอันดับ World Boss',
+              'คราฟต์: สร้างชิ้นเซ็ตจากวัตถุดิบที่ดรอป เกรดมิธิกได้จากการคราฟต์เท่านั้น (ดูแท็บ คราฟต์)',
             ]}
           />
           <Table
@@ -616,6 +585,11 @@ const buildSections = (wiki: IWikiData) => {
       ),
     },
     {
+      key: 'craft',
+      label: '🔨 คราฟต์',
+      children: <CraftWikiTab wiki={wiki} />,
+    },
+    {
       key: 'raid',
       label: '👹 บอสและชุดเซ็ต',
       children: (
@@ -629,6 +603,7 @@ const buildSections = (wiki: IWikiData) => {
               `ชนะ: ได้ชิ้นเซ็ตของบอส 1 ชิ้น (ช่องสุ่ม ช่องละเท่ากัน) เกรดตามระดับ + 🎫 Boss Token ${raid.bossTokensPerWin} + 🎖️ Raid Token (ชนะครั้งแรกของแต่ละบอส/ระดับได้ ${times(raid.firstClearMultiplier)})`,
               'กระเป๋าอุปกรณ์เต็มจะสู้ไม่ได้ (ไม่เสียโควตา) แพ้ไม่ได้อะไรและเสียโควตา',
               'ผลการสู้บอสไม่นับเป็นชนะ/แพ้ของมอนสำหรับเงื่อนไขวิวัฒนาการ',
+              'ชนะยังได้แกนวัตถุดิบคราฟต์ตามระดับ (ดูแท็บ คราฟต์)',
             ]}
           />
           <Table
@@ -653,12 +628,18 @@ const buildSections = (wiki: IWikiData) => {
             ]}
           />
           <Table
-            head={['เซ็ต', '2 ชิ้น', '4 ชิ้น']}
-            rows={Object.values(equipment.sets).map((set) => [
-              set.name,
-              describePctBonus(set.bonuses.find((bonus) => bonus.pieces === 2)?.pct ?? {}),
-              describeSetEffect(set.bonuses.find((bonus) => bonus.pieces === 4)?.effect ?? {}),
-            ])}
+            head={['เซ็ต', 'ที่มา', '2 ชิ้น', '4 ชิ้น']}
+            rows={Object.entries(equipment.sets).map(([setId, set]) => {
+              const two = set.bonuses.find((bonus) => bonus.pieces === 2)
+              return [
+                set.name,
+                isCraftSet(wiki, setId) ? 'คราฟต์' : 'บอส',
+                [describePctBonus(two?.pct ?? {}), describeCareBonus(two?.care)]
+                  .filter(Boolean)
+                  .join(' · '),
+                describeSetEffect(set.bonuses.find((bonus) => bonus.pieces === 4)?.effect ?? {}),
+              ]
+            })}
           />
         </>
       ),
@@ -685,6 +666,7 @@ const buildSections = (wiki: IWikiData) => {
               `บอสแตกก่อนสัปดาห์จบ: ทุกคนที่ร่วมได้เพิ่ม 🪙 ${worldBoss.defeatedBonus.coin} + 🎖️ ${worldBoss.defeatedBonus.raidToken}`,
               'รางวัลตามอันดับดาเมจ (ด้านล่าง) ชิ้นเซ็ตสุ่มด้วยค่าที่คงที่ต่อผู้เล่นต่อสัปดาห์ รับซ้ำหรือรับหลังเคลียร์กระเป๋าก็ได้ผลเดิม',
               'ผู้ตีครั้งสุดท้ายที่ทำให้บอสแตกได้หินรีไฟน์มหากาพย์เพิ่ม 1 ก้อน',
+              `รางวัลรายสัปดาห์ยังมีวัตถุดิบเฉพาะเซ็ตเรือธง ${wiki.craft.worldBoss.unique} ชิ้น และ Catalyst ${wiki.craft.worldBoss.catalyst} ก้อน (อันดับ 1–${wiki.craft.worldBoss.topRank} เพิ่มอีกอย่างละ ${wiki.craft.worldBoss.topUnique}/${wiki.craft.worldBoss.topCatalyst}) ดูแท็บ คราฟต์`,
               'กระเป๋าอุปกรณ์เต็มรับไม่ได้ถ้ามีชิ้นเซ็ตในรางวัล (ไม่เสียสิทธิ์) แลกชิ้นด้วย 🎫 ได้เฉพาะเกรดหายากและมหากาพย์ หลังเคยรับรางวัลบอสนี้',
             ]}
           />
@@ -836,5 +818,13 @@ export const WikiPanel = () => {
   if (isLoading || !data) {
     return <Spin />
   }
-  return <Collapse className="w-full" defaultActiveKey={['start']} items={buildSections(data)} />
+  // accordion: opening a section closes the one that was open.
+  return (
+    <Collapse
+      accordion
+      className="w-full"
+      defaultActiveKey={['start']}
+      items={buildSections(data)}
+    />
+  )
 }

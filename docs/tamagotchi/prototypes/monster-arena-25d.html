@@ -57,6 +57,8 @@ section { display: flex; flex-direction: column; gap: 18px }
 @media (max-width: 760px) { .stage { position: sticky; top: var(--navh, 64px); z-index: 4 } }
 .show.fused.earth canvas { background: radial-gradient(ellipse at 50% 75%, #3a2a14 0%, #14100a 72%) }
 .bolt-opts .show canvas, .show.fused.bolt canvas { background: radial-gradient(ellipse at 50% 75%, #1c2448 0%, #0c0e1a 72%) }
+.show.fused.holy canvas { background: radial-gradient(ellipse at 50% 75%, #3a3420 0%, #12100c 72%) }
+.show.boss.holy canvas { background: radial-gradient(ellipse at 50% 75%, #3a3018 0%, #14100a 72%) }
 .show.boss.bolt canvas { background: radial-gradient(ellipse at 50% 75%, #22264a 0%, #0c0c18 72%) }
 .show.boss.earth canvas { background: radial-gradient(ellipse at 50% 75%, #3a2a12 0%, #140e08 72%) }
 .stage canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; aspect-ratio: 16 / 9 }
@@ -156,6 +158,7 @@ td.st { white-space: nowrap; color: var(--muted) }
       <option value="leaf">มอนธาตุพฤกษ์ + สกิล</option>
       <option value="earth">มอนธาตุศิลา + สกิล</option>
       <option value="bolt">มอนธาตุอสนี + สกิล</option>
+      <option value="holy">มอนธาตุรัศมี (ภาพนิ่ง รอเลือกแบบ)</option>
       <option value="plan">แผนออกแบบทั้ง 8 สาย</option>
     </select>
     <span class="hint" id="jump-hint">ฉากต่อสู้อยู่บนสุดเสมอ</span>
@@ -163,7 +166,7 @@ td.st { white-space: nowrap; color: var(--muted) }
   <header style="order:0">
     <div class="eyebrow">ข้อเสนองานภาพ · ตัวอย่างให้ดูก่อน</div>
     <h1>มอนอารีนา <span class="tag">โฉมใหม่</span></h1>
-    <p class="lede">ตอนนี้ทำแล้ว 5 สาย: เพลิง วารี พฤกษ์ ศิลา และอสนี สนามมุมเฉียงแบบ 2.5D สไตล์พิกเซลอาร์ต มอนมีเงาและแสงจากมุมซ้ายบน ท่าโจมตี หลบ ตั้งรับ และสกิลมีเอฟเฟกต์ของแต่ละธาตุ ทุกอย่างในหน้านี้วาดด้วยโค้ด ไม่มีรูปจากที่อื่น กดปุ่มด้านล่างฉากเพื่อลองได้เลย</p>
+    <p class="lede">ตอนนี้ทำแล้ว 5 สาย: เพลิง วารี พฤกษ์ ศิลา และอสนี สายรัศมีมีภาพนิ่งให้เลือกแบบ สนามมุมเฉียงแบบ 2.5D สไตล์พิกเซลอาร์ต มอนมีเงาและแสงจากมุมซ้ายบน ท่าโจมตี หลบ ตั้งรับ และสกิลมีเอฟเฟกต์ของแต่ละธาตุ ทุกอย่างในหน้านี้วาดด้วยโค้ด ไม่มีรูปจากที่อื่น กดปุ่มด้านล่างฉากเพื่อลองได้เลย</p>
   </header>
 
   <section aria-labelledby="battle-h" data-group="battle" style="order:1">
@@ -190,6 +193,8 @@ td.st { white-space: nowrap; color: var(--muted) }
         <div class="row" id="leaf-skills"></div></div>
         <div class="skgroup" data-el="bolt"><div class="ctl-title">สกิลธาตุอสนีในเกม 8 ท่า</div>
         <div class="row" id="bolt-skills"></div></div>
+        <div class="skgroup" data-el="holy"><div class="ctl-title">สกิลธาตุรัศมี</div>
+        <div class="hint">ยังไม่ได้ทำ รอเลือกแบบมอนสายรัศมีก่อน แล้วค่อยทำท่าทางและสกิล</div></div>
         <div class="skgroup" data-el="earth"><div class="ctl-title">สกิลธาตุศิลาในเกม 8 ท่า</div>
         <div class="row" id="earth-skills"></div></div>
         <div class="skgroup" data-el="other"><div class="ctl-title">เอฟเฟกต์ธาตุอื่น (ร่างแรก รอออกแบบ)</div>
@@ -388,7 +393,36 @@ td.st { white-space: nowrap; color: var(--muted) }
     <div class="skills-grid" id="bolt-cards"></div>
   </section>
 
-  <section aria-labelledby="plan-h" data-group="plan" style="order:18">
+  <section aria-labelledby="hline-h" data-group="holy" style="order:18">
+    <div class="eyebrow">สายที่หก · ภาพนิ่งให้เลือกแบบก่อน</div>
+    <h2 id="hline-h">สายรัศมี 11 ร่าง</h2>
+    <p class="lede">ตระกูลสัตว์เทพ สีหลักเป็นขาวงาช้าง ทอง และฟ้าอ่อน ทุกตัวมีแสงหรือวงรัศมี สายหลักเป็นแกะต่อไปถึงกิเลน (ลูกแกะแสง → แกะปีกทิพย์ → กิเลนรัศมี เกล็ดทองเขาเดียว → กิเลนสุริยเทพ มีวงแสงซ้อนหลังหัว) สายรองเป็นสิงห์ (สิงห์น้อยรัศมี แผงคอเป็นแสง → ราชสีห์ปีกขาว หกปีก → มหาราชสีห์เทวะ สวมมงกุฎทอง ปีกแสง) ร่างแย่ยังตลก: ทูตน้อยขี้เซาเป็นก้อนขนปุยมีปีกจิ๋ว หลับ วงรัศมีเอียงหลุด ระฆังแตกเป็นปูเสฉวนง่วงๆ ที่อาศัยในระฆังร้าว รอบนี้เป็นภาพนิ่ง บอกได้เลยว่าตัวไหนชอบ ตัวไหนอยากแก้ แล้วค่อยทำท่าทางกับสกิล</p>
+    <div class="lineup" id="lineup-holy"></div>
+    <div class="evo" id="evo-holy"></div>
+  </section>
+
+  <section aria-labelledby="hshow-h" data-group="holy" style="order:19">
+    <div class="eyebrow">ร่างผสมและบอสสายรัศมี · ภาพนิ่ง</div>
+    <h2 id="hshow-h">ศักดิ์สิทธิ์ผู้ตื่น และบอสโลกธาตุรัศมี</h2>
+    <div class="showcase">
+      <div class="show fused holy">
+        <canvas id="show-hfused" width="112" height="112" aria-label="ร่างผสม ศักดิ์สิทธิ์ผู้ตื่น"></canvas>
+        <div class="act" id="act-hfused"></div>
+        <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
+        <h3>ศักดิ์สิทธิ์ผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ร่างผสมรัศมี+รัศมี เดิมเป็นอีโมจิ 🔆 ใหม่เป็นกิเลนสุริยเทพที่ตื่นแล้ว ใส่เกราะทองที่หน้า คอ หลัง และขา แผงคอและหางเป็นแสงสีขาวปนฟ้า เขาเดียวเรืองแสง มีปีกขนนกกับปีกแสงซ้อนกัน กีบเป็นแสงทอง และวงแสงสองวง (ทองกับขาวฟ้า) หมุนสวนกันตามแบบร่างผสม</p>
+      </div>
+      <div class="show boss holy">
+        <canvas id="show-holyele" width="128" height="112" aria-label="บอสโลกธาตุรัศมี คชสารรัศมี"></canvas>
+        <div class="act" id="act-holyele"></div>
+        <span class="rank" style="--c:#ff5a5a">บอส</span>
+        <h3>บอสโลก · คชสารรัศมี <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ในเกมคือ "เทวทูตรัศมี" ✨ ซึ่งเป็นคน (เทวดา) จึงเสนอเป็นช้างเผือกยักษ์ ยกงวงขึ้น งายาว สวมเครื่องทรงทองเป็นชั้น ผ้าคลุมหลังสีแดงขอบทองมีพู่ ปีกขนนกกับปีกแสงที่ไหล่ และวงรัศมีลอยเหนือหัว ในเกมตีธรรมดาแล้วทำให้ใบ้ จึงคิดว่าตอนทำสกิลจะให้เสียงแตรช้างเป็นคลื่นแสงที่ทำให้ใบ้ ชื่อใหม่เป็นแค่ข้อเสนอ</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="plan-h" data-group="plan" style="order:20">
     <div class="eyebrow">แผนทั้งเกม</div>
     <h2 id="plan-h">ออกแบบมอนใหม่ทั้ง 8 สาย</h2>
     <p class="lede">มอนที่ดูไม่สมเหตุสมผลส่วนใหญ่มีปัญหาแบบเดียวกัน คือเป็นสิ่งของหรือคนแทนที่จะเป็นสัตว์ (ดวงอาทิตย์ ตรีศูล ภูเขา หน้ากาก นินจา) หรือเปลี่ยนชนิดสัตว์กลางสาย (กิ้งก่ากลายเป็นเสือ หมาป่ากลายเป็นช้าง) แผนนี้ใช้กติกา 4 ข้อ</p>
@@ -401,7 +435,7 @@ td.st { white-space: nowrap; color: var(--muted) }
     <div class="lines" id="lines"></div>
   </section>
 
-  <section aria-labelledby="next-h" data-group="plan" style="order:19">
+  <section aria-labelledby="next-h" data-group="plan" style="order:21">
     <h2 id="next-h">ต้องตัดสินใจก่อนลงมือ</h2>
     <div class="next">
       <div class="q"><b>1. สไตล์ภาพนี้ใช้ได้ไหม</b><span>พิกเซลอาร์ตมุมเฉียงแบบในหน้านี้ หรืออยากลองแบบอื่น เช่น ภาพวาดเส้นเรียบความละเอียดสูง</span></div>
@@ -586,8 +620,25 @@ const MATS = {
   bear2: ['#0e0804', '#2c1a0e', '#422a16', '#5c3c22', '#82603e'],
   sap:   ['#0a3a10', '#6aff6a', '#a8ffa0', '#e0ffd8', '#ffffff'],
   bloom: ['#5a4a04', '#ffd84a', '#ffe88a', '#fff6c8', '#ffffff'],
+  // holy line
+  ivory: ['#2a2620', '#b4aa94', '#ddd4c0', '#f4eee0', '#ffffff'],
+  ivory2:['#201c18', '#8e8676', '#b4ab98', '#d0c8b6', '#ece6d6'],
+  fleece:['#2a2420', '#c4b8a8', '#e8e0d4', '#faf6ee', '#ffffff'],
+  halo:  ['#6a4a04', '#ffd84a', '#ffe88a', '#fff6c8', '#ffffff'],
+  hlight:['#7a6a30', '#fff0b0', '#fff8dc', '#ffffff', '#ffffff'],
+  sky:   ['#0e1a2a', '#5a86b4', '#8ab4e0', '#bcdcf8', '#ffffff'],
+  feath: ['#1e2230', '#a0aac4', '#d0d8ec', '#eef2fc', '#ffffff'],
+  feath2:['#181a26', '#7e88a4', '#a8b2cc', '#c8d0e6', '#e4eaf8'],
+  lionb: ['#2a2014', '#b89a6c', '#e0c89c', '#f4e6c4', '#fffaf0'],
+  lionb2:['#201810', '#94784e', '#b89c70', '#d4bc90', '#ecdcb8'],
+  mane:  ['#2a1a04', '#a8741c', '#d8a838', '#f4d070', '#fff0b8'],
+  bronze:['#1a1006', '#6a4a1c', '#9a7030', '#c89a48', '#f0cc80'],
+  bronze2:['#140c04', '#523814', '#7a5822', '#9e7838', '#c8a060'],
+  crabp: ['#2a0e12', '#a04a5a', '#d07a88', '#f0aab4', '#ffe0e4'],
+  elew:  ['#1e1c22', '#8e8a98', '#bcb8c6', '#e2deea', '#ffffff'],
+  elew2: ['#18161c', '#6e6a78', '#9a96a6', '#bcb8c8', '#dcd8e6'],
 };
-const GLOW = new Set(['fire', 'core', 'glowfin', 'foam', 'jglow', 'magglow', 'ice', 'sap', 'bloom', 'topaz', 'volt', 'vcore']);
+const GLOW = new Set(['fire', 'core', 'glowfin', 'foam', 'jglow', 'magglow', 'ice', 'sap', 'bloom', 'topaz', 'volt', 'vcore', 'halo', 'hlight']);
 const hexRgb = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16), h.length > 7 ? parseInt(h.slice(7, 9), 16) : 255];
 const MAT_RGB = Object.fromEntries(Object.entries(MATS).map(([k, v]) => [k, v.map(hexRgb)]));
 
@@ -786,6 +837,59 @@ function birdWing(s, sx, sy, sc, dir, lift, k, vein, puff) {
   if (puff) for (const i of [5, 7, 9, 11]) s.E(pts[i][0], pts[i][1], 3.4 * sc, 2.8 * sc, puff);
   for (const i of [6, 8, 10]) s.line([[pts[i][0], pts[i][1]], [(pts[i][0] + sx) / 2, (pts[i][1] + sy) / 2]], '#0c0a18');
   if (vein) s.line([[sx + 2 * d * sc, sy - 2 * sc], pts[2], [pts[2][0] - 2 * d, pts[2][1] + 2], pts[3]], vein, '#fffac0');
+}
+// Holy line helpers.
+// A thin glowing halo ring of detail pixels (always drawn on top), tilt leans it to one side.
+function haloRing(s, x, y, rx, ry, tilt = 0, thick = 1) {
+  const n = Math.ceil(rx * 8);
+  for (let i = 0; i < n; i++) {
+    const a = i / n * TAU, px = x + Math.cos(a) * rx, py = y + Math.sin(a) * ry + Math.cos(a) * rx * tilt;
+    const c = Math.sin(a) < -.2 ? '#fff6c8' : Math.sin(a) > .4 ? '#e8a820' : '#ffd84a';
+    s.d(px, py, c); if (thick > 1) s.d(px, py + 1, Math.sin(a) < 0 ? '#ffd84a' : '#c48a16');
+  }
+}
+// A light ray (thin pointed wedge) from radius r0 to r1 at angle a around (cx, cy).
+function ray(s, cx, cy, r0, r1, a, w, k) {
+  const c = Math.cos(a), sn = Math.sin(a);
+  s.P([[cx + c * r0 - sn * w, cy + sn * r0 + c * w], [cx + c * r1, cy + sn * r1], [cx + c * r0 + sn * w, cy + sn * r0 - c * w]], k);
+}
+// A lion's mane of light: alternating long gold and short white rays round a gold disc.
+function lightMane(s, cx, cy, r, n, k = 'mane', k2 = 'hlight') {
+  for (let i = 0; i < n; i++) { const a = i / n * TAU + .2; ray(s, cx, cy, r * .5, r * (i % 2 ? 1.05 : 1.45), a, r * .3, i % 2 ? k2 : k); }
+  s.E(cx, cy, r * .85, r * .8, k);
+}
+// A long feathered wing pointing along angle a from (sx, sy): smooth leading edge, scalloped trailing edge.
+// side flips which edge carries the feather tips.
+function plumeWing(s, sx, sy, len, wid, a, k, side = 1, line = '#7e88a4') {
+  const c = Math.cos(a), sn = Math.sin(a), T = (u, v) => [sx + c * u - sn * v * side, sy + sn * u + c * v * side], pts = [];
+  for (let i = 0; i <= 8; i++) { const q = i / 8; pts.push(T(len * q, -wid * .35 * Math.sin(Math.PI * Math.min(1, q * 1.05)))); }
+  for (let i = 10; i >= 0; i--) { const q = i / 10; pts.push(T(len * (q * .94), wid * (.2 + .8 * Math.sin(Math.PI * Math.min(1, q * .9 + .08))) * (i % 2 ? .62 : 1))); }
+  s.P(pts, k);
+  for (const q of [.3, .5, .7]) s.line([T(len * q, wid * .1), T(len * (q - .12), wid * .6 * Math.sin(Math.PI * q))], line);
+}
+// Gold scale plates in a row along the back.
+function scaleRow(s, pts, rx, ry, k = 'gold') { for (const [x, y] of pts) s.E(x, y, rx, ry, k); for (const [x, y] of pts) s.d(x - rx * .4, y - ry * .3, '#fff0a0'); }
+// A qilin head at (ex, ey) facing right: long snout, one swept-back horn, cloud brow, whisker.
+function qilinHead(s, ex, ey, sc, j, horn = 'gold', hornGlow = false) {
+  s.L(ex - 1 * sc, ey - 3 * sc, ex - 6 * sc, ey - 12 * sc, 1.3 * sc, horn, .5 * sc); s.L(ex - 6 * sc, ey - 12 * sc, ex - 9 * sc, ey - 14 * sc, .6 * sc, horn, .4);
+  s.P([[ex - 4 * sc, ey - 2 * sc], [ex - 8 * sc, ey - 6 * sc], [ex - 2 * sc, ey - 4 * sc]], 'ivory2');
+  s.E(ex, ey, 5 * sc, 4.2 * sc, 'ivory');
+  s.P([[ex + 2 * sc, ey - 2.5 * sc], [ex + 10 * sc, ey], [ex + 10 * sc, ey + 2.6 * sc], [ex + 2 * sc, ey + 3.4 * sc]], 'ivory');
+  s.P([[ex + 2 * sc, ey + 2.4 * sc], [ex + 9 * sc, ey + 2.6 * sc + j], [ex + 7 * sc, ey + 4.6 * sc + j], [ex + 2 * sc, ey + 4.2 * sc]], 'ivory2');
+  s.E(ex - 1 * sc, ey - 3.6 * sc, 3.4 * sc, 1.6 * sc, 'sky');
+  s.line([[ex + 8 * sc, ey + 1.5 * sc], [ex + 11 * sc, ey + 4 * sc], [ex + 10 * sc, ey + 7 * sc]], '#f2c13a', '#fff0a0');
+  s.d(ex + 2 * sc, ey - 1 * sc, '#ffffff').d(ex + 3 * sc, ey - 1 * sc, '#2a1802').d(ex + 1 * sc, ey - 2 * sc, '#2a1802').d(ex + 2 * sc, ey - 2 * sc, '#2a1802').d(ex + 3 * sc, ey - 2 * sc, '#2a1802');
+  s.d(ex + 9.5 * sc, ey + .4 * sc, '#2a2620');
+  if (hornGlow) s.d(ex - 9 * sc, ey - 14 * sc, '#ffffff').d(ex - 8 * sc, ey - 14 * sc, '#fff6c8');
+}
+// A lion head at (cx, cy) in its mane: cream face, short muzzle, gold eyes.
+function lionFace(s, cx, cy, sc, j, eye = 'cute') {
+  s.E(cx + 1.6 * sc, cy + .8 * sc, 4.6 * sc, 4.3 * sc, 'lionb'); s.E(cx - 1.4 * sc, cy - 3.6 * sc, 1.5 * sc, 1.5 * sc, 'lionb');
+  s.E(cx + 4.8 * sc, cy + 2 * sc, 2.8 * sc, 2.1 * sc + j * .3, 'ivory');
+  s.d(cx + 7 * sc, cy + .8 * sc, '#6a3a2a').d(cx + 6.4 * sc, cy + .8 * sc, '#6a3a2a');
+  if (j > .5) s.line([[cx + 4 * sc, cy + 3.4 * sc], [cx + 7 * sc, cy + 3.4 * sc]], '#5a0a1a');
+  if (eye === 'cute') s.eye(cx + 2 * sc, cy - 1 * sc, 'cute');
+  else s.d(cx + 2 * sc, cy - 1 * sc, '#fff6b0').d(cx + 3 * sc, cy - 1 * sc, '#c48a16').line([[cx + .5 * sc, cy - 2.4 * sc], [cx + 4 * sc, cy - 1.8 * sc]], '#2a1a04');
 }
 const glowSap = (s, x, y) => s.d(x, y, '#f0ffe0').d(x + 1, y, '#a8ffa0').d(x, y - 1, '#a8ffa0').d(x, y + 1, '#4ad44a').d(x - 1, y, '#a8ffa0').d(x + 2, y, '#4ad44a');
 // A pointed leaf from (x, y) along angle a, with an optional vein colour.
@@ -2072,6 +2176,212 @@ const SPRITES = {
     s.d(81 + hx, 73 + hy, '#fff6b0').d(82 + hx, 73 + hy, '#ffa02a').d(80 + hx, 72 + hy, '#1a140c').d(81 + hx, 72 + hy, '#1a140c').d(82 + hx, 72 + hy, '#1a140c');
     s.d(93 + hx, 78 + hy, '#1a140c');
   }, glows: [[82, 73, '#ffa02a', 4]], emit: [], mouth: [92, 78] },
+  /* ----- Holy line (still drafts for the owner to choose from): sacred animals, sheep and qilin main branch, lion branch ----- */
+  hegg: { size: 48, rig: BLOB, draw(s, P) {
+    const bx = P.body[0] * .6, by = P.body[1] * .3, m = (pts) => pts.map(([x, y]) => [x + bx, y + by]);
+    s.P(m([[16, 29], [9, 24], [11, 28], [7, 29], [11, 31], [8, 33], [15, 33]]), 'feath'); s.P(m([[32, 29], [39, 24], [37, 28], [41, 29], [37, 31], [40, 33], [33, 33]]), 'feath2');
+    s.E(24 + bx, 31 + by, 9, 12, 'ivory');
+    s.line(m([[16, 31], [18, 30], [20, 31], [22, 30], [24, 31], [26, 30], [28, 31], [30, 30], [32, 31]]), '#c48a16', '#f2c13a');
+    s.d(24 + bx, 34 + by, '#ffd84a').d(23 + bx, 35 + by, '#f2c13a').d(25 + bx, 35 + by, '#f2c13a').d(24 + bx, 36 + by, '#c48a16').d(24 + bx, 35 + by, '#fff6c8');
+    s.d(20 + bx, 23 + by, '#ffffff').d(19 + bx, 24 + by, '#ffffff').d(20 + bx, 24 + by, '#ffffff');
+    haloRing(s, 24 + bx, 16 + by, 6, 1.6);
+  }, glows: [[24, 16, '#fff0a0', 6], [24, 35, '#ffd84a', 4]], emit: [], mouth: [24, 28] },
+  glint: { size: 48, rig: BLOB, hover: 5, draw(s, P) {
+    const [bx, by] = P.body, cx = 24 + bx, cy = 33 + by;
+    s.P([[cx - 5, cy - 2], [cx - 12, cy - 9], [cx - 10, cy - 4], [cx - 14, cy - 3], [cx - 10, cy], [cx - 12, cy + 2], [cx - 5, cy + 2]], 'feath2');
+    s.P([[cx + 5, cy - 2], [cx + 12, cy - 9], [cx + 10, cy - 4], [cx + 14, cy - 3], [cx + 10, cy], [cx + 12, cy + 2], [cx + 5, cy + 2]], 'feath');
+    s.P([[cx, cy - 14], [cx + 2, cy - 4], [cx, cy + 12], [cx - 2, cy - 4]], 'hlight');
+    s.E(cx, cy, 6.5, 6, 'hlight'); s.E(cx, cy + 1, 4.2, 3.6, 'halo');
+    s.eye(cx - 4, cy - 2, 'big').eye(cx + 2, cy - 2, 'big');
+    s.d(cx - 1, cy + 3, '#7a6a30').d(cx, cy + 3, '#7a6a30'); s.d(cx - 6, cy + 2, '#ffa0b0').d(cx + 5, cy + 2, '#ffa0b0');
+  }, glows: [[24, 33, '#fff0b0', 13], [24, 20, '#ffffff', 4]], emit: [], mouth: [29, 35] },
+  lamb: { size: 48, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail;
+    s.L(17 + bx, 37 + by, 17 + P.bf[0], 43 + P.bf[1], 1.2, 'ivory2'); s.L(29 + bx, 37 + by, 29 + P.ff[0], 43 + P.ff[1], 1.2, 'ivory2');
+    s.E(17 + P.bf[0], 44 + P.bf[1], 1.6, .9, 'gold'); s.E(29 + P.ff[0], 44 + P.ff[1], 1.6, .9, 'gold');
+    s.E(10 + bx, 31 + by - t, 2.6, 2.4, 'fleece');
+    for (const [x, y, r] of [[14, 33, 4.5], [19, 30, 5], [25, 30, 5], [30, 32, 4.5], [17, 36, 4.5], [24, 36, 4.8], [30, 36, 3.6]]) s.E(x + bx, y + by, r, r * .9, 'fleece');
+    s.L(20 + bx, 38 + by, 20 + P.bl[0], 44 + P.bl[1], 1.4, 'ivory'); s.L(32 + bx, 38 + by, 32 + P.fl[0], 44 + P.fl[1], 1.4, 'ivory');
+    s.E(20 + P.bl[0], 45 + P.bl[1], 1.8, 1, 'gold'); s.E(32 + P.fl[0], 45 + P.fl[1], 1.8, 1, 'gold');
+    s.E(35 + hx, 29 + hy, 4.6, 4.2, 'ivory'); s.E(38 + hx, 31 + hy, 2.6, 2, 'ivory');
+    s.E(32 + hx, 30 + hy, 2.8, 1.4, 'ivory2'); s.E(34 + hx, 25 + hy, 3.4, 2.4, 'fleece');
+    s.E(31 + hx, 26.5 + hy, 1.6, 1.6, 'gold'); s.d(31 + hx, 26 + hy, '#7d520a');
+    s.eye(36 + hx, 28 + hy, 'cute'); s.d(40 + hx, 31 + hy, '#e8a0a8'); s.d(35 + hx, 31 + hy, '#ffb0c0');
+  }, glows: [[24, 30, '#fff0b0', 5]], emit: [], mouth: [40, 31] },
+  wingsheep: { size: 56, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, w = -5 * P.wing;
+    birdWing(s, 30 + bx, 34 + by, .52, 1, w, 'feath2');
+    s.L(19 + bx, 42 + by, 19 + P.bf[0], 50 + P.bf[1], 1.5, 'ivory2'); s.L(35 + bx, 42 + by, 35 + P.ff[0], 50 + P.ff[1], 1.5, 'ivory2');
+    s.E(19 + P.bf[0], 51 + P.bf[1], 2, 1, 'gold'); s.E(35 + P.ff[0], 51 + P.ff[1], 2, 1, 'gold');
+    s.E(11 + bx, 35 + by - t, 3, 2.8, 'fleece');
+    for (const [x, y, r] of [[16, 37, 5], [22, 33, 6], [29, 33, 6], [35, 36, 5], [19, 41, 5], [27, 41, 5.5], [34, 41, 4.5]]) s.E(x + bx, y + by, r, r * .9, 'fleece');
+    for (const [x, y] of [[20, 31], [27, 30], [33, 33]]) s.d(x + bx, y + by, '#fff6c8').d(x + 1 + bx, y + by, '#ffe88a');
+    s.L(22 + bx, 43 + by, 22 + P.bl[0], 51 + P.bl[1], 1.8, 'ivory'); s.L(37 + bx, 43 + by, 37 + P.fl[0], 51 + P.fl[1], 1.8, 'ivory');
+    s.E(22 + P.bl[0], 52 + P.bl[1], 2.2, 1.1, 'gold'); s.E(37 + P.fl[0], 52 + P.fl[1], 2.2, 1.1, 'gold');
+    s.E(39 + bx, 36 + by, 4, 4, 'fleece');
+    s.E(43 + hx, 31 + hy, 5, 4.6, 'ivory'); s.E(47 + hx, 33.5 + hy, 3, 2.4, 'ivory');
+    s.E(39 + hx, 32 + hy, 3.2, 1.5, 'ivory2'); s.E(41 + hx, 26.5 + hy, 4, 2.6, 'fleece');
+    s.L(39 + hx, 28 + hy, 36 + hx, 27 + hy, 1.2, 'gold', 1); s.E(36 + hx, 29.5 + hy, 1.8, 1.8, 'gold'); s.d(36 + hx, 29 + hy, '#7d520a');
+    birdWing(s, 25 + bx, 34 + by, .62, -1, w, 'feath');
+    s.eye(44 + hx, 30 + hy, 'cute'); s.d(49 + hx, 33 + hy, '#e8a0a8'); s.d(43 + hx, 33 + hy, '#ffb0c0');
+    haloRing(s, 43 + hx, 21 + hy, 5, 1.4);
+  }, glows: [[43, 21, '#fff0a0', 6]], emit: [], mouth: [50, 34] },
+  cherub: { size: 48, rig: BLOB, hover: 6, draw(s, P) {
+    const [bx, by] = P.body, cx = 24 + bx, cy = 33 + by;
+    s.P([[cx - 6, cy - 3], [cx - 13, cy - 8], [cx - 11, cy - 4], [cx - 14, cy - 2], [cx - 10, cy], [cx - 12, cy + 2], [cx - 6, cy + 1]], 'feath2');
+    s.P([[cx + 6, cy - 3], [cx + 12, cy - 7], [cx + 11, cy - 3], [cx + 13, cy - 1], [cx + 6, cy + 1]], 'feath');
+    for (const [x, y, r] of [[-5, -2, 4.5], [0, -4, 5], [5, -2, 4.5], [-3, 3, 5], [3, 3, 5]]) s.E(cx + x, cy + y, r, r * .9, 'fleece');
+    s.E(cx + 1, cy + 4, 5, 3, 'ivory');
+    s.eye(cx - 3, cy - 1, 'sleepy').eye(cx + 3, cy - 1, 'sleepy');
+    s.d(cx, cy + 3, '#7a5a5a').d(cx + 1, cy + 3, '#7a5a5a'); s.d(cx - 5, cy + 2, '#ffa0b0').d(cx + 6, cy + 2, '#ffa0b0');
+    s.E(cx + 3, cy + 5, 1.4, 1.4, 'sky');
+    haloRing(s, cx + 4, cy - 11, 5, 1.2, .25);
+  }, glows: [[28, 22, '#fff0a0', 5]], emit: [{ x: 31, y: 24, type: 'zz', rate: .7 }], mouth: [26, 36] },
+  lioncub: { size: 56, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail;
+    s.L(16 + bx, 40 + by, 10 + bx, 33 + by - t, 1.2, 'lionb', 1); s.E(9 + bx, 32 + by - t, 2.4, 2.4, 'mane'); s.d(9 + bx, 31 + by - t, '#fff6c8');
+    s.L(20 + bx, 44 + by, 20 + P.bf[0], 50 + P.bf[1], 2, 'lionb2', 1.8); s.L(34 + bx, 44 + by, 34 + P.ff[0], 50 + P.ff[1], 2, 'lionb2', 1.8);
+    s.E(26 + bx, 41 + by, 11, 6.5, 'lionb'); s.E(28 + bx, 45 + by, 7, 2, 'ivory');
+    s.L(23 + bx, 44 + by, 23 + P.bl[0], 50 + P.bl[1], 2.3, 'lionb', 2); s.L(36 + bx, 44 + by, 36 + P.fl[0], 50 + P.fl[1], 2.3, 'lionb', 2);
+    s.E(24 + P.bl[0], 51 + P.bl[1], 2.7, 1.4, 'lionb'); s.E(37 + P.fl[0], 51 + P.fl[1], 2.7, 1.4, 'lionb');
+    const cx = 39 + hx, cy = 33 + hy;
+    lightMane(s, cx, cy, 5.4, 12);
+    s.E(cx - 1, cy - 5, 1.6, 1.6, 'lionb'); lionFace(s, cx, cy, 1, P.jaw);
+  }, glows: [[39, 33, '#ffe88a', 8]], emit: [], mouth: [46, 35] },
+  qilin: { size: 64, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail;
+    for (const [x, y, r, k] of [[16, 43, 3, 'sky'], [12, 39, 3.4, 'feath'], [9, 35, 3, 'sky'], [8, 31, 2.2, 'feath']]) s.E(x + bx + t * (44 - y) * .1, y + by - t, r, r * .9, k);
+    s.L(21 + bx, 47 + by, 20 + P.bf[0], 58 + P.bf[1], 1.5, 'ivory2', 1.1); s.L(39 + bx, 47 + by, 40 + P.ff[0], 58 + P.ff[1], 1.5, 'ivory2', 1.1);
+    s.E(20 + P.bf[0], 59 + P.bf[1], 1.9, 1.1, 'gold'); s.E(40 + P.ff[0], 59 + P.ff[1], 1.9, 1.1, 'gold');
+    s.E(29 + bx, 44 + by, 13, 7, 'ivory'); s.E(31 + bx, 49 + by, 9, 2, 'ivory2');
+    scaleRow(s, [[18, 41], [22, 39], [26, 38], [30, 38], [34, 39], [38, 41]].map(([x, y]) => [x + bx, y + by]), 2.6, 2);
+    for (const [x, y] of [[22, 44], [27, 44], [32, 44], [25, 47], [30, 47]]) s.d(x + bx, y + by, '#d8b050').d(x + 1 + bx, y + 1 + by, '#d8b050');
+    s.L(24 + bx, 48 + by, 24 + P.bl[0], 59 + P.bl[1], 1.8, 'ivory', 1.3); s.L(42 + bx, 47 + by, 43 + P.fl[0], 59 + P.fl[1], 1.8, 'ivory', 1.3);
+    s.E(24 + P.bl[0], 60 + P.bl[1], 2.2, 1.2, 'gold'); s.E(43 + P.fl[0], 60 + P.fl[1], 2.2, 1.2, 'gold');
+    s.E(24 + P.bl[0] * .6, 53 + P.bl[1] * .6, 2.6, 1.6, 'feath'); s.E(43 + P.fl[0] * .6, 53 + P.fl[1] * .6, 2.6, 1.6, 'feath');
+    s.L(39 + bx, 42 + by, 46 + hx, 33 + hy, 3.6, 'ivory', 3);
+    for (let k = 0; k < 4; k++) s.E(37 + k * 2.4 + bx + (hx - bx) * k / 4, 39 - k * 2.6 + by + (hy - by) * k / 4, 3, 2.6, k % 2 ? 'feath' : 'sky');
+    qilinHead(s, 48 + hx, 30 + hy, 1, P.jaw * 1.5);
+  }, glows: [[40, 17, '#fff0a0', 4]], emit: [], mouth: [58, 32] },
+  bellcrab: { size: 56, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] * .5 + bx, hy = P.head[1] * .5 + by, m = (pts) => pts.map(([x, y]) => [x + bx, y + by]);
+    for (const [x, l] of [[16, P.bf], [21, P.bl], [27, P.ff], [32, P.fl]]) { s.L(x + bx, 44 + by, x - 3 + l[0], 48 + l[1], .7, 'crabp', .6); s.L(x - 3 + l[0], 48 + l[1], x - 4 + l[0], 51 + l[1], .6, 'crabp', .4); }
+    s.E(24 + bx, 26 + by, 6, 3, 'bronze'); s.E(24 + bx, 21.5 + by, 2, 2, 'bronze2');
+    s.P(m([[18, 26], [30, 26], [31, 31], [33, 39], [38, 44], [10, 44], [15, 39], [17, 31]]), 'bronze');
+    s.L(10 + bx, 43.5 + by, 38 + bx, 43.5 + by, 1.3, 'bronze2');
+    s.E(34 + bx, 44 + by, 2.2, 1.6, 0);
+    s.line(m([[25, 26], [24, 30], [26, 33], [24, 37], [25, 41], [23, 43]]), '#1a1006');
+    s.line(m([[16, 34], [32, 34]]), '#f0cc80'); s.d(19 + bx, 29 + by, '#fff0c0').d(19 + bx, 30 + by, '#f0cc80');
+    s.E(40 + hx, 44.5 + hy, 5, 3.6, 'crabp');
+    s.L(38 + hx, 42 + hy, 37 + hx, 37 + hy, .6, 'crabp'); s.L(41 + hx, 42 + hy, 42 + hx, 37.5 + hy, .6, 'crabp');
+    s.E(37 + hx, 36.5 + hy, 1.6, 1.6, 'ivory'); s.E(42 + hx, 37 + hy, 1.6, 1.6, 'ivory');
+    s.line([[36 + hx, 36 + hy], [38 + hx, 36 + hy]], '#1a0a0a').line([[41 + hx, 36.5 + hy], [43 + hx, 36.5 + hy]], '#1a0a0a');
+    s.E(46 + hx + P.fl[0] * .5, 44 + hy, 3.4, 2.6, 'crabp'); s.P([[47 + hx, 42 + hy], [51 + hx, 41 + hy], [49 + hx, 44 + hy]], 'crabp');
+    s.d(48 + hx, 44 + hy, '#2a0e12');
+    s.L(42 + hx, 47 + hy, 43 + P.ff[0], 51 + P.ff[1], .7, 'crabp', .5);
+  }, glows: [[24, 34, '#ffd84a', 3]], emit: [{ x: 30, y: 22, type: 'zz', rate: .6 }], mouth: [50, 42] },
+  winglion: { size: 64, rig: QUAD, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, w = P.wing * .25;
+    plumeWing(s, 36 + bx, 40 + by, 18, 6, -1.75 + w, 'feath2', -1); plumeWing(s, 34 + bx, 42 + by, 15, 5, -2.5 + w, 'feath2', -1);
+    s.L(16 + bx, 46 + by, 8 + bx, 38 + by - t, 1.4, 'lionb', 1.1); s.E(7 + bx, 37 + by - t, 2.8, 2.8, 'mane'); s.d(7 + bx, 36 + by - t, '#fff6c8');
+    s.L(21 + bx, 50 + by, 21 + P.bf[0], 58 + P.bf[1], 2.6, 'lionb2', 2.2); s.L(40 + bx, 50 + by, 40 + P.ff[0], 58 + P.ff[1], 2.6, 'lionb2', 2.2);
+    s.E(28 + bx, 46 + by, 14, 7.5, 'lionb'); s.E(30 + bx, 51 + by, 9, 2, 'ivory');
+    s.L(25 + bx, 50 + by, 25 + P.bl[0], 59 + P.bl[1], 2.9, 'lionb', 2.4); s.L(42 + bx, 50 + by, 43 + P.fl[0], 59 + P.fl[1], 2.9, 'lionb', 2.4);
+    s.E(26 + P.bl[0], 60 + P.bl[1], 3.2, 1.5, 'lionb'); s.E(44 + P.fl[0], 60 + P.fl[1], 3.2, 1.5, 'lionb');
+    plumeWing(s, 30 + bx, 42 + by, 24, 7, -2.0 + w, 'feath', -1); plumeWing(s, 29 + bx, 44 + by, 20, 6, -2.65 + w, 'feath', -1); plumeWing(s, 29 + bx, 46 + by, 14, 4.5, 2.95 + w, 'feath', -1);
+    const cx = 46 + hx, cy = 37 + hy;
+    lightMane(s, cx, cy, 7, 16);
+    lionFace(s, cx, cy, 1.25, P.jaw, 'fierce');
+  }, glows: [[46, 37, '#ffe88a', 11]], emit: [], mouth: [56, 40] },
+  sunqilin: { size: 80, rig: QUAD, aura: { type: 'halo', x: 58, y: 36, r: 15 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail;
+    for (const [x, y, r, k] of [[20, 54, 4, 'sky'], [14, 50, 4.6, 'feath'], [10, 45, 4.4, 'sky'], [8, 39, 3.6, 'feath'], [9, 34, 2.6, 'hlight']]) s.E(x + bx + t * (56 - y) * .08, y + by - t, r, r * .9, k);
+    s.L(27 + bx, 61 + by, 26 + P.bf[0], 74 + P.bf[1], 2, 'ivory2', 1.5); s.L(50 + bx, 60 + by, 51 + P.ff[0], 74 + P.ff[1], 2, 'ivory2', 1.5);
+    s.E(26 + P.bf[0], 75 + P.bf[1], 2.6, 1.3, 'gold'); s.E(51 + P.ff[0], 75 + P.ff[1], 2.6, 1.3, 'gold');
+    s.E(37 + bx, 56 + by, 17, 9, 'ivory'); s.E(39 + bx, 62 + by, 12, 2.4, 'ivory2');
+    scaleRow(s, [[22, 52], [27, 49.5], [32, 48], [37, 47.5], [42, 48], [47, 50], [51, 53]].map(([x, y]) => [x + bx, y + by]), 3.2, 2.4);
+    for (const [x, y] of [[26, 56], [32, 55], [38, 55], [44, 56], [29, 59], [35, 59], [41, 59]]) s.d(x + bx, y + by, '#d8b050').d(x + 1 + bx, y + 1 + by, '#d8b050');
+    s.L(30 + bx, 62 + by, 30 + P.bl[0], 75 + P.bl[1], 2.4, 'ivory', 1.8); s.L(53 + bx, 60 + by, 54 + P.fl[0], 75 + P.fl[1], 2.4, 'ivory', 1.8);
+    s.E(30 + P.bl[0], 76 + P.bl[1], 2.8, 1.4, 'gold'); s.E(54 + P.fl[0], 76 + P.fl[1], 2.8, 1.4, 'gold');
+    for (const [x, l] of [[30, P.bl], [54, P.fl], [26, P.bf], [51, P.ff]]) s.E(x + l[0] * .6, 68 + l[1] * .6, 3.2, 2, 'feath');
+    s.L(50 + bx, 54 + by, 58 + hx, 42 + hy, 4.6, 'ivory', 4);
+    for (let k = 0; k < 5; k++) s.E(47 + k * 2.6 + bx + (hx - bx) * k / 5, 51 - k * 2.8 + by + (hy - by) * k / 5, 3.8, 3.2, k % 2 ? 'feath' : 'sky');
+    s.E(53 + bx, 57 + by, 4, 3.4, 'gold'); s.d(52 + bx, 56 + by, '#fff6c8');
+    qilinHead(s, 60 + hx, 38 + hy, 1.3, P.jaw * 2, 'gold', true);
+  }, glows: [[48, 20, '#ffffff', 5], [53, 57, '#ffd84a', 4]], emit: [{ x: 48, y: 20, type: 'sparkle', rate: 2 }], mouth: [73, 40] },
+  lionking: { size: 80, rig: QUAD, aura: { type: 'motes', x: 40, y: 74, r: 30 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, w = P.wing * .25;
+    plumeWing(s, 44 + bx, 50 + by, 26, 8, -1.65 + w, 'feath2', -1); plumeWing(s, 42 + bx, 52 + by, 20, 6, -2.4 + w, 'hlight', -1, '#c8b880');
+    s.L(18 + bx, 58 + by, 8 + bx, 48 + by - t, 1.8, 'lionb', 1.4); s.E(7 + bx, 46 + by - t, 3.4, 3.4, 'mane'); s.d(6 + bx, 45 + by - t, '#fff6c8');
+    s.L(25 + bx, 62 + by, 24 + P.bf[0], 74 + P.bf[1], 3.4, 'lionb2', 2.8); s.L(50 + bx, 62 + by, 51 + P.ff[0], 74 + P.ff[1], 3.4, 'lionb2', 2.8);
+    s.E(34 + bx, 57 + by, 18, 9.5, 'lionb'); s.E(36 + bx, 63 + by, 12, 2.4, 'ivory');
+    s.L(29 + bx, 63 + by, 29 + P.bl[0], 75 + P.bl[1], 3.8, 'lionb', 3.1); s.L(53 + bx, 62 + by, 54 + P.fl[0], 75 + P.fl[1], 3.8, 'lionb', 3.1);
+    s.E(30 + P.bl[0], 76 + P.bl[1], 4, 1.8, 'lionb'); s.E(55 + P.fl[0], 76 + P.fl[1], 4, 1.8, 'lionb');
+    s.E(29 + P.bl[0] * .5, 69 + P.bl[1] * .5, 4.2, 1.6, 'gold'); s.E(54 + P.fl[0] * .5, 69 + P.fl[1] * .5, 4.2, 1.6, 'gold');
+    plumeWing(s, 36 + bx, 52 + by, 32, 10, -1.95 + w, 'feath', -1); plumeWing(s, 35 + bx, 55 + by, 24, 7, -2.6 + w, 'hlight', -1, '#c8b880');
+    const cx = 56 + hx, cy = 44 + hy;
+    lightMane(s, cx, cy, 9, 18);
+    lionFace(s, cx, cy, 1.55, P.jaw, 'fierce');
+    s.P([[cx - 6, cy - 6], [cx - 6, cy - 12], [cx - 3, cy - 9], [cx, cy - 14], [cx + 3, cy - 9], [cx + 6, cy - 12], [cx + 6, cy - 6]], 'gold');
+    s.d(cx, cy - 9, '#ff5a6a').d(cx - 5, cy - 8, '#7ee7ff').d(cx + 5, cy - 8, '#7ee7ff');
+  }, glows: [[56, 44, '#ffe88a', 14], [56, 33, '#fff0a0', 4]], emit: [], mouth: [70, 48] },
+  /* ----- Holy fused form (ศักดิ์สิทธิ์ผู้ตื่น): the sun qilin awakened, gold armour, light wings, twin rings of light ----- */
+  hfused: { size: 88, rig: QUAD, aura: { type: 'twinh', x: 44, y: 82, r: 32 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, w = P.wing * .25;
+    plumeWing(s, 50 + bx, 54 + by, 24, 7, -1.7 + w, 'hlight', -1, '#c8b880');
+    for (const [x, y, r, k] of [[22, 60, 4.4, 'hlight'], [15, 55, 5, 'sky'], [10, 49, 4.8, 'hlight'], [8, 42, 4, 'sky'], [9, 36, 3, 'hlight']]) s.E(x + bx + t * (62 - y) * .08, y + by - t, r, r * .9, k);
+    s.L(30 + bx, 67 + by, 29 + P.bf[0], 80 + P.bf[1], 2.3, 'ivory2', 1.8); s.L(56 + bx, 66 + by, 57 + P.ff[0], 80 + P.ff[1], 2.3, 'ivory2', 1.8);
+    s.L(29 + P.bf[0] * .85, 76 + P.bf[1] * .6, 29 + P.bf[0], 80 + P.bf[1], 2, 'gold'); s.L(57 + P.ff[0] * .85, 76 + P.ff[1] * .6, 57 + P.ff[0], 80 + P.ff[1], 2, 'gold');
+    s.E(40 + bx, 61 + by, 19, 10, 'ivory'); s.E(42 + bx, 68 + by, 13, 2.6, 'ivory2');
+    s.P([[24 + bx, 55 + by], [30 + bx, 51 + by], [48 + bx, 50 + by], [54 + bx, 54 + by], [50 + bx, 57 + by], [28 + bx, 58 + by]], 'gold');
+    for (const x of [30, 36, 42, 48]) s.line([[x + bx, 52 + by], [x + bx, 57 + by]], '#7d520a');
+    s.line([[30 + bx, 52 + by], [48 + bx, 51 + by]], '#fff0a0');
+    s.E(39 + bx, 54 + by, 2.4, 2, 'halo');
+    s.L(34 + bx, 68 + by, 34 + P.bl[0], 81 + P.bl[1], 2.7, 'ivory', 2.1); s.L(59 + bx, 66 + by, 60 + P.fl[0], 81 + P.fl[1], 2.7, 'ivory', 2.1);
+    s.L(34 + P.bl[0] * .85, 77 + P.bl[1] * .6, 34 + P.bl[0], 81 + P.bl[1], 2.4, 'gold'); s.L(60 + P.fl[0] * .85, 77 + P.fl[1] * .6, 60 + P.fl[0], 81 + P.fl[1], 2.4, 'gold');
+    for (const [x, l] of [[34, P.bl], [60, P.fl]]) s.E(x + l[0], 82 + l[1], 3, 1.4, 'halo');
+    s.L(55 + bx, 60 + by, 64 + hx, 46 + hy, 5.2, 'ivory', 4.4);
+    s.P([[58 + bx, 62 + by], [61 + bx, 58 + by], [64 + bx, 61 + by], [62 + bx, 66 + by]], 'gold'); s.d(61 + bx, 61 + by, '#7ee7ff');
+    for (let k = 0; k < 5; k++) s.E(51 + k * 2.6 + bx + (hx - bx) * k / 5, 55 - k * 3 + by + (hy - by) * k / 5, 4, 3.4, k % 2 ? 'hlight' : 'sky');
+    plumeWing(s, 42 + bx, 56 + by, 30, 9, -1.95 + w, 'feath', -1); plumeWing(s, 41 + bx, 58 + by, 22, 6.5, -2.55 + w, 'hlight', -1, '#c8b880');
+    const ex = 66 + hx, ey = 42 + hy;
+    qilinHead(s, ex, ey, 1.4, P.jaw * 2.2, 'halo', true);
+    s.P([[ex - 2, ey - 6], [ex + 9, ey - 4], [ex + 12, ey - .5], [ex + 3, ey - 1.5]], 'gold'); s.d(ex + 5, ey - 4, '#7ee7ff');
+  }, glows: [[52, 22, '#ffffff', 6], [39, 54, '#ffd84a', 4], [30, 30, '#fff6c8', 6]], emit: [{ x: 52, y: 22, type: 'sparkle', rate: 3 }], mouth: [81, 44] },
+  /* ----- Holy world boss (game: เทวทูตรัศมี, an angel): a white celestial elephant with a gold headdress ----- */
+  holyele: { size: 96, rig: QUAD, aura: { type: 'bossh', x: 48, y: 90, r: 36 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, w = P.wing * .25, m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
+    plumeWing(s, 54 + bx, 50 + by, 24, 8, -1.8 + w, 'feath2', -1);
+    s.L(14 + bx, 62 + by, 9 + bx, 74 + by - t, 1.4, 'elew', 1); s.E(9 + bx, 76 + by - t, 1.8, 2.6, 'elew2');
+    s.L(24 + bx, 72 + by, 24 + P.bf[0], 88 + P.bf[1], 5.6, 'elew2', 5); s.L(58 + bx, 72 + by, 59 + P.ff[0], 88 + P.ff[1], 5.6, 'elew2', 5);
+    s.E(24 + P.bf[0], 89 + P.bf[1], 5.6, 2.2, 'elew2'); s.E(59 + P.ff[0], 89 + P.ff[1], 5.6, 2.2, 'elew2');
+    s.E(38 + bx, 62 + by, 26, 17, 'elew');
+    // caparison: crimson cloth with a gold border and fringe over the back
+    s.P(m([[20, 52], [30, 46], [52, 46], [60, 52], [58, 68], [22, 68]], bx, by), 'crim');
+    s.L(22 + bx, 68 + by, 58 + bx, 68 + by, 1.4, 'gold'); s.L(20 + bx, 52 + by, 30 + bx, 46 + by, 1, 'gold'); s.L(52 + bx, 46 + by, 60 + bx, 52 + by, 1, 'gold');
+    for (let x = 23; x < 58; x += 3) s.d(x + bx, 70 + by, '#f2c13a').d(x + bx, 71 + by, '#c48a16');
+    for (const [x, y] of [[32, 56], [40, 54], [48, 56], [36, 62], [44, 62]]) s.d(x + bx, y + by, '#ffd84a').d(x + 1 + bx, y + by, '#fff0a0');
+    s.E(40 + bx, 46 + by, 5, 2.4, 'gold'); s.P(m([[36, 46], [40, 36], [44, 46]], bx, by), 'gold'); s.d(40 + bx, 41 + by, '#7ee7ff');
+    s.L(29 + bx, 74 + by, 29 + P.bl[0], 89 + P.bl[1], 6, 'elew', 5.4); s.L(62 + bx, 72 + by, 63 + P.fl[0], 89 + P.fl[1], 6, 'elew', 5.4);
+    s.E(29 + P.bl[0], 90 + P.bl[1], 6, 2.2, 'elew'); s.E(63 + P.fl[0], 90 + P.fl[1], 6, 2.2, 'elew');
+    for (const [x, l] of [[29, P.bl], [63, P.fl]]) { s.E(x + l[0] * .7, 84 + l[1] * .7, 6, 1.5, 'gold'); for (const dx of [-3, 0, 3]) s.d(x + dx + l[0], 91 + l[1], '#f4ede0'); }
+    plumeWing(s, 46 + bx, 52 + by, 28, 9, -2.0 + w, 'feath', -1); plumeWing(s, 45 + bx, 55 + by, 20, 6, -2.6 + w, 'hlight', -1, '#c8b880');
+    // head: big domed brow, fan ear, long tusks, trunk raised in a curl
+    s.E(71 + hx, 57 + hy, 12, 12, 'elew');
+    s.P(m([[64, 48], [56, 54], [55, 68], [62, 75], [68, 66], [69, 52]], hx, hy), 'elew'); s.line(m([[63, 51], [59, 56], [58, 66], [62, 71]], hx, hy), '#d8a8b4'); s.line(m([[68, 52], [68, 66]], hx, hy), '#8e8a98');
+    s.L(76 + hx, 64 + hy, 88 + hx, 72 + hy, 1.6, 'bone', 1); s.L(88 + hx, 72 + hy, 92 + hx, 68 + hy, 1, 'bone', .5);
+    s.L(74 + hx, 66 + hy, 82 + hx, 74 + hy, 1.1, 'bone', .7);
+    s.L(79 + hx, 60 + hy, 86 + hx, 64 + hy, 3.6, 'elew', 3); s.L(86 + hx, 64 + hy, 90 + hx, 56 + hy, 3, 'elew', 2.4); s.L(90 + hx, 56 + hy, 89 + hx, 49 + hy, 2.4, 'elew', 1.8); s.L(89 + hx, 49 + hy, 86 + hx, 47 + hy, 1.8, 'elew', 1.4);
+    for (const [x, y] of [[84, 63], [88, 59], [90, 54], [89, 50]]) s.d(x + hx, y + hy, '#8e8a98');
+    // tiered gold headdress
+    s.P(m([[62, 46], [64, 40], [78, 40], [80, 46], [76, 49], [66, 49]], hx, hy), 'gold');
+    s.P(m([[66, 40], [67, 34], [75, 34], [76, 40]], hx, hy), 'gold'); s.P(m([[69, 34], [71, 26], [73, 34]], hx, hy), 'gold');
+    s.line(m([[63, 45], [79, 45]], hx, hy), '#7d520a'); s.line(m([[67, 38], [75, 38]], hx, hy), '#7d520a');
+    s.d(71 + hx, 43 + hy, '#ff5a6a').d(67 + hx, 43 + hy, '#7ee7ff').d(75 + hx, 43 + hy, '#7ee7ff').d(71 + hx, 31 + hy, '#ff5a6a');
+    s.P(m([[78, 48], [84, 50], [82, 53], [78, 52]], hx, hy), 'gold');
+    s.d(77 + hx, 57 + hy, '#fff6b0').d(78 + hx, 57 + hy, '#c48a16').d(77 + hx, 58 + hy, '#1e1c22').d(78 + hx, 58 + hy, '#1e1c22').line(m([[75, 55], [79, 55.5]], hx, hy), '#1e1c22');
+    haloRing(s, 71 + hx, 20 + hy, 9, 2.4, 0, 2);
+  }, glows: [[71, 20, '#fff0a0', 10], [40, 40, '#ffd84a', 5], [30, 30, '#fff6c8', 7]], emit: [{ x: 71, y: 20, type: 'sparkle', rate: 3 }], mouth: [88, 50] },
 };
 // Animations are sampled from continuous pose curves (many in-between frames) and baked lazily,
 // so every frame keeps crisp pixel shading. Walk/idle loop; attack/cast/hurt run once (0..1).
@@ -2111,6 +2421,7 @@ function getFrame(def, name, i) {
   }
   return list[i];
 }
+const HOLY_IDS = ['hegg', 'glint', 'lamb', 'wingsheep', 'cherub', 'lioncub', 'qilin', 'bellcrab', 'winglion', 'sunqilin', 'lionking', 'hfused', 'holyele'];
 const BOLT_IDS = ['begg', 'spark', 'cloudpuff', 'tbird', 'staticcat', 'stormfox', 'hawk', 'gloomcloud', 'boltfox', 'thunderking', 'foxking', 'bfused', 'stormbison'];
 const EARTH_IDS = ['eegg', 'pebble', 'clay', 'tortoise', 'worm', 'rhino', 'pillarturtle', 'boulder', 'orerhino', 'mountturtle', 'crystalrhino', 'efused', 'pangolin'];
 const LEAF_IDS = ['legg', 'seed', 'sprout', 'leafdeer', 'mushroom', 'wolf', 'stag', 'stump', 'barkwolf', 'forestdeer', 'wolfking', 'lfused', 'flora'];
@@ -2118,7 +2429,7 @@ for (const [id, def] of Object.entries(SPRITES)) {
   def.amp = (def.size >= 96 ? 2.2 : def.size >= 64 ? 1.3 : def.size >= 56 ? 1.15 : 1) * 1.6;
   def.frames = Object.fromEntries(Object.keys(ANIM).map((n) => [n, new Array(ANIM[n].n)]));
   def.img = getFrame(def, 'idle', 0); def.id = id;
-  def.el = BOLT_IDS.includes(id) ? 'bolt' : EARTH_IDS.includes(id) ? 'earth' : LEAF_IDS.includes(id) ? 'leaf' : ['wfused', 'whaleA', 'whaleB', 'whaleC', 'wegg', 'drop', 'bubble', 'swordwhale', 'jelly', 'shark', 'armorwhale', 'octopus', 'seadragon', 'whaleking', 'leviathan', 'turtle'].includes(id) ? 'water' : 'fire';
+  def.el = HOLY_IDS.includes(id) ? 'holy' : BOLT_IDS.includes(id) ? 'bolt' : EARTH_IDS.includes(id) ? 'earth' : LEAF_IDS.includes(id) ? 'leaf' : ['wfused', 'whaleA', 'whaleB', 'whaleC', 'wegg', 'drop', 'bubble', 'swordwhale', 'jelly', 'shark', 'armorwhale', 'octopus', 'seadragon', 'whaleking', 'leviathan', 'turtle'].includes(id) ? 'water' : 'fire';
 }
 // The frame an entity shows: an action wins, then walking (phase follows the distance walked), then idle.
 function frameOf(e, t) {
@@ -2248,6 +2559,24 @@ function drawAura(ctx, a, ox, oy, t, flip, w) {
       ctx.globalAlpha = .55 + .4 * Math.sin(t * 9 + i * 2); ctx.fillStyle = col;
       let qx = px, qy = py; for (let k = 0; k < 4; k++) { const nx = qx + ((k + i) % 2 ? 2 : -2), ny = qy - 2; ctx.fillRect(Math.round(Math.min(qx, nx)), Math.round(ny), 2, 1); ctx.fillRect(Math.round(nx), Math.round(ny), 1, 2); qx = nx; qy = ny; }
     }
+  } else if (a.type === 'halo') {
+    // a sun wheel behind the head: two dotted rings turning opposite ways and short rays
+    for (const [r, spd, n] of [[a.r, .5, 20], [a.r * .7, -.8, 14]]) for (let i = 0; i < n; i++) {
+      const an = t * spd + i * TAU / n; ctx.globalAlpha = .5 + .3 * Math.sin(t * 2 + i); ctx.fillStyle = i % 2 ? '#fff6c8' : '#ffd84a';
+      ctx.fillRect(Math.round(x + Math.cos(an) * r), Math.round(y + Math.sin(an) * r), 1, 1);
+    }
+    for (let i = 0; i < 12; i++) { const an = -t * .2 + i * TAU / 12; ctx.globalAlpha = .35; ctx.fillStyle = '#fff0a0'; for (let d = a.r + 2; d < a.r + (i % 2 ? 5 : 8); d++) ctx.fillRect(Math.round(x + Math.cos(an) * d), Math.round(y + Math.sin(an) * d), 1, 1); }
+  } else if (a.type === 'motes' || a.type === 'twinh') {
+    const rings = a.type === 'twinh' ? [[a.r, 1, ['#ffd84a', '#fff0a0']], [a.r * .7, -1.5, ['#ffffff', '#bcdcf8']]] : [[a.r, 1, ['#fff6c8', '#ffd84a', '#ffffff']]];
+    for (const [r, spd, cols] of rings) for (let i = 0; i < 20; i++) {
+      const an = t * .8 * spd + i * TAU / 20, px = Math.round(x + Math.cos(an) * r), py = Math.round(y + Math.sin(an) * r * .32 - (i % 3) * 2 - ((t * 6 + i * 3) % 8));
+      ctx.globalAlpha = .45 + .4 * Math.sin(t * 4 + i * 1.3); ctx.fillStyle = cols[i % cols.length]; ctx.fillRect(px, py, 1, 1); if (i % 4 === 0) { ctx.fillRect(px - 1, py, 3, 1); ctx.fillRect(px, py - 1, 1, 3); }
+    }
+  } else if (a.type === 'bossh') {
+    const g = ctx.createRadialGradient(x, y, 2, x, y, a.r * 1.4);
+    g.addColorStop(0, 'rgba(255,230,140,.4)'); g.addColorStop(1, 'rgba(255,200,80,0)');
+    ctx.globalAlpha = .7 + .3 * Math.sin(t * 2); ctx.fillStyle = g;
+    ctx.beginPath(); ctx.ellipse(x, y, a.r * 1.5, a.r * .5, 0, 0, Math.PI * 2); ctx.fill();
   } else if (a.type === 'bossb') {
     const g = ctx.createRadialGradient(x, y, 2, x, y, a.r * 1.4);
     g.addColorStop(0, 'rgba(255,225,74,.32)'); g.addColorStop(1, 'rgba(90,100,160,0)');
@@ -2303,6 +2632,7 @@ const STAGES = {
 const STAGE_OF = {
   egg: 'egg', wisp: 'b1', coal: 'b2', gecko: 'adult', smoke: 'adult', raptor: 'adult', frill: 'perfect', lava: 'perfect', dragon: 'perfect', sunking: 'ultimate', phoenix: 'ultimate', avatar: 'fused', boss: 'boss',
   whaleA: 'ultimate', whaleB: 'ultimate', whaleC: 'ultimate', wfused: 'fused',
+  hegg: 'egg', glint: 'b1', lamb: 'b2', wingsheep: 'adult', cherub: 'adult', lioncub: 'adult', qilin: 'perfect', bellcrab: 'perfect', winglion: 'perfect', sunqilin: 'ultimate', lionking: 'ultimate', hfused: 'fused', holyele: 'boss',
   begg: 'egg', spark: 'b1', cloudpuff: 'b2', tbird: 'adult', staticcat: 'adult', stormfox: 'adult', hawk: 'perfect', gloomcloud: 'perfect', boltfox: 'perfect', thunderking: 'ultimate', foxking: 'ultimate', bfused: 'fused', stormbison: 'boss',
   eegg: 'egg', pebble: 'b1', clay: 'b2', tortoise: 'adult', worm: 'adult', rhino: 'adult', pillarturtle: 'perfect', boulder: 'perfect', orerhino: 'perfect', mountturtle: 'ultimate', crystalrhino: 'ultimate', efused: 'fused', pangolin: 'boss',
   legg: 'egg', seed: 'b1', sprout: 'b2', leafdeer: 'adult', mushroom: 'adult', wolf: 'adult', stag: 'perfect', stump: 'perfect', barkwolf: 'perfect', forestdeer: 'ultimate', wolfking: 'ultimate', lfused: 'fused', flora: 'boss',
@@ -2388,6 +2718,23 @@ const BOLT_LINE = [
     { id: 'foxking', name: 'ราชาจิ้งจอกอสนี', old: 'เดิม วัชรเทพ 🌀 (เป็นสัญลักษณ์) · จิ้งจอกยักษ์สีกรมท่า ห้าหางเป็นสายฟ้าแผ่ขึ้นหลังตัว แผงคอเป็นเมฆพายุ มงกุฎทองบนหน้าผาก', st: 'new' } ] },
 ];
 buildBoard(document.getElementById('evo-bolt'), BOLT_LINE);
+const HOLY_LINE = [
+  { stage: 'ไข่', items: [{ id: 'hegg', name: 'ไข่รัศมี', old: 'คงชื่อเดิม · เปลือกขาวงาช้าง คาดลายทองมีอัญมณี ปีกขนนกเล็กสองข้าง วงรัศมีลอยเหนือไข่', st: 'keep' }] },
+  { stage: 'ร่างเด็ก 1', items: [{ id: 'glint', name: 'ประกายแสง', old: 'คงชื่อเดิม · ลูกแสงมีตา แฉกแสงยาวบนล่าง ปีกขนนกจิ๋ว ลอยได้', st: 'keep' }] },
+  { stage: 'ร่างเด็ก 2', items: [{ id: 'lamb', name: 'ลูกแกะแสง', old: 'คงชื่อเดิม · ลูกแกะขนปุยขาว เขาม้วนทองเล็กๆ กีบทอง', st: 'keep' }] },
+  { stage: 'โตเต็มวัย', items: [
+    { id: 'wingsheep', name: 'แกะปีกทิพย์', old: 'เดิม นกพิราบทิพย์ 🕊️ (นก ไม่ต่อจากลูกแกะ) · แกะขาวขนมีประกายทอง ปีกขนนกบนหลัง เขาม้วนทอง วงรัศมีเหนือหัว', st: 'new' },
+    { id: 'cherub', name: 'ทูตน้อยขี้เซา', old: 'คงชื่อ ปรับร่าง เดิมเป็นเด็กทูตสวรรค์ 👼 (เป็นคน) · ร่างแย่ ก้อนขนปุยมีปีกจิ๋ว ลอยหลับ น้ำลายเป็นฟอง วงรัศมีเอียงหลุด', st: 'tweak' },
+    { id: 'lioncub', name: 'สิงห์น้อยรัศมี', old: 'เดิม อัศวินรัศมี 🛡️ (คนถือโล่) · ลูกสิงห์สีครีม แผงคอเป็นแฉกแสงทองสลับขาว ปลายหางทอง', st: 'new' } ] },
+  { stage: 'สมบูรณ์', items: [
+    { id: 'qilin', name: 'กิเลนรัศมี', old: 'เดิม เทพธิดารัศมี 👸 (เป็นคน) · กิเลนขาว เกล็ดทองตามสันหลัง เขาทองเดียว แผงคอและหางเป็นเมฆฟ้า กีบทอง', st: 'new' },
+    { id: 'bellcrab', name: 'ระฆังแตก', old: 'คงชื่อ ปรับร่าง เดิมเป็นระฆัง 🔔 (สิ่งของ) · ร่างแย่ ปูเสฉวนง่วงๆ อาศัยในระฆังสำริดร้าว ขอบระฆังบิ่น', st: 'tweak' },
+    { id: 'winglion', name: 'ราชสีห์ปีกขาว', old: 'เดิม เซราฟปีกขาว 😇 (เป็นคน) · สิงโตสีครีม แผงคอแสงใหญ่ขึ้น ปีกขาวหกปีก (ข้างละสาม) ตาทอง', st: 'new' } ] },
+  { stage: 'ร่างสุดท้าย', items: [
+    { id: 'sunqilin', name: 'กิเลนสุริยเทพ', old: 'เดิม เจ้าแห่งแสงสว่าง 🌞 (เป็นดวงอาทิตย์) · กิเลนยักษ์ เกล็ดทองเต็มหลัง เขาเรืองแสง แผงคอยาว วงแสงซ้อนสองชั้นหมุนอยู่หลังหัว', st: 'new' },
+    { id: 'lionking', name: 'มหาราชสีห์เทวะ', old: 'เดิม มหาเทวทูต 👑 (เป็นคน) · สิงโตยักษ์ สวมมงกุฎทองฝังอัญมณี แผงคอแสงใหญ่ ปีกขนนกกับปีกแสงซ้อนกัน กำไลทองที่ขา', st: 'new' } ] },
+];
+buildBoard(document.getElementById('evo-holy'), HOLY_LINE, true);
 const LEAF_LINE = [
   { stage: 'ไข่', items: [{ id: 'legg', name: 'ไข่พฤกษ์', old: 'คงชื่อเดิม · เปลือกเขียวอ่อนลายใบไม้ มีต้นกล้างอกบนยอด', st: 'keep' }] },
   { stage: 'ร่างเด็ก 1', items: [{ id: 'seed', name: 'เมล็ดจิ๋ว', old: 'คงชื่อเดิม · ลูกโอ๊กมีตา หมวกลายตาราง ใบอ่อนงอกบนหัว', st: 'keep' }] },
@@ -2447,6 +2794,7 @@ function drawLineup(L, dt) {
 }
 buildLineup(document.getElementById('lineup-fire'), ['egg', 'wisp', 'coal', 'gecko', 'frill', 'sunking', 'avatar'], ['ไข่เพลิง', 'ประกายจิ๋ว', 'ถ่านน้อย', 'เพลิงจอมซน', 'อัคนีแผงคอ', 'ราชันมังกรสุริยะ', 'อวตารสุริยะ']);
 buildLineup(document.getElementById('lineup-leaf'), ['legg', 'seed', 'sprout', 'leafdeer', 'stag', 'forestdeer', 'lfused'], ['ไข่พฤกษ์', 'เมล็ดจิ๋ว', 'ต้นอ่อน', 'กวางใบไม้', 'กวางเขาพฤกษา', 'เทพพนาลัย', 'พนาผู้ตื่น']);
+buildLineup(document.getElementById('lineup-holy'), ['hegg', 'glint', 'lamb', 'wingsheep', 'qilin', 'sunqilin', 'hfused'], ['ไข่รัศมี', 'ประกายแสง', 'ลูกแกะแสง', 'แกะปีกทิพย์', 'กิเลนรัศมี', 'กิเลนสุริยเทพ', 'ศักดิ์สิทธิ์ผู้ตื่น'], true);
 buildLineup(document.getElementById('lineup-bolt'), ['begg', 'spark', 'cloudpuff', 'tbird', 'hawk', 'thunderking', 'bfused'], ['ไข่อสนี', 'ประกายไฟฟ้า', 'ลูกเมฆฟ้า', 'นกฟ้าผ่า', 'เหยี่ยวพายุ', 'วิหคราชาอสนี', 'อสนีผู้ตื่น']);
 buildLineup(document.getElementById('lineup-earth'), ['eegg', 'pebble', 'clay', 'tortoise', 'pillarturtle', 'mountturtle', 'efused'], ['ไข่ศิลา', 'ก้อนกรวด', 'ก้อนดินเหนียว', 'เต่าศิลา', 'เต่าผาหิน', 'เต่าภูเขา', 'ธรณีผู้ตื่น']);
 buildLineup(document.getElementById('lineup-water'), ['wegg', 'drop', 'bubble', 'swordwhale', 'armorwhale', 'whaleC', 'wfused'], ['ไข่วารี', 'หยดน้ำ', 'ฟองจิ๋ว', 'ลูกวาฬดาบ', 'วาฬเกราะ', 'ราชาวาฬผลึก', 'สมุทรผู้ตื่น']);
@@ -2484,6 +2832,8 @@ addCard(document.getElementById('show-wfused'), 'wfused', document.getElementByI
   }
 }
 addCard(document.getElementById('show-bison'), 'stormbison', document.getElementById('act-bison'));
+addCard(document.getElementById('show-hfused'), 'hfused', document.getElementById('act-hfused'), 8, true);
+addCard(document.getElementById('show-holyele'), 'holyele', document.getElementById('act-holyele'), 8, true);
 addCard(document.getElementById('show-efused'), 'efused', document.getElementById('act-efused'));
 addCard(document.getElementById('show-pangolin'), 'pangolin', document.getElementById('act-pangolin'));
 addCard(document.getElementById('show-lfused'), 'lfused', document.getElementById('act-lfused'));
@@ -4125,7 +4475,7 @@ const PLAN = [
     ['ร่างสุดท้าย', 'ราชาอสนี 🌪️', 'วิหคราชาอสนี', 'พายุหมุนไม่ใช่สัตว์ เปลี่ยนเป็นนกยักษ์ที่ปีกเป็นเมฆพายุ'],
     ['ร่างสุดท้าย', 'วัชรเทพ 🌀', 'ราชาจิ้งจอกอสนี', 'จิ้งจอกยักษ์ห้าหางเป็นสายฟ้า แผงคอเป็นเมฆพายุ'] ],
     keep: 'ไข่อสนี, ประกายไฟฟ้า, ลูกเมฆฟ้า, นกฟ้าผ่า, แมวไฟสถิต, เมฆหม่นขี้เกียจ' },
-  { line: 'สายรัศมี', fam: 'สัตว์เทพ', sum: 'เปลี่ยน 6 (มีคนและสิ่งของมากที่สุด)', rows: [
+  { line: 'สายรัศมี', fam: 'สัตว์เทพ', sum: 'เปลี่ยน 6 (ภาพนิ่งด้านบน รอเลือก)', rows: [
     ['โตเต็มวัย', 'นกพิราบทิพย์ 🕊️', 'แกะปีกทิพย์', 'ต่อจากลูกแกะแสง'],
     ['โตเต็มวัย', 'อัศวินรัศมี 🛡️', 'สิงห์น้อยรัศมี', 'อัศวินเป็นคนถือโล่ เปลี่ยนเป็นสิงห์ตัวเล็กมีแผงคอเป็นแสง'],
     ['สมบูรณ์', 'เทพธิดารัศมี 👸', 'กิเลนรัศมี', 'สัตว์เทพมีเขาเดียว เกล็ดทอง'],
@@ -4243,14 +4593,14 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
 // Section picker: show one element at a time (the battle stays on top, with only that element's skills); remembered in the address (#fire, #water, #leaf, #earth, #plan).
 {
   const jump = document.getElementById('jump');
-  const ELS = ['fire', 'water', 'leaf', 'earth', 'bolt'], PICK = { fire: 'sunking', water: 'whaleking', leaf: 'forestdeer', earth: 'mountturtle', bolt: 'thunderking' };
+  const ELS = ['fire', 'water', 'leaf', 'earth', 'bolt', 'holy'], PICK = { fire: 'sunking', water: 'whaleking', leaf: 'forestdeer', earth: 'mountturtle', bolt: 'thunderking' };
   const apply = (v) => {
     document.querySelectorAll('section[data-group]').forEach((sec) => { const g = sec.dataset.group; sec.hidden = !(v === 'all' || g === 'battle' || g === v); });
-    document.querySelectorAll('.skgroup').forEach((g) => { g.hidden = ELS.includes(v) && g.dataset.el !== v; });
+    document.querySelectorAll('.skgroup').forEach((g) => { g.hidden = ELS.includes(v) ? g.dataset.el !== v : g.dataset.el === 'holy'; });
     if (PICK[v] && me.el !== v && !busy) { pickMe.value = PICK[v]; me = makeEnt(PICK[v], 0); showBanner('FIGHT!'); }
     jump.value = v;
   };
-  const fromHash = () => { const h = location.hash.slice(1); return ['fire', 'water', 'leaf', 'earth', 'bolt', 'plan'].includes(h) ? h : 'all'; };
+  const fromHash = () => { const h = location.hash.slice(1); return ['fire', 'water', 'leaf', 'earth', 'bolt', 'holy', 'plan'].includes(h) ? h : 'all'; };
   jump.addEventListener('change', () => { apply(jump.value); try { history.replaceState(null, '', jump.value === 'all' ? location.pathname : '#' + jump.value); } catch (e) { location.hash = jump.value === 'all' ? '' : jump.value; } document.getElementById('battle-h').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }); });
   window.addEventListener('hashchange', () => apply(fromHash()));
   apply(fromHash());

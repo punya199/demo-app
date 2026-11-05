@@ -15,7 +15,7 @@ asked for this more than once.
 - Source copy: `docs/tamagotchi/prototypes/monster-arena-25d.html`. It is one self-contained page:
   open it in a browser to run it. Add a `<!doctype html>` wrapper if a browser renders it oddly.
 - The page has a "ดูส่วน" dropdown at the top: all / fire / water / leaf / earth / lightning
-  (each "monsters + skills") / plan. The battle scene always
+  (each "monsters + skills") / holy (still drafts) / plan. The battle scene always
   stays on top. Choosing an element also shows only that element's skill buttons under the arena
   and puts one of its monsters in the arena. On a phone (≤ 760 px) the arena is pinned under the
   picker so a skill button lower down still shows its action; on a wide screen pressing a button
@@ -84,7 +84,8 @@ asked for this more than once.
 | Earth world boss | Done: ตัวนิ่มศิลาโบราณ, a stone pangolin with thorned scale rows (the game's ต้นไม้โบราณ is earth; the new name is only a proposal). Choosing it switches the arena to the new canyon theme |
 | Lightning line, 11 forms + fused + boss | Done and animated (owner approved, with the cat branch turned into foxes). Bird branch (นกฟ้าผ่า → เหยี่ยวพายุ → วิหคราชาอสนี) flies on the `FLY` rig like the fused form; fox branch (จิ้งจอกพายุ → จิ้งจอกอสนี two tails → ราชาจิ้งจอกอสนี five tails, `boltTail`). Fused อสนีผู้ตื่น is the storm wyvern (owner's option C). World boss: storm bison (the game's จักรกลพายุ is a machine; กระทิงพายุคำราม is a proposed name), with a new storm arena theme |
 | Lightning skills, all 8 | Done. New statuses in the prototype: static (`staticT`, crackling sparks, 30% a second to seize for 0.4 s, as `staticChance`/`staticStunSec` in the game), haste (`hasteT`, 30% faster walking, yellow after-images) and focus (`focusT`, basic-attack crit chance up, a crosshair over the head); `staticRetort` for แมวไฟสถิต's passive. Lightning is drawn with `boltLine`, a jagged line redrawn every frame so it flickers |
-| Holy, dark, shadow lines | Not started |
+| Holy line, 11 forms + fused + boss | Still drafts, waiting for the owner. Sheep → qilin main branch (ลูกแกะแสง → แกะปีกทิพย์ with feather wings and a halo → กิเลนรัศมี, one gold horn, gold back scales, cloud mane → กิเลนสุริยเทพ with a turning sun-wheel aura behind the head), lion branch (สิงห์น้อยรัศมี with a mane of light rays → ราชสีห์ปีกขาว with six wings → มหาราชสีห์เทวะ with a gold crown and light wings). Poor forms keep their names but became creatures: ทูตน้อยขี้เซา is a sleeping fluffball with tiny wings and a slipping halo, ระฆังแตก a sleepy hermit crab living in a cracked bronze bell. Fused ศักดิ์สิทธิ์ผู้ตื่น is the armoured sun qilin with light wings and twin rings (`twinh`). World boss: the game's เทวทูตรัศมี is an angel, so the proposal is a white celestial elephant, คชสารรัศมี (raised trunk, tiered gold headdress, crimson caparison, halo). New helpers: `haloRing`, `ray`, `lightMane`, `plumeWing` (a feathered wing at any angle), `scaleRow`, `qilinHead`, `lionFace` |
+| Dark, shadow lines | Not started |
 | The other 17 fused forms and 9 bosses | Not started |
 | Putting the art into the real game | Not started |
 
@@ -127,8 +128,8 @@ Still to ask the owner (old animal names left on skills): ตรีศูลส�
 
 ## Next steps (suggested order)
 
-1. Holy line next, then dark and shadow: still drafts first for the owner to choose, then animate them
-   and do their 8 skills.
+1. Holy line: wait for the owner's verdict on the still drafts, then animate it and do its 8 skills
+   (`holy_*` in `arena-data.ts`). Then dark and shadow the same way.
 3. Integration plan for the real game: replace the emoji in `ArenaReplay.tsx` with sprite frames.
    Positions come from the server replay, so poses map to replay events (walk while moving,
    attack/cast at skill events, the parry pose on dodge events with `parry`). Combat results stay

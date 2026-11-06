@@ -705,6 +705,7 @@ const MATS = {
   owlb2: ['#100c14', '#3a3446', '#524a64', '#6e6684', '#9a92b0'],
   soul:  ['#1a0a2acc', '#5a3ea8cc', '#8a72d8cc', '#bcaaf4d8', '#f0e8ffe6'],
   soul2: ['#14081ecc', '#3e2a80b0', '#6650b4b0', '#8a76d8b8', '#bcaaf4c8'],
+  soulm: ['#1a0a2acc', '#6a4eb8cc', '#9a84e4d0', '#c8b8f8dc', '#f0e8ffea'],
   soulc: ['#3a2a70', '#b8a4ff', '#dcd0ff', '#f4eeff', '#ffffff'],
 };
 const GLOW = new Set(['fire', 'core', 'glowfin', 'foam', 'jglow', 'magglow', 'ice', 'sap', 'bloom', 'topaz', 'volt', 'vcore', 'halo', 'hlight', 'curse', 'eclipse', 'soulc']);
@@ -2638,29 +2639,23 @@ const SPRITES = {
   darksoul: { size: 96, rig: BLOB, hover: 6, aura: { type: 'bossd', x: 48, y: 92, r: 36 }, draw(s, P) {
     const [bx, by] = P.body, j = P.jaw, g = P.glow;
     // eclipse behind the head: a black disc with a burning gold rim
-    s.E(50 + bx, 30 + by, 21, 21, 'eclipse'); s.E(50 + bx, 30 + by, 18, 18, 'void');
-    // trailing wisps instead of legs
-    for (const [x, len, sw, r] of [[40, 34, -9, 2.4], [48, 40, 6, 3], [56, 32, 10, 2.4], [44, 28, 14, 1.6], [52, 26, -12, 1.6]]) {
-      s.L(x + bx, 66 + by, x + sw * .5 + bx, 66 + len * .5 + by, r, 'soul2', r * .7); s.L(x + sw * .5 + bx, 66 + len * .5 + by, x + sw + bx, 66 + len + by, r * .7, 'soul2', .6);
-    }
-    // body: a tall teardrop of pale violet light
-    s.E(48 + bx, 50 + by, 22, 22, 'soul'); s.P([[28 + bx, 58 + by], [68 + bx, 58 + by], [56 + bx, 78 + by], [48 + bx, 90 + by], [40 + bx, 78 + by]], 'soul');
-    s.E(48 + bx, 58 + by, 10, 12, 'soulc');
-    for (const [x, y] of [[40, 56], [56, 52], [46, 66], [52, 60], [38, 66]]) { s.d(x + bx, y + by, '#ffffff'); s.d(x + 1 + bx, y + by, '#c8b8f8'); }
-    // arms of drifting light with clawed wisp hands
-    s.L(30 + bx, 50 + by, 18 + bx, 62 + by, 3.4, 'soul', 2); s.L(18 + bx, 62 + by, 12 + bx, 74 + by, 2, 'soul2', .8);
-    s.L(66 + bx, 50 + by, 78 + bx, 60 + by, 3.4, 'soul', 2); s.L(78 + bx, 60 + by, 86 + bx, 70 + by, 2, 'soul2', .8);
-    for (const [x, y] of [[12, 74], [86, 70]]) for (const d of [-2, 0, 2]) s.L(x + bx, y + by, x + d * 2 + bx, y + 6 + by, .9, 'soulc', .4);
-    // head crown: five tines of cold fire
-    for (const [x, h, l] of [[36, 9, -3], [42, 12, -1], [48, 14, 0], [54, 12, 1], [60, 9, 3]]) s.spike(x + bx, 36 + by, h, 2, 'soulc', l);
+    s.E(50 + bx, 28 + by, 21, 21, 'eclipse'); s.E(50 + bx, 28 + by, 18, 18, 'void');
+    // a great ball of drifting smoke: no arms, no legs, only loose puffs of it curling off the edge
+    for (const [x, y, r] of [[20, 58, 7], [76, 56, 7], [24, 72, 6], [72, 70, 6], [34, 80, 6], [62, 80, 6], [48, 84, 7], [14, 46, 4], [84, 44, 4]]) s.E(x + bx + Math.sin(y) * P.glow, y + by, r, r * .85, 'soul2');
+    s.E(48 + bx, 58 + by, 31, 28, 'soul'); s.E(46 + bx, 52 + by, 23, 19, 'soulm');
+    for (const [x, y, r] of [[28, 44, 6], [68, 46, 6], [30, 70, 6], [66, 72, 6]]) s.E(x + bx, y + by, r, r * .8, 'soul');
+    s.E(48 + bx, 62 + by, 14, 11, 'soulc');
+    // crown: five tines of cold fire
+    for (const [x, h, l] of [[34, 9, -3], [41, 12, -1], [48, 14, 0], [55, 12, 1], [62, 9, 3]]) s.spike(x + bx, 34 + by, h, 2, 'soulc', l);
     // hollow eyes burning amber like the eclipse, and a wide mouth
-    for (const x of [42, 58]) { s.E(x + bx, 46 + by, 4.6, 5.8, 'void'); s.d(x + bx, 46 + by, '#ffd87a').d(x + 1 + bx, 46 + by, '#ffb02a').d(x + bx, 47 + by, '#ffb02a'); }
-    s.E(51 + bx, 58 + by, 5 + j * 2, 2 + j * 3.5, 'void');
-    for (const x of [47, 50, 53, 56]) s.d(x + bx, 56 + by, '#f0e8ff');
+    for (const x of [38, 60]) { s.E(x + bx, 50 + by, 6, 7.4, 'void'); s.E(x + 1 + bx, 50 + by, 2.4, 3.2, 'eclipse'); s.d(x + bx, 49 + by, '#ffffff').d(x + 1 + bx, 49 + by, '#fff6c8'); }
+    s.E(49 + bx, 66 + by, 9 + j * 3, 3 + j * 4, 'void');
+    for (const x of [43, 46, 49, 52, 55]) s.d(x + bx, 64 + by, '#f0e8ff');
+    if (j > .5) for (const x of [44, 48, 52]) s.d(x + bx, 70 + j * 2 + by, '#f0e8ff');
     // small faces drifting on the body: the souls it keeps
-    for (const [x, y] of [[34, 62], [66, 64]]) { s.d(x + bx, y + by, '#1a0a2a').d(x + 3 + bx, y + by, '#1a0a2a').d(x + 1 + bx, y + 3 + by, '#1a0a2a').d(x + 2 + bx, y + 3 + by, '#1a0a2a'); }
-    if (g) s.E(51 + bx, 58 + by, 7, 6, 'soulc');
-  }, glows: [[50, 30, '#ffb02a', 12], [42, 46, '#ffb02a', 4], [58, 46, '#ffb02a', 4], [48, 60, '#a04ae8', 9]], emit: [{ x: 48, y: 8, type: 'ember', rate: 1.5 }, { x: 40, y: 80, type: 'glint', rate: 2 }], mouth: [62, 60] },
+    for (const [x, y] of [[26, 62], [72, 64], [34, 36]]) { s.d(x + bx, y + by, '#1a0a2a').d(x + 3 + bx, y + by, '#1a0a2a').d(x + 1 + bx, y + 3 + by, '#1a0a2a').d(x + 2 + bx, y + 3 + by, '#1a0a2a'); }
+    if (g) s.E(49 + bx, 62 + by, 18, 14, 'soulc');
+  }, glows: [[50, 28, '#ffb02a', 12], [39, 50, '#ffb02a', 4], [61, 50, '#ffb02a', 4], [48, 62, '#a04ae8', 12]], emit: [{ x: 48, y: 8, type: 'ember', rate: 1.5 }, { x: 48, y: 82, type: 'smoke', rate: 3 }, { x: 24, y: 70, type: 'glint', rate: 1.5 }], mouth: [64, 66] },
 };
 // Animations are sampled from continuous pose curves (many in-between frames) and baked lazily,
 // so every frame keeps crisp pixel shading. Walk/idle loop; attack/cast/hurt run once (0..1).

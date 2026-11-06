@@ -49,6 +49,7 @@ import {
   IWikiData,
   ICraftClaimResult,
   ICraftOverview,
+  IReturnHomeResult,
 } from './tamagotchi-interface'
 
 interface IGetMonsterHistoryResponse {
@@ -162,6 +163,22 @@ export const useMergeMonsters = () => {
       return data
     },
     // The parents are gone and the new monster is selected, so every tab's data may have changed.
+    onSettled: () => {
+      queryClient.invalidateQueries()
+    },
+  })
+}
+
+export const useReturnHome = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (monsterId: string) => {
+      const { data } = await apiClient.post<IReturnHomeResult>(`/monster/return-home`, {
+        monsterId,
+      })
+      return data
+    },
+    // The pet is gone, its slot is free, its gear is back in the bag and a core was added.
     onSettled: () => {
       queryClient.invalidateQueries()
     },

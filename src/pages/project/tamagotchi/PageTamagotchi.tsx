@@ -16,6 +16,7 @@ import { MergeModal } from './MergeModal'
 import { PassivePanel } from './PassivePanel'
 import { PetSprite } from './PetSprite'
 import { RenamePet } from './RenamePet'
+import { ReturnHomeModal } from './ReturnHomeModal'
 import { StatusPanel } from './StatusPanel'
 import { FriendsPanel } from './FriendsPanel'
 import { WorldBossPanel } from './WorldBossPanel'
@@ -36,6 +37,7 @@ import {
   elementLabel,
   formatAge,
   getActionBlocker,
+  getReturnHomeBlocker,
   getEvolutionCountdown,
   lineOptions,
   MAX_HEARTS,
@@ -44,7 +46,7 @@ import {
   toHearts,
   toThaiErrorMessage,
 } from './tamagotchi-helper'
-import { EnumMonsterStage, IMonsterData, IWikiSpecies } from './tamagotchi-interface'
+import { EnumMonsterStage, IMonsterData, IWikiData, IWikiSpecies } from './tamagotchi-interface'
 import {
   useGetMonsterHistory,
   useGetMyMonster,
@@ -259,10 +261,13 @@ const MonsterScreen = (props: {
   monster: IMonsterData
   fetchedAt: number
   species: IWikiSpecies[] | undefined
+  petCore: IWikiData['petCore'] | undefined
 }) => {
-  const { monster, fetchedAt, species } = props
+  const { monster, fetchedAt, species, petCore } = props
   const now = useNow(5000)
   const [isTreeOpen, setIsTreeOpen] = useState(false)
+  const [isReturning, setIsReturning] = useState(false)
+  const returnBlocker = getReturnHomeBlocker(monster, petCore?.stages)
   const { mutate: act, isPending } = useMonsterAction()
   const isEgg = monster.stage === EnumMonsterStage.EGG
 
@@ -341,6 +346,22 @@ const MonsterScreen = (props: {
           )
         })}
       </div>
+      {!isEgg && petCore && (
+        <>
+          <Tooltip title={returnBlocker}>
+            <Button disabled={!!returnBlocker} onClick={() => setIsReturning(true)}>
+              🌠 กลับดาว
+            </Button>
+          </Tooltip>
+          <ReturnHomeModal
+            open={isReturning}
+            onClose={() => setIsReturning(false)}
+            monster={monster}
+            petCore={petCore}
+            onError={showError}
+          />
+        </>
+      )}
     </div>
   )
 }
@@ -442,6 +463,7 @@ const TamagotchiGame = (props: {
           monster={monster}
           fetchedAt={dataUpdatedAt}
           species={wiki?.evolution.species}
+          petCore={wiki?.petCore}
         />
       )}
     </div>

@@ -149,6 +149,7 @@ const buildSections = (wiki: IWikiData) => {
     social,
     pvp,
     economy,
+    petCore,
   } = wiki
   const slotRows = Object.entries(equipment.slots).map(([slot, main]) => [
     slotLabel[slot as keyof typeof slotLabel],
@@ -444,6 +445,24 @@ const buildSections = (wiki: IWikiData) => {
               `โหนดเหรียญสำรวจและโอกาสดรอปอุปกรณ์รวมกันได้ไม่เกิน +${passive.economyCap}% อย่างละ`,
               `มาสเตอรีเลือก 1 จาก 3 ตัวเลือก เลือกครั้งแรกฟรี เปลี่ยนใช้ 💎 ${passive.masteryRepickGemPrice}`,
               `เส้นทางสูงสุด 3 เส้นทาง เลือกได้เส้นทางเดียว ใช้แต้มแยก (สูงสุด ${passive.ascendancyMaxPoints} แต้ม จากเรด Nightmare และบอสโลก) เริ่มใหม่ใช้ 💎 ${passive.ascendancyResetGemPrice}`,
+            ]}
+          />
+        </>
+      ),
+    },
+    {
+      key: 'return-home',
+      label: '🌠 กลับดาว (แกนสัตว์เลี้ยง)',
+      children: (
+        <>
+          <Heading>กลับดาว</Heading>
+          <List
+            items={[
+              `ปุ่ม "กลับดาว" ในหน้าเลี้ยงมอน ส่งมอนตัวที่เลือกอยู่กลับดาวบ้านเกิดถาวร ได้ 🔮 แกนสัตว์เลี้ยง ×${petCore.perReturn} ต่อครั้ง`,
+              `กดได้เมื่อมอนเป็น ${petCore.stages.map((stage) => stageLabel[stage]).join(' / ')} และไม่ได้ออกสำรวจอยู่ (รับกลับมาก่อน)`,
+              'แกนแยกตามสายพันธุ์ (รวมร่างของมอนนั้นด้วย) สายพันธุ์เดียวกันซ้อนกองได้ ดูได้ที่ถุงวัตถุดิบ',
+              'อุปกรณ์ที่สวมอยู่กลับเข้ากระเป๋า คอสตูม สกิล และ passive เป็นของบัญชี จึงอยู่กับคุณเหมือนเดิม',
+              'ช่องเลี้ยงที่ว่างรับไข่ใหม่ได้ทันที ตอนนี้แกนยังไม่มีที่ใช้ จะนำไปคราฟต์ในอัปเดตถัดไป',
             ]}
           />
         </>

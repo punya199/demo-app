@@ -113,28 +113,30 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
           const item = worn.get(slot)
           return (
             <Card key={slot} size="small" className="dark:border-slate-700 dark:bg-slate-900">
-              <div className="flex items-center gap-3">
-                <span className="w-28 shrink-0 text-sm">{slotLabel[slot]}</span>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                <span className="shrink-0 text-sm sm:w-28">{slotLabel[slot]}</span>
                 {item ? (
                   <>
                     <ItemLine item={item} set={setOf(item)} />
-                    <Button size="small" onClick={() => setEnhancing(item)}>
-                      ตีบวก
-                    </Button>
-                    {Object.keys(item.subStats).length > 0 && (
-                      <Button size="small" onClick={() => setRefiningId(item.id)}>
-                        รีไฟน์{item.pendingRefine ? ' (รอเลือก)' : ''}
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      <Button size="small" onClick={() => setEnhancing(item)}>
+                        ตีบวก
                       </Button>
-                    )}
-                    <Tooltip title={getEquipBlocker(monster)}>
-                      <Button
-                        size="small"
-                        disabled={!!getEquipBlocker(monster) || isBusy}
-                        onClick={() => unequip(slot, { onError })}
-                      >
-                        ถอด
-                      </Button>
-                    </Tooltip>
+                      {Object.keys(item.subStats).length > 0 && (
+                        <Button size="small" onClick={() => setRefiningId(item.id)}>
+                          รีไฟน์{item.pendingRefine ? ' (รอเลือก)' : ''}
+                        </Button>
+                      )}
+                      <Tooltip title={getEquipBlocker(monster)}>
+                        <Button
+                          size="small"
+                          disabled={!!getEquipBlocker(monster) || isBusy}
+                          onClick={() => unequip(slot, { onError })}
+                        >
+                          ถอด
+                        </Button>
+                      </Tooltip>
+                    </div>
                   </>
                 ) : (
                   <Button

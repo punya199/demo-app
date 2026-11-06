@@ -1,3 +1,10 @@
+# [1.50.0](https://github.com/punya199/demo-app/compare/v1.49.0...v1.50.0) (2026-11-06)
+
+
+### New
+
+* boss stats and skill tooltips, training dummy screen ([99a9e92](https://github.com/punya199/demo-app/commit/99a9e92b2730282e6c6e201e0ddb0ab362fb03d3))
+
 # [1.49.0](https://github.com/punya199/demo-app/compare/v1.48.0...v1.49.0) (2026-11-05)
 
 

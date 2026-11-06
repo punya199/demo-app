@@ -1,3 +1,10 @@
+## [1.52.1](https://github.com/punya199/demo-app/compare/v1.52.0...v1.52.1) (2026-11-06)
+
+
+### Fix
+
+* stack worn equipment card buttons under item info on mobile ([478ea1f](https://github.com/punya199/demo-app/commit/478ea1f75ed6c856edabd3b2f6a1ffb95528133e))
+
 # [1.52.0](https://github.com/punya199/demo-app/compare/v1.51.0...v1.52.0) (2026-11-06)
 
 

@@ -1105,6 +1105,22 @@ describe('filterBag', () => {
       filterBag(bag, { slot: EnumEquipmentSlot.WEAPON, freeOnly: true }).map((i) => i.id)
     ).toEqual(['axe', 'sword'])
   })
+
+  it('can keep only pieces the monster is evolved enough to wear', () => {
+    const gated = [
+      item({ id: 'free', minStage: null }),
+      item({ id: 'adult', minStage: EnumMonsterStage.ADULT }),
+      item({ id: 'perfect', minStage: EnumMonsterStage.PERFECT }),
+      item({ id: 'worn', minStage: EnumMonsterStage.ADULT, equipped: true, monsterId: 'pet-2' }),
+    ]
+    const ids = (usableStage?: EnumMonsterStage) =>
+      filterBag(gated, { slot: 'all', freeOnly: false, usableStage })
+        .map((i) => i.id)
+        .sort()
+    expect(ids(EnumMonsterStage.ADULT)).toEqual(['adult', 'free', 'worn'])
+    expect(ids(EnumMonsterStage.EGG)).toEqual(['free'])
+    expect(ids(undefined)).toHaveLength(4)
+  })
 })
 
 describe('bag set filter', () => {

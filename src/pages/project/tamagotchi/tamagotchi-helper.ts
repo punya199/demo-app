@@ -314,6 +314,13 @@ export const minigameBarPosition = (elapsedMs: number, periodMs: number) => {
 export const isInZone = (position: number, zone: { start: number; width: number }) =>
   position >= zone.start && position <= zone.start + zone.width
 
+// Enum order is evolution order (egg ... fused).
+const stageRank = (stage: EnumMonsterStage) => Object.values(EnumMonsterStage).indexOf(stage)
+
+// Whether a monster at `stage` has evolved far enough to wear `item`.
+export const meetsMinStage = (stage: EnumMonsterStage, item: Pick<IEquipmentItem, 'minStage'>) =>
+  !item.minStage || stageRank(stage) >= stageRank(item.minStage)
+
 export type BagFilterSlot = EnumEquipmentSlot | 'all'
 // One set id, 'none' (pieces without a set) or 'all'.
 export type BagFilterSet = string
@@ -322,16 +329,24 @@ export const BAG_SET_ALL = 'all'
 export const BAG_SET_NONE = 'none'
 
 // The bag as the gear screen lists it: one slot type (or all), one set (or all), optionally only
-// pieces nobody wears, highest grade first then highest level.
+// pieces nobody wears, optionally only pieces a monster of `usableStage` may wear (stage
+// requirement only; pieces another pet wears still count, they can be moved), highest grade first
+// then highest level.
 export const filterBag = (
   items: IEquipmentItem[],
-  filter: { slot: BagFilterSlot; freeOnly: boolean; setId?: BagFilterSet }
+  filter: {
+    slot: BagFilterSlot
+    freeOnly: boolean
+    setId?: BagFilterSet
+    usableStage?: EnumMonsterStage
+  }
 ) => {
   const gradeOrder = Object.values(EnumEquipmentGrade)
   const setId = filter.setId ?? BAG_SET_ALL
   return items
     .filter((item) => filter.slot === 'all' || item.slot === filter.slot)
     .filter((item) => !filter.freeOnly || !item.equipped)
+    .filter((item) => !filter.usableStage || meetsMinStage(filter.usableStage, item))
     .filter(
       (item) =>
         setId === BAG_SET_ALL || (setId === BAG_SET_NONE ? !item.setId : item.setId === setId)
@@ -346,7 +361,7 @@ export const filterBag = (
 // BAG_SET_NONE counts pieces without a set.
 export const countBagBySet = (
   items: IEquipmentItem[],
-  filter: { slot: BagFilterSlot; freeOnly: boolean }
+  filter: { slot: BagFilterSlot; freeOnly: boolean; usableStage?: EnumMonsterStage }
 ) => {
   const counts: Record<string, number> = {}
   for (const item of filterBag(items, filter)) {
@@ -645,9 +660,6 @@ export const compareEquipment = (item: IEquipmentItem, worn: IEquipmentItem | un
     .filter(({ diff }) => diff !== 0)
 
 // Gear can't change while the monster is away (the server refuses).
-// Enum order is evolution order (egg ... fused).
-const stageRank = (stage: EnumMonsterStage) => Object.values(EnumMonsterStage).indexOf(stage)
-
 export const getEquipBlocker = (
   monster: IMonsterData | null,
   item?: Pick<IEquipmentItem, 'minStage'>
@@ -655,7 +667,7 @@ export const getEquipBlocker = (
   if (monster?.expeditionAreaId) {
     return 'มอนออกสำรวจอยู่'
   }
-  if (monster && item?.minStage && stageRank(monster.stage) < stageRank(item.minStage)) {
+  if (monster && item?.minStage && !meetsMinStage(monster.stage, item)) {
     return `ต้องวิวัฒนาการถึง ${stageLabel[item.minStage]} ขึ้นไป`
   }
   return null

@@ -50,6 +50,7 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
   const [refiningId, setRefiningId] = useState<string | null>(null)
   const [bagSlot, setBagSlot] = useState<BagFilterSlot>('all')
   const [freeOnly, setFreeOnly] = useState(false)
+  const [usableOnly, setUsableOnly] = useState(false)
   const [bagSet, setBagSet] = useState<BagFilterSet>(BAG_SET_ALL)
   const [bagTab, setBagTab] = useState<'gear' | 'materials'>('gear')
 
@@ -61,9 +62,10 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
   const isWorn = (item: IEquipmentItem) => isWornBy(item, data.monsterId)
   const worn = new Map(data.items.filter(isWorn).map((item) => [item.slot, item]))
   const bag = data.items.filter((item) => !isWorn(item))
-  const shownBag = filterBag(bag, { slot: bagSlot, freeOnly, setId: bagSet })
-  const countIn = (slot: BagFilterSlot) => filterBag(bag, { slot, freeOnly }).length
-  const setCounts = countBagBySet(bag, { slot: bagSlot, freeOnly })
+  const usableStage = usableOnly ? monster?.stage : undefined
+  const shownBag = filterBag(bag, { slot: bagSlot, freeOnly, setId: bagSet, usableStage })
+  const countIn = (slot: BagFilterSlot) => filterBag(bag, { slot, freeOnly, usableStage }).length
+  const setCounts = countBagBySet(bag, { slot: bagSlot, freeOnly, usableStage })
   const setOptions = [
     {
       value: BAG_SET_ALL,
@@ -195,6 +197,9 @@ export const EquipmentPanel = (props: IEquipmentPanelProps) => {
           />
           <Checkbox checked={freeOnly} onChange={(event) => setFreeOnly(event.target.checked)}>
             เฉพาะชิ้นที่ยังไม่มีใครใส่
+          </Checkbox>
+          <Checkbox checked={usableOnly} onChange={(event) => setUsableOnly(event.target.checked)}>
+            เฉพาะชิ้นที่ใช้ได้กับตัวนี้
           </Checkbox>
           {selected === null ? (
             <Button size="small" onClick={() => setSelected([])}>

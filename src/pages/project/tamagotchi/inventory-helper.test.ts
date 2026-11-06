@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { EnumMonsterStage } from './tamagotchi-interface'
 import { groupInventory, inventoryGroupOf, IItemSources, itemLabel } from './inventory-helper'
 
 const sources: IItemSources = {
@@ -6,6 +7,9 @@ const sources: IItemSources = {
   materials: [{ id: 'enhance_stone', name: 'หินตีบวก', emoji: '🪨' }],
   craftMaterials: [{ id: 'craft_catalyst', name: 'ตัวเร่งคราฟต์', emoji: '🧿' }],
   bosses: [{ id: 'lava_king', name: 'ราชันย์ลาวา', emoji: '🔥' }],
+  species: [
+    { id: 'flame_perfectGood', name: 'เปลวสมบูรณ์', emoji: '🔥', stage: EnumMonsterStage.PERFECT },
+  ],
 }
 
 describe('itemLabel', () => {
@@ -18,6 +22,8 @@ describe('itemLabel', () => {
     expect(itemLabel('enhance_stone', sources)).toBe('🪨 หินตีบวก')
     expect(itemLabel('boss_token:lava_king', sources)).toBe('🎫 🔥 ราชันย์ลาวา')
     expect(itemLabel('boss_token:gone', sources)).toBe('🎫 เหรียญบอส')
+    expect(itemLabel('petcore:flame_perfectGood', sources)).toBe('🔮 🔥 เปลวสมบูรณ์ (ร่างสมบูรณ์)')
+    expect(itemLabel('petcore:gone', sources)).toBe('🔮 แกนสัตว์เลี้ยง')
     expect(itemLabel('mystery', sources)).toBe('mystery')
   })
 })
@@ -29,6 +35,7 @@ describe('inventoryGroupOf', () => {
     expect(inventoryGroupOf('enhance_stone', sources)).toBe('upgrade')
     expect(inventoryGroupOf('boss_token:lava_king', sources)).toBe('token')
     expect(inventoryGroupOf('meat', sources)).toBe('consumable')
+    expect(inventoryGroupOf('petcore:flame_perfectGood', sources)).toBe('core')
     expect(inventoryGroupOf('mystery', sources)).toBe('other')
   })
 })

@@ -27,6 +27,8 @@ export enum EnumMonsterDeathCause {
   STARVATION = 'starvation',
   // Consumed as a parent of a merge.
   MERGED = 'merged',
+  // Sent home (กลับดาว) for a Pet Core.
+  RETURNED = 'returned',
 }
 
 export enum EnumMonsterAction {
@@ -911,6 +913,7 @@ export interface IWikiData {
     statusNumbers: { ccWindowSec: number; ccSteps: number[]; poisonMaxStacks: number }
   }
   // Craft (phase 5.6): every number the craft screen and its guide page use.
+  petCore: { stages: EnumMonsterStage[]; perReturn: number; itemPrefix: string }
   dummy: { fightSec: number; defMax: number; defenseK: number; maxDefenseReduction: number }
   craft: {
     tiers: Record<
@@ -1268,4 +1271,10 @@ export interface ICraftClaimResult {
   item: IEquipmentItem
   upgraded: boolean
   overview: ICraftOverview
+}
+
+// POST /monster/return-home: the Pet Core the pet left behind.
+export interface IReturnHomeResult {
+  itemId: string
+  quantity: number
 }

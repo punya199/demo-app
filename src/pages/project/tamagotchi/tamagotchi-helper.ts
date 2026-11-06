@@ -58,6 +58,7 @@ export const deathCauseLabel: Record<EnumMonsterDeathCause, string> = {
   [EnumMonsterDeathCause.SICKNESS]: 'ป่วยหนักโดยไม่ได้รับการรักษา',
   [EnumMonsterDeathCause.STARVATION]: 'หิวจนทนไม่ไหว',
   [EnumMonsterDeathCause.MERGED]: 'รวมร่างเป็นมอนตัวใหม่แล้ว',
+  [EnumMonsterDeathCause.RETURNED]: 'กลับดาวแล้ว ทิ้งแกนสัตว์เลี้ยงไว้',
 }
 
 interface ILineOption {
@@ -1149,6 +1150,24 @@ export const getMergeParentBlocker = (monster: IMonsterData): string | null => {
     return 'ป่วยอยู่'
   }
   return monster.expeditionAreaId ? 'ออกสำรวจอยู่' : null
+}
+
+// Mirrors the server's return-home check (pet-core.ts), so the button explains itself.
+// `stages` comes from the wiki (the server's list); null = the button is fine to press.
+export const getReturnHomeBlocker = (
+  monster: IMonsterData,
+  stages: EnumMonsterStage[] | undefined
+): string | null => {
+  if (monster.diedAt) {
+    return 'จากไปแล้ว'
+  }
+  if (!stages) {
+    return 'กำลังโหลดข้อมูล'
+  }
+  if (!stages.includes(monster.stage)) {
+    return `ต้องเป็น${stageLabel[stages[0]]}ขึ้นไป`
+  }
+  return monster.expeditionAreaId ? 'ออกสำรวจอยู่ ต้องรับกลับมาก่อน' : null
 }
 
 // The form two parents make, whichever order they are picked in.

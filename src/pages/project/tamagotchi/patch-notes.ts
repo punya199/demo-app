@@ -12,6 +12,17 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: '1.51.0',
+    // Provisional: set to the real release time once semantic-release publishes it.
+    releasedAt: '2026-11-06T12:00:00Z',
+    changes: [
+      {
+        kind: 'new',
+        text: 'ปุ่ม 🌠 กลับดาว ในหน้าเลี้ยงมอน: ส่งมอนร่างสมบูรณ์ขึ้นไปกลับดาวบ้านเกิดแล้วได้ 🔮 แกนสัตว์เลี้ยง 1 ชิ้น (แยกตามสายพันธุ์ ซ้อนกองได้) มีหน้าต่างยืนยันก่อนทุกครั้ง อุปกรณ์ที่สวมอยู่กลับเข้ากระเป๋า คอสตูม สกิล และ passive ยังอยู่ครบ ดูแกนได้ที่ถุงวัตถุดิบ เก็บไว้ใช้คราฟต์ในอัปเดตถัดไป',
+      },
+    ],
+  },
+  {
     version: '1.50.0',
     // Provisional: set to the real release time once semantic-release publishes it.
     releasedAt: '2026-11-06T09:00:00Z',

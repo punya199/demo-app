@@ -20,6 +20,7 @@ import {
   describeMissingConditions,
   formatAge,
   getActionBlocker,
+  getReturnHomeBlocker,
   getBattleBlocker,
   getEvolutionCountdown,
   describePctBonus,
@@ -1336,5 +1337,23 @@ describe('skipRunsAffordable', () => {
     expect(skipRunsAffordable(35.6, 10, 10)).toBe(3)
     expect(skipRunsAffordable(9, 10, 10)).toBe(0)
     expect(skipRunsAffordable(500, 10, 10)).toBe(10)
+  })
+})
+
+describe('getReturnHomeBlocker', () => {
+  const stages = [EnumMonsterStage.PERFECT, EnumMonsterStage.ULTIMATE, EnumMonsterStage.FUSED]
+  const perfect = (overrides: Partial<IMonsterData> = {}) =>
+    monster({ stage: EnumMonsterStage.PERFECT, ...overrides })
+
+  it('lets a perfect-or-later pet that is home go', () => {
+    expect(getReturnHomeBlocker(perfect(), stages)).toBeNull()
+    expect(getReturnHomeBlocker(perfect({ stage: EnumMonsterStage.FUSED }), stages)).toBeNull()
+  })
+
+  it('explains why not', () => {
+    expect(getReturnHomeBlocker(monster(), stages)).toMatch(/ร่างสมบูรณ์ขึ้นไป/)
+    expect(getReturnHomeBlocker(perfect({ expeditionAreaId: 'forest' }), stages)).toMatch(/สำรวจ/)
+    expect(getReturnHomeBlocker(perfect({ diedAt: NOW.toISOString() }), stages)).toBe('จากไปแล้ว')
+    expect(getReturnHomeBlocker(perfect(), undefined)).toBe('กำลังโหลดข้อมูล')
   })
 })

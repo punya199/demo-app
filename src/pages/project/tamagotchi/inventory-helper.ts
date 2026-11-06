@@ -1,5 +1,5 @@
-import { craftMaterialLabel, refineStoneLabel } from './tamagotchi-helper'
-import { IInventoryItem, IWikiData } from './tamagotchi-interface'
+import { craftMaterialLabel, refineStoneLabel, stageLabel } from './tamagotchi-helper'
+import { EnumMonsterStage, IInventoryItem, IWikiData } from './tamagotchi-interface'
 
 // Display-only helpers for the bag's materials tab. The server owns every rule; these only name
 // and group the rows of GET /inventory.
@@ -15,9 +15,11 @@ export interface IItemSources {
   materials: INamed[]
   craftMaterials: INamed[]
   bosses: INamed[]
+  // Every species, to name the Pet Cores (`petcore:<speciesId>`).
+  species: (INamed & { stage: EnumMonsterStage })[]
 }
 
-export type InventoryGroupKey = 'craft' | 'upgrade' | 'token' | 'consumable' | 'other'
+export type InventoryGroupKey = 'craft' | 'core' | 'upgrade' | 'token' | 'consumable' | 'other'
 
 export interface IInventoryEntry {
   itemId: string
@@ -33,9 +35,12 @@ export interface IInventoryGroup {
 
 const BOSS_TOKEN_PREFIX = 'boss_token:'
 const CRAFT_PREFIX = 'craft_'
+// Same as PET_CORE_ITEM_PREFIX on the server (the wiki also publishes it).
+export const PET_CORE_PREFIX = 'petcore:'
 
 export const INVENTORY_GROUP_TITLE: Record<InventoryGroupKey, string> = {
   craft: 'วัตถุดิบคราฟต์',
+  core: 'แกนสัตว์เลี้ยง (กลับดาว)',
   upgrade: 'วัตถุดิบตีบวก / รีไฟน์',
   token: 'เหรียญบอส',
   consumable: 'ไอเทมใช้งาน',
@@ -43,16 +48,24 @@ export const INVENTORY_GROUP_TITLE: Record<InventoryGroupKey, string> = {
 }
 
 // Fixed display order.
-const GROUP_ORDER: InventoryGroupKey[] = ['craft', 'upgrade', 'token', 'consumable', 'other']
+const GROUP_ORDER: InventoryGroupKey[] = [
+  'craft',
+  'core',
+  'upgrade',
+  'token',
+  'consumable',
+  'other',
+]
 
 export const itemSourcesOf = (wiki: IWikiData | undefined): IItemSources => ({
   shopItems: wiki?.economy.shopItems ?? [],
   materials: wiki?.equipment.materials ?? [],
   craftMaterials: wiki?.craft.materials ?? [],
   bosses: [...(wiki?.raid.bosses ?? []), ...(wiki?.worldBoss.bosses ?? [])],
+  species: wiki?.evolution.species ?? [],
 })
 
-const named = (list: INamed[], id: string) => list.find((entry) => entry.id === id)
+const named = <T extends INamed>(list: T[], id: string) => list.find((entry) => entry.id === id)
 const show = (entry: INamed) => `${entry.emoji} ${entry.name}`
 
 // "emoji name" for any inventory item id; the raw id when nothing knows it.
@@ -60,6 +73,12 @@ export const itemLabel = (itemId: string, sources: IItemSources): string => {
   if (itemId.startsWith(BOSS_TOKEN_PREFIX)) {
     const boss = named(sources.bosses, itemId.slice(BOSS_TOKEN_PREFIX.length))
     return boss ? `🎫 ${boss.emoji} ${boss.name}` : '🎫 เหรียญบอส'
+  }
+  if (itemId.startsWith(PET_CORE_PREFIX)) {
+    const species = named(sources.species, itemId.slice(PET_CORE_PREFIX.length))
+    return species
+      ? `🔮 ${species.emoji} ${species.name} (${stageLabel[species.stage]})`
+      : '🔮 แกนสัตว์เลี้ยง'
   }
   const shop = named(sources.shopItems, itemId)
   const material = named(sources.materials, itemId)
@@ -76,6 +95,7 @@ export const itemLabel = (itemId: string, sources: IItemSources): string => {
 
 export const inventoryGroupOf = (itemId: string, sources: IItemSources): InventoryGroupKey => {
   if (itemId.startsWith(BOSS_TOKEN_PREFIX)) return 'token'
+  if (itemId.startsWith(PET_CORE_PREFIX)) return 'core'
   if (itemId.startsWith(CRAFT_PREFIX)) return 'craft'
   if (itemId in refineStoneLabel || named(sources.materials, itemId)) return 'upgrade'
   if (named(sources.shopItems, itemId)) return 'consumable'

@@ -12,9 +12,20 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    // Unreleased changes go in this one 'next' entry. The Docker/Pages build stamps it with the real
+    // version and release time (scripts/stamp-patch-notes.mjs), so never write either by hand.
+    version: 'next',
+    releasedAt: '2026-11-06T00:55:00Z',
+    changes: [
+      {
+        kind: 'new',
+        text: 'ปุ่ม "อัปเดต" ในเมนูมีจุดแดงเมื่อมีบันทึกอัปเดตใหม่ที่ยังไม่ได้อ่าน เปิดหน้าอัปเดตแล้วจุดจะหายไป',
+      },
+    ],
+  },
+  {
     version: '1.51.0',
-    // Provisional: set to the real release time once semantic-release publishes it.
-    releasedAt: '2026-11-06T12:00:00Z',
+    releasedAt: '2026-11-06T00:44:11Z',
     changes: [
       {
         kind: 'new',
@@ -24,8 +35,7 @@ export const PATCH_NOTES: IPatchNote[] = [
   },
   {
     version: '1.50.0',
-    // Provisional: set to the real release time once semantic-release publishes it.
-    releasedAt: '2026-11-06T09:00:00Z',
+    releasedAt: '2026-11-06T00:16:58Z',
     changes: [
       {
         kind: 'new',
@@ -39,8 +49,7 @@ export const PATCH_NOTES: IPatchNote[] = [
   },
   {
     version: '1.49.0',
-    // Provisional: set to the real release time once semantic-release publishes it.
-    releasedAt: '2026-11-05T17:30:00Z',
+    releasedAt: '2026-11-05T16:33:45Z',
     changes: [
       {
         kind: 'new',
@@ -62,8 +71,7 @@ export const PATCH_NOTES: IPatchNote[] = [
   },
   {
     version: '1.48.0',
-    // Provisional: set to the real release time once semantic-release publishes it.
-    releasedAt: '2026-11-05T17:00:00Z',
+    releasedAt: '2026-11-05T16:16:54Z',
     changes: [
       {
         kind: 'new',
@@ -253,3 +261,8 @@ export const formatPatchDate = (releasedAt: string) =>
     hour: '2-digit',
     minute: '2-digit',
   })} น.`
+
+// A badge only for players who have seen the notes before: a first visit (no stored version) is not
+// "unread", it is just the baseline.
+export const hasUnreadPatch = (seenVersion: string | null, notes: IPatchNote[] = PATCH_NOTES) =>
+  seenVersion !== null && notes.length > 0 && seenVersion !== notes[0].version

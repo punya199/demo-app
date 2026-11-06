@@ -23,6 +23,8 @@ RUN yarn install --immutable
 
 COPY . .
 
+RUN node scripts/stamp-patch-notes.mjs "$VITE_APP_VERSION"
+
 RUN yarn build
 
 FROM nginx:1.29.1-alpine-slim AS runner

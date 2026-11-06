@@ -1,3 +1,18 @@
+# [1.52.0](https://github.com/punya199/demo-app/compare/v1.51.0...v1.52.0) (2026-11-06)
+
+
+### Fix
+
+* move the return-home patch note under released 1.51.0 with its real time ([356a558](https://github.com/punya199/demo-app/commit/356a558ad5be9dd2baae8f39f4ce3a6ceb24eba0))
+
+### New
+
+* unread red-dot badge on the patch notes menu button, fix patch release times ([94660a4](https://github.com/punya199/demo-app/commit/94660a4783ac6d2b6b7ccacf6bd13fe654b4f3ff))
+
+### Update
+
+* stamp the real version and release time into patch notes at build ([8099994](https://github.com/punya199/demo-app/commit/8099994573ff798f58203aa3bb4968f81d26fc53))
+
 # [1.51.0](https://github.com/punya199/demo-app/compare/v1.50.0...v1.51.0) (2026-11-06)
 
 

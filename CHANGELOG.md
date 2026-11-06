@@ -1,3 +1,10 @@
+# [1.51.0](https://github.com/punya199/demo-app/compare/v1.50.0...v1.51.0) (2026-11-06)
+
+
+### New
+
+* return pet home (กลับดาว) button, modal and core bag ([948f4a1](https://github.com/punya199/demo-app/commit/948f4a1cfbe3c01fe222c0743deec8bd53d4d71e))
+
 # [1.50.0](https://github.com/punya199/demo-app/compare/v1.49.0...v1.50.0) (2026-11-06)
 
 

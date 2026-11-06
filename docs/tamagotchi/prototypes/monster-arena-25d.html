@@ -455,11 +455,11 @@ td.st { white-space: nowrap; color: var(--muted) }
         <p class="hint">ร่างผสมรัตติกาล+รัตติกาล เดิมเป็นอีโมจิหลุมดำ 🕳️ ใหม่เป็นราชินีแมงมุมที่ตื่นแล้ว ท้องใหญ่ขึ้นเป็นท้องฟ้ากลางคืนมีกาแล็กซีหมุนเป็นเกลียว ใส่เกราะทองที่หลัง อก และข้อขา มงกุฎทองมีพระจันทร์เสี้ยว เขี้ยวทอง และวงแสงสองวง (ม่วงกับแดง) หมุนสวนกันตามแบบร่างผสม</p>
       </div>
       <div class="show boss dark">
-        <canvas id="show-nightowl" width="128" height="112" aria-label="บอสโลกธาตุรัตติกาล พญาเค้าจันทร์ดับ"></canvas>
-        <div class="act" id="act-nightowl"></div>
+        <canvas id="show-darksoul" width="128" height="112" aria-label="บอสโลกธาตุรัตติกาล วิญญาณจันทร์ดับ"></canvas>
+        <div class="act" id="act-darksoul"></div>
         <span class="rank" style="--c:#ff5a5a">บอส</span>
-        <h3>บอสโลก · พญาเค้าจันทร์ดับ <span class="chip new">ออกแบบใหม่</span></h3>
-        <p class="hint">ในเกมคือ "จอมราตรี" 🌑 ซึ่งเป็นอีโมจิพระจันทร์ ไม่ใช่สัตว์ จึงเสนอเป็นนกเค้าแมวยักษ์สีม่วงคราม ยืนกางปีกครึ่งหนึ่ง มีสุริยุปราคา (วงดำขอบไฟสีทอง) อยู่หลังหัว ตาทั้งสองข้างก็เป็นสุริยุปราคา ขนหูตั้ง กรงเล็บทอง ในเกมตีธรรมดาแล้วลดเกราะ มีโล่ และคลั่งเมื่อสู้นาน จึงให้ท่าทางนิ่งน่ากลัว ชื่อใหม่เป็นแค่ข้อเสนอ</p>
+        <h3>บอสโลก · วิญญาณจันทร์ดับ <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ในเกมคือ "จอมราตรี" 🌑 ซึ่งเป็นอีโมจิพระจันทร์ จึงเสนอเป็นดวงวิญญาณยักษ์สีม่วงอ่อนโปร่งแสง ตัวเป็นหยดน้ำยาวลอยเหนือพื้น ปลายตัวเป็นริ้วแสงแทนขา มีแขนแสงเล็บแหลม มงกุฎเป็นเปลวแสงเย็นห้าแฉก ตาสองข้างกลวงเรืองสีอำพันเหมือนสุริยุปราคา มีสุริยุปราคาดำขอบทองอยู่หลังหัว และมีใบหน้าเล็กๆ ของวิญญาณที่ถูกกลืนลอยอยู่บนตัว ในเกมตีธรรมดาแล้วลดเกราะ มีโล่ และคลั่งเมื่อสู้นาน จึงให้ท่าทางนิ่งลอยน่ากลัว ชื่อใหม่เป็นแค่ข้อเสนอ</p>
       </div>
     </div>
   </section>
@@ -703,8 +703,11 @@ const MATS = {
   owl2:  ['#08060c', '#1c182c', '#2a2440', '#3e385c', '#6a6490'],
   owlb:  ['#141018', '#4a4258', '#6a6280', '#8e86a6', '#c4bed8'],
   owlb2: ['#100c14', '#3a3446', '#524a64', '#6e6684', '#9a92b0'],
+  soul:  ['#1a0a2acc', '#5a3ea8cc', '#8a72d8cc', '#bcaaf4d8', '#f0e8ffe6'],
+  soul2: ['#14081ecc', '#3e2a80b0', '#6650b4b0', '#8a76d8b8', '#bcaaf4c8'],
+  soulc: ['#3a2a70', '#b8a4ff', '#dcd0ff', '#f4eeff', '#ffffff'],
 };
-const GLOW = new Set(['fire', 'core', 'glowfin', 'foam', 'jglow', 'magglow', 'ice', 'sap', 'bloom', 'topaz', 'volt', 'vcore', 'halo', 'hlight', 'curse', 'eclipse']);
+const GLOW = new Set(['fire', 'core', 'glowfin', 'foam', 'jglow', 'magglow', 'ice', 'sap', 'bloom', 'topaz', 'volt', 'vcore', 'halo', 'hlight', 'curse', 'eclipse', 'soulc']);
 const hexRgb = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16), h.length > 7 ? parseInt(h.slice(7, 9), 16) : 255];
 const MAT_RGB = Object.fromEntries(Object.entries(MATS).map(([k, v]) => [k, v.map(hexRgb)]));
 
@@ -2631,26 +2634,33 @@ const SPRITES = {
     s.L(67 + hx, 66 + hy, 68 + hx, 73 + hy + P.jaw * 1.5, 1.3, 'gold', .5); s.L(69 + hx, 65 + hy, 73 + hx, 71 + hy + P.jaw * 1.5, 1.3, 'gold', .5);
     spiderEyes(s, 61 + hx, 59 + hy, 1.7);
   }, glows: [[25, 54, '#a04ae8', 9], [64, 49, '#c8c4ff', 5], [63, 58, '#ff3a4a', 5]], emit: [{ x: 25, y: 50, type: 'glint', rate: 2 }], mouth: [73, 68] },
-  /* ----- Dark world boss (game: จอมราตรี, a shadow lord): a giant eclipse owl ----- */
-  nightowl: { size: 96, rig: BIPED, aura: { type: 'bossd', x: 48, y: 90, r: 36 }, draw(s, P) {
-    const [bx, by] = P.body, hx = P.head[0] * .6 + bx, hy = P.head[1] * .6 + by, w = -6 * P.wing, m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
+  /* ----- Dark world boss (game: จอมราตรี, a moon emoji): a giant spirit hanging in front of a black eclipse ----- */
+  darksoul: { size: 96, rig: BLOB, hover: 6, aura: { type: 'bossd', x: 48, y: 92, r: 36 }, draw(s, P) {
+    const [bx, by] = P.body, j = P.jaw, g = P.glow;
     // eclipse behind the head: a black disc with a burning gold rim
-    s.E(52 + hx, 30 + hy, 21, 21, 'eclipse'); s.E(52 + hx, 30 + hy, 18, 18, 'void');
-    s.P(m([[28, 46], [10, 40 + w], [14, 50 + w * .7], [6, 54 + w * .5], [14, 60 + w * .3], [8, 66], [26, 70]], bx, by), 'owl2');
-    s.P(m([[30, 74], [16, 88], [24, 86], [22, 92], [32, 86], [36, 76]], bx, by), 'owl2');
-    s.E(42 + bx, 64 + by, 20, 22, 'owl'); s.E(48 + bx, 68 + by, 12, 16, 'owlb');
-    for (let r = 0; r < 4; r++) for (let i = 0; i < 4; i++) s.P([[42 + i * 5 + bx, 56 + r * 7 + by], [44.5 + i * 5 + bx, 60 + r * 7 + by], [47 + i * 5 + bx, 56 + r * 7 + by]], 'owlb2');
-    for (const [x, l] of [[38, P.bl], [52, P.bf]]) { s.L(x + bx, 84 + by, x + l[0], 90 + l[1], 2.4, 'owlb2'); for (const dx of [-4, 0, 4]) s.L(x + l[0], 90 + l[1], x + dx + l[0], 93 + l[1], .9, 'gold', .5); }
-    s.P(m([[30, 48], [16, 54 + w], [10, 66 + w * .6], [16, 70 + w * .4], [14, 78], [24, 80], [34, 74], [36, 56]], bx, by), 'owl');
-    for (const [y, x] of [[60, 18], [67, 16], [74, 20]]) s.line([[x + bx, y + by], [x + 12 + bx, y - 2 + by]], '#0a0810');
-    // head: wide facial disc, ear tufts, big eclipse eyes
-    s.E(54 + hx, 34 + hy, 15, 13, 'owl');
-    s.P(m([[42, 26], [38, 12], [47, 22]], hx, hy), 'owl'); s.P(m([[62, 22], [70, 12], [66, 26]], hx, hy), 'owl');
-    s.E(50 + hx, 36 + hy, 7, 6.5, 'owlb'); s.E(62 + hx, 36 + hy, 6, 6, 'owlb');
-    for (const [x, r] of [[50, 4.6], [62, 4.2]]) { s.E(x + hx, 35.5 + hy, r, r, 'eclipse'); s.E(x + hx, 35.5 + hy, r - 1.6, r - 1.6, 'void'); s.d(x + hx - 1, 34.5 + hy, '#ffffff'); }
-    s.P(m([[55, 39], [59, 41], [56, 46]], hx, hy), 'gold');
-    s.line(m([[42, 30], [48, 28], [53, 31]], hx, hy), '#0a0810').line(m([[59, 31], [64, 28], [69, 30]], hx, hy), '#0a0810');
-  }, glows: [[52, 30, '#ffb02a', 12], [50, 36, '#ffb02a', 4], [62, 36, '#ffb02a', 4]], emit: [{ x: 52, y: 10, type: 'ember', rate: 1.5 }], mouth: [58, 44] },
+    s.E(50 + bx, 30 + by, 21, 21, 'eclipse'); s.E(50 + bx, 30 + by, 18, 18, 'void');
+    // trailing wisps instead of legs
+    for (const [x, len, sw, r] of [[40, 34, -9, 2.4], [48, 40, 6, 3], [56, 32, 10, 2.4], [44, 28, 14, 1.6], [52, 26, -12, 1.6]]) {
+      s.L(x + bx, 66 + by, x + sw * .5 + bx, 66 + len * .5 + by, r, 'soul2', r * .7); s.L(x + sw * .5 + bx, 66 + len * .5 + by, x + sw + bx, 66 + len + by, r * .7, 'soul2', .6);
+    }
+    // body: a tall teardrop of pale violet light
+    s.E(48 + bx, 50 + by, 22, 22, 'soul'); s.P([[28 + bx, 58 + by], [68 + bx, 58 + by], [56 + bx, 78 + by], [48 + bx, 90 + by], [40 + bx, 78 + by]], 'soul');
+    s.E(48 + bx, 58 + by, 10, 12, 'soulc');
+    for (const [x, y] of [[40, 56], [56, 52], [46, 66], [52, 60], [38, 66]]) { s.d(x + bx, y + by, '#ffffff'); s.d(x + 1 + bx, y + by, '#c8b8f8'); }
+    // arms of drifting light with clawed wisp hands
+    s.L(30 + bx, 50 + by, 18 + bx, 62 + by, 3.4, 'soul', 2); s.L(18 + bx, 62 + by, 12 + bx, 74 + by, 2, 'soul2', .8);
+    s.L(66 + bx, 50 + by, 78 + bx, 60 + by, 3.4, 'soul', 2); s.L(78 + bx, 60 + by, 86 + bx, 70 + by, 2, 'soul2', .8);
+    for (const [x, y] of [[12, 74], [86, 70]]) for (const d of [-2, 0, 2]) s.L(x + bx, y + by, x + d * 2 + bx, y + 6 + by, .9, 'soulc', .4);
+    // head crown: five tines of cold fire
+    for (const [x, h, l] of [[36, 9, -3], [42, 12, -1], [48, 14, 0], [54, 12, 1], [60, 9, 3]]) s.spike(x + bx, 36 + by, h, 2, 'soulc', l);
+    // hollow eyes burning amber like the eclipse, and a wide mouth
+    for (const x of [42, 58]) { s.E(x + bx, 46 + by, 4.6, 5.8, 'void'); s.d(x + bx, 46 + by, '#ffd87a').d(x + 1 + bx, 46 + by, '#ffb02a').d(x + bx, 47 + by, '#ffb02a'); }
+    s.E(51 + bx, 58 + by, 5 + j * 2, 2 + j * 3.5, 'void');
+    for (const x of [47, 50, 53, 56]) s.d(x + bx, 56 + by, '#f0e8ff');
+    // small faces drifting on the body: the souls it keeps
+    for (const [x, y] of [[34, 62], [66, 64]]) { s.d(x + bx, y + by, '#1a0a2a').d(x + 3 + bx, y + by, '#1a0a2a').d(x + 1 + bx, y + 3 + by, '#1a0a2a').d(x + 2 + bx, y + 3 + by, '#1a0a2a'); }
+    if (g) s.E(51 + bx, 58 + by, 7, 6, 'soulc');
+  }, glows: [[50, 30, '#ffb02a', 12], [42, 46, '#ffb02a', 4], [58, 46, '#ffb02a', 4], [48, 60, '#a04ae8', 9]], emit: [{ x: 48, y: 8, type: 'ember', rate: 1.5 }, { x: 40, y: 80, type: 'glint', rate: 2 }], mouth: [62, 60] },
 };
 // Animations are sampled from continuous pose curves (many in-between frames) and baked lazily,
 // so every frame keeps crisp pixel shading. Walk/idle loop; attack/cast/hurt run once (0..1).
@@ -2690,7 +2700,7 @@ function getFrame(def, name, i) {
   }
   return list[i];
 }
-const DARK_IDS = ['degg', 'mote', 'batling', 'spider', 'rat', 'vampbat', 'eyespider', 'zrat', 'batlord', 'spiderqueen', 'batemperor', 'dfused', 'nightowl'];
+const DARK_IDS = ['degg', 'mote', 'batling', 'spider', 'rat', 'vampbat', 'eyespider', 'zrat', 'batlord', 'spiderqueen', 'batemperor', 'dfused', 'darksoul'];
 const HOLY_IDS = ['hegg', 'glint', 'lamb', 'wingsheep', 'cherub', 'lioncub', 'qilin', 'bellcrab', 'winglion', 'sunqilin', 'lionking', 'hfused', 'holyele'];
 const BOLT_IDS = ['begg', 'spark', 'cloudpuff', 'tbird', 'staticcat', 'stormfox', 'hawk', 'gloomcloud', 'boltfox', 'thunderking', 'foxking', 'bfused', 'stormbison'];
 const EARTH_IDS = ['eegg', 'pebble', 'clay', 'tortoise', 'worm', 'rhino', 'pillarturtle', 'boulder', 'orerhino', 'mountturtle', 'crystalrhino', 'efused', 'pangolin'];
@@ -2913,7 +2923,7 @@ const STAGES = {
 const STAGE_OF = {
   egg: 'egg', wisp: 'b1', coal: 'b2', gecko: 'adult', smoke: 'adult', raptor: 'adult', frill: 'perfect', lava: 'perfect', dragon: 'perfect', sunking: 'ultimate', phoenix: 'ultimate', avatar: 'fused', boss: 'boss',
   whaleA: 'ultimate', whaleB: 'ultimate', whaleC: 'ultimate', wfused: 'fused',
-  degg: 'egg', mote: 'b1', batling: 'b2', spider: 'adult', rat: 'adult', vampbat: 'adult', eyespider: 'perfect', zrat: 'perfect', batlord: 'perfect', spiderqueen: 'ultimate', batemperor: 'ultimate', dfused: 'fused', nightowl: 'boss',
+  degg: 'egg', mote: 'b1', batling: 'b2', spider: 'adult', rat: 'adult', vampbat: 'adult', eyespider: 'perfect', zrat: 'perfect', batlord: 'perfect', spiderqueen: 'ultimate', batemperor: 'ultimate', dfused: 'fused', darksoul: 'boss',
   hegg: 'egg', glint: 'b1', lamb: 'b2', wingsheep: 'adult', cherub: 'adult', lioncub: 'adult', qilin: 'perfect', bellcrab: 'perfect', winglion: 'perfect', sunqilin: 'ultimate', lionking: 'ultimate', hfused: 'fused', holyele: 'boss',
   begg: 'egg', spark: 'b1', cloudpuff: 'b2', tbird: 'adult', staticcat: 'adult', stormfox: 'adult', hawk: 'perfect', gloomcloud: 'perfect', boltfox: 'perfect', thunderking: 'ultimate', foxking: 'ultimate', bfused: 'fused', stormbison: 'boss',
   eegg: 'egg', pebble: 'b1', clay: 'b2', tortoise: 'adult', worm: 'adult', rhino: 'adult', pillarturtle: 'perfect', boulder: 'perfect', orerhino: 'perfect', mountturtle: 'ultimate', crystalrhino: 'ultimate', efused: 'fused', pangolin: 'boss',
@@ -3135,7 +3145,7 @@ addCard(document.getElementById('show-bison'), 'stormbison', document.getElement
 addCard(document.getElementById('show-hfused'), 'hfused', document.getElementById('act-hfused'));
 addCard(document.getElementById('show-holyele'), 'holyele', document.getElementById('act-holyele'));
 addCard(document.getElementById('show-dfused'), 'dfused', document.getElementById('act-dfused'), 8, true);
-addCard(document.getElementById('show-nightowl'), 'nightowl', document.getElementById('act-nightowl'), 8, true);
+addCard(document.getElementById('show-darksoul'), 'darksoul', document.getElementById('act-darksoul'), 8, true);
 addCard(document.getElementById('show-efused'), 'efused', document.getElementById('act-efused'));
 addCard(document.getElementById('show-pangolin'), 'pangolin', document.getElementById('act-pangolin'));
 addCard(document.getElementById('show-lfused'), 'lfused', document.getElementById('act-lfused'));

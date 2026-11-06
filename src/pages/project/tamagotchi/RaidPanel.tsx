@@ -2,6 +2,7 @@ import { ResetCountdown } from './ResetCountdown'
 import { Button, Card, Select, Spin, Tag, Tooltip } from 'antd'
 import { useState } from 'react'
 import { ArenaBattleModal } from './ArenaBattleModal'
+import { BossSkills, RaidStatTable } from './BossDetail'
 import {
   describePctBonus,
   describeSetEffect,
@@ -101,6 +102,8 @@ const BossCard = (props: {
             </div>
           ))}
         </div>
+        <RaidStatTable difficulties={boss.difficulties} />
+        <BossSkills detail={boss.detail} />
         {boss.difficulties.map((difficulty) => {
           const blocker = getRaidBlocker(monster, difficulty, attemptsLeft)
           return (
@@ -111,8 +114,7 @@ const BossCard = (props: {
                   <Tag color={gradeColor[difficulty.grade]}>{gradeLabel[difficulty.grade]}</Tag>
                 </div>
                 <div className="text-xs text-slate-500">
-                  ต้อง{stageLabel[difficulty.minStage]}ขึ้นไป · HP {difficulty.enemy.stats.hp} · ATK{' '}
-                  {difficulty.enemy.stats.atk} · 🎖️ {difficulty.raidTokens} · ชนะแล้ว{' '}
+                  ต้อง{stageLabel[difficulty.minStage]}ขึ้นไป · 🎖️ {difficulty.raidTokens} · ชนะแล้ว{' '}
                   {difficulty.clearCount} ครั้ง
                 </div>
               </div>

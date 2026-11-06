@@ -472,6 +472,28 @@ export interface IRentableUnit extends ISupportUnit {
   costume: ILoadout | null
 }
 
+export interface IBossSkillView {
+  id: string
+  name: string
+  icon: string
+  element: string
+  kind: string
+  slot: 'active' | 'passive' | 'dodge'
+  // Seconds; 0 for a passive.
+  cooldown: number
+  description: string
+}
+
+// What a boss screen shows about a boss: final stats, the damage its DEF cuts, and its skills.
+export interface IBossDetail {
+  stats: { hp: number; atk: number; def: number; spd: number }
+  // Base cut from DEF alone, in percent (status effects such as DEF down change it in a fight).
+  defReductionPct: number
+  skills: IBossSkillView[]
+  passives: string[]
+  dodge: IBossSkillView | null
+}
+
 export interface IWorldBossReward {
   coin: number
   raidToken: number
@@ -498,6 +520,8 @@ export interface IWorldBossStatus {
     hp: number
     maxHp: number
     isDefeated: boolean
+    // `stats.hp` is the week's shared pool.
+    detail: IBossDetail
   }
   hitsLeft: number
   // When the hit allowance refills.
@@ -547,6 +571,7 @@ export interface IRaidDifficultyInfo {
   raidTokens: number
   exchangeCost: number
   enemy: IFighter
+  defReductionPct: number
   clearCount: number
   unlocked: boolean
 }
@@ -559,7 +584,45 @@ export interface IRaidBossInfo {
   setId: string
   setName: string
   bossTokens: number
+  // Skills are the same on every difficulty; stats are on each difficulty's `enemy`.
+  detail: IBossDetail
   difficulties: IRaidDifficultyInfo[]
+}
+
+export type DummyPreset = 'plain' | 'raid' | 'world'
+
+export interface IDummyPresets {
+  fightSec: number
+  defDefault: number
+  defMax: number
+  elements: string[]
+  raidBosses: { id: string; name: string; emoji: string }[]
+  difficulties: string[]
+  worldBosses: { id: string; name: string; emoji: string }[]
+}
+
+export interface IDummyFightInput {
+  preset: DummyPreset
+  def?: number
+  element?: string
+  bossId?: string
+  difficulty?: string
+}
+
+export interface IDummySummary {
+  totalDamage: number
+  seconds: number
+  dps: number
+  hits: number
+  crits: number
+  avgHit: number
+  bestHit: { damage: number; skill: string | null } | null
+}
+
+export interface IDummyFightResponse {
+  battle: IArenaFight
+  summary: IDummySummary
+  dummy: { def: number; defReductionPct: number }
 }
 
 export interface IRaidData {
@@ -848,6 +911,7 @@ export interface IWikiData {
     statusNumbers: { ccWindowSec: number; ccSteps: number[]; poisonMaxStacks: number }
   }
   // Craft (phase 5.6): every number the craft screen and its guide page use.
+  dummy: { fightSec: number; defMax: number; defenseK: number; maxDefenseReduction: number }
   craft: {
     tiers: Record<
       'standard' | 'flagship',

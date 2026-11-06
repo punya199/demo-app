@@ -29,6 +29,9 @@ import {
   IMonsterData,
   IPvpBattleResponse,
   IRaidBattleResponse,
+  IDummyFightInput,
+  IDummyFightResponse,
+  IDummyPresets,
   IRaidData,
   IWorldBossAttackResponse,
   IWorldBossRankingEntry,
@@ -725,6 +728,27 @@ export const useClaimPvpSeason = () => {
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: PVP_KEY })
+    },
+  })
+}
+
+export const useGetDummyPresets = () => {
+  return useQuery({
+    queryKey: ['dummy-presets'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IDummyPresets>(`/dummy/presets`)
+      return data
+    },
+    staleTime: Infinity,
+  })
+}
+
+// Free and saves nothing, so there is no cache to update afterwards.
+export const useDummyFight = () => {
+  return useMutation({
+    mutationFn: async (input: IDummyFightInput) => {
+      const { data } = await apiClient.post<IDummyFightResponse>(`/dummy/fight`, input)
+      return data
     },
   })
 }

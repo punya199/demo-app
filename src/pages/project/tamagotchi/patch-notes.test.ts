@@ -20,4 +20,12 @@ describe('patch notes', () => {
     expect(hasUnreadPatch(latest)).toBe(false)
     expect(hasUnreadPatch('0.0.1')).toBe(true)
   })
+
+  it("keeps unreleased changes in a single 'next' entry at the top, with no future times", () => {
+    const nextIndexes = PATCH_NOTES.flatMap((note, i) => (note.version === 'next' ? [i] : []))
+    expect(nextIndexes.every((i) => i === 0)).toBe(true)
+    expect(nextIndexes.length).toBeLessThanOrEqual(1)
+    const newest = new Date(PATCH_NOTES[0].releasedAt).getTime()
+    expect(newest).toBeLessThanOrEqual(Date.now())
+  })
 })

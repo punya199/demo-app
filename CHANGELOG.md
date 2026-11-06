@@ -1,3 +1,10 @@
+# [1.53.0](https://github.com/punya199/demo-app/compare/v1.52.1...v1.53.0) (2026-11-06)
+
+
+### New
+
+* add "usable by this monster" filter to the equipment bag ([0269484](https://github.com/punya199/demo-app/commit/02694844f23627a50f7453476656b048688cb543))
+
 ## [1.52.1](https://github.com/punya199/demo-app/compare/v1.52.0...v1.52.1) (2026-11-06)
 
 

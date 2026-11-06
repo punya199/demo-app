@@ -13,6 +13,7 @@ export type GameMenuKey =
   | 'expedition'
   | 'raid'
   | 'world-boss'
+  | 'dummy'
   | 'pvp'
   | 'quests'
   | 'friends'
@@ -51,6 +52,7 @@ export const GAME_MENU: IGameMenuGroup[] = [
       { key: 'expedition', label: 'สำรวจ', emoji: '🧭' },
       { key: 'raid', label: 'บอส', emoji: '🐉' },
       { key: 'world-boss', label: 'บอสโลก', emoji: '🌋' },
+      { key: 'dummy', label: 'หุ่นซ้อม', emoji: '🎯' },
       { key: 'pvp', label: 'สนามประลอง', emoji: '🏟️' },
     ],
   },

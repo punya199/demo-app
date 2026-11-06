@@ -19,6 +19,7 @@ import { RenamePet } from './RenamePet'
 import { StatusPanel } from './StatusPanel'
 import { FriendsPanel } from './FriendsPanel'
 import { WorldBossPanel } from './WorldBossPanel'
+import { DummyPanel } from './DummyPanel'
 import { RaidPanel } from './RaidPanel'
 import { CraftPanel } from './CraftPanel'
 import { PvpPanel } from './PvpPanel'
@@ -605,6 +606,7 @@ const GameShell = () => {
     expedition: <ExpeditionPanel monster={monster} onError={showError} />,
     raid: <RaidPanel monster={monster} onError={showError} />,
     'world-boss': <WorldBossPanel monster={monster} onError={showError} />,
+    dummy: <DummyPanel monster={monster} onError={showError} />,
     pvp: <PvpPanel monster={monster} onError={showError} />,
     quests: <QuestPanel onError={showError} />,
     friends: <FriendsPanel monster={monster} onError={showError} />,

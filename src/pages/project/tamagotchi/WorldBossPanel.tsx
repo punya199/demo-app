@@ -1,3 +1,4 @@
+import { BossSkills, BossStats } from './BossDetail'
 import { PetAvatar } from './PetAvatar'
 import { ResetCountdown } from './ResetCountdown'
 import { Alert, Button, Card, Collapse, Progress, Select, Spin, Tag, Tooltip } from 'antd'
@@ -143,6 +144,10 @@ export const WorldBossPanel = (props: IWorldBossPanelProps) => {
               · ผู้ร่วมตี {status.participants} คน
             </div>
           </div>
+        </div>
+        <div className="mt-2 flex flex-col gap-2">
+          <BossStats detail={status.boss.detail} showHp={false} />
+          <BossSkills detail={status.boss.detail} />
         </div>
       </Card>
 

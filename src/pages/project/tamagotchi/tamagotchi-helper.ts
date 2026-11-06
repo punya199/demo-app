@@ -35,6 +35,7 @@ import {
   PassiveEffectKey,
   ISpecialOption,
   SpecialKey,
+  IDummySummary,
 } from './tamagotchi-interface'
 
 // Display helpers only. Whether an action is allowed is decided by the server; getActionBlocker
@@ -1356,3 +1357,24 @@ export const missingMaterials = (materials: { itemId: string; qty: number; owned
   materials
     .filter((material) => material.owned < material.qty)
     .map((material) => ({ itemId: material.itemId, missing: material.qty - material.owned }))
+
+// Share of damage a DEF value cuts (the arena formula, constants from the wiki), in whole percent.
+export const defCutPct = (def: number, k: number, maxReduction: number) =>
+  Math.round(Math.min(def / (def + k), maxReduction) * 100)
+
+// "DEF 60 (−60% damage)" for the boss and dummy screens.
+export const describeDef = (def: number, cutPct: number) => `DEF ${def} (ลดดาเมจ ${cutPct}%)`
+
+// Rows of the training dummy's result table.
+export const summaryRows = (summary: IDummySummary): [string, string][] => [
+  ['ดาเมจรวม', String(summary.totalDamage)],
+  ['DPS', String(summary.dps)],
+  ['ดาเมจเฉลี่ยต่อครั้ง', String(summary.avgHit)],
+  ['จำนวนครั้งที่ตี (คริ)', `${summary.hits} (${summary.crits})`],
+  [
+    'ครั้งที่แรงที่สุด',
+    summary.bestHit
+      ? `${summary.bestHit.damage}${summary.bestHit.skill ? ` (${summary.bestHit.skill})` : ''}`
+      : '-',
+  ],
+]

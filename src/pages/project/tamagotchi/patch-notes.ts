@@ -12,6 +12,21 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: '1.50.0',
+    // Provisional: set to the real release time once semantic-release publishes it.
+    releasedAt: '2026-11-06T09:00:00Z',
+    changes: [
+      {
+        kind: 'new',
+        text: 'เมนู 🎯 หุ่นซ้อม: ให้มอนสู้กับหุ่นที่ไม่ตีกลับเพื่อวัดดาเมจของตัวเอง ฟรี ไม่เสียโควตา ไม่ได้รางวัล เลือกหุ่นกลาง (ปรับ DEF/ธาตุเอง) หรือจำลองบอส Raid / บอสโลก พร้อมสรุปดาเมจรวม DPS และจำนวนคริ',
+      },
+      {
+        kind: 'update',
+        text: 'หน้า บอส และ บอสโลก แสดงค่า ATK / DEF / SPD ของบอส พร้อมดาเมจที่ DEF ลดให้ (เป็น %) Raid เทียบค่าทุกระดับความยาก และเอาเมาส์ชี้ไอคอนสกิลเพื่อดูรายละเอียดสกิลของบอสได้',
+      },
+    ],
+  },
+  {
     version: '1.49.0',
     // Provisional: set to the real release time once semantic-release publishes it.
     releasedAt: '2026-11-05T17:30:00Z',

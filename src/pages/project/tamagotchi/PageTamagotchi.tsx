@@ -1,5 +1,5 @@
 import { ArrowLeftOutlined } from '@ant-design/icons'
-import { Button, Card, message, Progress, Spin, Tag, Tooltip } from 'antd'
+import { Badge, Button, Card, message, Progress, Spin, Tag, Tooltip } from 'antd'
 import { useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { ReactNode, useEffect, useState } from 'react'
@@ -29,6 +29,7 @@ import { ShopPanel } from './ShopPanel'
 import { SkillsPanel } from './SkillsPanel'
 import { WikiPanel } from './WikiPanel'
 import { PatchNotesPanel } from './PatchNotesPanel'
+import { hasUnreadPatch, PATCH_NOTES } from './patch-notes'
 import { GAME_MENU, GameMenuKey, parseMenuHash } from './game-menu'
 import {
   actionOptions,
@@ -542,7 +543,11 @@ const ActivePetBar = (props: {
   )
 }
 
-const GameMenu = (props: { active: GameMenuKey; onSelect: (key: GameMenuKey) => void }) => (
+const GameMenu = (props: {
+  active: GameMenuKey
+  onSelect: (key: GameMenuKey) => void
+  hasUnreadPatch: boolean
+}) => (
   <nav aria-label="เมนูเกม" className="flex flex-col gap-2">
     {GAME_MENU.map((group) => (
       <div key={group.title}>
@@ -564,7 +569,9 @@ const GameMenu = (props: { active: GameMenuKey; onSelect: (key: GameMenuKey) => 
                     : 'border-slate-200 bg-white text-slate-700 hover:border-amber-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200'
                 }`}
               >
-                <span className="text-lg">{item.emoji}</span>
+                <Badge dot={item.key === 'patch-notes' && props.hasUnreadPatch} offset={[2, 0]}>
+                  <span className="text-lg">{item.emoji}</span>
+                </Badge>
                 {item.label}
               </button>
             )
@@ -590,11 +597,46 @@ const useMenuFromHash = () => {
   return [menu, select] as const
 }
 
+const PATCH_SEEN_KEY = 'tamagotchi:patch-seen'
+
+// Newest patch version the player has opened; localStorage can throw (private mode), so it is optional.
+const readSeen = () => {
+  try {
+    return window.localStorage.getItem(PATCH_SEEN_KEY)
+  } catch {
+    return null
+  }
+}
+const writeSeen = (version: string) => {
+  try {
+    window.localStorage.setItem(PATCH_SEEN_KEY, version)
+  } catch {
+    // ignore: the badge just shows again next visit
+  }
+}
+
+const usePatchUnread = (menu: GameMenuKey) => {
+  const latest = PATCH_NOTES[0].version
+  const [seen, setSeen] = useState<string | null>(() => {
+    const stored = readSeen()
+    if (stored === null) writeSeen(latest) // first visit: baseline, no badge
+    return stored ?? latest
+  })
+  useEffect(() => {
+    if (menu === 'patch-notes' && seen !== latest) {
+      writeSeen(latest)
+      setSeen(latest)
+    }
+  }, [menu, seen, latest])
+  return hasUnreadPatch(seen)
+}
+
 const GameShell = () => {
   const queryClient = useQueryClient()
   const { data: monsterData } = useGetMyMonster()
   const { data: wallet } = useGetWallet()
   const [menu, setMenu] = useMenuFromHash()
+  const isPatchUnread = usePatchUnread(menu)
   const [isChoosingEgg, setIsChoosingEgg] = useState(false)
   const monster = monsterData?.monster ?? null
   const monsters = [...(monsterData?.monsters ?? [])].sort(
@@ -659,7 +701,7 @@ const GameShell = () => {
               }}
             />
           </div>
-          <GameMenu active={menu} onSelect={setMenu} />
+          <GameMenu active={menu} onSelect={setMenu} hasUnreadPatch={isPatchUnread} />
         </aside>
         <section className="min-w-0" aria-live="polite">
           {panels[menu]}

@@ -1,3 +1,10 @@
+# [1.60.0](https://github.com/punya199/demo-app/compare/v1.59.0...v1.60.0) (2026-11-07)
+
+
+### Update
+
+* arena modal puts actions above a scrollable combat log and caps canvas at 400px (#47) ([aba0da2](https://github.com/punya199/demo-app/commit/aba0da2e150bbab74ee5f291bfeda2db063ab82c)), closes [#47](https://github.com/punya199/demo-app/issues/47)
+
 # [1.59.0](https://github.com/punya199/demo-app/compare/v1.58.0...v1.59.0) (2026-11-07)
 
 

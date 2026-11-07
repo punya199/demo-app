@@ -9,7 +9,7 @@ import {
   IMonsterData,
   IWikiSpecies,
 } from './tamagotchi-interface'
-import { useGetEvolutionPath } from './tamagotchi-service'
+import { useGetEvolutionPath, useGetMonsterDex } from './tamagotchi-service'
 
 interface IConditionRow {
   label: string
@@ -60,6 +60,12 @@ interface IEvolutionTreeModalProps {
 export const EvolutionTreeModal = (props: IEvolutionTreeModalProps) => {
   const { open, monster, species, onClose } = props
   const { data, isLoading } = useGetEvolutionPath(open ? monster.id : null)
+  const { data: dex } = useGetMonsterDex()
+  // No Dex data (loading or failed) just means no badges.
+  const collected = useMemo(
+    () => new Set(dex?.species.filter((entry) => entry.discovered).map((entry) => entry.id)),
+    [dex]
+  )
   const layout = useMemo(() => buildEvolutionTree(species, monster.line), [species, monster.line])
   const path = data?.path ?? [monster.speciesId]
   const speciesById = new Map(species.map((entry) => [entry.id, entry]))
@@ -81,8 +87,12 @@ export const EvolutionTreeModal = (props: IEvolutionTreeModalProps) => {
         </p>
       ) : (
         <div className="flex flex-col gap-3">
-          <TreeLegend />
-          {isLoading ? <Spin /> : <EvolutionTree layout={layout} progress={{ path }} />}
+          <TreeLegend showCollected={collected.size > 0} />
+          {isLoading ? (
+            <Spin />
+          ) : (
+            <EvolutionTree layout={layout} progress={{ path }} collected={collected} />
+          )}
           <div className="font-semibold text-slate-900 dark:text-slate-100">
             {isFinal ? 'ร่างสุดท้ายแล้ว' : `ขั้นถัดไปจาก ${monster.name}`}
           </div>

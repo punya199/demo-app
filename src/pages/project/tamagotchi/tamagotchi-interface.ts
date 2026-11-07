@@ -285,6 +285,36 @@ export interface ISetProgress {
   tiers: { pieces: number; pct: Partial<IBattleStats> | null; effect: IFighterEffects | null }[]
 }
 
+// The pet's arena-only numbers (GET /equipment `arenaStats`). 0 / false / null = it has none.
+export interface IArenaStats {
+  // HP as it is in a fight (the arena HP lean applied).
+  fightHp: number
+  eva: number
+  acc: number
+  res: number
+  attackSpeed: number
+  cdCut: number
+  doubleStrike: number
+  firstStrike: boolean
+  executeBonus: number
+  burnChance: number
+  burnBonus: number
+  poisonBonus: number
+  onBasic: { status: string; chance: number }[]
+  afterDodgeBonus: number
+  noCrit: boolean
+  regenPct: number
+  regenPerSec: number
+  lifesteal: number
+  thorns: number
+  damageCut: number
+  startShield: number
+  periodicShield: { pct: number; sec: number } | null
+  lastStand: { belowPct: number; shield: number } | null
+  dodgeCdCut: number
+  retort: number
+}
+
 export interface IEquipmentData {
   capacity: number
   items: IEquipmentItem[]
@@ -300,6 +330,8 @@ export interface IEquipmentData {
   stats: IBattleStats | null
   // Its crit rate (%), crit damage (% multiplier) and evasion (%) with gear and passives.
   combat: { critRate: number; critDamage: number; evasion: number } | null
+  // Arena-only numbers (regen, lifesteal, line EVA/ACC/RES ...); null without a hatched monster.
+  arenaStats: IArenaStats | null
 }
 
 export type EnhanceFailure = 'material' | 'drop' | 'drop_or_break'

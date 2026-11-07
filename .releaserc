@@ -13,7 +13,7 @@
       "@semantic-release/exec",
       {
         "verifyReleaseCmd": "echo ${nextRelease.version} > VERSION",
-        "prepareCmd": "echo ${nextRelease.version} > VERSION"
+        "prepareCmd": "echo ${nextRelease.version} > VERSION && node scripts/stamp-patch-notes.mjs ${nextRelease.version}"
       }
     ],
     [
@@ -39,7 +39,8 @@
       {
         "assets": [
           "package.json",
-          "CHANGELOG.md"
+          "CHANGELOG.md",
+          "src/pages/project/tamagotchi/patch-notes.ts"
         ],
         "message": "chore(release)[ci skip]: ${nextRelease.version}"
       }

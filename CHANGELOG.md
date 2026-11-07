@@ -1,3 +1,10 @@
+# [1.56.0](https://github.com/punya199/demo-app/compare/v1.55.0...v1.56.0) (2026-11-07)
+
+
+### Update
+
+* make PvP seasons weekly in the wiki and patch notes ([84f7e84](https://github.com/punya199/demo-app/commit/84f7e84329d806c8b7ff79ff79955c95f4d2b780))
+
 # [1.55.0](https://github.com/punya199/demo-app/compare/v1.54.0...v1.55.0) (2026-11-07)
 
 

@@ -94,8 +94,12 @@ asked for this more than once.
 | Dark line, 11 forms + fused + boss | Done and animated (owner approved the drafts). Spider main branch (แมงมุมคำสาป with a curse rune → แมงมุมอสูรตาแดง, eight red eyes and a blood hourglass → ราชินีแมงมุมรัตติกาล, abdomen of night sky with stars and a crescent moon, horn crown), bat branch (ลูกค้างคาว → ค้างคาวเขี้ยวโลหิต → ค้างคาวอสูรราชันย์ with horns → จักรพรรดิค้างคาวคำสาป with torn wings and a skull breastplate); all bats fly on the `FLY` rig. Poor forms: หนูท่อมืด (grubby sleepy rat), หนูซากศพขี้เกียจ (stitched zombie rat, replaces ซอมบี้ขี้เกียจ). Fused รัตติกาลผู้ตื่น is the awakened spider queen (galaxy abdomen, black-gold armour, moon crown, twin rings `twind`). World boss: the game's จอมราตรี is a moon emoji, so the proposal is a giant translucent spirit hanging in front of a black eclipse, วิญญาณจันทร์ดับ (sprite id `darksoul`; the owner rejected the owl, then the version with arms and tail wisps: it must be a limbless ball of smoke with a face). Helpers: `memWing` (bat wing, `torn` cuts notches), `jLeg`, `spiderEyes`, `starDots` |
 | Dark skills, all 8 | Done. New statuses in the prototype: curse (`curseT`, a turning violet sigil over the head; `cursed(e, n)` halves heals and shields, wired into the water, leaf and holy heals and `holyShield`), attack down (`atkDownT`, -20% damage dealt, red down arrow), defence down (reuses `defT`, +25% damage taken), and the zombie rat's passive (`ROSTER.zrat.undead`: `damage()` drains 15% of melee hits and sets `enraged`, +20% damage, below 50% HP). `cleanse` also clears curse and attack down. The dark boss switches the arena to the new purple `eclipse` theme |
 | Shadow line, 11 forms + fused + boss | Done and animated (owner approved, 2026-11-07). Knights walk on their legs (`P.bf`/`P.bl`), wraiths float. History: a cat/snake draft, two attempts at copying the owner's reference picture (rejected as "ประหลาด"), then three concepts side by side; the owner said A (shadow knight) or B (hooded wraith) are both fine (2026-11-07), so both are in: knights are the main branch, wraiths the alt branch. Palette: black steel (`arm`, `arm2`), purple-grey cloth (`wr`, `cape`), violet glow. Tree: ไข่เงา (`segg`) → เงาจิ๋ว (`wbaby`, round hooded wisp) → หมวกผีน้อย (`kbaby`, the wisp wearing a helmet, smoke tail, floating gauntlets) → knight branch อัศวินเงา (`knight`) → อัศวินเงาเกราะทมิฬ (`knight2`, kite shield with a violet crescent, flame plume) → จอมอัศวินเงา (`knightlord`, horned helm, spiked pauldrons, violet chest core, smoke cape, greatsword); wraith branch ภูตตะเกียงเงา (`lantern`) → ภูตโคมวิญญาณ (`soulwraith`, lantern on a staff, soul flames) → เจ้าภูตเงา (`wraithlord`, bone-horned hood, torn cloak wings, scythe). Poor forms kept: ผีเงาขี้อาย, ม่านหมอกขี้เกียจ. Fused เงาผู้ตื่น (`sfused`): knight upper body on a wraith smoke tail, crowned horned helm, greatsword, flaming back hand, torn cloak wings, twin violet rings. Boss: the game's ราชาม่านเงา keeps its name (it fits the wraiths): a giant crowned phantom whose robe spreads like a curtain and fades into smoke, jagged grin, clawed hands holding violet flames (`sboss`, aura `bosss`). The rejected picture copies are in git history |
-| Shadow skills, all 8 | Done (`SHADOW`, ids `shd_*`). คุไนเงา: three spinning shadow blades fan out (`shdFly`, several fly at once, unlike `projectile`). ลอยหนี: the shy ghost fades and drifts back, evasion up (`evaT`, 40% of basic hits against it miss, violet after-images) + focus. ศรเงียบ: a silent soul-flame streak from the lantern, silence. เขี้ยวเงียบ: shield bash, then a crossed shadow cut, poison. กลืนกลบ: the mist puffs up and a grey fog rolls out, blindness drawn as dark fog (`mistBlind`). เหล็กในเงา: passive `venom` (30% of basic hits poison, a soul flame clings on). อวสานเงา: screen darkens, one huge violet cleave, double damage and "ประหาร!" below 35% HP. จักรวาลเงา: passive `voidP` (20% of basic hits against it miss; after any dodge `critNext` makes its next basic hit crit +25%). The shadow boss switches the arena to the new silver-violet `crypt` theme. Skill names are still the game's (คุไนเงา, ศรเงียบ, เขี้ยวเงียบ, เหล็กในเงา name a ninja, an archer, a snake and a scorpion): ask the owner for new names |
-| The other 16 fused forms and 8 bosses | Not started |
+| Shadow skills, all 8 | Done (`SHADOW`, ids `shd_*`). คุไนเงา: three spinning shadow blades fan out (`shdFly`, several fly at once, unlike `projectile`). ลอยหนี: the shy ghost fades and drifts back, evasion up (`evaT`, 40% of basic hits against it miss, violet after-images) + focus. ศรเงียบ: a silent soul-flame streak from the lantern, silence. เขี้ยวเงียบ: shield bash, then a crossed shadow cut, poison. กลืนกลบ: the mist puffs up and a grey fog rolls out, blindness drawn as dark fog (`mistBlind`). เหล็กในเงา: passive `venom` (30% of basic hits poison, a soul flame clings on). อวสานเงา: screen darkens, one huge violet cleave, double damage and "ประหาร!" below 35% HP. จักรวาลเงา: passive `voidP` (20% of basic hits against it miss; after any dodge `critNext` makes its next basic hit crit +25%). The shadow boss switches the arena to the new silver-violet `crypt` theme. The four skills that named a ninja, an archer, a snake and a scorpion were renamed (2026-11-07, see "Names to apply in the game"): พัดดาบเงา, ไฟโคมเงียบ, โล่ทมิฬ, เปลวพิษวิญญาณ |
+| Awakened fused forms (same line twice), all 8 | Done (one per line, see each line above) |
+| Cross-line fused forms, 13 | Not started. The game's `FUSED_FORMS` (`species-data.ts`) has 21 fused forms: the 8 awakened ones plus 13 hybrids that still show an emoji. Natural group (10): ยักษ์ไอน้ำ ♨️ fire+water, บึงโบราณ 🐊 leaf+water, จ้าวไฟป่า 🦁 fire+leaf, ภูเขาไฟคำราม 🌋 fire+earth, พายุเพลิงสายฟ้า 💥 fire+lightning, โคลนมหาสมุทร 🦦 water+earth, พายุทะเลหลวง 🌀 water+lightning, ป่าหินโบราณ 🌵 leaf+earth, ไพรอสนี 🍃 leaf+lightning, ผาฟ้าผ่า 🏞️ earth+lightning. Spiritual group (3): สมดุลแสงมืด ☯️ holy+dark, ราชาไร้แสง 🦉 dark+shadow, ผู้พิพากษาเงียบ ⚖️ holy+shadow. Several are objects or places (♨️ 🌋 💥 🌀 🏞️ ☯️ ⚖️) and need a creature design. Still drafts first |
+| World bosses, all 7 | Done (fire, water, earth, lightning, holy, dark, shadow; leaf has no world boss) |
+| Raid bosses | 1 of 6 done (พฤกษาโบราณ, leaf). Not started: ราชันย์ลาวา 🔥 `lava_king`, อสูรห้วงลึก 💧 `deep_dweller`, เซราฟรัศมี ✨ `radiant_seraph`, จ้าวมืดมิด 🌑 `void_sovereign`, ราชันย์เงานิรนาม 🌫️ `nameless_phantom` (`raid-data.ts`; there is no earth or lightning raid boss) |
+| Adventure enemies, 20, and the training dummy | Not started. `adventure-data.ts` enemies are emoji animals that are not in any line (หนอนใบไม้ 🐛, ปูน้ำจืด 🦀, ค้างคาวถ่าน 🦇, กระต่ายยักษ์ 🐇, … นกยูงอสนี 🦚); the dummy (`dummy-data.ts`) is หุ่นซ้อม 🎯. They need sprites too, or the arena mixes pixel art and emoji |
 | All 8 lines | Done in the prototype |
 | Putting the art into the real game | Not started |
 
@@ -108,30 +112,38 @@ The prototype uses these; the game data still has the old ones.
 | Skill | `ltn_claw` | เล็บพายุ | ข่วนสายฟ้า |
 | Skill | `ltn_hoof` | กีบอสนี | โฉบอสนี |
 | Skill | `ltn_vajra` | วัชระผ่าฟ้า | หางปาอสนี |
+| Skill | `tide_trident` | ตรีศูลสมุทร | หอกเขาผลึก (also the water entry of `FUSED_SKILLS`, and `monster-merge.spec.ts` expects the old name) |
+| Skill | `leaf_claw` | กรงเล็บไพร | เขาไพรสามคม |
+| Skill | `leaf_trunk` | งวงพฤกษา | เถาวัลย์ฟาด |
+| Skill | `earth_paw` | อุ้งตีนผา | กระทืบผา |
+| Skill | `earth_quill` | ขนแร่ | หนามแร่ |
+| Skill | `holy_blade` | ดาบรัศมี | อุ้งเล็บรัศมี |
+| Skill | `holy_arrow` | ธนูรัศมี | ศรเขากิเลน |
+| Skill | `shd_kunai` | คุไนเงา | พัดดาบเงา |
+| Skill | `shd_arrow` | ศรเงียบ | ไฟโคมเงียบ |
+| Skill | `shd_snake` | เขี้ยวเงียบ | โล่ทมิฬ |
+| Skill | `shd_sting` | เหล็กในเงา | เปลวพิษวิญญาณ |
 | Species | see the plan table on the page | อัคนีพยัคฆ์, ราชาสุริยะ, … | อัคนีแผงคอ, ราชันมังกรสุริยะ, … |
 | Species (shadow) | `shadow_baby2` … `shadow_ultimateAlt` | แมวเงา, นินจาเงา, ผู้ล่าไร้เสียง, พญางูเงา, แมงป่องอาถรรพ์, เจ้าแห่งเงา, ราชันย์ไร้ตัวตน | หมวกผีน้อย, อัศวินเงา, ภูตตะเกียงเงา, อัศวินเงาเกราะทมิฬ, ภูตโคมวิญญาณ, จอมอัศวินเงา, เจ้าภูตเงา (เงาจิ๋ว, ผีเงาขี้อาย, ม่านหมอกขี้เกียจ, เงาผู้ตื่น and the boss ราชาม่านเงา keep their names) |
 
-Still to ask the owner (old animal names left on skills): คุไนเงา / ศรเงียบ / เขี้ยวเงียบ / เหล็กในเงา (shadow: a ninja, an archer, a snake and a scorpion; now the knight's blade fan, the lantern's soul flame, the black knight's shield-and-cross cut and the soul lantern's poison passive), ดาบรัศมี / ธนูรัศมี (holy: a knight's sword and a bow, now the lion cub's light claw and the qilin's horn arrow), ตรีศูลสมุทร (water), กรงเล็บไพร /
-งวงพฤกษา / พิทักษ์พนา (leaf), อุ้งตีนผา / ขนแร่ (earth).
+The owner left the remaining skill names to Claude (2026-11-07), so every skill that named an old
+animal or weapon now has a name that fits its new animal (the eleven rows above). พิทักษ์พนา keeps
+its name: "forest guardian" already fits the wolf king. Skill names live in two places in the game:
+`arena-data.ts` (the arena skill) and the species tuple in `species-data.ts` (the old turn-based
+skill, also stored in PvP history: the golden file `battle-engine.golden.json` records `moveName`,
+so check it with the `battle-golden-check` skill when renaming).
 
 ## Open items and known gaps
 
 - Weapon/equipment sets: the boss-set arena rebalance (backend PR #27) and the 12 craft sets with the Mythic grade (backend PR #29, frontend PRs #29 and #30) are merged, released (backend 1.38.0, frontend 1.46.0) and deployed (Cloud Run and Cloudflare Pages) as of 2026-11-05. Frontend PR #31 (craft patch notes) is still open.
 
-- The glow on the crystal whale's horn tip does not follow the head during the attack pose
-  (`glows` are static sprite coordinates).
 - The fire line is less detailed than water v2. Plan: raise it to the same level.
 - New names (ราชาวาฬผลึก and the names in the plan table) are proposals only. The game data in
   `demo-app-backend` `species-data.ts` is unchanged.
-- The skill name "ตรีศูลสมุทร" is still the game's name. Ask the owner before renaming it.
-- Lightning skills renamed on the owner's word (see the table above).
-- Earth skill names that still name old animals: อุ้งตีนผา (bear paw, now the pillar tortoise's
-  stamp), ขนแร่ (hedgehog quills, now ore spines fired from the ore rhino's armour).
-- Leaf skill names still name the old animals: กรงเล็บไพร (tiger claw, now the stag's three antler
-  slashes), งวงพฤกษา (elephant trunk, now a thick vine that rears up from the bark wolf's back),
-  พิทักษ์พนา (ent, now the wolf king's passive). Ask the owner before renaming them.
-- `ROSTER` in the prototype gives the wolf king the ent passive from the start, so it regenerates in
-  every fight there.
+- `ROSTER` gives a form whose own skill is a passive that passive from the start (the wolf king's
+  regen, the boulder's stone skin, the seraph lion's last stand, the zombie rat, the soul lantern,
+  the wraith lord). This is not a bug: in the game a form's own skill is always active
+  (`arena-fighter.ts`), so the wolf king regenerates in every fight there too.
 - Perfect forms have no aura yet. The idea is a small sparkle at the feet to tell them from
   adult forms.
 - Guarding: the game has no manual guard. The prototype's guard pose stands for the "ปัดป้อง"
@@ -139,11 +151,39 @@ Still to ask the owner (old animal names left on skills): คุไนเงา 
 
 ## Next steps (suggested order)
 
-1. Ask the owner for new shadow skill names (see the status table), then the other fused forms and bosses.
-2. Integration plan for the real game: replace the emoji in `ArenaReplay.tsx` with sprite frames.
-   Positions come from the server replay, so poses map to replay events (walk while moving,
-   attack/cast at skill events, the parry pose on dodge events with `parry`). Combat results stay
-   unchanged.
+1. Still drafts of what is missing (status table): the 13 cross-line fused forms, the 5 raid
+   bosses, the 20 adventure enemies and the dummy. The owner decides the order.
+2. Put the art into the game. Read the latest patch notes first
+   (`src/pages/project/tamagotchi/meta/patch-notes.ts`; the frontend's tamagotchi folder and the
+   backend's monster module were split into feature folders on 2026-11-07, so older paths in these
+   notes may have moved). What the game looks like now (frontend 1.61.0, backend 1.48.0):
+   - `arena/ArenaReplay.tsx` draws each fighter as a 44 px emoji on a fixed `ARENA_W` × `ARENA_H`
+     canvas (at most 400 px tall on a computer), with no camera. The prototype's arena is three
+     screens wide with a camera; the game version only needs the sprites, the poses and the skill
+     effects, not the camera or the minimap.
+   - Positions, projectiles (`frame.p`) and zones (`frame.z`) come from the server replay. Each
+     fighter row is `[x, y, hp, act, kind, actT, inv, face, shield, statusBits]` (`act` 1 = winding
+     up a skill, 2 = dodging). Events: `hit` (crit, `parried`, element bonus), `dot`, `heal`,
+     `dodge`, `miss`, `skill`, `status` / `resist` / `seize`, `burst` / `zoneHit` / `beam`,
+     `thorns`, `rage` and `grow`. The prototype's skill scripts (`useFire`) move the fighters
+     themselves (`approach`, `lungeHit`); in the game they must not: keep only the visual part,
+     started by the `skill` event and the wind-up (`act` 1), at the server's positions.
+   - Pose map: walk while the position changes, attack on a basic `hit`, cast during `act` 1 and at
+     `skill`, hurt on being hit, the parry pose on `dodge` / `parried`, a KO pose at `hp` 0.
+   - New since the prototype: the world boss grows twice in a fight (`grow` event at 20 s and
+     40 s, ATK/DEF +30%) and has an arena-wide attack with a 1 s warning, so the boss sprite needs
+     a bigger, angrier look per stage and a warning effect. World boss fights are team battles
+     (rented friend support units), so several sprites share the arena. The game has 19 statuses
+     (`StatusId` in `arena/arena-interface.ts`); the prototype draws most of them, check `evaDown`,
+     `defUp`, `regen`, `slow` and `immune`.
+   - Emoji also show the pet outside the arena: `shared/PetSprite.tsx` (home screen),
+     `PetAvatar.tsx` (`PetCostumeFrame`: costumes are emoji layers for backdrop, aura, back item,
+     face item and hat over a 128 px box, so a sprite needs a face and head anchor for them), the
+     Dex, the evolution tree and the return-home (กลับดาว) screen.
+   - Suggested order: a shared sprite module in the frontend (the `Spr` / `SPRITES` / `ANIM` code
+     as TypeScript, baked lazily per species id), then `ArenaReplay`, then the home screen and
+     cards, then the skill effects line by line. Apply the renames above in the same release, with
+     a patch-notes entry and the wiki (`WikiPanel` + backend `wiki.ts`).
 
 ## How the prototype code is organised (inside the HTML)
 
@@ -152,7 +192,9 @@ Still to ask the owner (old animal names left on skills): คุไนเงา 
   automatically, and supports translucent palettes (`#rrggbbaa`).
 - `MATS`: palettes, 5 tones each. `GLOW`: emissive materials.
 - `SPRITES[id]`: `size`, `rig` (QUAD / BIPED / BLOB / SWIM), `draw(s, P)` with pose offsets,
-  `emit` particle emitters, `mouth`, optional `hover`, `aura`, and `glows`.
+  `emit` particle emitters, `mouth`, optional `hover`, `aura`, and `glows`. A glow is
+  `[x, y, colour, radius, part?]`: with part `'head'` (or `'body'`) it follows that part's pose
+  offset in the frame shown (each baked frame keeps its `pose`), as on the crystal whale's horn.
 - `ANIM` + `getFrame`: pose curves and lazy frame baking.
 - `FIRE` / `WATER` / `LEAF`: game-skill animations (`useFire(id, att, def)` dispatches all of
   them; `skillEl(id)` picks the tag colour, `elCols(el)` the particle colours).

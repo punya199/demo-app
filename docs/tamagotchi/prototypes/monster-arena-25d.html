@@ -508,7 +508,7 @@ td.st { white-space: nowrap; color: var(--muted) }
   <section aria-labelledby="shadow-h" data-group="shadow" style="order:26">
     <div class="eyebrow">สกิลธาตุเงาทุกท่าในเกม</div>
     <h2 id="shadow-h">อนิเมชันสกิลธาตุเงา</h2>
-    <p class="lede">ท่าอัศวินเป็นดาบและใบมีดเงา ท่าภูตเป็นตะเกียง ไฟวิญญาณ และหมอก มีสถานะใหม่: หลบเก่งขึ้น (มีเงาม่วงตามหลัง ตีธรรมดาที่มาโดนพลาด 40%) มองไม่เห็นจากหมอก (ตีธรรมดาพลาด 35%) ติดตัวของภูตโคมวิญญาณ (ตีธรรมดาติดพิษ 30%) และติดตัวของเจ้าภูตเงา (ตีธรรมดาที่มาโดนพลาด 20% หลบแล้วสวนกลับคริ) ชื่อสกิลยังเป็นชื่อเดิมในเกม บางชื่อยังเป็นของนินจา นักธนู และแมงป่อง รอเปลี่ยน</p>
+    <p class="lede">ท่าอัศวินเป็นดาบและใบมีดเงา ท่าภูตเป็นตะเกียง ไฟวิญญาณ และหมอก มีสถานะใหม่: หลบเก่งขึ้น (มีเงาม่วงตามหลัง ตีธรรมดาที่มาโดนพลาด 40%) มองไม่เห็นจากหมอก (ตีธรรมดาพลาด 35%) ติดตัวของภูตโคมวิญญาณ (ตีธรรมดาติดพิษ 30%) และติดตัวของเจ้าภูตเงา (ตีธรรมดาที่มาโดนพลาด 20% หลบแล้วสวนกลับคริ) ชื่อสกิลตั้งใหม่ให้เข้ากับอัศวินและภูต (พัดดาบเงา ไฟโคมเงียบ โล่ทมิฬ เปลวพิษวิญญาณ)</p>
     <div class="skills-grid" id="shadow-cards"></div>
   </section>
 
@@ -1702,7 +1702,7 @@ const SPRITES = {
     if (j > 1) s.line([[56 + hx, 57 + hy], [65 + hx, 56 + hy + j * .5]], '#120c30');
     s.eye(61 + hx, 47 + hy, 'fierce');
     if (P.glow) glowMouth(s, 63 + hx, 27 + hy);
-  }, glows: [[63, 28, '#7ee7ff', 6]], emit: [{ x: 40, y: 34, type: 'mist', rate: 3 }, { x: 63, y: 28, type: 'glint', rate: 2 }, { x: 30, y: 64, type: 'bubble', rate: 1.5 }], mouth: [63, 28] },
+  }, glows: [[63, 28, '#7ee7ff', 6, 'head']], emit: [{ x: 40, y: 34, type: 'mist', rate: 3 }, { x: 63, y: 28, type: 'glint', rate: 2 }, { x: 30, y: 64, type: 'bubble', rate: 1.5 }], mouth: [63, 28] },
   /* ----- Tide fused form (สมุทรผู้ตื่น): a roaring sea dragon rising in an S-curve.
      The belly always faces one side of the path (front/below), the back the other. ----- */
   wfused: { size: 88, rig: SWIM, hover: 5, aura: { type: 'twinw', x: 34, y: 66, r: 34 }, draw(s, P) {
@@ -3142,9 +3142,9 @@ function getFrame(def, name, i) {
   const A = ANIM[name], list = def.frames[name];
   i = ((i % A.n) + A.n) % A.n;
   if (!list[i]) {
-    const s = new Spr(def.size, def.size);
-    def.draw(s, scalePose(fullPose(A.pose(def.rig, A.loop ? i / A.n : i / (A.n - 1))), def.amp));
-    list[i] = s.bake();
+    const s = new Spr(def.size, def.size), P = scalePose(fullPose(A.pose(def.rig, A.loop ? i / A.n : i / (A.n - 1))), def.amp);
+    def.draw(s, P);
+    list[i] = s.bake(); list[i].pose = P; // kept so a glow tagged with a body part can follow it
   }
   return list[i];
 }
@@ -3227,10 +3227,18 @@ class PSys {
 }
 
 /* ---------- Auras drawn behind a sprite ---------- */
-function drawGlows(ctx, def, x, y, sx, sy, flip, t, alpha = 1) {
+// A glow is [x, y, colour, radius, part?]: with part 'head' it moves with the head (head + body pose
+// offsets of the frame shown), with 'body' with the body; without one it stays on the sprite grid.
+function glowShift(pose, part) {
+  if (!pose || !part) return [0, 0];
+  const b = pose.body || [0, 0], h = pose.head || [0, 0];
+  return part === 'head' ? [b[0] + h[0], b[1] + h[1]] : part === 'body' ? b : [0, 0];
+}
+function drawGlows(ctx, def, x, y, sx, sy, flip, t, alpha = 1, img = null) {
   if (!def.glows) return;
   ctx.save(); ctx.globalCompositeOperation = 'lighter';
-  def.glows.forEach(([gx, gy, col, r], i) => {
+  def.glows.forEach(([gx0, gy0, col, r, part], i) => {
+    const [dx, dy] = glowShift(img && img.pose, part), gx = gx0 + dx, gy = gy0 + dy;
     const px = x + (flip ? (def.size - gx) : gx) * sx, py = y + gy * sy, rr = r * (1 + .25 * Math.sin(t * 3 + i * 1.7));
     const g = ctx.createRadialGradient(px, py, 0, px, py, rr);
     g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)');
@@ -3656,7 +3664,7 @@ function drawLineup(L, dt) {
     const hv = d.hover ? Math.round(d.hover + Math.sin(L.t * 2.2 + i) * 1.4) : 0, oy = ground - d.img.foot - 1 - hv;
     ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.beginPath(); ctx.ellipse(x + d.size / 2, ground - 1, d.size * (d.hover ? .22 : .3), 2.5, 0, 0, 7); ctx.fill();
     if (d.aura) drawAura(ctx, d.aura, x, oy, L.t, false, d.size);
-    ctx.drawImage(img.cv, x, oy); drawGlows(ctx, d, x, oy, 1, 1, false, L.t);
+    ctx.drawImage(img.cv, x, oy); drawGlows(ctx, d, x, oy, 1, 1, false, L.t, 1, img);
     if (i < ids.length - 1) { ctx.fillStyle = '#4a4258'; const ax = x + d.size + gap / 2; ctx.fillRect(ax - 2, ground + 9, 4, 1); ctx.fillRect(ax, ground + 8, 1, 3); }
     x += d.size + gap;
   });
@@ -3747,7 +3755,7 @@ function drawCard(c, dt) {
   ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.beginPath(); ctx.ellipse(W / 2, base - 1, def.size * .3, 2.5, 0, 0, Math.PI * 2); ctx.fill();
   if (def.aura) drawAura(ctx, def.aura, ox, oy, c.t, false, def.size);
   ctx.drawImage(img.cv, ox, oy);
-  drawGlows(ctx, def, ox, oy, 1, 1, false, c.t);
+  drawGlows(ctx, def, ox, oy, 1, 1, false, c.t, 1, img);
   if (!c.still) emitFor(def, c.ps, c.acc, dt, ox, oy, false);
   c.ps.update(dt); c.ps.draw(ctx);
 }
@@ -4558,8 +4566,8 @@ const WATER = {
       await damage(def, 105, { from: att });
     }
   } },
-  // ตรีศูลสมุทร (spread x3): the trident horn glows, then three water spears fly out in a fan
-  tide_trident: { name: 'ตรีศูลสมุทร', icon: '🔱', reach: 230, async run(att, def) {
+  // หอกเขาผลึก (spread x3): the trident horn glows, then three water spears fly out in a fan
+  tide_trident: { name: 'หอกเขาผลึก', icon: '🔱', reach: 230, async run(att, def) {
     const p = castPose(att, 450, 600, 'water'); await p.charged; p.release();
     const m = mouthOf(att), base = Math.atan2(centerOf(def).y - m.y, centerOf(def).x - m.x);
     const pending = [];
@@ -4691,8 +4699,8 @@ const LEAF = {
         return damage(def, 55, { from: att });
       } });
   } },
-  // กรงเล็บไพร (3 hits, lifesteal 30%): three quick antler slashes; each draws green life back to the attacker
-  leaf_claw: { name: 'กรงเล็บไพร', icon: '🐾', async run(att, def) {
+  // เขาไพรสามคม (3 hits, lifesteal 30%): three quick antler slashes; each draws green life back to the attacker
+  leaf_claw: { name: 'เขาไพรสามคม', icon: '🐾', async run(att, def) {
     const heals = [];
     await meleeStrike(att, def, { wind: 300, hits: 3, gap: 160, onHit(i, dir) {
       const t = centerOf(def), r = def.def.size * .28, sgn = i % 2 ? -1 : 1;
@@ -4731,8 +4739,8 @@ const LEAF = {
       await damage(def, 95, { from: att });
     } else await wait(500);
   } },
-  // งวงพฤกษา (melee 66, long wind-up, power 250): a thick vine rears up from the back, then slams down on the target
-  leaf_trunk: { name: 'งวงพฤกษา', icon: '🌿', async run(att, def) {
+  // เถาวัลย์ฟาด (melee 66, long wind-up, power 250): a thick vine rears up from the back, then slams down on the target
+  leaf_trunk: { name: 'เถาวัลย์ฟาด', icon: '🌿', async run(att, def) {
     const vine = { h: 0, slam: 0 };
     const root = () => { const a = anchor(att), d = att.flip ? -1 : 1; return { x: a.x - d * att.def.size * .12, y: a.y - att.def.img.foot * .72, d }; };
     const fx = { age: 0, life: 99, draw(c) {
@@ -4868,8 +4876,8 @@ const EARTH = {
     await tween(320, (k) => { A(.62 + .38 * k); att.ox = ux * dist * (1 - ease(k)); att.oy = uy * dist * .8 * (1 - ease(k)); });
     att.ox = att.oy = 0; att.anim = null; await p;
   } },
-  // อุ้งตีนผา (melee 64, long wind-up, stun 1 s): rear up on the hind legs, then stamp down; stone pillars burst round the target
-  earth_paw: { name: 'อุ้งตีนผา', icon: '🐾', async run(att, def) {
+  // กระทืบผา (melee 64, long wind-up, stun 1 s): rear up on the hind legs, then stamp down; stone pillars burst round the target
+  earth_paw: { name: 'กระทืบผา', icon: '🐾', async run(att, def) {
     await meleeStrike(att, def, { wind: 700, rush: 170, windFx: (k) => { att.sy = 1 + .14 * ease(k); att.sx = 1 - .05 * k; if (Math.random() < .3) ps.add(makeParticle('grit', anchor(att).x, anchor(att).y - att.def.img.foot * .6)); },
       onHit(i, dir) {
         att.sy = .86; att.sx = 1.08; tween(200, (k) => { att.sy = .86 + .14 * k; att.sx = 1.08 - .08 * k; });
@@ -4890,8 +4898,8 @@ const EARTH = {
     await wait(300); await lungeHit(def, att);
     await wait(600);
   } },
-  // ขนแร่ (4 shots in a fan, 30% armour down each): ore spines bristle up from the armour and fire at the target
-  earth_quill: { name: 'ขนแร่', icon: '🦔', reach: 230, async run(att, def) {
+  // หนามแร่ (4 shots in a fan, 30% armour down each): ore spines bristle up from the armour and fire at the target
+  earth_quill: { name: 'หนามแร่', icon: '🦔', reach: 230, async run(att, def) {
     const p = castPose(att, 500, 600, 'earth');
     fxs.push({ age: 0, life: .5, draw(c, k) { const cc = centerOf(att), top = cc.y - att.def.img.foot * .3; for (let i = 0; i < 6; i++) { const x = cc.x + (i - 2.5) * 5, h = 8 * ease(Math.min(1, k * 2)); c.fillStyle = '#566070'; c.beginPath(); c.moveTo(x - 1.5, top); c.lineTo(x, top - h); c.lineTo(x + 1.5, top); c.fill(); c.fillStyle = '#d0daea'; c.fillRect(x, top - h, 1, 2); } } });
     await p.charged; p.release();
@@ -5113,8 +5121,8 @@ const HOLY = {
     silenceOn(def, 2.5);
     await damage(def, 45, { from: att });
   } },
-  // ดาบรัศมี (melee, range 62, then a 10% shield for 3 s): a pounce with one wide crescent of light, then a gold shield
-  holy_blade: { name: 'ดาบรัศมี', icon: '🛡️', async run(att, def) {
+  // อุ้งเล็บรัศมี (melee, range 62, then a 10% shield for 3 s): a pounce with one wide crescent of light, then a gold shield
+  holy_blade: { name: 'อุ้งเล็บรัศมี', icon: '🛡️', async run(att, def) {
     if (!inRange(att, def, 62)) await approach(att, def);
     await meleeStrike(att, def, { wind: 280, rush: 140, hits: 1, windFx(k) { if (Math.random() < .7) { const m = mouthOf(att); ps.add({ x: m.x + (Math.random() - .5) * 14, y: m.y + 6 + (Math.random() - .5) * 8, vx: 0, vy: -10, life: .3, size: 1, cols: HOLY_COLS, glow: true }); } }, onHit(i, dir) {
       const t = centerOf(def), r = def.def.size * .34;
@@ -5125,8 +5133,8 @@ const HOLY = {
     holyShield(att, .1, 3); lightBurst(anchor(att).x, centerOf(att).y, 14, 40);
     await wait(250);
   } },
-  // ธนูรัศมี (shot, blind 2 s): the horn gathers light and fires one fast arrow of light; a glare bursts over the target's eyes
-  holy_arrow: { name: 'ธนูรัศมี', icon: '🏹', async run(att, def) {
+  // ศรเขากิเลน (shot, blind 2 s): the horn gathers light and fires one fast arrow of light; a glare bursts over the target's eyes
+  holy_arrow: { name: 'ศรเขากิเลน', icon: '🏹', async run(att, def) {
     const p = castPose(att, 420, 450, 'holy'); await p.charged; p.release();
     const m = mouthOf(att), c = centerOf(def), ang = Math.atan2(c.y - m.y, c.x - m.x);
     await tween(170, (k) => { const x = lerp(m.x, c.x, k), y = lerp(m.y, c.y, k); fxs.push({ age: 0, life: .1, draw(cx, q) { cx.globalCompositeOperation = 'lighter'; cx.globalAlpha = 1 - q; cx.strokeStyle = '#ffd84a'; cx.lineWidth = 3; cx.beginPath(); cx.moveTo(x - Math.cos(ang) * 22, y - Math.sin(ang) * 22); cx.lineTo(x, y); cx.stroke(); cx.strokeStyle = '#ffffff'; cx.lineWidth = 1; cx.stroke(); cx.fillStyle = '#ffffff'; cx.fillRect(x - 1, y - 1, 3, 3); } }); });
@@ -5344,8 +5352,8 @@ function drawSoulFlame(c, x, y, s = 1) {
   c.fillStyle = '#f0d8ff'; c.fillRect(x - 1, y - 1, 2, 3);
 }
 const SHADOW = {
-  // คุไนเงา (spread, 3 hits of 70): the shadow knight slashes the air and three spinning shadow blades fan out at the target
-  shd_kunai: { name: 'คุไนเงา', icon: '🗡️', async run(att, def) {
+  // พัดดาบเงา (spread, 3 hits of 70): the shadow knight slashes the air and three spinning shadow blades fan out at the target
+  shd_kunai: { name: 'พัดดาบเงา', icon: '🗡️', async run(att, def) {
     const p = castPose(att, 320, 420, 'shadow'); await p.charged; p.release();
     const m = mouthOf(att), c = centerOf(def), dir = Math.sign(c.x - m.x) || 1;
     fxs.push({ age: 0, life: .25, draw(cx, k) { cx.globalCompositeOperation = 'lighter'; cx.globalAlpha = 1 - k; cx.strokeStyle = '#d08aff'; cx.lineWidth = 2; cx.beginPath(); cx.arc(m.x - dir * 4, m.y, 12, dir > 0 ? -1.4 : 1.7, dir > 0 ? 1.4 : 4.5); cx.stroke(); } });
@@ -5365,8 +5373,8 @@ const SHADOW = {
     att.alpha = 1; const c = centerOf(att); shadowBurst(c.x, c.y, 14, 40);
     evaOn(att, 4); att.focusT = 4;
   } },
-  // ศรเงียบ (shot 140; silence 2 s): the lantern flares and a silent soul flame streaks out, no shake, no sound effect, then a crossed bubble
-  shd_arrow: { name: 'ศรเงียบ', icon: '🏮', async run(att, def) {
+  // ไฟโคมเงียบ (shot 140; silence 2 s): the lantern flares and a silent soul flame streaks out, no shake, no sound effect, then a crossed bubble
+  shd_arrow: { name: 'ไฟโคมเงียบ', icon: '🏮', async run(att, def) {
     const p = castPose(att, 480, 420, 'shadow');
     await tween(460, (k) => { const m = mouthOf(att); fxs.push({ age: 0, life: .03, draw(cx) { cx.globalCompositeOperation = 'lighter'; cx.globalAlpha = .4 + .5 * k; cx.fillStyle = 'rgba(160,74,255,.5)'; cx.beginPath(); cx.arc(m.x, m.y, 4 + 10 * k, 0, 7); cx.fill(); } }); });
     await p.charged; p.release();
@@ -5376,8 +5384,8 @@ const SHADOW = {
     silenceOn(def, 2);
     await damage(def, 90, { from: att });
   } },
-  // เขี้ยวเงียบ (melee r60, 120; 2 poison stacks): the black-armour knight bashes with its shield, then a crossed shadow cut leaves violet venom
-  shd_snake: { name: 'เขี้ยวเงียบ', icon: '⚔️', async run(att, def) {
+  // โล่ทมิฬ (melee r60, 120; 2 poison stacks): the black-armour knight bashes with its shield, then a crossed shadow cut leaves violet venom
+  shd_snake: { name: 'โล่ทมิฬ', icon: '⚔️', async run(att, def) {
     if (!inRange(att, def, 60)) await approach(att, def);
     await meleeStrike(att, def, { wind: 200, rush: 110, hits: 2, onHit(i, dir) {
       const t = centerOf(def); shake = Math.max(shake, 3); hitstop = .05;
@@ -5402,9 +5410,9 @@ const SHADOW = {
     await wait(300);
     if (inRange(att, def, R)) { mistBlind(def, 3.5); await damage(def, 45, { from: att }); } else await wait(400);
   } },
-  // เหล็กในเงา (passive; 30% of basic hits poison): the soul-lantern wraith's lantern flickers and a soul flame clings to whoever it hits
-  shd_sting: { name: 'เหล็กในเงา', icon: '🏮', passive: true, async run(att, def) {
-    att.venom = true; tag(att, '🏮 เหล็กในเงา (ติดตัว)', 'shadow');
+  // เปลวพิษวิญญาณ (passive; 30% of basic hits poison): the soul-lantern wraith's lantern flickers and a soul flame clings to whoever it hits
+  shd_sting: { name: 'เปลวพิษวิญญาณ', icon: '🏮', passive: true, async run(att, def) {
+    att.venom = true; tag(att, '🏮 เปลวพิษวิญญาณ (ติดตัว)', 'shadow');
     for (let i = 0; i < 4; i++) { await approach(att, def); await lungeHit(att, def, undefined); await wait(350); }
   } },
   // อวสานเงา (melee r62, 180; double damage below 35% HP): the light dies, the knight lord's greatsword grows a violet edge, one huge falling cleave
@@ -5536,7 +5544,7 @@ function drawEnt(c, e, t) {
   if (d.aura) drawAura(c, d.aura, a.x - d.size / 2, y, t, e.flip, d.size);
   c.globalAlpha = e.alpha;
   drawImg(c, img.cv, x, y, w, h, e.flip);
-  drawGlows(c, d, x, y, e.sx, e.sy, e.flip, t, e.alpha);
+  drawGlows(c, d, x, y, e.sx, e.sy, e.flip, t, e.alpha, img);
   if (e.flash > 0) { c.globalAlpha = e.flash * e.alpha; drawImg(c, img.white, x, y, w, h, e.flip); }
   if (e.status === 'shock' && Math.random() < .5) { const cc = centerOf(e); ps.add({ x: cc.x + (Math.random() - .5) * d.size * .5, y: cc.y + (Math.random() - .5) * 20, vx: 0, vy: 0, life: .1, size: 1, cols: ['#ffe14a'], glow: true }); }
   if (e.status === 'burn' && Math.random() < .5) { const cc = centerOf(e); ps.add(makeParticle('flame', cc.x + (Math.random() - .5) * d.size * .4, cc.y + 6)); }
@@ -5844,7 +5852,7 @@ const WATER_INFO = {
   tide_armor: ['วาฬเกราะ', 'ใส่ตัวเอง · โล่ 22% อยู่ 5 วิ + เกราะขึ้น', 'วงน้ำสามวงลอยขึ้นจากพื้นรอบตัว แล้วกลายเป็นฟองน้ำใสห่อตัว ตอนโดนตีฟองสว่างวาบและบอกว่าดูดดาเมจไปเท่าไหร่'],
   tide_ink: ['หมึกขี้เกียจ', 'ยิง · มองไม่เห็น 3.5 วิ', 'พองตัวขึ้น แล้วพ่นก้อนหมึกเป็นวิถีโค้ง หมึกหยดตามทาง กระทบแล้วเป็นรอยหมึกดำเปื้อนบนตัวศัตรู'],
   tide_whirl: ['มังกรทะเลลึก', 'โซน · รัศมี 90 · ระเบิดหลัง 0.7 วิ · ช้าลง 3 วิ', 'น้ำวนหมุนเป็นเกลียวก่อตัวใต้ศัตรู (เป็นวงเตือน) แล้วพุ่งเป็นงวงน้ำโยนศัตรูลอยขึ้น'],
-  tide_trident: ['ราชาวาฬผลึก', 'กระจาย 3 ลูก · ช้าลง 50%', 'เขาผลึกเรืองแสง แล้วยิงหอกน้ำสามเล่มออกจากปลายเขาเป็นรูปพัด เข้าเป้าทีละเล่ม แต่ละเล่มมีน้ำแตก'],
+  tide_trident: ['ราชาวาฬผลึก', 'กระจาย 3 ลูก · ช้าลง 50%', 'เขาผลึกเรืองแสง แล้วยิงหอกน้ำสามเล่มออกจากปลายเขาเป็นรูปพัด เข้าเป้าทีละเล่ม แต่ละเล่มมีน้ำแตก (ชื่อใหม่ เดิมชื่อตรีศูลสมุทร)'],
   tide_eternal: ['เลวีอาธานคลื่นคลั่ง', 'ใส่ตัวเอง · ฟื้น 18% + ล้างสถานะ + ฟื้นต่อเนื่อง 4 วิ', 'สายน้ำสองเส้นพันเป็นเกลียวลอยขึ้นรอบตัว ล้างสถานะผิดปกติทั้งหมด ฟื้นเลือดก้อนใหญ่ แล้วมีฟองเขียวลอยและฟื้นทุกวินาที'],
 };
 const waterCards = document.getElementById('water-cards');
@@ -5859,19 +5867,19 @@ const LEAF_INFO = {
   leaf_antler: ['กวางใบไม้', 'พุ่งชน · พลัง 150 · ติดราก 1.2 วิ', 'ก้มหัวเล็งเขากิ่งไม้ ใบไม้เรืองแสงที่ปลายเขา แล้ววิ่งพุ่งชน ทิ้งเงาสีเขียวและใบไม้ตามทาง ชนแล้วใบไม้แตกกระจาย รากโผล่จากพื้นพันขาศัตรูไว้'],
   leaf_spore: ['เห็ดง่วง', 'ระเบิดรอบตัว · รัศมี 100 · ใบ้ 2.5 วิ + พิษ 5 วิ', 'พองตัวจนหมวกเห็ดบาน แล้วปล่อยสปอร์เป็นโดมสีม่วงอ่อนรอบตัว ศัตรูในวงขึ้นป้ายใบ้ (ใช้สกิลไม่ได้) และติดพิษเสียเลือดทุกวินาที'],
   leaf_fang: ['หมาป่าไพร', 'ประชิด · ระยะ 58 · คูลดาวน์ 3.5 วิ · พิษ 5 วิ', 'ง้างสั้นแล้วพุ่งกัดเร็ว ขากรรไกรหนามสีเขียวงับปิด น้ำพิษกระเด็น ศัตรูมีฟองพิษลอยขึ้นจากตัว ใช้ได้ถี่ที่สุดในสายนี้'],
-  leaf_claw: ['กวางเขาพฤกษา', 'ตี 3 ครั้ง · ระยะ 60 · ดูดเลือด 30%', 'พุ่งเข้าไปฟาดเขาสามครั้งสลับบนล่าง ทุกครั้งมีแสงเขียวไหลจากศัตรูกลับเข้าตัวเราและเลือดขึ้น (ชื่อท่าเดิมของเสือ ยังไม่เปลี่ยน)'],
+  leaf_claw: ['กวางเขาพฤกษา', 'ตี 3 ครั้ง · ระยะ 60 · ดูดเลือด 30%', 'พุ่งเข้าไปฟาดเขาสามครั้งสลับบนล่าง ทุกครั้งมีแสงเขียวไหลจากศัตรูกลับเข้าตัวเราและเลือดขึ้น (ชื่อใหม่ เดิมชื่อกรงเล็บไพร)'],
   leaf_root: ['ตอไม้แก่', 'โซน · รัศมี 85 · ขึ้นหลัง 0.6 วิ · ติดราก 2 วิ', 'กระทืบพื้น รอยแตกวิ่งใต้ดินไปหาศัตรู วงเตือนสีเขียวกะพริบ แล้วรากหลายเส้นพุ่งขึ้นรอบวงฟาดเข้าหากลาง ใครอยู่ในวงติดรากเดินไม่ได้'],
-  leaf_trunk: ['หมาป่าเปลือกไม้', 'ประชิด · ระยะ 66 · พลัง 250 ง้างนาน', 'เถาวัลย์หนาเหมือนงวงงอกจากหลังแล้วชูขึ้นสูง (ง้างนาน ตามคูลดาวน์ง้าง 12) พุ่งเข้าไปแล้วฟาดลงเต็มแรง จอสั่นแรง ฝุ่นและใบไม้กระจาย ตัวศัตรูยุบ (ชื่อท่าเดิมของช้าง ยังไม่เปลี่ยน)'],
+  leaf_trunk: ['หมาป่าเปลือกไม้', 'ประชิด · ระยะ 66 · พลัง 250 ง้างนาน', 'เถาวัลย์หนาเหมือนงวงงอกจากหลังแล้วชูขึ้นสูง (ง้างนาน ตามคูลดาวน์ง้าง 12) พุ่งเข้าไปแล้วฟาดลงเต็มแรง จอสั่นแรง ฝุ่นและใบไม้กระจาย ตัวศัตรูยุบ (ชื่อใหม่ เดิมชื่องวงพฤกษา)'],
   leaf_wrath: ['เทพพนาลัย', 'กระจาย 5 ใบ · พิษ 40% ต่อใบ', 'ใบไม้หมุนเป็นวงรอบตัวตอนชาร์จ แล้วยิงใบมีดห้าใบเป็นรูปพัด ใบหมุนระหว่างบิน เข้าเป้าทีละใบ แต่ละใบมีโอกาสติดพิษ'],
-  leaf_ent: ['ราชาหมาป่าพงไพร', 'ติดตัว · ฟื้น 1.2% ทุกวินาที · ดาเมจที่ได้รับ -8%', 'ตอนโดนตีมีเกราะเปลือกไม้วาบและขึ้น -8% ทุกวินาทีมีใบไม้ร่วงและเลือดขึ้นเล็กน้อย ปุ่มทดลองจะลดเลือดเรา แล้วให้ศัตรูเข้ามาตีสองครั้ง (ชื่อท่าเดิมของเอนท์ ยังไม่เปลี่ยน)'],
+  leaf_ent: ['ราชาหมาป่าพงไพร', 'ติดตัว · ฟื้น 1.2% ทุกวินาที · ดาเมจที่ได้รับ -8%', 'ตอนโดนตีมีเกราะเปลือกไม้วาบและขึ้น -8% ทุกวินาทีมีใบไม้ร่วงและเลือดขึ้นเล็กน้อย ปุ่มทดลองจะลดเลือดเรา แล้วให้ศัตรูเข้ามาตีสองครั้ง (คงชื่อเดิม "ผู้พิทักษ์ป่า" เข้ากับราชาหมาป่าอยู่แล้ว)'],
 };
 const EARTH_INFO = {
   earth_shell: ['เต่าศิลา', 'ใส่ตัวเอง · โล่ 25% อยู่ 5 วิ', 'แผ่นหินลอยขึ้นจากพื้นหมุนรอบตัว แล้วประกบเป็นโล่หิน มีก้อนหินวนรอบตัวตลอดเวลาที่โล่ยังอยู่ ตอนโดนตีบอกว่าโล่ดูดดาเมจไปเท่าไหร่'],
   earth_crawl: ['หนอนดินเกียจคร้าน', 'ประชิด · ระยะ 60 · ช้าลง 2.5 วิ', 'ยืดตัวขึ้นสูง แล้วล้มตัวทับทั้งตัว ฝุ่นกับดินกระจาย ศัตรูยุบลงแล้วเดินช้าลง'],
   earth_horn: ['แรดผา', 'พุ่งชน · พลัง 190 · มึน 0.8 วิ', 'ก้มหัวเล็งเขาหิน แล้ววิ่งพุ่งชน ฝุ่นตลบตามหลัง ชนแล้วเศษหินแตกกระจาย ศัตรูกระเด็นและมีดาวหมุนเหนือหัว'],
-  earth_paw: ['เต่าผาหิน', 'ประชิด · ระยะ 64 · พลัง 260 ง้างนาน · มึน 1 วิ', 'ยกตัวขึ้นง้างนาน (ตามค่าง้าง 14) แล้วกระทืบลงเต็มแรง พื้นแตกเป็นแฉก แท่งหินพุ่งขึ้นรอบศัตรู จอสั่นแรง (ชื่อท่าเดิมของหมี ยังไม่เปลี่ยน)'],
+  earth_paw: ['เต่าผาหิน', 'ประชิด · ระยะ 64 · พลัง 260 ง้างนาน · มึน 1 วิ', 'ยกตัวขึ้นง้างนาน (ตามค่าง้าง 14) แล้วกระทืบลงเต็มแรง พื้นแตกเป็นแฉก แท่งหินพุ่งขึ้นรอบศัตรู จอสั่นแรง (ชื่อใหม่ เดิมชื่ออุ้งตีนผา)'],
   earth_boulder: ['ก้อนหินขี้เกียจ', 'ติดตัว · ดาเมจที่ได้รับ -12% · ติดสถานะสั้นลง 40% · เดินช้าลง 15%', 'ผิวเป็นหินแข็ง โดนตีแล้วขึ้น -12% ทุกครั้ง ถ้าโดนมึนหรือติดรากจะหายเร็วกว่าตัวอื่น ปุ่มทดลองจะให้ศัตรูเข้ามาตีสองครั้ง'],
-  earth_quill: ['แรดเกราะแร่', 'กระจาย 4 ลูก · เกราะลด 30% ต่อลูก', 'หนามแร่เหล็กตั้งขึ้นจากเกราะบนหลัง แล้วยิงออกเป็นรูปพัดสี่ลูก ลูกโค้งขึ้นแล้วปักเป้า (ชื่อท่าเดิมของเม่น ยังไม่เปลี่ยน)'],
+  earth_quill: ['แรดเกราะแร่', 'กระจาย 4 ลูก · เกราะลด 30% ต่อลูก', 'หนามแร่เหล็กตั้งขึ้นจากเกราะบนหลัง แล้วยิงออกเป็นรูปพัดสี่ลูก ลูกโค้งขึ้นแล้วปักเป้า (ชื่อใหม่ เดิมชื่อขนแร่)'],
   earth_quake: ['เต่าภูเขา', 'ระเบิดรอบตัว · รัศมี 130 · ง้างนานมาก · มึน 0.8 วิ', 'ท่าไม้ตาย: ยกตัวขึ้นช้าๆ จอมืดลงและสั่นมากขึ้นเรื่อยๆ มีหินร่วงลงมา แล้วกระแทกพื้น แผ่นดินแยกเป็นแฉก แท่งหินพุ่งขึ้นเป็นวงสามชั้นจากตัวออกไป'],
   earth_crystal: ['ไททันแรดคริสตัล', 'ใส่ตัวเอง · เกราะขึ้น + พลังโจมตีขึ้น 6 วิ', 'ผลึกบุษราคัมเรืองแสงพุ่งขึ้นเป็นวงรอบตัว ประกายทองลอยขึ้น แล้วขึ้นป้ายเกราะขึ้น (เขียว) กับพลังโจมตีขึ้น (ส้ม) ข้างหัว'],
 };
@@ -5888,8 +5896,8 @@ const BOLT_INFO = {
 const HOLY_INFO = {
   holy_wing: ['แกะปีกทิพย์', 'ใส่ตัวเอง · ฟื้นเลือด 15% + ล้างสถานะ', 'กางปีก ขนนกขาวร่วงลงรอบตัว วงแสงทองค่อยๆ ลดลงมาครอบตัว มีเสาแสงอ่อนๆ แล้วล้างสถานะผิดปกติทั้งหมดและฟื้นเลือด'],
   holy_lull: ['ทูตน้อยขี้เซา', 'ยิง · พลัง 80 · ใบ้ 2.5 วิ', 'เป่าลูกแสงง่วงๆ ลอยช้าๆ เป็นคลื่นไปหาเป้า มี Zz ลอยตาม ถึงแล้ววงรัศมีเล็กๆ ตกลงมาบนหัวศัตรู ศัตรูง่วงจนใช้สกิลไม่ได้'],
-  holy_blade: ['สิงห์น้อยรัศมี', 'ประชิด · ระยะ 62 · พลัง 170 · โล่ 10% 3 วิ', 'แสงรวมที่อุ้งเท้า แล้วตะครุบฟันเป็นเสี้ยวแสงทองกว้างหนึ่งครั้ง จากนั้นได้โล่แสงสีทองครอบตัว (ชื่อเดิมเป็นดาบของอัศวิน ตอนนี้เป็นกรงเล็บแสงของสิงห์)'],
-  holy_arrow: ['กิเลนรัศมี', 'ยิง · พลัง 160 · ตาพร่า 2 วิ', 'เขารวมแสง แล้วยิงลูกศรแสงเส้นเดียวเร็วมาก ถึงเป้าแล้วแตกเป็นแฉกแสงแปดทิศ จอแวบ ศัตรูตาพร่า (ตีธรรมดาพลาด 35%)'],
+  holy_blade: ['สิงห์น้อยรัศมี', 'ประชิด · ระยะ 62 · พลัง 170 · โล่ 10% 3 วิ', 'แสงรวมที่อุ้งเท้า แล้วตะครุบฟันเป็นเสี้ยวแสงทองกว้างหนึ่งครั้ง จากนั้นได้โล่แสงสีทองครอบตัว (ชื่อใหม่ เดิมชื่อดาบรัศมี)'],
+  holy_arrow: ['กิเลนรัศมี', 'ยิง · พลัง 160 · ตาพร่า 2 วิ', 'เขารวมแสง แล้วยิงลูกศรแสงเส้นเดียวเร็วมาก ถึงเป้าแล้วแตกเป็นแฉกแสงแปดทิศ จอแวบ ศัตรูตาพร่า (ตีธรรมดาพลาด 35%) (ชื่อใหม่ เดิมชื่อธนูรัศมี)'],
   holy_bell: ['ระฆังแตก', 'ระเบิดรอบตัว · รัศมี 110 · ใบ้ 1.5 วิ', 'ตัวสั่นเขย่าระฆังจนดัง "ก้อง~" วงเสียงสีทองสามวงกระจายออกจากตัว ศัตรูที่อยู่ในวงใช้สกิลไม่ได้'],
   holy_seraph: ['ราชสีห์ปีกขาว', 'ติดตัว · เลือดต่ำกว่า 35% ครั้งแรก: โล่ 28% + ล้างสถานะ + คุ้มกันสถานะ 2 วิ', 'ปุ่มทดลองลดเลือดให้เหลือ 37% แล้วให้ศัตรูเดินมาตี พอเลือดต่ำกว่า 35% ปีกหกปีกเปล่งแสงออก จอแวบ ขนนกร่วง ได้โล่แสงทอง และมีวงแสงทองหมุนรอบเท้าตอนคุ้มกัน'],
   holy_sun: ['กิเลนสุริยเทพ', 'โซน · รัศมี 100 · ลงหลัง 1.6 วิ · พลัง 200 · ตาพร่า 2 วิ', 'ท่าไม้ตาย: ดวงตะวันเล็กๆ ก่อตัวบนฟ้าเหนือศัตรู วงเตือนสีทองกะพริบเร็วขึ้นเรื่อยๆ จอมืดลง แล้วเสาแสงตะวันกระแทกลงกลางวง จอขาว ใครอยู่ในวงตาพร่า หลบออกจากวงได้ถ้าเดินทัน'],
@@ -5906,12 +5914,12 @@ const DARK_INFO = {
   dark_curse: ['จักรพรรดิค้างคาวคำสาป', 'โซน · รัศมี 90 · ลงหลัง 1.4 วิ · พลัง 110 · คำสาป + ลดพลังโจมตี + พิษ 5 วิ', 'วงอักขระม่วงหมุนเร็วขึ้นเรื่อยๆ ใต้ศัตรู จอมืดและสั่น แล้วเปลวไฟดำพุ่งขึ้นเป็นแฉกพร้อมวิญญาณลอยขึ้น ใครอยู่ในวงติดคำสาป ตีเบาลง และเสียเลือดจากพิษ หลบออกจากวงได้ถ้าเดินทัน'],
 };
 const SHADOW_INFO = {
-  shd_kunai: ['อัศวินเงา', 'กระจาย · 3 ครั้ง · พลัง 70', 'ฟันดาบกลางอากาศ แล้วใบมีดเงาสีม่วงสามใบหมุนพุ่งออกเป็นพัด โค้งเข้าหาเป้าทีละใบ โดนครบสามครั้ง (ชื่อเดิมยังเป็นคุไน รอเปลี่ยน)'],
+  shd_kunai: ['อัศวินเงา', 'กระจาย · 3 ครั้ง · พลัง 70', 'ฟันดาบกลางอากาศ แล้วใบมีดเงาสีม่วงสามใบหมุนพุ่งออกเป็นพัด โค้งเข้าหาเป้าทีละใบ โดนครบสามครั้ง (ชื่อใหม่ เดิมชื่อคุไนเงา)'],
   shd_flee: ['ผีเงาขี้อาย', 'ใส่ตัวเอง · หลบเก่งขึ้น + คริขึ้น 4 วิ', 'หน้าแดง ตัวจางโปร่งแสงแล้วลอยถอยหนี มีเงาม่วงตามหลัง ระหว่างนี้ตีธรรมดาที่มาโดนพลาด 40% และตัวเองคริขึ้น'],
-  shd_arrow: ['ภูตตะเกียงเงา', 'ยิง · พลัง 140 · ใบ้ 2 วิ', 'ตะเกียงสว่างขึ้นช้าๆ แล้วไฟวิญญาณสีม่วงพุ่งออกเป็นสายเงียบๆ ไม่มีจอสั่น โดนแล้วศัตรูใบ้ ใช้สกิลไม่ได้ (ชื่อเดิมยังเป็นศร รอเปลี่ยน)'],
-  shd_snake: ['อัศวินเงาเกราะทมิฬ', 'ประชิด · ระยะ 60 · พลัง 120 · พิษ 2 ชั้น', 'กระแทกโล่ก่อน แล้วฟันดาบเงาไขว้เป็นรูปกากบาท มีละอองพิษสีม่วงเขียวกระจาย ติดพิษสองชั้น (ชื่อเดิมยังเป็นเขี้ยวงู รอเปลี่ยน)'],
+  shd_arrow: ['ภูตตะเกียงเงา', 'ยิง · พลัง 140 · ใบ้ 2 วิ', 'ตะเกียงสว่างขึ้นช้าๆ แล้วไฟวิญญาณสีม่วงพุ่งออกเป็นสายเงียบๆ ไม่มีจอสั่น โดนแล้วศัตรูใบ้ ใช้สกิลไม่ได้ (ชื่อใหม่ เดิมชื่อศรเงียบ)'],
+  shd_snake: ['อัศวินเงาเกราะทมิฬ', 'ประชิด · ระยะ 60 · พลัง 120 · พิษ 2 ชั้น', 'กระแทกโล่ก่อน แล้วฟันดาบเงาไขว้เป็นรูปกากบาท มีละอองพิษสีม่วงเขียวกระจาย ติดพิษสองชั้น (ชื่อใหม่ เดิมชื่อเขี้ยวเงียบ)'],
   shd_mist: ['ม่านหมอกขี้เกียจ', 'ระเบิดรอบตัว · รัศมี 100 · พลัง 70 · มองไม่เห็น 3.5 วิ', 'พองตัวขึ้นแล้วพ่นหมอกเทาแผ่ออกเป็นวงกว้าง ใครอยู่ในวงมองไม่เห็น ตีธรรมดาพลาดง่าย'],
-  shd_sting: ['ภูตโคมวิญญาณ', 'ติดตัว · ตีธรรมดามีโอกาส 30% ติดพิษ', 'ปุ่มทดลองให้ตีธรรมดาสี่ครั้ง ครั้งไหนติดพิษจะมีไฟวิญญาณม่วงเกาะตัวศัตรูลอยขึ้น (ชื่อเดิมยังเป็นเหล็กใน รอเปลี่ยน)'],
+  shd_sting: ['ภูตโคมวิญญาณ', 'ติดตัว · ตีธรรมดามีโอกาส 30% ติดพิษ', 'ปุ่มทดลองให้ตีธรรมดาสี่ครั้ง ครั้งไหนติดพิษจะมีไฟวิญญาณม่วงเกาะตัวศัตรูลอยขึ้น (ชื่อใหม่ เดิมชื่อเหล็กในเงา)'],
   shd_end: ['จอมอัศวินเงา', 'ประชิด · ระยะ 62 · พลัง 180 · แรงสองเท่าถ้าศัตรูเลือดต่ำกว่า 35%', 'ท่าไม้ตาย: จอมืดลง เงาไหลลงมารวมที่ดาบใหญ่ แล้วฟันลงทีเดียวเป็นวงโค้งม่วงขนาดใหญ่ มีเสาแสงตกลงกลางตัว ถ้าเลือดศัตรูต่ำจะขึ้นคำว่าประหาร'],
   shd_void: ['เจ้าภูตเงา', 'ติดตัว · ค่าหลบ +8 · หลบแล้วตีครั้งถัดไปคริและแรงขึ้น 25%', 'ปุ่มทดลอง: ศัตรูเข้ามาตี เจ้าภูตละลายเป็นควันหลบไป แล้วสวนกลับด้วยการตีคริ ระหว่างสู้ตีธรรมดาที่มาโดนพลาด 20%'],
 };

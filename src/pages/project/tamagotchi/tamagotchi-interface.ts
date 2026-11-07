@@ -1060,6 +1060,8 @@ export interface IWikiData {
       enrage?: { sec: number; mult: number }
       ability: string
     }[]
+    // Every boss grows a stage at each of these seconds of a fight: +atk% ATK and +def% DEF.
+    grow: { secs: number[]; atk: number; def: number }
     perHit: { coin: number; raidToken: number }
     defeatedBonus: { coin: number; raidToken: number }
     killingBlowGrade: EnumEquipmentGrade

@@ -231,6 +231,8 @@ export const describeArenaEvent = (
       return st ? ['bad', `${n(e.who)} เสีย ${e.dmg} จาก${st.label}`] : null
     case 'rage':
       return ['bad', `${n(e.who)} คลั่ง! โจมตีแรงขึ้น`]
+    case 'grow':
+      return ['bad', `${n(e.who)} แข็งแกร่งขึ้น! ATK และ DEF เพิ่ม`]
     case 'thorns':
       return ['bad', `${n(e.who)} โดนสะท้อน ${e.dmg} จาก${n(e.by)}`]
     case 'status':

@@ -756,15 +756,21 @@ const MATS = {
   shdw:  ['#0a0814cc', '#221e36cc', '#363050cc', '#5a5290d4', '#a8a0d8e0'],
   ghost: ['#2a2650c4', '#6a6498cc', '#9a94c8d4', '#c8c4e8e0', '#f4f0ffec'],
   mist:  ['#2a2a56b0', '#5a5a94b8', '#8a8ac0c0', '#b8b8e0c8', '#f0eefcd4'],
-  dem:   ['#0e0c18', '#2c2840', '#46405e', '#675f82', '#9a92b8'],
-  dem2:  ['#0a0812', '#1e1a30', '#302a48', '#463e64', '#6e6690'],
+  dem: ['#0e0c18', '#3a3654', '#5a5676', '#7e7a9c', '#aaa6c4'],
+  dem2: ['#0a0812', '#2a2640', '#403c5a', '#5a5678', '#7e7a9c'],
   vio:   ['#2a0a4a', '#7a2ad0', '#a04aff', '#d08aff', '#f0d8ff'],
-  vwing: ['#1a0a2e', '#4a2288', '#7a3ac4', '#a460e8', '#d8a8ff'],
-  vwing2:['#12061e', '#341868', '#5a2aa0', '#7e44c8', '#b088f0'],
+  vwing: ['#1e0a2a', '#6a2a88', '#9a46b8', '#c070dc', '#e8b0f4'],
+  vwing2: ['#160820', '#4e1e68', '#783498', '#9c52bc', '#c888e0'],
   crys:  ['#3a0a5a', '#9a3ae0', '#c470ff', '#e8a8ff', '#ffffff'],
-  wr:    ['#0c0a18', '#2a2640', '#403a5c', '#5c5478', '#8c82a8'],
-  wr2:   ['#08060f', '#1c1830', '#2c2644', '#403858', '#645c84'],
+  wr: ['#0c0a16', '#35304a', '#55506c', '#77728e', '#a6a2bc'],
+  wr2: ['#08060f', '#25213a', '#3a3552', '#524c6c', '#76708e'],
   bone2: ['#1e1a22', '#7a7080', '#a89eb0', '#cfc6d6', '#f4eef8'],
+  vten: ['#14082a', '#3e1e70', '#5e2ea0', '#8448cc', '#b07ae8'],
+  iron: ['#0e0c16', '#3a3850', '#5e5c78', '#8a88a4', '#c4c2d8'],
+  shield: ['#0e0c16', '#3e3850', '#5c5470', '#7e7694', '#aaa2c0'],
+  cloak: ['#0e0a1a', '#3a2e58', '#584878', '#7a6a9c', '#a898c8'],
+  cloak2: ['#0a0714', '#2a2044', '#40345e', '#5a4c7c', '#7e70a0'],
+  skul: ['#221e22', '#7e7480', '#b0a6a8', '#d4ccc6', '#f2ece6'],
 };
 const GLOW = new Set(['fire', 'core', 'glowfin', 'foam', 'jglow', 'magglow', 'ice', 'sap', 'bloom', 'topaz', 'volt', 'vcore', 'halo', 'hlight', 'curse', 'eclipse', 'soulc', 'vio', 'crys']);
 const hexRgb = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16), h.length > 7 ? parseInt(h.slice(7, 9), 16) : 255];
@@ -1052,70 +1058,164 @@ function shEye(s, x, y, kind = 'o') {
 function ribbon(s, pts, r0, r1, k) { const n = pts.length - 1; for (let i = 0; i < n; i++) s.L(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], r0 + (r1 - r0) * i / n, k, r0 + (r1 - r0) * (i + 1) / n); }
 // A pixel arc of a circle centred (cx, cy), radius r, from angle a0 to a1 (radians), drawn as detail dots.
 function arc(s, cx, cy, r, a0, a1, c, rx = r) { const pts = []; for (let i = 0; i <= 8; i++) { const a = a0 + (a1 - a0) * i / 8; pts.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * r]); } return s.line(pts, c); }
-// A hunched horned demon on a 64-pixel layout, scaled by sc. tier 1 bare-handed, 2 holds a bone club, 3 has long horns and a spiked mace.
-function drawDemon(s, P, sc, tier) {
-  const [bx, by] = P.body, hx = P.head[0] * .6, hy = P.head[1] * .6, t = P.tail;
-  const X = (x) => x * sc + bx, Y = (y) => y * sc + by;
-  const E = (x, y, rx, ry, k) => s.E(X(x), Y(y), rx * sc, ry * sc, k);
-  const L = (x0, y0, x1, y1, r0, k, r1 = r0) => s.L(X(x0), Y(y0), X(x1), Y(y1), r0 * sc, k, r1 * sc);
-  const Pg = (pts, k) => s.P(pts.map(([x, y]) => [X(x), Y(y)]), k);
-  const D = (x, y, c) => s.d(X(x), Y(y), c);
-  const sp = (x, y, h, w, k, l) => s.spike(X(x), Y(y), h * sc, w * sc, k, l * sc);
-  ribbon(s, [[16, 42], [8, 46 - t], [4, 40 - t], [7, 33 - t]].map(([x, y]) => [X(x), Y(y)]), 1.6 * sc, .7 * sc, 'dem2'); Pg([[3, 30 - t], [8, 31 - t], [6, 37 - t]], 'vio');
-  L(26, 44, 23, 52, 3.2, 'dem2', 2.6); L(23, 52, 27, 59, 2.6, 'dem2', 2.2); E(28.4, 59.8, 3.4, 1.2, 'dem2');
-  L(34, 31, 42 + P.arm2[0], 41 + P.arm2[1], 2.4, 'dem2', 2);
-  E(31, 36, 10.5, 12.5, 'dem'); E(35, 27, 8.4, 6.4, 'dem'); E(32, 42, 6.4, 6, 'dem2');
-  for (let i = 0; i < 5; i++) sp(21 + i * 3.4, 27 + i * 2.2, 4.4, 1.5, 'dem2', -1.4);
-  for (const [x, y, x2, y2] of [[28, 33, 32, 35], [29, 38, 34, 40], [33, 29, 37, 31]]) s.line([[X(x), Y(y)], [X(x2), Y(y2)]], '#2c2840');
-  L(33, 45, 38, 53, 4.2, 'dem', 3.2); L(38, 53, 34, 59, 3.2, 'dem', 2.5); E(35.6, 59.8, 4.4, 1.4, 'dem');
-  for (const x of [38, 40, 42]) D(x, 61, '#d6ccbb');
-  E(41 + hx, 23 + hy, 8.4, 7.4, 'dem'); Pg([[45 + hx, 22 + hy], [53 + hx, 25.5 + hy], [45 + hx, 30 + hy]], 'dem');
-  Pg([[36 + hx, 19 + hy], [32 + hx, 12 + hy], [39 + hx, 17 + hy]], 'dem');
-  const hl = tier === 3 ? 1.35 : 1;
-  L(37 + hx, 17 + hy, 32 + hx, 8 * (2 - hl) + 1 + hy, 2.4, 'horn', 1.2); L(32 + hx, 8 * (2 - hl) + 1 + hy, 33 + hx, 2 * (2 - hl) + hy - (tier === 3 ? 4 : 0), 1.3, 'horn', .4);
-  L(44 + hx, 16 + hy, 46 + hx, 7 * (2 - hl) + 1 + hy, 2.4, 'horn', 1.2); L(46 + hx, 7 * (2 - hl) + 1 + hy, 51 + hx, 2 * (2 - hl) + hy - (tier === 3 ? 4 : 0), 1.3, 'horn', .4);
-  { const ex = X(43 + hx), ey = Y(21 + hy); shEye(s, ex, ey, 'n'); shEye(s, X(48 + hx), Y(21.6 + hy), 'n'); }
-  for (const x of [48, 50.5, 53]) D(x + hx, 29 + hy, '#f4eef8'); D(54 + hx, 25 + hy, '#0a0814');
-  L(38, 32, 47 + P.arm[0], 40 + P.arm[1], 3.4, 'dem', 2.8); L(47 + P.arm[0], 40 + P.arm[1], 50 + P.arm[0], 47 + P.arm[1], 2.8, 'dem', 2.2); E(50.6 + P.arm[0], 48 + P.arm[1], 3, 2.6, 'dem');
-  for (const x of [48.5, 50.5, 52.5]) D(x + P.arm[0], 50.4 + P.arm[1], '#d6ccbb');
-  if (tier === 3) {
-    L(40 + P.arm[0], 44 + P.arm[1], 58 + P.arm[0], 56 + P.arm[1], 1.3, 'armor'); E(61 + P.arm[0], 58 + P.arm[1], 5.6, 5.6, 'armor');
-    for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; sp(61 + P.arm[0] + Math.cos(a) * 5.4, 58 + P.arm[1] + Math.sin(a) * 5.4, 3, 1.3, 'armor', Math.cos(a) * 2.4); }
-    D(59.5 + P.arm[0], 57 + P.arm[1], '#d08aff'); D(63 + P.arm[0], 57 + P.arm[1], '#d08aff'); D(61 + P.arm[0], 60 + P.arm[1], '#7a2ad0');
-  } else if (tier === 2) {
-    L(46 + P.arm[0], 46 + P.arm[1], 55 + P.arm[0], 53 + P.arm[1], 1.4, 'bone'); E(56 + P.arm[0], 54 + P.arm[1], 3, 3, 'bone'); D(55 + P.arm[0], 53 + P.arm[1], '#a04aff');
+// Drawing on a design grid: scale sc, offset (ox, oy).
+function tf(s, sc, ox, oy) {
+  const X = (x) => x * sc + ox, Y = (y) => y * sc + oy, M = (pts) => pts.map(([x, y]) => [X(x), Y(y)]);
+  return {
+    X, Y, M,
+    E: (x, y, rx, ry, k) => s.E(X(x), Y(y), rx * sc, ry * sc, k),
+    L: (x0, y0, x1, y1, r0, k, r1 = r0) => s.L(X(x0), Y(y0), X(x1), Y(y1), r0 * sc, k, r1 * sc),
+    P: (pts, k) => s.P(M(pts), k),
+    d: (x, y, c) => s.d(X(x), Y(y), c),
+    ln: (pts, c, c2) => s.line(M(pts), c, c2),
+    R: (pts, r0, r1, k) => ribbon(s, M(pts), r0 * sc, r1 * sc, k),
+    sp: (x, y, h, w, k, l = 0) => s.spike(X(x), Y(y), h * sc, w * sc, k, l * sc),
+  };
+}
+// The hooded wraith from the owner's picture (fused form), on an 88-pixel grid. mini: the baby version.
+function drawWraith(s, P, sc, mini) {
+  const [bx, by] = P.body, t = P.tail, hx = P.head[0] * .5, hy = P.head[1] * .5, g = tf(s, sc, bx, by);
+  // purple tendrils streaming back from the hood
+  const ten = mini ? [[[42, 22], [32, 16 - t], [22, 18 - t], [17, 25 - t]], [[46, 18], [40, 9], [33, 5 - t]]]
+    : [[[42, 23], [33, 17 - t], [24, 16 - t], [18, 20 - t], [16, 27 - t]], [[44, 19], [38, 11], [31, 6 - t], [26, 6 - t]], [[47, 17], [45, 9], [44, 2 - t]],
+      [[50, 15], [50, 8], [47, 2]], [[41, 28], [35, 27], [29, 29 - t], [26, 33 - t]], [[43, 25], [37, 22], [31, 22 - t]]];
+  ten.forEach((p, i) => g.R(p.map(([x, y]) => [x + hx, y + hy]), i < 2 ? 2.6 : 2, .7, i % 2 ? 'vten' : 'vwing2'));
+  // back arm ending in dripping purple claws
+  g.R([[42, 40], [34, 45], [28, 50]], 4, 2.6, 'wr2');
+  if (!mini) for (const [x, y, l] of [[20, 62, -1], [23, 64, 0], [26, 63, .5], [29, 61, 1], [18, 57, -2], [31, 58, 2]]) g.R([[28, 49], [(28 + x) / 2 - l, (49 + y) / 2], [x, y]], 1.6, .5, 'vten');
+  else for (const x of [22, 26, 30]) g.R([[28, 50], [x, 58]], 1.4, .5, 'vten');
+  // robe: thick at the chest, swirling down to a hooked tail
+  const bp = [[45, 40, 11], [48, 49, 10.5], [52, 57, 9], [55, 64, 7.4], [53, 71, 6], [46, 76, 5], [38, 78, 4], [31, 76, 3.2], [28, 71, 2.4], [31, 67, 1.6]];
+  for (let i = 0; i < bp.length - 1; i++) g.L(bp[i][0], bp[i][1] + (i > 5 ? t * .4 : 0), bp[i + 1][0], bp[i + 1][1] + (i > 4 ? t * .4 : 0), bp[i][2], i > 5 ? 'wr2' : 'wr', bp[i + 1][2]);
+  // wrap folds across the robe, with violet bands
+  for (let i = 0; i < bp.length - 2; i++) for (const q of [.2, .55, .85]) {
+    const [x0, y0, r0] = bp[i], [x1, y1, r1] = bp[i + 1], x = x0 + (x1 - x0) * q, y = y0 + (y1 - y0) * q, r = (r0 + (r1 - r0) * q) * .85;
+    const nx = -(y1 - y0), ny = x1 - x0, n = Math.hypot(nx, ny) || 1, ux = nx / n * r, uy = ny / n * r;
+    g.ln([[x - ux, y - uy + 1.2], [x, y + 1.8], [x + ux, y + uy + 1.2]], q === .55 && i % 2 ? '#6a40a8' : q === .2 ? '#35304a' : '#6e6988');
+  }
+  // collar and hood (tall point, face a dark void with two angry violet eyes)
+  g.E(50 + hx, 38 + hy, 9, 5, 'wr');
+  g.ln([[43 + hx, 37 + hy], [50 + hx, 40 + hy], [57 + hx, 37 + hy]], '#35304a'); g.ln([[44 + hx, 39 + hy], [51 + hx, 42 + hy]], '#7a4ac0');
+  g.P([[54, 12], [58, 15], [63, 20], [66, 27], [65, 34], [61, 39], [55, 41], [48, 39], [42, 34], [40, 27], [43, 20], [48, 15]].map(([x, y]) => [x + hx, y + hy]), 'wr');
+  g.ln([[53 + hx, 14 + hy], [48 + hx, 20 + hy], [45 + hx, 28 + hy], [47 + hx, 35 + hy]], '#a6a2bc'); g.ln([[50 + hx, 16 + hy], [44 + hx, 24 + hy]], '#77728e');
+  g.P([[56, 19], [61, 22], [64, 28], [62, 35], [58, 37], [54, 33], [53, 25]].map(([x, y]) => [x + hx, y + hy]), 'void');
+  for (const [x, y, c] of [[55, 26, '#7a2ad0'], [56, 26, '#d08aff'], [57, 27, '#f0d8ff'], [58, 27, '#b04aff'], [60, 27, '#b04aff'], [61, 27, '#f0d8ff'], [62, 26, '#d08aff'], [63, 26, '#7a2ad0']]) g.d(x + hx, y + hy, c);
+  // front arm reaching to a violet vortex
+  g.R([[54, 44], [61, 46], [66, 49]], 3.8, 2.6, 'wr'); g.ln([[56, 45], [64, 48]], '#8c87a6');
+  for (const [x, y] of [[69, 50], [69, 53], [67, 55]]) g.R([[66, 49], [x, y]], 1.3, .4, 'vten');
+  if (!mini) {
+    let prev = null;
+    for (let i = 0; i <= 90; i++) { const an = i * .3, r = .8 + i * .1, p = [74 + Math.cos(an) * r, 58 + Math.sin(an) * r * .85]; if (prev) g.ln([prev, p], i % 9 < 3 ? '#9a8aff' : i % 9 < 6 ? '#5a4ae8' : '#3a2aa8'); prev = p; }
+    g.E(74, 58, 2, 2, 'vio');
   }
 }
-// An armoured skeleton with shield and sword on a 64-pixel layout, scaled by sc. king adds a crown, pauldrons and a long cape.
+// The horned demon from the picture, turned to face right, on an 80-pixel grid. tier 0 imp, 1 bare claws, 2 bone club, 3 spiked mace.
+function drawDemon(s, P, sc, tier) {
+  const [bx, by] = P.body, t = P.tail, hx = P.head[0] * .6, hy = P.head[1] * .6, g = tf(s, sc, bx, by);
+  const a = P.arm, a2 = P.arm2, hs = [.5, .7, .85, 1][tier];
+  const horn = (base, pts, r) => g.R([base, ...pts.map(([x, y]) => [base[0] + (x - base[0]) * hs, base[1] + (y - base[1]) * hs])].map(([x, y]) => [x + hx, y + hy]), r, .5, 'horn');
+  // tail
+  g.R([[21, 54], [12, 55 - t], [6, 50 - t], [5, 44 - t]], 2, .7, 'dem2'); g.P([[3, 41 - t], [7, 41 - t], [5, 46 - t]], 'dem2');
+  // back leg, crouched: hip, knee out to the back, clawed foot
+  g.L(29, 55, 20, 63, 4.6, 'dem2', 3.8); g.L(20, 63, 17, 74, 3.6, 'dem2', 2.6); g.E(15, 76, 4.6, 1.8, 'dem2');
+  for (const x of [10, 13, 16]) g.d(x, 77.5, '#d6ccbb');
+  // back arm down to the weapon
+  g.L(28, 34, 24, 47, 4.2, 'dem2', 3.6); g.L(24, 47, 29, 55 + a2[1] * .5, 3.4, 'dem2', 2.8); g.E(30, 55.5, 3.2, 2.8, 'dem2');
+  // torso: broad shoulders, deep chest, abs, leaning forward
+  g.E(30, 32, 8.6, 7, 'dem'); g.E(37, 40, 10.5, 10.5, 'dem'); g.E(37.5, 50, 8, 6.4, 'dem'); g.E(33, 54, 7, 3.6, 'dem2');
+  g.ln([[30, 39], [36, 42], [42, 41], [46, 37]], '#3a3654'); g.ln([[38, 43], [38, 55]], '#3a3654'); g.ln([[32, 47], [44, 47]], '#3a3654'); g.ln([[33, 51], [43, 51]], '#3a3654');
+  g.ln([[23, 30], [28, 26.6], [34, 27]], '#aaa6c4'); g.ln([[34, 35], [40, 34]], '#8e8aac'); g.ln([[29, 42], [30, 50]], '#3a3654');
+  if (tier >= 2) for (let i = 0; i < 4; i++) g.sp(23 + i * 3.4, 28 - i * 1.2, 3.4, 1.2, 'dem2', -1);
+  // front leg
+  g.L(40, 55, 48, 63, 5, 'dem', 4); g.L(48, 63, 46, 74, 3.8, 'dem', 2.8); g.E(48, 76, 5, 1.9, 'dem');
+  for (const x of [46, 49.5, 53]) g.d(x, 78, '#d6ccbb');
+  g.ln([[44, 58], [48, 63]], '#3a3654');
+  // head: pointed ears, brow, angry violet eyes, grinning fangs, C-shaped horns
+  g.sp(36 + hx, 21 + hy, 6, 2.2, 'dem', -3); g.sp(51 + hx, 20 + hy, 6, 2.2, 'dem', 3.4);
+  horn([35, 18], [[31, 12], [30, 6], [31.5, 2]], 2.6); horn([46, 18], [[49.5, 12], [49, 6], [46.5, 2.5]], 2.8);
+  g.E(43 + hx, 23 + hy, 8.4, 8.2, 'dem'); g.E(44 + hx, 29.4 + hy, 6.8, 4, 'dem');
+  g.ln([[37 + hx, 21 + hy], [42 + hx, 22.6 + hy], [44 + hx, 22.6 + hy], [50 + hx, 21 + hy]], '#2a2640');
+  for (const [x, y, c] of [[38, 23, '#7a2ad0'], [39, 23.6, '#d08aff'], [40, 24, '#f0d8ff'], [41, 24, '#b04aff'], [45, 24, '#b04aff'], [46, 24, '#f0d8ff'], [47, 23.6, '#d08aff'], [48, 23, '#7a2ad0']]) g.d(x + hx, y + hy, c);
+  g.ln([[39 + hx, 29 + hy], [49 + hx, 29 + hy]], '#1a1626');
+  for (const x of [40, 42.5, 45, 47.5]) g.d(x + hx, 28.6 + hy, '#f4eef8'); g.d(41 + hx, 30.4 + hy, '#f4eef8'); g.d(47 + hx, 30.4 + hy, '#f4eef8');
+  g.d(43.5 + hx, 26.4 + hy, '#2a2640');
+  // weapon held across the body in both hands, head out in front
+  if (tier === 3) {
+    g.L(22, 55, 56, 51, 1.4, 'iron');
+    for (let i = 0; i < 8; i++) { const an = i * Math.PI / 4; g.sp(63 + Math.cos(an) * 6, 51 + Math.sin(an) * 6, 3.4, 1.4, 'iron', Math.cos(an) * 2.6); }
+    g.E(63, 51, 6.4, 6.4, 'iron'); g.E(61, 50, 1.4, 1.3, 'vio'); g.E(65.5, 50, 1.4, 1.3, 'vio'); g.d(63, 53, '#3a3850');
+    for (const [x0, w] of [[58, 1], [63, -1], [67, 1]]) g.ln([[x0, 43], [x0 + w, 40], [x0, 37], [x0 + w, 34], [x0, 31]], '#6a3aa8');
+  } else if (tier === 2) {
+    g.L(26, 55, 52, 50, 1.6, 'bone'); g.E(55, 49.5, 3.6, 3.2, 'bone'); g.d(54, 49, '#7a2ad0');
+  }
+  // front arm, hand gripping the shaft
+  g.L(46, 33, 51, 43, 4, 'dem', 3.4); g.L(51, 43, 45, 52 + a[1] * .5, 3.4, 'dem', 2.8); g.E(44.5, 53, 3.4, 3, 'dem');
+  if (tier < 2) for (const x of [42, 44.5, 47]) g.d(x, 56, '#d6ccbb');
+  g.ln([[47, 34], [50, 40]], '#aaa6c4');
+}
+// The armoured skeleton from the picture, on a 64-pixel grid. king: the boss version.
 function drawSkel(s, P, sc, king) {
-  const [bx, by] = P.body, hx = P.head[0] * .5, hy = P.head[1] * .5;
-  const X = (x) => x * sc + bx, Y = (y) => y * sc + by;
-  const E = (x, y, rx, ry, k) => s.E(X(x), Y(y), rx * sc, ry * sc, k);
-  const L = (x0, y0, x1, y1, r0, k, r1 = r0) => s.L(X(x0), Y(y0), X(x1), Y(y1), r0 * sc, k, r1 * sc);
-  const Pg = (pts, k) => s.P(pts.map(([x, y]) => [X(x), Y(y)]), k);
-  const D = (x, y, c) => s.d(X(x), Y(y), c);
-  const ln = (pts, c) => s.line(pts.map(([x, y]) => [X(x), Y(y)]), c);
-  const sp = (x, y, h, w, k, l) => s.spike(X(x), Y(y), h * sc, w * sc, k, l * sc);
-  if (king) Pg([[26, 24], [12, 50], [8, 62], [18, 58], [22, 63], [28, 57], [34, 63], [38, 50], [38, 26]], 'crim2');
-  Pg([[24, 26], [17, 46], [13, 54], [20, 51], [24, 57], [29, 50], [34, 56], [38, 48], [38, 28]], 'wr');
-  L(28, 46, 26 + P.bf[0], 58 + P.bf[1], 1.5, 'bone2'); E(26 + P.bf[0], 59 + P.bf[1], 2.6, 1, 'bone2');
-  E(31, 34, 6.6, 8.4, 'bone'); for (const y of [30, 33, 36, 39]) ln([[27, y], [35, y + .6]], '#4a4050'); ln([[31, 26], [31, 44]], '#4a4050');
-  E(31, 45, 5.4, 3, 'bone'); Pg([[26, 43], [37, 43], [37, 47], [26, 47]], 'bark2'); D(31, 45, '#c48a16');
-  L(33, 46, 35 + P.bl[0], 58 + P.bl[1], 1.7, 'bone'); E(36 + P.bl[0], 59 + P.bl[1], 3, 1.1, 'bone');
-  L(33, 31, 45 + P.arm2[0], 27 + P.arm2[1], 1.5, 'bone2');
-  const sx = 45 + P.arm2[0], sy = 27 + P.arm2[1];
-  Pg([[sx - 1.4, sy - 1], [sx + 5, sy - 22], [sx + 7.6, sy - 21], [sx + 2, sy + .6]], 'steel'); ln([[sx + .5, sy - 2], [sx + 5.8, sy - 20]], '#d0dae6');
-  L(sx - 3, sy + 2.4, sx + 3, sy - 2.4, 1.1, 'horn');
-  for (const [x, y] of [[sx + 6, sy - 26], [sx + 9, sy - 30], [sx + 5, sy - 34]]) D(x, y, '#a04aff'), D(x + 1, y + 1, '#d08aff');
-  E(30 + hx, 19 + hy, 6.4, 6.2, 'bone'); E(31 + hx, 25 + hy, 4, 2, 'bone2');
-  Pg([[23 + hx, 19 + hy], [24 + hx, 11 + hy], [30 + hx, 8 + hy], [37 + hx, 11 + hy], [38 + hx, 19 + hy], [33 + hx, 16 + hy], [27 + hx, 16 + hy]], 'steel'); L(32 + hx, 12 + hy, 32 + hx, 20 + hy, .9, 'steel');
-  E(27 + hx, 20 + hy, 1.8, 2, 'void'); E(34 + hx, 20 + hy, 1.8, 2, 'void'); D(27 + hx, 20 + hy, '#b04aff'); D(34 + hx, 20 + hy, '#b04aff'); D(30 + hx, 23 + hy, '#2a2030');
-  for (const x of [28, 30, 32, 34]) D(x + hx, 25 + hy, '#2a2030');
-  if (king) { for (const [dx, h, l] of [[-5, 7, -1], [-1, 9, 0], [3, 7, 1], [7, 6, 2]]) sp(29 + dx + hx, 9 + hy, h, 1.6, 'gold', l); E(33 + hx, 9 + hy, 7, 1.6, 'gold'); D(33 + hx, 9 + hy, '#a04aff'); E(31, 29, 4.4, 2.4, 'steel'); E(21, 29, 0, 0, 'steel'); }
-  L(32, 29, 38, 36, 1.5, 'bone');
-  Pg([[35, 27], [50, 27], [50, 40], [43, 51], [35, 40]], 'steel'); ln([[36, 28.5], [49, 28.5], [49, 40], [43, 49.5], [36, 40], [36, 28.5]], '#b8c4ce');
-  ln([[43, 29], [41, 36], [45, 40], [43, 48]], '#2c2840'); D(43, 36, '#a04aff');
-  if (king) { Pg([[33, 24], [39, 22], [41, 28], [34, 30]], 'steel'); }
+  const [bx, by] = P.body, hx = P.head[0] * .5, hy = P.head[1] * .5, a2 = P.arm2, g = tf(s, sc, bx, by);
+  // sword smoke behind the blade
+  for (const [pts, r] of [[[[46, 26], [48, 18], [46, 12], [49, 5], [47, 0]], 2.2], [[[52, 18], [54, 11], [52, 6], [55, 1]], 1.8], [[[56, 12], [58, 6], [57, 1]], 1.4]]) g.R(pts.map(([x, y]) => [x + a2[0], y + a2[1]]), r, .6, 'shdw');
+  if (king) g.P([[16, 14], [8, 40], [6, 58], [12, 54], [16, 60], [22, 55], [26, 61], [30, 55], [36, 60], [40, 53], [44, 58], [42, 30], [36, 14]], 'cloak2');
+  // hanging bone legs under the tattered robe
+  g.L(21, 46, 20, 56, 1.3, 'skul'); g.E(19.4, 57, 2.2, 1, 'skul'); g.L(34, 48, 35.5, 60, 1.4, 'skul'); g.E(36.6, 61, 2.4, 1, 'skul');
+  // robe and cowl
+  g.P([[15, 15], [24, 12], [33, 13], [38, 18], [39, 25], [37, 30], [40, 40], [41, 50], [39, 55], [37, 51], [35, 56], [32, 51], [29, 57], [26, 51], [23, 55], [21, 49], [18, 52], [18, 44], [19, 34], [17, 26]], 'cloak');
+  for (const [p, c] of [[[[29, 35], [30, 45], [29, 54]], '#3a2e58'], [[[34, 34], [36, 44], [36, 52]], '#3a2e58'], [[[24, 36], [23, 46], [24, 53]], '#3a2e58'], [[[32, 36], [33, 48]], '#a898c8'], [[[20, 22], [24, 18], [30, 17]], '#a898c8']]) g.ln(p, c);
+  // ribs and the bony hand on the chest
+  g.E(26, 27, 5, 3.8, 'skul'); for (const y of [25.6, 27.4, 29.2]) g.ln([[22, y], [30, y + .4]], '#3a2e40'); g.ln([[26, 23.5], [26, 30.5]], '#3a2e40');
+  g.L(20, 28, 25, 27, .9, 'skul'); for (const y of [26, 27.4, 28.8]) g.ln([[25, y], [28, y - .3]], '#d4ccc6');
+  // belt
+  g.P([[19, 32], [32, 31.5], [32.5, 34], [19.5, 34.5]], 'bark2'); g.E(26, 33, 1.4, 1.2, 'iron');
+  // cowl round the head, skull face, helmet with a nose guard
+  g.E(23 + hx, 13 + hy, 8, 6.4, 'cloak');
+  g.E(23 + hx, 14 + hy, 4.4, 4.8, 'skul');
+  g.E(21.3 + hx, 13.2 + hy, 1.5, 1.4, 'void'); g.E(25 + hx, 13.2 + hy, 1.5, 1.4, 'void'); g.d(23.2 + hx, 15.4 + hy, '#2a2030');
+  if (king) { g.d(21.3 + hx, 13.2 + hy, '#b04aff'); g.d(25 + hx, 13.2 + hy, '#b04aff'); }
+  g.ln([[20 + hx, 17.4 + hy], [26.6 + hx, 17.4 + hy]], '#2a2030'); for (const x of [20.6, 22, 23.4, 24.8, 26]) g.d(x + hx, 17 + hy, '#f2ece6');
+  g.P([[17.5, 11.5], [18, 6.5], [21, 3.4], [25, 3.4], [28, 6.5], [28.6, 11.5], [26, 10.2], [20.4, 10.2]].map(([x, y]) => [x + hx, y + hy]), 'iron');
+  g.ln([[18.4 + hx, 10.6 + hy], [28 + hx, 10.6 + hy]], '#c4c2d8'); g.L(23.2 + hx, 6 + hy, 23.2 + hx, 14 + hy, .7, 'iron'); g.d(21.4 + hx, 6.2 + hy, '#e8ecff');
+  if (king) { for (const [dx, h, l] of [[-4.5, 5, -1], [-1.5, 6.5, 0], [1.5, 6.5, 0], [4.5, 5, 1]]) g.sp(23.2 + dx + hx, 4.4 + hy, h, 1.3, 'gold', l); g.E(23.2 + hx, 4.6 + hy, 5.6, 1.4, 'gold'); g.d(23.2 + hx, 4.6 + hy, '#b04aff'); }
+  // sword: bone forearm, hilt, long blade up to the right
+  const sx = a2[0], sy = a2[1];
+  g.L(31 + sx, 26 + sy, 38 + sx, 33 + sy, 1, 'skul'); g.E(39 + sx, 34 + sy, 1.8, 1.6, 'skul');
+  g.P([[41 + sx, 30 + sy], [57 + sx, 9 + sy], [61 + sx, 7 + sy], [59.4 + sx, 11 + sy], [44 + sx, 33 + sy]], 'iron'); g.ln([[43 + sx, 31 + sy], [58.6 + sx, 10 + sy]], '#3a2e58'); g.ln([[42 + sx, 30 + sy], [57.4 + sx, 9.4 + sy]], '#c4c2d8');
+  g.L(37.4 + sx, 31 + sy, 45.4 + sx, 37 + sy, 1.1, 'shield'); g.L(39.4 + sx, 35.4 + sy, 37.6 + sx, 38.6 + sy, 1, 'bark2'); g.E(37 + sx, 39.4 + sy, 1, 1, 'shield');
+  // kite shield on the left
+  g.P([[4, 15], [19.5, 17], [20.5, 29], [13, 42.5], [3.4, 28]], 'shield');
+  g.P([[6, 17], [18, 18.6], [18.8, 28.6], [13, 39.6], [5.4, 27.6]], 'cloak2');
+  g.ln([[12, 17.6], [12.6, 41]], '#aaa2c0'); g.ln([[5, 16], [19, 17.6]], '#d4ccec'); g.ln([[4.4, 17], [4, 27]], '#aaa2c0');
+  g.ln([[8, 22], [10, 26], [8.6, 30]], '#1a1626'); g.ln([[15, 25], [16.6, 30]], '#1a1626');
+  if (king) { g.E(12.4, 26, 2.4, 2.6, 'vio'); g.d(11.6, 25.4, '#f0d8ff'); }
+}
+// The skull from the picture, on an 80-pixel grid. winged: bat wings and the crystal crown.
+function drawSkull(s, P, sc, winged) {
+  const [bx, by] = P.body, j = P.jaw * 2, w = -7 * P.wing, g = tf(s, sc, bx, by);
+  if (winged) {
+    memWing(s, g.M([[29, 40]])[0], g.M([[19, 32 + w]])[0], g.M([[4, 40 + w], [6, 47 + w * .7], [13, 50 + w * .4], [20, 50 + w * .2]]), g.M([[28, 47]])[0], 'vwing', 'vwing2', 'dem2', 1);
+    memWing(s, g.M([[54, 40]])[0], g.M([[63, 31 + w]])[0], g.M([[78, 40 + w], [77, 46 + w * .7], [71, 49 + w * .4], [64, 49 + w * .2]]), g.M([[55, 47]])[0], 'vwing2', 'vwing', 'dem2', 1);
+    // crystal crown
+    for (const [b, tip, wd] of [[[41, 27], [40.5, 9.5], 3.2], [[35.7, 28], [32.4, 15.4], 2.4], [[31.5, 30.6], [24.6, 20.6], 2.4], [[46.3, 27.5], [47.8, 17.4], 2.2], [[51.5, 29], [56.4, 17.6], 2.6], [[27, 33], [21.6, 28], 1.4], [[55, 31], [59, 26.6], 1.4]]) {
+      const dx = tip[0] - b[0], dy = tip[1] - b[1], n = Math.hypot(dx, dy), px = -dy / n * wd, py = dx / n * wd;
+      g.P([b, [b[0] + dx * .3 + px, b[1] + dy * .3 + py], tip, [b[0] + dx * .3 - px, b[1] + dy * .3 - py]], 'crys');
+      g.ln([[b[0] + dx * .3 + px * .4, b[1] + dy * .3 + py * .4], [tip[0] - dx * .1, tip[1] - dy * .1]], '#ffffff');
+    }
+  }
+  // cranium turned a little to the right, cheekbones, cracks
+  g.E(41, 39, 14.5, 13, 'skul'); g.E(45, 50, 10.5, 4.6, 'skul'); g.E(31, 44, 3.4, 6, 'skul');
+  g.ln([[46, 26.5], [45, 30], [47, 32], [45.6, 35]], '#6e6470'); g.ln([[29, 34], [31, 37], [29.6, 40]], '#6e6470'); g.ln([[30, 40], [34, 44], [33, 48]], '#9a9092');
+  // eye sockets with violet glow, nose
+  g.E(40, 39, 3.8, 4, 'void'); g.E(50.4, 39, 3.2, 3.8, 'void'); g.E(40, 39.4, 1.8, 1.8, 'vio'); g.E(50.4, 39.4, 1.6, 1.7, 'vio'); g.d(39.4, 38.6, '#f0d8ff'); g.d(49.8, 38.6, '#f0d8ff');
+  g.P([[46.3, 42.6], [48, 46], [46.3, 47], [44.6, 46]], 'void');
+  // jaw hanging open, glowing orb inside
+  g.P([[39.4, 50], [53.6, 50], [52, 61 + j], [50, 63.6 + j], [42, 63.6 + j], [40, 61 + j]], 'void');
+  g.P([[38.6, 50.6], [40.4, 51], [41, 61 + j], [43, 63 + j], [50, 63 + j], [51.6, 61 + j], [52.6, 51], [54.4, 50.6], [53, 63 + j], [50.4, 66 + j], [42, 66 + j], [39.6, 63 + j]], 'skul');
+  for (let x = 41; x <= 53; x += 2) { g.d(x, 50.4, '#f2ece6'); g.d(x + 1, 50.4, '#4a4048'); }
+  for (let x = 42; x <= 50; x += 2) { g.d(x, 62.6 + j, '#f2ece6'); g.d(x + 1, 62.6 + j, '#4a4048'); }
+  g.E(45.6, 56 + j * .5, 3.8, 3.6, 'vio'); g.E(45, 55.4 + j * .5, 1.4, 1.2, 'crys'); g.d(44.6, 55 + j * .5, '#ffffff');
+  if (winged) for (const [x, y] of [[58, 58], [60, 62], [56, 66], [62, 54], [26, 60]]) g.d(x, y, '#b070e8');
 }
 const glowSap = (s, x, y) => s.d(x, y, '#f0ffe0').d(x + 1, y, '#a8ffa0').d(x, y - 1, '#a8ffa0').d(x, y + 1, '#4ad44a').d(x - 1, y, '#a8ffa0').d(x + 2, y, '#4ad44a');
 // A pointed leaf from (x, y) along angle a, with an optional vein colour.
@@ -2822,79 +2922,17 @@ const SPRITES = {
     s.d(cx - 13, cy - 1, '#ff9ab4').d(cx - 12, cy - 1, '#ff9ab4').d(cx + 11, cy - 1, '#ff9ab4').d(cx + 12, cy - 1, '#ff9ab4');
     for (const [x, y] of [[-8, -12], [3, -14], [10, -6], [-4, 12], [-16, 2]]) s.d(cx + x, cy + y, '#f0eefc');
   }, glows: [], emit: [{ x: 46, y: 18, type: 'zz', rate: .5 }], mouth: [36, 44] },
-  /* ----- Shadow line, redrawn from the owner's picture: hooded wraith, horned demon, armoured skeleton, winged skull ----- */
-  shade: { size: 48, rig: BLOB, hover: 5, draw(s, P) {
-    const [bx, by] = P.body, cx = 26 + bx, cy = 22 + by;
-    ribbon(s, [[cx - 3, cy + 12], [cx - 8, cy + 19], [cx - 5, cy + 24], [cx - 11, cy + 28]], 6, 1.2, 'wr2');
-    s.E(cx - 1, cy + 10, 8, 10, 'wr');
-    s.P([[cx - 9, cy + 15], [cx - 10, cy + 21], [cx - 6, cy + 18], [cx - 3, cy + 23], [cx + 1, cy + 18], [cx + 4, cy + 22], [cx + 8, cy + 15]], 'wr');
-    s.E(cx, cy, 10, 10, 'wr'); s.P([[cx - 6, cy - 6], [cx - 17, cy - 13], [cx - 13, cy - 3], [cx - 8, cy + 3]], 'wr');
-    s.E(cx + 2, cy + 1, 6, 6.6, 'void'); shEye(s, cx, cy - 1, 'n'); shEye(s, cx + 4, cy - 1, 'n');
-    s.line([[cx - 6, cy + 10], [cx + 4, cy + 12]], '#7a2ad0').line([[cx - 7, cy + 14], [cx + 3, cy + 16]], '#403a5c');
-    s.line([[cx - 15, cy - 11], [cx - 9, cy - 5]], '#7a2ad0');
-  }, glows: [[26, 21, '#b04aff', 4], [30, 21, '#b04aff', 4]], emit: [{ x: 14, y: 40, type: 'glint', rate: 1.5 }], mouth: [30, 27] },
-  imp: { size: 48, rig: BIPED, draw(s, P) {
-    const [bx, by] = P.body, hx = P.head[0] * .6 + bx, hy = P.head[1] * .6 + by, t = P.tail;
-    ribbon(s, [[16 + bx, 36 + by], [9 + bx, 39 + by - t], [6 + bx, 33 + by - t * 1.4]], 1.5, .8, 'dem2'); s.P([[3 + bx, 31 + by - t * 1.4], [8 + bx, 31 + by - t * 1.4], [6 + bx, 36 + by - t * 1.4]], 'vio');
-    s.L(22 + bx, 38 + by, 21 + P.bf[0], 45 + P.bf[1], 2, 'dem2'); s.E(21 + P.bf[0], 46 + P.bf[1], 2.6, 1.1, 'dem2');
-    s.L(22 + bx, 31 + by, 28 + P.arm2[0] + bx, 38 + by + P.arm2[1], 1.6, 'dem2');
-    s.E(23 + bx, 33 + by, 7, 8.5, 'dem'); s.E(25 + bx, 37 + by, 4, 4.4, 'dem2');
-    s.L(25 + bx, 40 + by, 26 + P.bl[0], 45 + P.bl[1], 2.4, 'dem', 2); s.E(26.6 + P.bl[0], 46 + P.bl[1], 3, 1.2, 'dem');
-    s.L(26 + bx, 31 + by, 33 + P.arm[0] + bx, 37 + by + P.arm[1], 1.8, 'dem'); s.d(34 + P.arm[0] + bx, 38 + by + P.arm[1], '#d6ccbb');
-    s.E(27 + hx, 21 + hy, 7.6, 6.8, 'dem'); s.P([[31 + hx, 21 + hy], [37.5 + hx, 24 + hy], [31 + hx, 27.5 + hy]], 'dem');
-    s.spike(23 + hx, 16 + hy, 5, 2, 'dem', -2); s.L(24 + hx, 16 + hy, 21 + hx, 9 + hy, 1.7, 'horn', .5); s.L(31 + hx, 16 + hy, 34 + hx, 8 + hy, 1.7, 'horn', .5);
-    shEye(s, 28 + hx, 20 + hy, 'n'); s.d(35 + hx, 27 + hy, '#ffffff').d(33 + hx, 27 + hy, '#ffffff'); s.d(36 + hx, 23 + hy, '#0a0814');
-  }, glows: [[29, 20, '#b04aff', 3]], emit: [], mouth: [37, 26] },
-  skull: { size: 56, rig: BLOB, hover: 6, draw(s, P) {
-    const [bx, by] = P.body, cx = 28 + bx, cy = 26 + by, j = P.jaw * 2;
-    for (const [dx, h, l] of [[-5, 10, -3], [-1, 13, 0], [4, 10, 3]]) { s.spike(cx + dx - 3, cy - 9, h, 2.4, 'vio', l); }
-    ribbon(s, [[cx - 4, cy + 12], [cx - 9, cy + 20], [cx - 5, cy + 27]], 4, 1, 'vio');
-    s.E(cx, cy, 13, 11.5, 'bone'); s.E(cx - 4, cy + 7, 7, 4, 'bone');
-    s.E(cx + 1, cy + 11 + j, 8, 3.2, 'bone2'); for (const x of [-4, -1, 2, 5]) s.d(cx + x, cy + 10 + j, '#2a2030');
-    s.E(cx - 5, cy + 1, 4.6, 5, 'void'); s.E(cx + 6, cy + 1, 4.6, 5, 'void'); s.E(cx - 5, cy + 1.6, 2.6, 3, 'vio'); s.E(cx + 6, cy + 1.6, 2.6, 3, 'vio');
-    s.P([[cx, cy + 5], [cx + 2, cy + 9], [cx - 2, cy + 9]], 'void');
-    s.line([[cx + 1, cy - 10], [cx + 3, cy - 6], [cx + 1, cy - 3]], '#6a5a74'); s.line([[cx - 10, cy - 3], [cx - 8, cy]], '#6a5a74');
-  }, glows: [[23, 27, '#b04aff', 5], [34, 27, '#b04aff', 5], [30, 5, '#a04aff', 5]], emit: [{ x: 28, y: 6, type: 'glint', rate: 2 }], mouth: [33, 38] },
-  wingskull: { size: 80, rig: FLY, hover: 7, fly: true, aura: { type: 'shadm', x: 40, y: 76, r: 30 }, draw(s, P) {
-    const [bx, by] = P.body, hx = P.head[0] * .5 + bx, hy = P.head[1] * .5 + by, w = -9 * P.wing, j = P.jaw * 2.4, o = (pts) => pts.map(([x, y]) => [x + bx, y + by]);
-    memWing(s, [49 + bx, 46 + by], [60 + bx, 28 + by + w], o([[76, 22 + w], [79, 36 + w * .8], [75, 46 + w * .6], [67, 52 + w * .3]]), [52 + bx, 56 + by], 'vwing2', 'vwing', 'wr', 2);
-    memWing(s, [31 + bx, 46 + by], [20 + bx, 28 + by + w], o([[4, 22 + w], [1, 36 + w * .8], [5, 46 + w * .6], [13, 52 + w * .3]]), [28 + bx, 56 + by], 'vwing', 'vwing2', 'wr', 2);
-    // crystal crown
-    for (const [dx, h, l] of [[-12, 12, -4], [-6, 17, -2], [0, 20, 0], [6, 17, 2], [12, 12, 4]]) s.spike(40 + dx + hx, 33 + Math.abs(dx) * .35 + hy, h, 2.6, 'crys', l);
-    s.E(40 + hx, 46 + hy, 15, 13.5, 'bone'); s.E(34 + hx, 55 + hy, 8, 4.4, 'bone');
-    s.line([[44 + hx, 33 + hy], [46 + hx, 39 + hy], [44 + hx, 44 + hy], [47 + hx, 48 + hy]], '#6a5a74'); s.line([[28 + hx, 41 + hy], [31 + hx, 44 + hy]], '#6a5a74');
-    s.E(34 + hx, 45 + hy, 4.8, 5.4, 'void'); s.E(47 + hx, 45 + hy, 4.8, 5.4, 'void'); s.E(34 + hx, 45.6 + hy, 2.8, 3.4, 'vio'); s.E(47 + hx, 45.6 + hy, 2.8, 3.4, 'vio');
-    s.P([[40.5 + hx, 50 + hy], [42.5 + hx, 54 + hy], [38.5 + hx, 54 + hy]], 'void');
-    s.E(41 + hx, 59 + hy + j, 9, 4, 'bone2'); s.E(41 + hx, 59.5 + hy + j, 5.4, 2.4, 'void');
-    for (const x of [34, 37, 40, 43, 46]) s.d(x + hx, 56.5 + hy + j * .6, '#f4eef8');
-    s.E(41 + hx, 60 + hy + j, 2.8, 2.8, 'vio');
-    for (const [x, y] of [[20, 20], [62, 18], [10, 52], [72, 56]]) s.d(x + bx, y + by, '#d08aff');
-  }, glows: [[34, 45, '#b04aff', 5], [47, 45, '#b04aff', 5], [40, 18, '#e8a8ff', 7], [41, 60, '#b04aff', 5]], emit: [{ x: 40, y: 20, type: 'glint', rate: 2 }], mouth: [41, 60] },
-  demon1: { size: 56, rig: BIPED, draw(s, P) { drawDemon(s, P, .875, 1); }, glows: [[40, 20, '#b04aff', 3], [42, 21, '#b04aff', 3]], emit: [], mouth: [48, 26] },
-  demon2: { size: 64, rig: BIPED, draw(s, P) { drawDemon(s, P, 1, 2); }, glows: [[44, 21, '#b04aff', 3], [49, 22, '#b04aff', 3]], emit: [], mouth: [54, 26] },
-  demon3: { size: 80, rig: BIPED, aura: { type: 'shadm', x: 40, y: 76, r: 30 }, draw(s, P) { drawDemon(s, P, 1.25, 3); }, glows: [[54, 27, '#b04aff', 4], [60, 28, '#b04aff', 4], [75, 71, '#d08aff', 4]], emit: [{ x: 70, y: 66, type: 'glint', rate: 2 }], mouth: [68, 33] },
-  skelknight: { size: 64, rig: BIPED, draw(s, P) { drawSkel(s, P, 1, false); }, glows: [[27, 20, '#b04aff', 3], [34, 20, '#b04aff', 3]], emit: [{ x: 50, y: 6, type: 'glint', rate: 1.5 }], mouth: [31, 24] },
-  skelking: { size: 96, rig: BIPED, aura: { type: 'bosss', x: 48, y: 92, r: 36 }, draw(s, P) { drawSkel(s, P, 1.5, true); }, glows: [[41, 30, '#b04aff', 4], [51, 30, '#b04aff', 4], [75, 12, '#a04aff', 7]], emit: [{ x: 80, y: 10, type: 'glint', rate: 2 }, { x: 40, y: 60, type: 'ember', rate: 1 }], mouth: [46, 36] },
-  wraith: { size: 88, rig: BLOB, hover: 6, aura: { type: 'twins', x: 44, y: 84, r: 34 }, draw(s, P) {
-    const [bx, by] = P.body, t = P.tail, hx = P.head[0] * .5, hy = P.head[1] * .5, m = (pts) => pts.map(([x, y]) => [x + bx, y + by]);
-    // tendrils fanning over and behind the hood
-    for (const [pts, r] of [[[[38, 18], [28, 8 - t], [20, 6 - t], [12, 10 - t]], 2.6], [[[40, 14], [34, 4], [28, 0 - t], [20, 0 - t]], 2.2], [[[34, 24], [22, 18], [14, 20 - t], [8, 26 - t]], 2.4]]) ribbon(s, m(pts), r, .8, 'vio');
-    // body: a swirling S-curve robe that tapers to a hooked tail
-    const bp = [[44, 34], [47, 46], [49, 58], [45, 68], [37, 74], [28, 72 + t * .4], [23, 64 + t * .4]];
-    ribbon(s, m(bp), 13, 2.2, 'wr');
-    bp.forEach(([x, y], i) => { const r = 13 - i * 1.8; if (i > 0 && i < 6) { s.line(m([[x - r * .8, y - 1], [x + r * .8, y + 2]]), i % 2 ? '#5c5478' : '#7a2ad0'); s.line(m([[x - r * .7, y + 3], [x + r * .7, y + 5]]), '#2a2640'); } });
-    // clawed fins of violet flame at the lower left
-    for (const [x, y, h, l] of [[20, 60, 12, -4], [16, 54, 10, -4], [22, 50, 9, -3]]) { s.spike(x + bx, y + by, h, 2.4, 'vio', l); }
-    // back arm with a flame claw
-    ribbon(s, m([[40, 42], [32, 50], [27, 56]]), 4, 2.2, 'wr2'); for (const dx of [-3, 0, 3]) s.spike(26 + dx + bx, 58 + by, 7, 1.4, 'vio', dx * .5);
-    // hood and face
-    s.E(44 + hx + bx, 24 + hy + by, 14, 15, 'wr'); s.P(m([[34, 14], [22, 8], [28, 20], [32, 30]]), 'wr');
-    s.E(48 + hx + bx, 26 + hy + by, 8, 9, 'void'); shEye(s, 45 + hx + bx, 23 + hy + by, 'n'); shEye(s, 51 + hx + bx, 23 + hy + by, 'n'); shEye(s, 45 + hx + bx, 24 + hy + by, 'n');
-    // front arm reaching out to a violet vortex
-    ribbon(s, m([[52, 38], [62, 36 - t * .4], [70, 33]]), 4.6, 2.8, 'wr'); for (const dy of [-3, 0, 3]) s.spike(72 + bx, 33 + dy + by, 7, 1.4, 'vio', 3);
-    for (let i = 0; i < 40; i++) { const a = i * .5, r = 1.5 + i * .27; s.d(80 + bx + Math.cos(a) * r, 36 + by + Math.sin(a) * r * .9, i % 3 ? '#7a2ad0' : '#4a3ae8'); }
-    s.E(80 + bx, 36 + by, 2.4, 2.4, 'vio');
-  }, glows: [[45, 23, '#b04aff', 5], [51, 23, '#b04aff', 5], [80, 36, '#a04aff', 9], [20, 54, '#a04aff', 5]], emit: [{ x: 60, y: 60, type: 'glint', rate: 2 }, { x: 30, y: 70, type: 'smoke', rate: 2 }], mouth: [50, 30] },
+  /* ----- Shadow line, drawn as close as possible to the owner's picture: hooded wraith, horned demon with a mace, armoured skeleton, crowned winged skull ----- */
+  shade: { size: 48, rig: BLOB, hover: 5, draw(s, P) { drawWraith(s, P, .52, true); }, glows: [[30, 14, '#b04aff', 4]], emit: [], mouth: [32, 20] },
+  imp: { size: 48, rig: BIPED, draw(s, P) { drawDemon(s, P, .58, 0); }, glows: [[25, 14, '#b04aff', 3]], emit: [], mouth: [27, 17] },
+  demon1: { size: 56, rig: BIPED, draw(s, P) { drawDemon(s, P, .69, 1); }, glows: [[30, 16, '#b04aff', 3]], emit: [], mouth: [32, 20] },
+  demon2: { size: 64, rig: BIPED, draw(s, P) { drawDemon(s, P, .8, 2); }, glows: [[34, 19, '#b04aff', 3]], emit: [], mouth: [37, 23] },
+  demon3: { size: 80, rig: BIPED, aura: { type: 'shadm', x: 34, y: 78, r: 30 }, draw(s, P) { drawDemon(s, P, 1, 3); }, glows: [[43, 24, '#b04aff', 4], [63, 50, '#a04aff', 6], [63, 36, '#7a3ac4', 6]], emit: [{ x: 63, y: 40, type: 'glint', rate: 1.5 }], mouth: [46, 29] },
+  skull: { size: 56, rig: BLOB, hover: 6, draw(s, P) { drawSkull(s, P, .78, false); }, glows: [[31, 31, '#b04aff', 3], [39, 31, '#b04aff', 3], [36, 44, '#a04aff', 5]], emit: [], mouth: [36, 44] },
+  wingskull: { size: 80, rig: FLY, hover: 6, fly: true, aura: { type: 'shadm', x: 42, y: 76, r: 30 }, draw(s, P) { drawSkull(s, P, 1, true); }, glows: [[40, 39, '#b04aff', 4], [50, 39, '#b04aff', 4], [45, 56, '#a04aff', 8], [40, 14, '#e8a8ff', 6]], emit: [{ x: 40, y: 16, type: 'glint', rate: 2 }], mouth: [46, 56] },
+  skelknight: { size: 64, rig: BIPED, hover: 3, draw(s, P) { drawSkel(s, P, 1, false); }, glows: [[52, 8, '#7a3ac4', 6]], emit: [{ x: 52, y: 6, type: 'smoke', rate: 1.5 }], mouth: [23, 17] },
+  skelking: { size: 96, rig: BIPED, hover: 4, aura: { type: 'bosss', x: 40, y: 94, r: 36 }, draw(s, P) { drawSkel(s, P, 1.5, true); }, glows: [[32, 20, '#b04aff', 3], [37.5, 20, '#b04aff', 3], [18.6, 39, '#a04aff', 6], [78, 12, '#7a3ac4', 8]], emit: [{ x: 78, y: 8, type: 'smoke', rate: 2 }], mouth: [35, 26] },
+  wraith: { size: 88, rig: BLOB, hover: 6, aura: { type: 'twins', x: 44, y: 84, r: 34 }, draw(s, P) { drawWraith(s, P, 1, false); }, glows: [[58, 27, '#b04aff', 4], [61, 27, '#b04aff', 4], [74, 58, '#6a3ad8', 10]], emit: [{ x: 74, y: 58, type: 'glint', rate: 2 }, { x: 24, y: 62, type: 'smoke', rate: 1.5 }], mouth: [58, 32] },
 };
 // Animations are sampled from continuous pose curves (many in-between frames) and baked lazily,
 // so every frame keeps crisp pixel shading. Walk/idle loop; attack/cast/hurt run once (0..1).

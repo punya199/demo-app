@@ -24,11 +24,11 @@ describe('ResetWikiTab', () => {
     ).toBeTruthy()
     expect(screen.getByText('ทุกชั่วโมงตรง')).toBeTruthy()
     expect(screen.getByText(/^ทุก 3 ชม\. นับจาก 00:00 น\./)).toBeTruthy()
-    // Raid (hourly) next reset is 15:00; the monthly season is the 1st at 00:00
+    // Raid (hourly) next reset is 15:00; the weekly season is Monday 00:00
     const nextOf = (event: string) =>
       within(rows.find((row) => within(row).queryByText(event))!).getAllByRole('cell')[3]
         .textContent
     expect(nextOf('👹 Boss Raid')).toMatch(/15:00 น\.$/)
-    expect(nextOf('🏆 PvP: ซีซัน')).toMatch(/ 1 .+ 00:00 น\.$/)
+    expect(nextOf('🏆 PvP: ซีซัน')).toMatch(/ 9 .+ 00:00 น\.$/)
   })
 })

@@ -164,7 +164,7 @@ export const describeReset = (resetsAt: string, now: Date) => {
 }
 
 // How the server schedules a reset, all on the Thai clock (UTC+7, no DST): quest day and PvP
-// attempts at midnight, weekly quests and the world boss on Monday 00:00, PvP seasons on the 1st,
+// attempts at midnight, weekly quests and the world boss on Monday 00:00, PvP seasons on Monday 00:00 too,
 // and boss attempts in `hours`-long windows counted from midnight (as daily-fights.ts).
 export type ResetSchedule =
   | { kind: 'daily' }

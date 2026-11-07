@@ -1,3 +1,10 @@
+# [1.58.0](https://github.com/punya199/demo-app/compare/v1.57.0...v1.58.0) (2026-11-07)
+
+
+### New
+
+* split pet combat status into Offensive / Defensive / Other tabs ([584abbb](https://github.com/punya199/demo-app/commit/584abbb62efe813fd729f1113a7cd34a9f6f6660))
+
 # [1.57.0](https://github.com/punya199/demo-app/compare/v1.56.0...v1.57.0) (2026-11-07)
 
 

@@ -535,7 +535,7 @@ describe('set effects in replays', () => {
     expect(describeSetEffect({ shieldPct: 0.04, shieldRefresh: 0.04 })).toBe(
       'เริ่มสู้ด้วยโล่ 4% ของ HP · ได้โล่ 4% ของ HP ทุก 12 วิ'
     )
-    expect(describeSetEffect({ regenPct: 0.045 })).toBe('ฟื้น HP 0.14% ของ HP สูงสุดทุกวินาที')
+    expect(describeSetEffect({ regenPct: 0.00135 })).toBe('ฟื้น HP 0.14% ของ HP สูงสุดทุกวินาที')
     expect(describeSetEffect({ evasion: 0.15, dodgeCdCutSec: 4, afterDodgeBonus: 0.85 })).toBe(
       'EVA +15 · คูลดาวน์สกิลหลบลดลง 4 วิ · หลบได้แล้ว การโจมตีครั้งถัดไปติดคริและแรงขึ้น 85%'
     )

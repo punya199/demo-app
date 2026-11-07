@@ -40,7 +40,7 @@
         "assets": [
           "package.json",
           "CHANGELOG.md",
-          "src/pages/project/tamagotchi/patch-notes.ts"
+          "src/pages/project/tamagotchi/meta/patch-notes.ts"
         ],
         "message": "chore(release)[ci skip]: ${nextRelease.version}"
       }

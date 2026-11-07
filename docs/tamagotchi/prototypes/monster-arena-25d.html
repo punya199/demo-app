@@ -164,7 +164,7 @@ td.st { white-space: nowrap; color: var(--muted) }
       <option value="bolt">มอนธาตุอสนี + สกิล</option>
       <option value="holy">มอนธาตุรัศมี + สกิล</option>
       <option value="dark">มอนธาตุรัตติกาล + สกิล</option>
-      <option value="shadow">มอนธาตุเงา (ภาพนิ่ง รอเลือกแบบ)</option>
+      <option value="shadow">มอนธาตุเงา + สกิล</option>
       <option value="plan">แผนออกแบบทั้ง 8 สาย</option>
     </select>
     <span class="hint" id="jump-hint">ฉากต่อสู้อยู่บนสุดเสมอ</span>
@@ -172,7 +172,7 @@ td.st { white-space: nowrap; color: var(--muted) }
   <header style="order:0">
     <div class="eyebrow">ข้อเสนองานภาพ · ตัวอย่างให้ดูก่อน</div>
     <h1>มอนอารีนา <span class="tag">โฉมใหม่</span></h1>
-    <p class="lede">ตอนนี้ทำแล้ว 7 สาย: เพลิง วารี พฤกษ์ ศิลา อสนี รัศมี และรัตติกาล ส่วนสายเงามีภาพนิ่งให้เลือกแบบ สนามมุมเฉียงแบบ 2.5D สไตล์พิกเซลอาร์ต มอนมีเงาและแสงจากมุมซ้ายบน ท่าโจมตี หลบ ตั้งรับ และสกิลมีเอฟเฟกต์ของแต่ละธาตุ ทุกอย่างในหน้านี้วาดด้วยโค้ด ไม่มีรูปจากที่อื่น กดปุ่มด้านล่างฉากเพื่อลองได้เลย</p>
+    <p class="lede">ตอนนี้ทำครบ 8 สาย: เพลิง วารี พฤกษ์ ศิลา อสนี รัศมี รัตติกาล และเงา สนามมุมเฉียงแบบ 2.5D สไตล์พิกเซลอาร์ต มอนมีเงาและแสงจากมุมซ้ายบน ท่าโจมตี หลบ ตั้งรับ และสกิลมีเอฟเฟกต์ของแต่ละธาตุ ทุกอย่างในหน้านี้วาดด้วยโค้ด ไม่มีรูปจากที่อื่น กดปุ่มด้านล่างฉากเพื่อลองได้เลย</p>
   </header>
 
   <section aria-labelledby="battle-h" data-group="battle" style="order:1">
@@ -203,8 +203,8 @@ td.st { white-space: nowrap; color: var(--muted) }
         <div class="row" id="holy-skills"></div></div>
         <div class="skgroup" data-el="dark"><div class="ctl-title">สกิลธาตุรัตติกาลในเกม 8 ท่า</div>
         <div class="row" id="dark-skills"></div></div>
-        <div class="skgroup" data-el="shadow"><div class="ctl-title">สกิลธาตุเงา</div>
-        <div class="hint">ยังไม่ได้ทำ รอเลือกแบบมอนสายเงาก่อน แล้วค่อยทำท่าทางและสกิล 8 ท่า</div></div>
+        <div class="skgroup" data-el="shadow"><div class="ctl-title">สกิลธาตุเงาในเกม 8 ท่า</div>
+        <div class="row" id="shadow-skills"></div></div>
         <div class="skgroup" data-el="earth"><div class="ctl-title">สกิลธาตุศิลาในเกม 8 ท่า</div>
         <div class="row" id="earth-skills"></div></div>
         <div class="skgroup" data-el="other"><div class="ctl-title">เอฟเฟกต์ธาตุอื่น (ร่างแรก รอออกแบบ)</div>
@@ -216,7 +216,7 @@ td.st { white-space: nowrap; color: var(--muted) }
           <label class="sel">มอนของเรา<select id="pick-me"></select></label>
           <label class="sel">คู่ต่อสู้<select id="pick-foe"></select></label>
         </div>
-        <div class="hint">สนามกว้างกว่าจอสามเท่าทั้งสองด้าน กล้องเลื่อนตามการต่อสู้ ดูตำแหน่งได้จากแผนที่ย่อมุมขวาล่าง · ในโหมดสาธิต มอนจะเดินไปทั่วสนามเอง เข้าประชิดเพื่อตี และถอยไปยืนห่างเพื่อใช้สกิล · เลือกบอสไฟแล้วสนามเปลี่ยนเป็นธีมลาวา บอสพฤกษ์เป็นธีมป่า บอสศิลาเป็นธีมหุบผา บอสรัศมีเป็นธีมวิหาร</div>
+        <div class="hint">สนามกว้างกว่าจอสามเท่าทั้งสองด้าน กล้องเลื่อนตามการต่อสู้ ดูตำแหน่งได้จากแผนที่ย่อมุมขวาล่าง · ในโหมดสาธิต มอนจะเดินไปทั่วสนามเอง เข้าประชิดเพื่อตี และถอยไปยืนห่างเพื่อใช้สกิล · เลือกบอสไฟแล้วสนามเปลี่ยนเป็นธีมลาวา บอสพฤกษ์เป็นธีมป่า บอสศิลาเป็นธีมหุบผา บอสรัศมีเป็นธีมวิหาร บอสเงาเป็นธีมสุสาน</div>
       </div>
     </div>
   </section>
@@ -477,15 +477,15 @@ td.st { white-space: nowrap; color: var(--muted) }
   </section>
 
   <section aria-labelledby="sline-h" data-group="shadow" style="order:24">
-    <div class="eyebrow">สายที่แปด · ภาพนิ่งให้เลือกแบบก่อน</div>
+    <div class="eyebrow">สายที่แปด</div>
     <h2 id="sline-h">สายเงา 11 ร่าง</h2>
-    <p class="lede">คุณเลือกแบบ A กับ B จึงรวมเป็นสายเดียว สายหลักเป็นอัศวินเงา (ชุดเกราะที่มีเงาเป็นตัวข้างใน) และสายรองเป็นภูตฮู้ดเงา สีหลักเป็นเหล็กดำ ผ้าม่วงเทา และแสงม่วง เงาจิ๋วเป็นภูตผ้าคลุมตัวกลม โตแล้วไปสวมหมวกเหล็กเป็นหมวกผีน้อย จากนั้นแยกเป็นอัศวินเงา → อัศวินเงาเกราะทมิฬ → จอมอัศวินเงา หรือถอดหมวกกลับเป็นภูต: ภูตตะเกียงเงา → ภูตโคมวิญญาณ → เจ้าภูตเงา ถือเคียว ร่างแย่ยังตลก (ผีเงาขี้อาย ม่านหมอกขี้เกียจ) ตอนนี้เป็นภาพนิ่ง (เลือกดูได้ที่เมนู "ดูส่วน" ด้านบน → มอนธาตุเงา) ถ้าผ่านแล้วจะทำท่าทางกับสกิล 8 ท่า</p>
+    <p class="lede">คุณเลือกแบบ A กับ B จึงรวมเป็นสายเดียว สายหลักเป็นอัศวินเงา (ชุดเกราะที่มีเงาเป็นตัวข้างใน) และสายรองเป็นภูตฮู้ดเงา สีหลักเป็นเหล็กดำ ผ้าม่วงเทา และแสงม่วง เงาจิ๋วเป็นภูตผ้าคลุมตัวกลม โตแล้วไปสวมหมวกเหล็กเป็นหมวกผีน้อย จากนั้นแยกเป็นอัศวินเงา → อัศวินเงาเกราะทมิฬ → จอมอัศวินเงา หรือถอดหมวกกลับเป็นภูต: ภูตตะเกียงเงา → ภูตโคมวิญญาณ → เจ้าภูตเงา ถือเคียว ร่างแย่ยังตลก (ผีเงาขี้อาย ม่านหมอกขี้เกียจ) อัศวินเดินด้วยขา ภูตทุกตัวลอยเหนือพื้น ลองในฉากต่อสู้ได้ที่ช่องมอนของเรา "สายเงา" และเลือก "บอส · ราชาม่านเงา" ที่ช่องคู่ต่อสู้ สนามจะเปลี่ยนเป็นธีมสุสาน</p>
     <div class="lineup" id="lineup-shadow"></div>
     <div class="evo" id="evo-shadow"></div>
   </section>
 
   <section aria-labelledby="sshow-h" data-group="shadow" style="order:25">
-    <div class="eyebrow">ร่างผสมและบอสสายเงา · ภาพนิ่ง</div>
+    <div class="eyebrow">ร่างผสมและบอสสายเงา</div>
     <h2 id="sshow-h">เงาผู้ตื่น และบอสโลกธาตุเงา</h2>
     <div class="showcase">
       <div class="show fused shadow">
@@ -505,20 +505,27 @@ td.st { white-space: nowrap; color: var(--muted) }
     </div>
   </section>
 
-  <section aria-labelledby="plan-h" data-group="plan" style="order:26">
+  <section aria-labelledby="shadow-h" data-group="shadow" style="order:26">
+    <div class="eyebrow">สกิลธาตุเงาทุกท่าในเกม</div>
+    <h2 id="shadow-h">อนิเมชันสกิลธาตุเงา</h2>
+    <p class="lede">ท่าอัศวินเป็นดาบและใบมีดเงา ท่าภูตเป็นตะเกียง ไฟวิญญาณ และหมอก มีสถานะใหม่: หลบเก่งขึ้น (มีเงาม่วงตามหลัง ตีธรรมดาที่มาโดนพลาด 40%) มองไม่เห็นจากหมอก (ตีธรรมดาพลาด 35%) ติดตัวของภูตโคมวิญญาณ (ตีธรรมดาติดพิษ 30%) และติดตัวของเจ้าภูตเงา (ตีธรรมดาที่มาโดนพลาด 20% หลบแล้วสวนกลับคริ) ชื่อสกิลยังเป็นชื่อเดิมในเกม บางชื่อยังเป็นของนินจา นักธนู และแมงป่อง รอเปลี่ยน</p>
+    <div class="skills-grid" id="shadow-cards"></div>
+  </section>
+
+  <section aria-labelledby="plan-h" data-group="plan" style="order:27">
     <div class="eyebrow">แผนทั้งเกม</div>
     <h2 id="plan-h">ออกแบบมอนใหม่ทั้ง 8 สาย</h2>
     <p class="lede">มอนที่ดูไม่สมเหตุสมผลส่วนใหญ่มีปัญหาแบบเดียวกัน คือเป็นสิ่งของหรือคนแทนที่จะเป็นสัตว์ (ดวงอาทิตย์ ตรีศูล ภูเขา หน้ากาก นินจา) หรือเปลี่ยนชนิดสัตว์กลางสาย (กิ้งก่ากลายเป็นเสือ หมาป่ากลายเป็นช้าง) แผนนี้ใช้กติกา 4 ข้อ</p>
     <div class="rules">
       <div class="rule"><b>เป็นสัตว์ ไม่ใช่สิ่งของ</b><span>ทุกร่างต้องเป็นสิ่งมีชีวิตที่มีตา มีท่าทาง และขยับได้ ร่างวิญญาณอย่างละอองหรือผีใช้ได้</span></div>
-      <div class="rule"><b>หนึ่งสาย หนึ่งตระกูล</b><span>เพลิง = กิ้งก่าและมังกร · วารี = สัตว์ทะเล · พฤกษ์ = สัตว์ป่ามีพืชงอก · ศิลา = สัตว์เกราะหิน · อสนี = สัตว์พายุ · รัศมี = สัตว์เทพ · รัตติกาล = ค้างคาวและแมงมุม · เงา = นักล่าย่องเงียบ</span></div>
+      <div class="rule"><b>หนึ่งสาย หนึ่งตระกูล</b><span>เพลิง = กิ้งก่าและมังกร · วารี = สัตว์ทะเล · พฤกษ์ = สัตว์ป่ามีพืชงอก · ศิลา = สัตว์เกราะหิน · อสนี = สัตว์พายุ · รัศมี = สัตว์เทพ · รัตติกาล = ค้างคาวและแมงมุม · เงา = อัศวินเงาและภูตคลุมฮู้ด</span></div>
       <div class="rule"><b>ยิ่งสูงยิ่งอลังการ</b><span>ไข่ถึงร่างเด็กขนาดเล็กและน่ารัก ร่างโตเต็มวัยใช้กรอบ 56 พิกเซล ร่างสุดท้ายและร่างผสม 64 พิกเซล มีออร่าและอนุภาคลอย บอส 96 พิกเซล</span></div>
       <div class="rule"><b>ร่างแย่ยังตลก</b><span>ร่างที่ได้จากการเลี้ยงไม่ดี (ควันกรุ่น ลาวาอ้วน หมึกขี้เกียจ) คงความตลกไว้ เป็นรางวัลปลอบใจที่น่าเก็บ</span></div>
     </div>
     <div class="lines" id="lines"></div>
   </section>
 
-  <section aria-labelledby="next-h" data-group="plan" style="order:27">
+  <section aria-labelledby="next-h" data-group="plan" style="order:28">
     <h2 id="next-h">ต้องตัดสินใจก่อนลงมือ</h2>
     <div class="next">
       <div class="q"><b>1. สไตล์ภาพนี้ใช้ได้ไหม</b><span>พิกเซลอาร์ตมุมเฉียงแบบในหน้านี้ หรืออยากลองแบบอื่น เช่น ภาพวาดเส้นเรียบความละเอียดสูง</span></div>
@@ -2951,9 +2958,9 @@ const SPRITES = {
   knight: { size: 56, rig: BIPED, draw(s, P) {
     const [bx, by] = P.body, g = tf(s, 1, bx, by), a = P.arm, t = P.tail;
     g.P([[19, 25], [30, 24], [30, 38], [27, 52], [23, 47], [19, 53], [16, 46], [11, 50 - t], [13, 37]], 'cape'); g.ln([[20, 28], [17, 44]], '#36204e');
-    g.L(25, 41, 24, 50, 2.2, 'arm2'); g.E(24, 51.6, 3.2, 1.5, 'arm2');
+    g.L(25, 41, 24 + P.bf[0], 50 + P.bf[1], 2.2, 'arm2'); g.E(24 + P.bf[0], 51.6 + P.bf[1], 3.2, 1.5, 'arm2');
     g.E(28, 36, 7, 7, 'arm'); g.ln([[23, 33], [28, 35], [33, 33]], '#a0a0c0'); g.E(28, 42.4, 6, 2, 'shdw'); g.ln([[22, 40.6], [34, 40.6]], '#2a2a3c');
-    g.L(30, 42, 31, 50, 2.5, 'arm'); g.E(32, 51.8, 3.6, 1.6, 'arm'); g.E(30.6, 46, 2, 1.6, 'arm');
+    g.L(30, 42, 31 + P.bl[0], 50 + P.bl[1], 2.5, 'arm'); g.E(32 + P.bl[0], 51.8 + P.bl[1], 3.6, 1.6, 'arm'); g.E(30.6 + P.bl[0] * .5, 46 + P.bl[1] * .5, 2, 1.6, 'arm');
     g.E(24, 29, 5, 4, 'arm'); g.sp(23, 26.4, 3.4, 1.2, 'arm', -1);
     g.R([[30, 13], [24, 10], [19, 12 - t], [16, 16 - t]], 2.4, 1, 'cape');
     g.E(30, 20, 8, 8, 'arm'); g.P([[22, 20], [38, 20], [37, 27], [23, 27]], 'arm'); g.ln([[23, 15], [28, 12.6]], '#a0a0c0');
@@ -2962,13 +2969,13 @@ const SPRITES = {
     g.P([[39.6 + a[0], 34 + a[1]], [50 + a[0], 14 + a[1]], [52.6 + a[0], 15 + a[1]], [42 + a[0], 36 + a[1]]], 'arm'); g.ln([[41 + a[0], 34 + a[1]], [51 + a[0], 15 + a[1]]], '#b04aff');
     g.L(35.6 + a[0], 32 + a[1], 43 + a[0], 38.6 + a[1], .9, 'iron'); g.E(38.6 + a[0], 38 + a[1], 1, 1, 'vio');
     g.L(30, 31, 37 + a[0], 35 + a[1], 2, 'arm'); g.E(38 + a[0], 36 + a[1], 2.2, 2, 'arm');
-  }, glows: [[33, 20, '#b04aff', 3], [37, 20, '#b04aff', 3], [46, 24, '#7a2ad0', 4]], emit: [], mouth: [37, 23] },
+  }, glows: [[33, 20, '#b04aff', 3], [37, 20, '#b04aff', 3], [46, 24, '#7a2ad0', 4]], emit: [], mouth: [42, 30] },
   knight2: { size: 64, rig: BIPED, draw(s, P) {
     const [bx, by] = P.body, g = tf(s, 1.14, bx, by), a = P.arm, t = P.tail;
     g.P([[19, 25], [30, 24], [30, 38], [27, 52], [23, 47], [19, 53], [16, 46], [11, 50 - t], [13, 37]], 'cape'); g.ln([[20, 28], [17, 44]], '#36204e');
-    g.L(25, 41, 24, 50, 2.2, 'arm2'); g.E(24, 51.6, 3.2, 1.5, 'arm2');
+    g.L(25, 41, 24 + P.bf[0], 50 + P.bf[1], 2.2, 'arm2'); g.E(24 + P.bf[0], 51.6 + P.bf[1], 3.2, 1.5, 'arm2');
     g.E(28, 36, 7, 7, 'arm'); g.ln([[23, 33], [28, 35], [33, 33]], '#a0a0c0'); g.E(28, 42.4, 6, 2, 'shdw'); g.ln([[22, 40.6], [34, 40.6]], '#2a2a3c');
-    g.L(30, 42, 31, 50, 2.5, 'arm'); g.E(32, 51.8, 3.6, 1.6, 'arm'); g.E(30.6, 46, 2, 1.6, 'arm');
+    g.L(30, 42, 31 + P.bl[0], 50 + P.bl[1], 2.5, 'arm'); g.E(32 + P.bl[0], 51.8 + P.bl[1], 3.6, 1.6, 'arm'); g.E(30.6 + P.bl[0] * .5, 46 + P.bl[1] * .5, 2, 1.6, 'arm');
     g.E(24, 29, 5, 4, 'arm'); g.sp(23, 26.4, 3.4, 1.2, 'arm', -1);
     g.R([[30, 13], [24, 9], [18, 10 - t], [13, 15 - t], [12, 20 - t]], 3, 1, 'vten');
     g.E(30, 20, 8, 8, 'arm'); g.P([[22, 20], [38, 20], [37, 27], [23, 27]], 'arm'); g.ln([[23, 15], [28, 12.6]], '#a0a0c0');
@@ -2985,11 +2992,11 @@ const SPRITES = {
     g.P([[24, 30], [40, 28], [42, 50], [37, 70], [31, 64], [26, 74], [20, 62], [12, 70 - t], [9, 54 - t], [13, 40]], 'cape');
     for (const [x, y] of [[14, 72], [22, 76], [32, 72]]) g.R([[x, y - 6], [x - 2, y - t], [x + 1, y + 3]], 2, .5, 'shdw');
     g.ln([[24, 34], [19, 52], [17, 62]], '#36204e'); g.ln([[33, 34], [30, 56]], '#6a4a92');
-    g.L(36, 58, 34, 71, 3.4, 'arm2'); g.E(33.6, 74, 5, 2.2, 'arm2');
+    g.L(36, 58, 34 + P.bf[0], 71 + P.bf[1], 3.4, 'arm2'); g.E(33.6 + P.bf[0], 74 + P.bf[1], 5, 2.2, 'arm2');
     g.L(36, 38, 31, 51, 3.2, 'arm2'); g.E(30.6, 53, 3.2, 3, 'arm2');
     g.E(42, 46, 10.5, 11, 'arm'); g.ln([[34, 42], [42, 45], [50, 42]], '#a0a0c0'); g.ln([[42, 46], [42, 54]], '#2a2a3c'); g.E(42, 45, 2.4, 2.4, 'vio');
     g.P([[32, 54], [52, 54], [54, 63], [30, 63]], 'arm2'); for (const x of [36, 42, 48]) g.ln([[x, 55], [x, 62]], '#1e1e2c'); g.E(42, 56.6, 10, 1.4, 'shdw');
-    g.L(45, 60, 47, 72, 3.8, 'arm'); g.E(48, 75, 5.6, 2.4, 'arm'); g.E(46, 66, 3.2, 2.6, 'arm');
+    g.L(45, 60, 47 + P.bl[0], 72 + P.bl[1], 3.8, 'arm'); g.E(48 + P.bl[0], 75 + P.bl[1], 5.6, 2.4, 'arm'); g.E(46 + P.bl[0] * .5, 66 + P.bl[1] * .5, 3.2, 2.6, 'arm');
     g.E(34, 36, 8, 6, 'arm'); for (const [x, h] of [[29, 6], [33, 8], [37, 6]]) g.sp(x, 33, h, 1.6, 'arm', -1.4);
     for (const [x, y] of [[40, 22], [36, 24], [33, 21]]) g.R([[44, 24], [x, y - t], [x - 4, y + 1 - t]], 1.6, .4, 'vten');
     g.E(47, 25, 9, 9.4, 'arm'); g.P([[38, 25], [56, 25], [55, 34], [39, 34]], 'arm'); g.ln([[40, 19], [46, 16]], '#a0a0c0');
@@ -3014,7 +3021,7 @@ const SPRITES = {
     g.R([[34, 28], [41, 30], [45, 32]], 2.8, 1.8, 'wr'); g.E(46, 32, 1.8, 1.6, 'vten');
     g.ln([[46, 33], [46, 36]], '#5e5c78'); g.P([[43, 36], [49, 36], [49.6, 44], [42.4, 44]], 'iron'); g.E(46, 35.4, 3.6, 1.2, 'iron'); g.E(46, 44.4, 3.8, 1.1, 'iron');
     g.E(46, 40, 2, 3, 'vio'); g.ln([[44.2, 37], [44.2, 43]], '#3a3850'); g.ln([[47.8, 37], [47.8, 43]], '#3a3850');
-  }, glows: [[46, 40, '#a04aff', 8], [33, 20, '#b04aff', 3]], emit: [{ x: 46, y: 38, type: 'glint', rate: 1.5 }], mouth: [36, 23] },
+  }, glows: [[46, 40, '#a04aff', 8], [33, 20, '#b04aff', 3]], emit: [{ x: 46, y: 38, type: 'glint', rate: 1.5 }], mouth: [46, 40] },
   soulwraith: { size: 64, rig: BLOB, hover: 5, draw(s, P) {
     const [bx, by] = P.body, g = tf(s, 1.14, bx, by), t = P.tail;
     g.R([[28, 26], [27, 36], [23, 44], [16, 48 - t], [10, 46 - t]], 9, 1.4, 'wr');
@@ -3029,7 +3036,7 @@ const SPRITES = {
     g.E(49, 40, 2, 3, 'vio'); g.ln([[47.2, 37], [47.2, 43]], '#3a3850'); g.ln([[50.8, 37], [50.8, 43]], '#3a3850');
     for (const [x, y] of [[13, 22], [40, 8], [10, 36]]) { g.E(x, y + .6, 2, 1.8, 'vio'); g.sp(x, y, 4.6, 1.6, 'vio', .6); }
     g.sp(31, 11, 4, 1.2, 'wr', -1); g.sp(35, 11.6, 3.4, 1, 'wr', 1);
-  }, glows: [[56, 46, '#a04aff', 9], [39, 23, '#b04aff', 3], [15, 25, '#a04aff', 4], [46, 9, '#a04aff', 4], [11, 41, '#a04aff', 4]], emit: [{ x: 56, y: 44, type: 'glint', rate: 1.5 }], mouth: [41, 26] },
+  }, glows: [[56, 46, '#a04aff', 9], [39, 23, '#b04aff', 3], [15, 25, '#a04aff', 4], [46, 9, '#a04aff', 4], [11, 41, '#a04aff', 4]], emit: [{ x: 56, y: 44, type: 'glint', rate: 1.5 }], mouth: [56, 46] },
   wraithlord: { size: 80, rig: BLOB, hover: 6, aura: { type: 'shadm', x: 40, y: 78, r: 30 }, draw(s, P) {
     const [bx, by] = P.body, g = tf(s, 1, bx, by), t = P.tail;
     g.P([[36, 30], [20, 22 - t], [10, 26 - t], [16, 30], [6, 36 - t], [16, 40], [8, 48 - t], [22, 46], [32, 46]], 'wr2');
@@ -3596,7 +3603,7 @@ const SHADOW_LINE = [
   ]
  }
 ];
-buildBoard(document.getElementById('evo-shadow'), SHADOW_LINE, true);
+buildBoard(document.getElementById('evo-shadow'), SHADOW_LINE);
 const LEAF_LINE = [
   { stage: 'ไข่', items: [{ id: 'legg', name: 'ไข่พฤกษ์', old: 'คงชื่อเดิม · เปลือกเขียวอ่อนลายใบไม้ มีต้นกล้างอกบนยอด', st: 'keep' }] },
   { stage: 'ร่างเด็ก 1', items: [{ id: 'seed', name: 'เมล็ดจิ๋ว', old: 'คงชื่อเดิม · ลูกโอ๊กมีตา หมวกลายตาราง ใบอ่อนงอกบนหัว', st: 'keep' }] },
@@ -3657,7 +3664,7 @@ function drawLineup(L, dt) {
 buildLineup(document.getElementById('lineup-fire'), ['egg', 'wisp', 'coal', 'gecko', 'frill', 'sunking', 'avatar'], ['ไข่เพลิง', 'ประกายจิ๋ว', 'ถ่านน้อย', 'เพลิงจอมซน', 'อัคนีแผงคอ', 'ราชันมังกรสุริยะ', 'อวตารสุริยะ']);
 buildLineup(document.getElementById('lineup-leaf'), ['legg', 'seed', 'sprout', 'leafdeer', 'stag', 'forestdeer', 'lfused'], ['ไข่พฤกษ์', 'เมล็ดจิ๋ว', 'ต้นอ่อน', 'กวางใบไม้', 'กวางเขาพฤกษา', 'เทพพนาลัย', 'พนาผู้ตื่น']);
 buildLineup(document.getElementById('lineup-dark'), ['degg', 'mote', 'batling', 'spider', 'eyespider', 'spiderqueen', 'dfused'], ['ไข่รัตติกาล', 'ละอองมืด', 'ลูกค้างคาว', 'แมงมุมคำสาป', 'แมงมุมอสูรตาแดง', 'ราชินีแมงมุมรัตติกาล', 'รัตติกาลผู้ตื่น']);
-buildLineup(document.getElementById('lineup-shadow'), ['segg', 'wbaby', 'kbaby', 'knight', 'knight2', 'knightlord', 'sfused'], ['ไข่เงา', 'เงาจิ๋ว', 'หมวกผีน้อย', 'อัศวินเงา', 'อัศวินเงาเกราะทมิฬ', 'จอมอัศวินเงา', 'เงาผู้ตื่น'], true);
+buildLineup(document.getElementById('lineup-shadow'), ['segg', 'wbaby', 'kbaby', 'knight', 'knight2', 'knightlord', 'sfused'], ['ไข่เงา', 'เงาจิ๋ว', 'หมวกผีน้อย', 'อัศวินเงา', 'อัศวินเงาเกราะทมิฬ', 'จอมอัศวินเงา', 'เงาผู้ตื่น']);
 buildLineup(document.getElementById('lineup-holy'), ['hegg', 'glint', 'lamb', 'wingsheep', 'qilin', 'sunqilin', 'hfused'], ['ไข่รัศมี', 'ประกายแสง', 'ลูกแกะแสง', 'แกะปีกทิพย์', 'กิเลนรัศมี', 'กิเลนสุริยเทพ', 'ศักดิ์สิทธิ์ผู้ตื่น']);
 buildLineup(document.getElementById('lineup-bolt'), ['begg', 'spark', 'cloudpuff', 'tbird', 'hawk', 'thunderking', 'bfused'], ['ไข่อสนี', 'ประกายไฟฟ้า', 'ลูกเมฆฟ้า', 'นกฟ้าผ่า', 'เหยี่ยวพายุ', 'วิหคราชาอสนี', 'อสนีผู้ตื่น']);
 buildLineup(document.getElementById('lineup-earth'), ['eegg', 'pebble', 'clay', 'tortoise', 'pillarturtle', 'mountturtle', 'efused'], ['ไข่ศิลา', 'ก้อนกรวด', 'ก้อนดินเหนียว', 'เต่าศิลา', 'เต่าผาหิน', 'เต่าภูเขา', 'ธรณีผู้ตื่น']);
@@ -3700,8 +3707,8 @@ addCard(document.getElementById('show-hfused'), 'hfused', document.getElementByI
 addCard(document.getElementById('show-holyele'), 'holyele', document.getElementById('act-holyele'));
 addCard(document.getElementById('show-dfused'), 'dfused', document.getElementById('act-dfused'));
 addCard(document.getElementById('show-darksoul'), 'darksoul', document.getElementById('act-darksoul'));
-addCard(document.getElementById('show-sfused'), 'sfused', document.getElementById('act-sfused'), 8, true);
-addCard(document.getElementById('show-veilking'), 'sboss', document.getElementById('act-veilking'), 8, true);
+addCard(document.getElementById('show-sfused'), 'sfused', document.getElementById('act-sfused'));
+addCard(document.getElementById('show-veilking'), 'sboss', document.getElementById('act-veilking'));
 addCard(document.getElementById('show-efused'), 'efused', document.getElementById('act-efused'));
 addCard(document.getElementById('show-pangolin'), 'pangolin', document.getElementById('act-pangolin'));
 addCard(document.getElementById('show-lfused'), 'lfused', document.getElementById('act-lfused'));
@@ -3756,6 +3763,7 @@ const bx = sx;
 const THEMES = {
   cave: { rim: [57, 198, 255], rimDeep: [10, 60, 96], stone: [58, 54, 80], wall: [22, 19, 34], crystal: ['#7ee7ff', '#39c6ff', '#1a6fa0'] },
   lava: { rim: [255, 122, 26], rimDeep: [110, 26, 8], stone: [62, 46, 46], wall: [26, 14, 14], crystal: ['#ffd04a', '#ff7a1a', '#a3260f'] },
+  crypt: { rim: [150, 140, 210], rimDeep: [30, 26, 50], stone: [44, 44, 58], wall: [12, 12, 18], crystal: ['#d4ccec', '#8c82a8', '#b04aff'] },
   eclipse: { rim: [160, 74, 232], rimDeep: [40, 16, 70], stone: [46, 40, 64], wall: [14, 10, 24], crystal: ['#e4b8ff', '#a04ae8', '#ffb02a'] },
   temple: { rim: [255, 216, 120], rimDeep: [90, 70, 30], stone: [88, 80, 70], wall: [30, 26, 22], crystal: ['#ffffff', '#ffe88a', '#c89a20'] },
   storm: { rim: [255, 225, 74], rimDeep: [40, 44, 90], stone: [52, 56, 78], wall: [16, 18, 32], crystal: ['#fffac0', '#ffe14a', '#3a72d4'] },
@@ -3796,7 +3804,7 @@ function buildFloor(theme) {
   }
   c.putImageData(img, 0, 0);
   // Cracks
-  let seed = theme === 'lava' ? 99 : theme === 'forest' ? 41 : theme === 'canyon' ? 23 : theme === 'storm' ? 61 : theme === 'temple' ? 83 : theme === 'eclipse' ? 97 : 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let seed = theme === 'lava' ? 99 : theme === 'forest' ? 41 : theme === 'canyon' ? 23 : theme === 'storm' ? 61 : theme === 'temple' ? 83 : theme === 'eclipse' ? 97 : theme === 'crypt' ? 53 : 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   for (let k = 0; k < 150; k++) {
     let x = 30 + rnd() * (WW - 60), y = FLOOR_TOP + 8 + rnd() * (FLOOR_BOT - FLOOR_TOP - 16), a = rnd() * Math.PI * 2;
     for (let s = 0; s < 22 + rnd() * 26; s++) {
@@ -3835,7 +3843,7 @@ function buildFloor(theme) {
   for (let y = FLOOR_TOP + 40; y < FLOOR_BOT; y += 50 + rnd() * 60) { crystal(edgeAt(y) - 12, y, .8 + rnd() * .5); crystal(WW - edgeAt(y) + 12, y, .8 + rnd() * .5); }
   return cv;
 }
-const floors = { cave: buildFloor('cave'), lava: buildFloor('lava'), forest: buildFloor('forest'), canyon: buildFloor('canyon'), storm: buildFloor('storm'), temple: buildFloor('temple'), eclipse: buildFloor('eclipse') };
+const floors = { cave: buildFloor('cave'), lava: buildFloor('lava'), forest: buildFloor('forest'), canyon: buildFloor('canyon'), storm: buildFloor('storm'), temple: buildFloor('temple'), eclipse: buildFloor('eclipse'), crypt: buildFloor('crypt') };
 
 const ELEM = {
   fire: { name: 'เพลิง', col: '#ff8a24' }, water: { name: 'วารี', col: '#3a90d2' }, leaf: { name: 'พฤกษ์', col: '#5ad35a' }, earth: { name: 'ศิลา', col: '#b98a52' },
@@ -3882,6 +3890,11 @@ const ROSTER = {
   eyespider: { sprite: 'eyespider', name: 'แมงมุมอสูรตาแดง', el: 'dark', hp: 620 }, zrat: { sprite: 'zrat', name: 'หนูซากศพขี้เกียจ', el: 'dark', hp: 600, undead: true }, batlord: { sprite: 'batlord', name: 'ค้างคาวอสูรราชันย์', el: 'dark', hp: 600 },
   spider: { sprite: 'spider', name: 'แมงมุมคำสาป', el: 'dark', hp: 420 }, rat: { sprite: 'rat', name: 'หนูท่อมืด', el: 'dark', hp: 380 }, vampbat: { sprite: 'vampbat', name: 'ค้างคาวเขี้ยวโลหิต', el: 'dark', hp: 430 },
   batling: { sprite: 'batling', name: 'ลูกค้างคาว', el: 'dark', hp: 150 }, mote: { sprite: 'mote', name: 'ละอองมืด', el: 'dark', hp: 90 },
+  sfused: { sprite: 'sfused', name: 'เงาผู้ตื่น', el: 'shadow', hp: 1290 }, knightlord: { sprite: 'knightlord', name: 'จอมอัศวินเงา', el: 'shadow', hp: 940 }, wraithlord: { sprite: 'wraithlord', name: 'เจ้าภูตเงา', el: 'shadow', hp: 880, voidP: true },
+  knight2: { sprite: 'knight2', name: 'อัศวินเงาเกราะทมิฬ', el: 'shadow', hp: 640 }, mistblob: { sprite: 'mistblob', name: 'ม่านหมอกขี้เกียจ', el: 'shadow', hp: 620 }, soulwraith: { sprite: 'soulwraith', name: 'ภูตโคมวิญญาณ', el: 'shadow', hp: 600, venom: true },
+  knight: { sprite: 'knight', name: 'อัศวินเงา', el: 'shadow', hp: 430 }, shyghost: { sprite: 'shyghost', name: 'ผีเงาขี้อาย', el: 'shadow', hp: 380 }, lantern: { sprite: 'lantern', name: 'ภูตตะเกียงเงา', el: 'shadow', hp: 410 },
+  kbaby: { sprite: 'kbaby', name: 'หมวกผีน้อย', el: 'shadow', hp: 150 }, wbaby: { sprite: 'wbaby', name: 'เงาจิ๋ว', el: 'shadow', hp: 90 },
+  sboss: { sprite: 'sboss', name: 'ราชาม่านเงา', el: 'shadow', hp: 7400, boss: true },
   darksoul: { sprite: 'darksoul', name: 'วิญญาณจันทร์ดับ', el: 'dark', hp: 7400, boss: true },
 };
 const pickMe = document.getElementById('pick-me'), pickFoe = document.getElementById('pick-foe');
@@ -3891,13 +3904,14 @@ const pickMe = document.getElementById('pick-me'), pickFoe = document.getElement
   const ge = document.createElement('optgroup'); ge.label = 'สายศิลา'; for (const id of ['efused', 'mountturtle', 'crystalrhino', 'pillarturtle', 'orerhino', 'boulder', 'tortoise', 'rhino', 'worm', 'clay', 'pebble']) ge.append(new Option(ROSTER[id].name, id)); pickMe.append(ge);
   const gb = document.createElement('optgroup'); gb.label = 'สายอสนี'; for (const id of ['bfused', 'thunderking', 'foxking', 'hawk', 'boltfox', 'gloomcloud', 'tbird', 'stormfox', 'staticcat', 'cloudpuff', 'spark']) gb.append(new Option(ROSTER[id].name, id)); pickMe.append(gb);
   const gh = document.createElement('optgroup'); gh.label = 'สายรัศมี'; for (const id of ['hfused', 'sunqilin', 'lionking', 'qilin', 'winglion', 'bellcrab', 'wingsheep', 'lioncub', 'cherub', 'lamb', 'glint']) gh.append(new Option(ROSTER[id].name, id)); pickMe.append(gh);
-  const gd = document.createElement('optgroup'); gd.label = 'สายรัตติกาล'; for (const id of ['dfused', 'spiderqueen', 'batemperor', 'eyespider', 'batlord', 'zrat', 'spider', 'vampbat', 'rat', 'batling', 'mote']) gd.append(new Option(ROSTER[id].name, id)); pickMe.append(gd); }
-for (const id of ['shark', 'dragon', 'armorwhale', 'wolf', 'barkwolf', 'rhino', 'orerhino', 'stormfox', 'lioncub', 'boss', 'turtle', 'flora', 'pangolin', 'stormbison', 'holyele', 'darksoul']) pickFoe.add(new Option(ROSTER[id].boss ? 'บอส · ' + ROSTER[id].name : ROSTER[id].name, id));
+  const gd = document.createElement('optgroup'); gd.label = 'สายรัตติกาล'; for (const id of ['dfused', 'spiderqueen', 'batemperor', 'eyespider', 'batlord', 'zrat', 'spider', 'vampbat', 'rat', 'batling', 'mote']) gd.append(new Option(ROSTER[id].name, id)); pickMe.append(gd);
+  const gs = document.createElement('optgroup'); gs.label = 'สายเงา'; for (const id of ['sfused', 'knightlord', 'wraithlord', 'knight2', 'soulwraith', 'mistblob', 'knight', 'lantern', 'shyghost', 'kbaby', 'wbaby']) gs.append(new Option(ROSTER[id].name, id)); pickMe.append(gs); }
+for (const id of ['shark', 'dragon', 'armorwhale', 'wolf', 'barkwolf', 'rhino', 'orerhino', 'stormfox', 'lioncub', 'boss', 'turtle', 'flora', 'pangolin', 'stormbison', 'holyele', 'darksoul', 'knight', 'lantern', 'sboss']) pickFoe.add(new Option(ROSTER[id].boss ? 'บอส · ' + ROSTER[id].name : ROSTER[id].name, id));
 
 function makeEnt(rid, side) {
   const r = ROSTER[rid]; const def = SPRITES[r.sprite];
   const boss = !!r.boss;
-  return { rid, def, name: r.name, el: r.el, boss, bossKind: r.kind || 'บอสโลก', ent: !!r.ent, stoneSkin: !!r.stoneSkin, lastStand: !!r.lastStand, undead: !!r.undead, side, flip: side === 1, hpMax: r.hp, hp: r.hp, hpShown: r.hp,
+  return { rid, def, name: r.name, el: r.el, boss, bossKind: r.kind || 'บอสโลก', ent: !!r.ent, stoneSkin: !!r.stoneSkin, lastStand: !!r.lastStand, undead: !!r.undead, venom: !!r.venom, voidP: !!r.voidP, side, flip: side === 1, hpMax: r.hp, hp: r.hp, hpShown: r.hp,
     x: WW / 2 + (side === 0 ? -85 : (boss ? 90 : 82)), y: WH * .58 + (side === 0 ? 14 : (boss ? -6 : -14)),
     ox: 0, oy: 0, sx: 1, sy: 1, alpha: 1, flash: 0, shield: 0, ghosts: [], acc: {}, status: null, statusT: 0, hidden: false,
     goal: null, walking: 0, speed: (boss ? 34 : 50 + (def.size < 56 ? 12 : 0)) * (r.stoneSkin ? .85 : 1), stepT: 0 };
@@ -3948,7 +3962,7 @@ async function knockout(e) {
   showBanner('K.O.!', '#ff6a4a', 1300);
   await tween(500, (k) => { e.sy = 1 - k * .5; e.sx = 1 + k * .25; e.alpha = 1 - k; });
   await wait(700);
-  e.hp = e.hpMax; e.status = null; e.rootT = e.silenceT = e.poisonT = e.stunT = e.staticT = e.immuneT = e.blindT = 0; e.lastStandUsed = false; e.curseT = e.atkDownT = 0; e.enraged = false;
+  e.hp = e.hpMax; e.status = null; e.rootT = e.silenceT = e.poisonT = e.stunT = e.staticT = e.immuneT = e.blindT = 0; e.lastStandUsed = false; e.curseT = e.atkDownT = 0; e.enraged = false; e.evaT = 0; e.critNext = false;
   await tween(400, (k) => { e.sy = .6 + k * .4; e.sx = 1.2 - k * .2; e.alpha = k; });
   e.sx = e.sy = 1; e.alpha = 1; showBanner('FIGHT!');
 }
@@ -4014,12 +4028,13 @@ async function lungeHit(att, def, react) {
   const put = (e, a, px = 0, py = 0) => { e.ox = ux * a + px; e.oy = uy * a * .8 + py; };
   const A = (t) => { att.anim = { name: 'attack', t }; };
   await tween(220, (k) => { A(.3 * k); put(att, -5 * ease(k)); });
+  if (!react && ((def.evaT > 0 && Math.random() < .4) || (def.voidP && Math.random() < .2))) react = 'dodge';
   let dodged = false;
   const dash = tween(150, (k) => { A(.3 + .12 * k); put(att, -5 + (dist + 5) * easeIn(k)); const q = Math.sin(k * Math.PI); att.sx = 1 + .07 * q; att.sy = 1 - .05 * q; });
   const side = Math.random() < .5 ? 1 : -1, px = -uy * 18 * side, py = ux * 12 * side;
   if (react === 'dodge') {
     await wait(60);
-    sayAt(def, 'หลบ!', '#7ee7ff');
+    sayAt(def, 'หลบ!', '#7ee7ff'); if (def.voidP) { def.critNext = true; tag(def, '🌀 จักรวาลเงา', 'shadow'); const vc = centerOf(def); shadowBurst(vc.x, vc.y, 16, 50); }
     tween(220, (k) => { const q = ease(k); def.ox = px * q + ux * 6 * q; def.oy = py * q - 6 * Math.sin(k * Math.PI); if (Math.random() < .7) def.ghosts.push({ x: def.x + def.ox, y: def.y + def.oy, a: .5, img: frameOf(def, clock) }); });
     dodged = true;
   }
@@ -4039,8 +4054,10 @@ async function lungeHit(att, def, react) {
     return;
   }
   const c = centerOf(def); impactBurst(c.x - dir * 6, c.y, react === 'guard' ? '#9ad8ff' : '#ffd04a');
-  const crit = !react && Math.random() < (att.focusT > 0 ? .65 : .25);
-  const p = damage(def, 40 + Math.random() * 25, { guard: react === 'guard', crit, from: att, melee: true });
+  const cn = !react && att.critNext; if (cn) { att.critNext = false; sayAt(att, 'สวนกลับ!', '#d08aff', true); }
+  const crit = !react && (cn || Math.random() < (att.focusT > 0 ? .65 : .25));
+  if (att.venom && !react && Math.random() < .3) { poisonOn(def, 5); const sc = centerOf(def); fxs.push({ age: 0, life: .7, draw(cx, k) { cx.globalAlpha = 1 - k; drawSoulFlame(cx, sc.x, sc.y - 10 - k * 14, .9); } }); }
+  const p = damage(def, (40 + Math.random() * 25) * (cn ? 1.25 : 1), { guard: react === 'guard', crit, from: att, melee: true });
   await tween(120, (k) => A(.42 + .2 * k));
   await tween(300, (k) => { A(.62 + .38 * k); put(att, dist * (1 - ease(k))); });
   att.ox = att.oy = 0; att.anim = null; await p; def.shield = 0;
@@ -5036,7 +5053,7 @@ function immune(e) { if (e.immuneT > 0) { sayAt(e, 'คุ้มกัน', '#ff
 function blindOn(e, sec) { if (immune(e)) return; e.blindT = Math.max(e.blindT || 0, sec); e.blindLight = true; sayAt(e, 'ตาพร่า', '#fff0a0'); }
 function cleanse(e) {
   const had = e.status || e.blindT > 0 || e.slowT > 0 || e.defT > 0 || e.rootT > 0 || e.silenceT > 0 || e.poisonT > 0 || e.stunT > 0 || e.staticT > 0;
-  e.status = null; e.blindT = e.slowT = e.defT = e.rootT = e.silenceT = e.poisonT = e.stunT = e.staticT = e.curseT = e.atkDownT = 0;
+  e.status = null; e.blindT = e.slowT = e.defT = e.rootT = e.silenceT = e.poisonT = e.stunT = e.staticT = e.curseT = e.atkDownT = e.evaT = 0;
   if (had) sayAt(e, 'ล้างสถานะ', '#fff6c8');
   return had;
 }
@@ -5304,9 +5321,121 @@ const DARK = {
     if (Math.hypot(def.x - z.x, (def.y - z.y) * 2.4) <= R + 6) { curseOn(def, 5); atkDownOn(def, 5); poisonOn(def, 5); await damage(def, 110, { from: att }); } else await wait(500);
   } },
 };
-function elCols(el) { return el === 'dark' ? DARK_COLS : el === 'holy' ? HOLY_COLS : el === 'water' ? WATER_COLS : el === 'leaf' ? LEAF_COLS : el === 'earth' ? EARTH_COLS : el === 'bolt' ? BOLT_COLS : FLAME_COLS; }
-const skillEl = (id) => (id.startsWith('tide') ? 'water' : id.startsWith('leaf') ? 'leaf' : id.startsWith('earth') ? 'earth' : id.startsWith('ltn') ? 'bolt' : id.startsWith('holy') ? 'holy' : id.startsWith('dark') ? 'dark' : 'fire');
-const GAME_SKILLS = { ...FIRE, ...WATER, ...LEAF, ...EARTH, ...BOLT, ...HOLY, ...DARK };
+/* ---------- Shadow skills from the game, each with its own animation ----------
+   Shadow knights fight with blades of shadow, the hooded wraiths with lanterns, mist and soul fire. New statuses in the
+   prototype: evasion up (`evaT`: 40% of basic attacks against it miss, violet after-images), mist blindness (the old blind,
+   drawn as dark fog instead of light), the soul-lantern wraith's passive (`venom`: 30% of its basic hits poison) and the
+   wraith lord's void step (`voidP`: 20% of basic attacks against it miss; after any dodge its next basic hit crits +25%). */
+const SHADOW_COLS = ['#ffffff', '#f0d8ff', '#d08aff', '#a04aff', '#6a6a9a'];
+function evaOn(e, sec) { e.evaT = Math.max(e.evaT || 0, sec); sayAt(e, 'หลบเก่งขึ้น', '#d08aff'); }
+function mistBlind(e, sec) { if (immune(e)) return; e.blindT = Math.max(e.blindT || 0, sec); e.blindLight = false; sayAt(e, 'มองไม่เห็น', '#a8a0d8'); }
+function shadowBurst(x, y, n = 18, sp = 70) { ps.burst(n, () => { const a = Math.random() * TAU, v = sp * (.4 + Math.random() * .8); return { x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * .7, drag: 4, life: .35 + Math.random() * .3, size: Math.random() < .3 ? 2 : 1, cols: SHADOW_COLS, glow: true }; }); }
+// Something flying from a to b (several can fly at once, unlike `projectile`).
+function shdFly(a, b, ms, arc, draw, trail) { return tween(ms, (k) => { const x = lerp(a.x, b.x, k), y = lerp(a.y, b.y, k) - Math.sin(k * Math.PI) * arc; fxs.push({ age: 0, life: .05, draw(c) { draw(c, x, y, k); } }); if (trail) trail(x, y); }); }
+// A spinning shadow blade: a violet crescent with a white edge.
+function drawShadeBlade(c, x, y, r, spin) {
+  c.globalCompositeOperation = 'lighter';
+  for (const [w, col, rr] of [[4, 'rgba(160,74,255,.45)', r], [2, '#b04aff', r], [1, '#ffffff', r - 1]]) { c.strokeStyle = col; c.lineWidth = w; c.beginPath(); c.arc(x, y, rr, spin, spin + 2.3); c.stroke(); }
+}
+// A soul flame: a small violet teardrop with a white core.
+function drawSoulFlame(c, x, y, s = 1) {
+  c.globalCompositeOperation = 'lighter'; c.fillStyle = 'rgba(160,74,255,.5)'; c.beginPath(); c.ellipse(x, y, 5 * s, 6 * s, 0, 0, 7); c.fill();
+  c.fillStyle = '#b04aff'; c.beginPath(); c.moveTo(x - 3 * s, y + 1); c.quadraticCurveTo(x, y - 9 * s, x + 3 * s, y + 1); c.arc(x, y + 1, 3 * s, 0, Math.PI); c.fill();
+  c.fillStyle = '#f0d8ff'; c.fillRect(x - 1, y - 1, 2, 3);
+}
+const SHADOW = {
+  // คุไนเงา (spread, 3 hits of 70): the shadow knight slashes the air and three spinning shadow blades fan out at the target
+  shd_kunai: { name: 'คุไนเงา', icon: '🗡️', async run(att, def) {
+    const p = castPose(att, 320, 420, 'shadow'); await p.charged; p.release();
+    const m = mouthOf(att), c = centerOf(def), dir = Math.sign(c.x - m.x) || 1;
+    fxs.push({ age: 0, life: .25, draw(cx, k) { cx.globalCompositeOperation = 'lighter'; cx.globalAlpha = 1 - k; cx.strokeStyle = '#d08aff'; cx.lineWidth = 2; cx.beginPath(); cx.arc(m.x - dir * 4, m.y, 12, dir > 0 ? -1.4 : 1.7, dir > 0 ? 1.4 : 4.5); cx.stroke(); } });
+    const hits = [-16, 0, 16].map((off, i) => wait(i * 90).then(async () => {
+      await shdFly(m, { x: c.x, y: c.y + off * .5 }, 300, off, (cx, x, y, k) => drawShadeBlade(cx, x, y, 5, clock * 18 + i), (x, y) => { if (Math.random() < .5) ps.add({ x, y, vx: 0, vy: 0, life: .25, size: 1, cols: SHADOW_COLS, glow: true }); });
+      impactBurst(c.x, c.y + off * .4, '#b04aff', 6); shake = Math.max(shake, 1.5);
+      return damage(def, 25, { from: att });
+    }));
+    await Promise.all(hits);
+  } },
+  // ลอยหนี (self; evasion up + crit up 4 s): the shy ghost blushes, fades half see-through and drifts back out of reach
+  shd_flee: { name: 'ลอยหนี', icon: '👻', async run(att, def) {
+    const p = castPose(att, 250, 300, 'shadow'); await p.charged; p.release();
+    const dir = Math.sign(att.x - def.x) || 1, x0 = att.x, to = clampPos(att, att.x + dir * 70, att.y);
+    sayAt(att, 'อ๊ะ...', '#ffb0c8');
+    await tween(520, (k) => { const q = ease(k); att.x = lerp(x0, to.x, q); att.alpha = 1 - .55 * Math.sin(k * Math.PI); if (Math.random() < .6) att.ghosts.push({ x: att.x + att.ox, y: att.y + att.oy, a: .4, img: frameOf(att, clock), tint: '#a04aff' }); });
+    att.alpha = 1; const c = centerOf(att); shadowBurst(c.x, c.y, 14, 40);
+    evaOn(att, 4); att.focusT = 4;
+  } },
+  // ศรเงียบ (shot 140; silence 2 s): the lantern flares and a silent soul flame streaks out, no shake, no sound effect, then a crossed bubble
+  shd_arrow: { name: 'ศรเงียบ', icon: '🏮', async run(att, def) {
+    const p = castPose(att, 480, 420, 'shadow');
+    await tween(460, (k) => { const m = mouthOf(att); fxs.push({ age: 0, life: .03, draw(cx) { cx.globalCompositeOperation = 'lighter'; cx.globalAlpha = .4 + .5 * k; cx.fillStyle = 'rgba(160,74,255,.5)'; cx.beginPath(); cx.arc(m.x, m.y, 4 + 10 * k, 0, 7); cx.fill(); } }); });
+    await p.charged; p.release();
+    const m = mouthOf(att), c = centerOf(def);
+    await shdFly(m, c, 260, 0, (cx, x, y) => { cx.globalCompositeOperation = 'lighter'; const dx = c.x - m.x, dy = c.y - m.y, n = Math.hypot(dx, dy) || 1; for (let i = 0; i < 6; i++) { cx.globalAlpha = .9 - i * .14; drawSoulFlame(cx, x - dx / n * i * 6, y - dy / n * i * 6, 1 - i * .12); } });
+    impactBurst(c.x, c.y, '#d08aff', 10); shadowBurst(c.x, c.y, 16, 60);
+    silenceOn(def, 2);
+    await damage(def, 90, { from: att });
+  } },
+  // เขี้ยวเงียบ (melee r60, 120; 2 poison stacks): the black-armour knight bashes with its shield, then a crossed shadow cut leaves violet venom
+  shd_snake: { name: 'เขี้ยวเงียบ', icon: '⚔️', async run(att, def) {
+    if (!inRange(att, def, 60)) await approach(att, def);
+    await meleeStrike(att, def, { wind: 200, rush: 110, hits: 2, onHit(i, dir) {
+      const t = centerOf(def); shake = Math.max(shake, 3); hitstop = .05;
+      if (i === 0) { impactBurst(t.x, t.y, '#a0a0c0', 10); fxs.push({ age: 0, life: .3, draw(c, k) { c.globalAlpha = 1 - k; c.strokeStyle = '#d4ccec'; c.lineWidth = 2; c.beginPath(); c.arc(t.x - dir * 6, t.y, 6 + 12 * k, 0, 7); c.stroke(); } }); }
+      else {
+        for (const sg of [-1, 1]) fxs.push({ age: 0, life: .45, draw(c, k) { c.globalCompositeOperation = 'lighter'; c.globalAlpha = 1 - k; for (const [w, col] of [[5, 'rgba(160,74,255,.45)'], [2, '#b04aff'], [1, '#ffffff']]) { c.strokeStyle = col; c.lineWidth = w; c.beginPath(); c.moveTo(t.x - 14, t.y + sg * 14); c.lineTo(t.x + 14, t.y - sg * 14); c.stroke(); } } });
+        ps.burst(16, () => ({ x: t.x, y: t.y, vx: (Math.random() - .5) * 50, vy: -10 - Math.random() * 30, g: 60, life: .7, size: Math.random() < .4 ? 2 : 1, cols: ['#d08aff', '#7a2ad0', '#9aff6a'], glow: true }));
+        poisonOn(def, 5); sayAt(def, 'พิษ ×2', '#9aff6a', true);
+      }
+      return damage(def, 60, { from: att, melee: true });
+    } });
+  } },
+  // กลืนกลบ (burst r100, 70; blind 3.5 s): the lazy mist puffs itself up and a wide grey fog rolls out over everything near it
+  shd_mist: { name: 'กลืนกลบ', icon: '🌫️', async run(att, def) {
+    for (let i = 0; i < 3 && !inRange(att, def, 100 * SCALE * .85); i++) await approach(att, def);
+    const p = castPose(att, 600, 500, 'shadow');
+    await tween(560, (k) => { att.sx = 1 + .25 * k; att.sy = 1 + .18 * k; });
+    await p.charged; p.release(); att.sx = att.sy = 1;
+    const a = anchor(att), R = 100 * SCALE; sayAt(att, 'ฟู่...', '#c8c4e8');
+    for (let n = 0; n < 26; n++) { const an = n / 26 * TAU; ps.add({ x: a.x, y: a.y - 10, vx: Math.cos(an) * R * 1.6, vy: Math.sin(an) * R * .6, drag: 2.4, life: 1.6, size: 3, cols: ['#8a8ac0', '#5a5a94', '#c8c4e8'], glow: false }); }
+    fxs.push({ age: 0, life: 1.6, draw(c, k) { const g = ease(Math.min(1, k * 3)), al = k < .6 ? .5 : .5 * (1 - (k - .6) / .4); c.globalCompositeOperation = 'source-over'; c.globalAlpha = al; const gr = c.createRadialGradient(a.x, a.y - 8, 4, a.x, a.y - 8, R * g); gr.addColorStop(0, 'rgba(200,196,232,.9)'); gr.addColorStop(.7, 'rgba(110,104,160,.6)'); gr.addColorStop(1, 'rgba(60,56,100,0)'); c.fillStyle = gr; c.beginPath(); c.ellipse(a.x, a.y - 8, R * g, R * .5 * g, 0, 0, 7); c.fill(); } });
+    await wait(300);
+    if (inRange(att, def, R)) { mistBlind(def, 3.5); await damage(def, 45, { from: att }); } else await wait(400);
+  } },
+  // เหล็กในเงา (passive; 30% of basic hits poison): the soul-lantern wraith's lantern flickers and a soul flame clings to whoever it hits
+  shd_sting: { name: 'เหล็กในเงา', icon: '🏮', passive: true, async run(att, def) {
+    att.venom = true; tag(att, '🏮 เหล็กในเงา (ติดตัว)', 'shadow');
+    for (let i = 0; i < 4; i++) { await approach(att, def); await lungeHit(att, def, undefined); await wait(350); }
+  } },
+  // อวสานเงา (melee r62, 180; double damage below 35% HP): the light dies, the knight lord's greatsword grows a violet edge, one huge falling cleave
+  shd_end: { name: 'อวสานเงา', icon: '⚔️', async run(att, def) {
+    if (!inRange(att, def, 62)) await approach(att, def);
+    const p = castPose(att, 650, 500, 'shadow');
+    await tween(640, (k) => { darken = .7 * k; const m = mouthOf(att); if (Math.random() < .7) ps.add({ x: m.x + (Math.random() - .5) * 30, y: m.y - Math.random() * 40, vx: 0, vy: 18, life: .4, size: 1, cols: SHADOW_COLS, glow: true }); });
+    await p.charged; p.release();
+    const low = def.hp < def.hpMax * .35;
+    await meleeStrike(att, def, { wind: 160, rush: 120, hits: 1, onHit(i, dir) {
+      const t = centerOf(def); darken = 0; flashScreen = .9; hitstop = .14; shake = 10;
+      fxs.push({ age: 0, life: .55, draw(c, k) { c.globalCompositeOperation = 'lighter'; c.globalAlpha = 1 - k; for (const [w, col] of [[9, 'rgba(160,74,255,.4)'], [4, '#b04aff'], [1.5, '#ffffff']]) { c.strokeStyle = col; c.lineWidth = w; c.beginPath(); c.arc(t.x - dir * 10, t.y - 18, 34, dir > 0 ? -1.9 : -1.2 - Math.PI * .1, dir > 0 ? .9 : 2.4 + Math.PI * .1); c.stroke(); } } });
+      fxs.push({ age: 0, life: .6, draw(c, k) { c.globalCompositeOperation = 'lighter'; c.globalAlpha = (1 - k) * .8; c.fillStyle = '#b04aff'; c.fillRect(t.x - 1, t.y - 60 + 60 * Math.min(1, k * 4), 2, 70); } });
+      impactBurst(t.x, t.y, '#d08aff', 22); shadowBurst(t.x, t.y, 40, 110);
+      if (low) { sayAt(def, 'ประหาร!', '#ff5a5a', true); flashScreen = 1; }
+      return damage(def, low ? 360 : 180, { from: att, melee: true, crit: true });
+    } });
+    darken = 0;
+  } },
+  // จักรวาลเงา (passive; evasion +8, shorter dodge cooldown, after a dodge the next hit crits +25%): the wraith lord melts into smoke and reappears with a scythe swing
+  shd_void: { name: 'จักรวาลเงา', icon: '🌀', passive: true, async run(att, def) {
+    att.voidP = true; tag(att, '🌀 จักรวาลเงา (ติดตัว)', 'shadow');
+    await approach(def, att); await lungeHit(def, att, 'dodge'); await wait(250);
+    await approach(att, def); await lungeHit(att, def, undefined); await wait(400);
+    for (let i = 0; i < 2; i++) { await approach(def, att); await lungeHit(def, att, undefined); await wait(300); }
+    await approach(att, def); await lungeHit(att, def, undefined); await wait(300);
+  } },
+};
+function elCols(el) { return el === 'shadow' ? SHADOW_COLS : el === 'dark' ? DARK_COLS : el === 'holy' ? HOLY_COLS : el === 'water' ? WATER_COLS : el === 'leaf' ? LEAF_COLS : el === 'earth' ? EARTH_COLS : el === 'bolt' ? BOLT_COLS : FLAME_COLS; }
+const skillEl = (id) => (id.startsWith('tide') ? 'water' : id.startsWith('leaf') ? 'leaf' : id.startsWith('earth') ? 'earth' : id.startsWith('ltn') ? 'bolt' : id.startsWith('holy') ? 'holy' : id.startsWith('dark') ? 'dark' : id.startsWith('shd') ? 'shadow' : 'fire');
+const GAME_SKILLS = { ...FIRE, ...WATER, ...LEAF, ...EARTH, ...BOLT, ...HOLY, ...DARK, ...SHADOW };
 async function useFire(id, att, def) {
   const s = GAME_SKILLS[id];
   if (!s.passive) tag(att, s.icon + ' ' + s.name, skillEl(id));
@@ -5334,6 +5463,11 @@ const waterRow = document.getElementById('water-skills');
 for (const [id, sk] of Object.entries(WATER)) {
   const b = document.createElement('button'); b.className = 'el'; b.textContent = `${sk.icon} ${sk.name}${sk.passive ? ' (ติดตัว)' : ''}`;
   b.addEventListener('click', () => run(() => useFire(id, me, foe))); waterRow.append(b);
+}
+const shadowRow = document.getElementById('shadow-skills');
+for (const [id, sk] of Object.entries(SHADOW)) {
+  const b = document.createElement('button'); b.className = 'el'; b.textContent = `${sk.icon} ${sk.name}${sk.passive ? ' (ติดตัว)' : ''}`;
+  b.addEventListener('click', () => run(() => useFire(id, me, foe))); shadowRow.append(b);
 }
 const darkRow = document.getElementById('dark-skills');
 for (const [id, sk] of Object.entries(DARK)) {
@@ -5381,8 +5515,8 @@ async function autoLoop() {
       else if (r < .5) await run(async () => { await approach(foe, me); await lungeHit(foe, me, react()); });
       else if (me.stunT > 0) await wait(300);
       else if (r < .82 && me.silenceT > 0) await run(async () => { await approach(me, foe); await lungeHit(me, foe); });
-      else if (r < .82) { const set = me.el === 'water' ? WATER : me.el === 'leaf' ? LEAF : me.el === 'earth' ? EARTH : me.el === 'bolt' ? BOLT : me.el === 'holy' ? HOLY : me.el === 'dark' ? DARK : FIRE; const fk = Object.keys(set).filter((k) => !set[k].passive); const k = fk[Math.floor(Math.random() * fk.length)]; await run(() => useFire(k, me, foe)); }
-      else { const list = foe.el === 'water' ? ['tide_whirl', 'tide_trident', 'tide_fang', 'tide_ink', 'tide_sword'] : foe.el === 'leaf' ? ['leaf_root', 'leaf_wrath', 'leaf_fang', 'leaf_spore', 'leaf_antler', 'leaf_trunk'] : foe.el === 'earth' ? ['earth_quake', 'earth_horn', 'earth_paw', 'earth_quill', 'earth_crawl'] : foe.el === 'bolt' ? ['ltn_bolt', 'ltn_roar', 'ltn_claw', 'ltn_wing', 'ltn_vajra'] : foe.el === 'dark' ? ['dark_end', 'dark_curse', 'dark_web', 'dark_eye', 'dark_wrath', 'dark_fang'] : foe.el === 'holy' ? ['holy_sun', 'holy_judge', 'holy_arrow', 'holy_bell', 'holy_lull', 'holy_blade'] : ['flame_breath', 'flame_lava', 'flame_claw', 'flame_sun']; const k = list[Math.floor(Math.random() * list.length)]; await run(() => useFire(k, foe, me)); }
+      else if (r < .82) { const set = me.el === 'water' ? WATER : me.el === 'leaf' ? LEAF : me.el === 'earth' ? EARTH : me.el === 'bolt' ? BOLT : me.el === 'holy' ? HOLY : me.el === 'dark' ? DARK : me.el === 'shadow' ? SHADOW : FIRE; const fk = Object.keys(set).filter((k) => !set[k].passive); const k = fk[Math.floor(Math.random() * fk.length)]; await run(() => useFire(k, me, foe)); }
+      else { const list = foe.el === 'water' ? ['tide_whirl', 'tide_trident', 'tide_fang', 'tide_ink', 'tide_sword'] : foe.el === 'leaf' ? ['leaf_root', 'leaf_wrath', 'leaf_fang', 'leaf_spore', 'leaf_antler', 'leaf_trunk'] : foe.el === 'earth' ? ['earth_quake', 'earth_horn', 'earth_paw', 'earth_quill', 'earth_crawl'] : foe.el === 'bolt' ? ['ltn_bolt', 'ltn_roar', 'ltn_claw', 'ltn_wing', 'ltn_vajra'] : foe.el === 'shadow' ? ['shd_end', 'shd_kunai', 'shd_arrow', 'shd_snake', 'shd_mist'] : foe.el === 'dark' ? ['dark_end', 'dark_curse', 'dark_web', 'dark_eye', 'dark_wrath', 'dark_fang'] : foe.el === 'holy' ? ['holy_sun', 'holy_judge', 'holy_arrow', 'holy_bell', 'holy_lull', 'holy_blade'] : ['flame_breath', 'flame_lava', 'flame_claw', 'flame_sun']; const k = list[Math.floor(Math.random() * list.length)]; await run(() => useFire(k, foe, me)); }
       if (autoOn) await roam(2600 + Math.random() * 1600);
     }
     await new Promise((res) => setTimeout(res, 120));
@@ -5513,7 +5647,7 @@ function hud(t) {
     sx.globalAlpha = Math.max(0, a); sx.font = `700 ${15 * u}px "Chakra Petch", sans-serif`;
     const tw = sx.measureText(tg.text).width + 22 * u, px = right ? Wd - 14 * u - tw : 14 * u, py = (right && foe.boss ? 120 : 84) * u;
     const slide = (1 - Math.min(1, tg.age * 6)) * 20 * u * (right ? 1 : -1);
-    sx.fillStyle = tg.el === 'water' ? 'rgba(58,170,240,.92)' : tg.el === 'leaf' ? 'rgba(90,211,90,.92)' : tg.el === 'earth' ? 'rgba(212,170,110,.94)' : tg.el === 'bolt' ? 'rgba(255,225,74,.95)' : tg.el === 'holy' ? 'rgba(255,240,190,.96)' : tg.el === 'dark' ? 'rgba(196,122,255,.95)' : 'rgba(255,138,36,.92)'; sx.beginPath(); sx.roundRect(px + slide, py, tw, 26 * u, 13 * u); sx.fill();
+    sx.fillStyle = tg.el === 'water' ? 'rgba(58,170,240,.92)' : tg.el === 'leaf' ? 'rgba(90,211,90,.92)' : tg.el === 'earth' ? 'rgba(212,170,110,.94)' : tg.el === 'bolt' ? 'rgba(255,225,74,.95)' : tg.el === 'holy' ? 'rgba(255,240,190,.96)' : tg.el === 'shadow' ? 'rgba(170,150,230,.95)' : tg.el === 'dark' ? 'rgba(196,122,255,.95)' : 'rgba(255,138,36,.92)'; sx.beginPath(); sx.roundRect(px + slide, py, tw, 26 * u, 13 * u); sx.fill();
     sx.fillStyle = '#1b0f02'; sx.textAlign = 'left'; sx.fillText(tg.text, px + slide + 11 * u, py + 18 * u);
   }
   skillTags = skillTags.filter((tg) => tg.age < tg.life); sx.globalAlpha = 1;
@@ -5553,7 +5687,7 @@ function frame(dt) {
     stepWalk(e, dt);
     if (e.charging && Math.random() < .9) {
       const m = mouthOf(e), a = Math.random() * 7, r = 12 + Math.random() * 10, col = ELEM[e.charging === 'fire' ? 'fire' : e.charging]?.col || '#fff';
-      ps.add({ x: m.x + Math.cos(a) * r, y: m.y + Math.sin(a) * r * .7, vx: -Math.cos(a) * r * 3.2, vy: -Math.sin(a) * r * 2.2, life: .3, size: 1, cols: ['fire', 'water', 'leaf', 'earth', 'bolt', 'holy', 'dark'].includes(e.charging) ? elCols(e.charging) : ['#ffffff', col], glow: true });
+      ps.add({ x: m.x + Math.cos(a) * r, y: m.y + Math.sin(a) * r * .7, vx: -Math.cos(a) * r * 3.2, vy: -Math.sin(a) * r * 2.2, life: .3, size: 1, cols: ['fire', 'water', 'leaf', 'earth', 'bolt', 'holy', 'dark', 'shadow'].includes(e.charging) ? elCols(e.charging) : ['#ffffff', col], glow: true });
     }
     if (e.released > 0) { e.released -= dt; const m = mouthOf(e); if (e.released > .18) ps.burst(6, () => ({ x: m.x, y: m.y, vx: (e.flip ? -1 : 1) * (30 + Math.random() * 50), vy: (Math.random() - .5) * 30, drag: 3, life: .35, size: 1, cols: elCols(e.castEl), glow: true })); }
     e.flip = anchor(other(e)).x < anchor(e).x;
@@ -5562,7 +5696,7 @@ function frame(dt) {
     e.ghosts.forEach((g) => (g.a -= dt * 2.5)); e.ghosts = e.ghosts.filter((g) => g.a > 0);
     if (e.status) { e.statusT -= dt; if (e.statusT <= 0) e.status = null; }
     if (e.blindT > 0) e.blindT -= dt; else e.blindLight = false; if (e.defT > 0) e.defT -= dt; if (e.immuneT > 0) e.immuneT -= dt; if (e.curseT > 0) e.curseT -= dt; if (e.atkDownT > 0) e.atkDownT -= dt;
-    if (e.rootT > 0) e.rootT -= dt; if (e.silenceT > 0) e.silenceT -= dt; if (e.stunT > 0) e.stunT -= dt; if (e.atkUpT > 0) e.atkUpT -= dt; if (e.hasteT > 0) e.hasteT -= dt; if (e.focusT > 0) e.focusT -= dt;
+    if (e.rootT > 0) e.rootT -= dt; if (e.silenceT > 0) e.silenceT -= dt; if (e.stunT > 0) e.stunT -= dt; if (e.atkUpT > 0) e.atkUpT -= dt; if (e.hasteT > 0) e.hasteT -= dt; if (e.focusT > 0) e.focusT -= dt; if (e.evaT > 0) { e.evaT -= dt; if (Math.random() < .25) e.ghosts.push({ x: e.x + e.ox, y: e.y + e.oy, a: .3, img: frameOf(e, clock), tint: '#a04aff' }); }
     if (e.staticT > 0) { e.staticT -= dt; e.staticAcc = (e.staticAcc || 0) + dt; if (e.staticAcc >= 1) { e.staticAcc -= 1; if (Math.random() < .3) { e.stunT = Math.max(e.stunT || 0, .4); e.goal = null; sayAt(e, 'ช็อต!', '#ffe14a'); const cc = centerOf(e); zapBurst(cc.x, cc.y, 12, 50); } } }
     if (e.hasteT > 0 && e.walking > .3 && Math.random() < .35) e.ghosts.push({ x: e.x + e.ox, y: e.y + e.oy, a: .4, img: frameOf(e, clock), tint: '#ffe14a' });
     if (e.poisonT > 0) { e.poisonT -= dt; e.poisonAcc = (e.poisonAcc || 0) + dt; if (e.poisonAcc >= 1 && e.hp > 0) { e.poisonAcc -= 1; const h = Math.max(4, Math.round(e.hpMax * .02)); e.hp = Math.max(1, e.hp - h); sayAt(e, '-' + h + ' พิษ', '#9aff6a'); } }
@@ -5581,7 +5715,7 @@ function frame(dt) {
   const follow = Math.min(1, dt * 2.5);
   cam.x = Math.max(0, Math.min(WW - W, cam.x + (tx - cam.x) * follow));
   cam.y = Math.max(0, Math.min(WH - H, cam.y + (ty - cam.y) * follow));
-  const theme = foe.boss ? ({ fire: 'lava', leaf: 'forest', earth: 'canyon', bolt: 'storm', holy: 'temple', dark: 'eclipse' }[foe.el] || 'cave') : 'cave';
+  const theme = foe.boss ? ({ fire: 'lava', leaf: 'forest', earth: 'canyon', bolt: 'storm', holy: 'temple', dark: 'eclipse', shadow: 'crypt' }[foe.el] || 'cave') : 'cave';
   const shx = reduceMotion ? 0 : (Math.random() - .5) * shake, shy = reduceMotion ? 0 : (Math.random() - .5) * shake;
   shake = Math.max(0, shake - dt * 18);
   const K = stage.width / W;
@@ -5674,14 +5808,16 @@ const PLAN = [
     ['ร่างสุดท้าย', 'จักรพรรดิรัตติกาล 🌚', 'ราชินีแมงมุมรัตติกาล', 'แมงมุมยักษ์มีใยเป็นท้องฟ้ากลางคืน'],
     ['ร่างสุดท้าย', 'เจ้าแห่งคำสาป 💀', 'จักรพรรดิค้างคาวคำสาป', 'ค้างคาวยักษ์ปีกฉีก มีกะโหลกเป็นเกราะอก'] ],
     keep: 'ไข่รัตติกาล, ละอองมืด, ลูกค้างคาว, แมงมุมคำสาป, หนูท่อมืด' },
-  { line: 'สายเงา', fam: 'นักล่าย่องเงียบ (แมวและงู)', sum: 'เปลี่ยน 6', rows: [
-    ['โตเต็มวัย', 'นินจาเงา 🥷', 'แมวนินจาเงา', 'คงความนินจาไว้ แต่เป็นแมวสวมผ้าพันคอ'],
-    ['โตเต็มวัย', 'ผู้ล่าไร้เสียง 🏹', 'งูเงาไร้เสียง', 'นักธนูเป็นคน เปลี่ยนเป็นงู'],
-    ['สมบูรณ์', 'พญางูเงา 🐍', 'เสือดำเงา', 'ต่อจากแมวนินจาเงา (งูย้ายไปสายรอง)'],
-    ['สมบูรณ์', 'แมงป่องอาถรรพ์ 🦂', 'พญางูเงา', 'ต่อจากงูเงาไร้เสียง'],
-    ['ร่างสุดท้าย', 'เจ้าแห่งเงา 🎭', 'พญาแมวเงาเก้าหาง', 'หน้ากากเป็นสิ่งของ เปลี่ยนเป็นแมวยักษ์หางเงาเก้าหาง'],
-    ['ร่างสุดท้าย', 'ราชันย์ไร้ตัวตน 🌌', 'นาคราชไร้ตัวตน', 'กาแล็กซีไม่ใช่สัตว์ เปลี่ยนเป็นนาคที่ลำตัวโปร่งเห็นดวงดาว'] ],
-    keep: 'ไข่เงา, เงาจิ๋ว, แมวเงา, ผีเงาขี้อาย, ม่านหมอกขี้เกียจ' },
+  { line: 'สายเงา', fam: 'อัศวินเงาและภูตคลุมฮู้ด', sum: 'เปลี่ยน 8 (ทำครบแล้วด้านบน)', rows: [
+    ['ร่างเด็ก 2', 'แมวเงา 🐈', 'หมวกผีน้อย', 'เงาจิ๋วที่ไปสวมหมวกเหล็ก แยกได้ทั้งสายอัศวินและสายภูต'],
+    ['โตเต็มวัย', 'นินจาเงา 🥷', 'อัศวินเงา', 'นินจาเป็นคน เปลี่ยนเป็นชุดเกราะที่มีเงาเป็นตัวข้างใน'],
+    ['โตเต็มวัย', 'ผู้ล่าไร้เสียง 🏹', 'ภูตตะเกียงเงา', 'นักธนูเป็นคน เปลี่ยนเป็นภูตคลุมฮู้ดถือตะเกียง'],
+    ['สมบูรณ์', 'พญางูเงา 🐍', 'อัศวินเงาเกราะทมิฬ', 'ต่อจากอัศวินเงา ถือโล่'],
+    ['สมบูรณ์', 'แมงป่องอาถรรพ์ 🦂', 'ภูตโคมวิญญาณ', 'ต่อจากภูตตะเกียงเงา'],
+    ['ร่างสุดท้าย', 'เจ้าแห่งเงา 🎭', 'จอมอัศวินเงา', 'หน้ากากเป็นสิ่งของ เปลี่ยนเป็นอัศวินหมวกมีเขาถือดาบใหญ่'],
+    ['ร่างสุดท้าย', 'ราชันย์ไร้ตัวตน 🌌', 'เจ้าภูตเงา', 'กาแล็กซีไม่ใช่สัตว์ เปลี่ยนเป็นภูตยักษ์ถือเคียว'],
+    ['ร่างผสม', 'เงาผู้ตื่น 🪞', 'เงาผู้ตื่น (คงชื่อ)', 'อัศวินกับภูตรวมร่าง ท่อนล่างเป็นหางควัน'] ],
+    keep: 'ไข่เงา, เงาจิ๋ว, ผีเงาขี้อาย, ม่านหมอกขี้เกียจ, บอสราชาม่านเงา' },
 ];
 const FIRE_INFO = {
   flame_tail: ['เพลิงจอมซน', 'ประชิด · ระยะ 62 · เผาไหม้ 3 วิ แน่นอน', 'ง้างตัวโดยมีไฟลุกที่ปลายหาง แล้วพุ่งเข้าไปฟาดหางเป็นวงโค้งไฟจากด้านหลังไปด้านหน้า โดนแล้วตัวศัตรูลุกเป็นไฟ'],
@@ -5769,6 +5905,24 @@ const DARK_INFO = {
   dark_end: ['ราชินีแมงมุมรัตติกาล', 'ประชิด · ระยะ 66 · พลัง 280 · เกราะลด 4 วิ', 'ท่าไม้ตาย: แสงทั้งสนามดับลงเกือบหมด มีละอองมืดถูกดูดเข้าตัว แล้วแมงมุมพุ่งออกจากความมืดกัดสองเขี้ยวลงกลางตัวศัตรู จอแวบขาวแล้วมืดสั้นๆ ศัตรูรับดาเมจหนักและเกราะลด'],
   dark_curse: ['จักรพรรดิค้างคาวคำสาป', 'โซน · รัศมี 90 · ลงหลัง 1.4 วิ · พลัง 110 · คำสาป + ลดพลังโจมตี + พิษ 5 วิ', 'วงอักขระม่วงหมุนเร็วขึ้นเรื่อยๆ ใต้ศัตรู จอมืดและสั่น แล้วเปลวไฟดำพุ่งขึ้นเป็นแฉกพร้อมวิญญาณลอยขึ้น ใครอยู่ในวงติดคำสาป ตีเบาลง และเสียเลือดจากพิษ หลบออกจากวงได้ถ้าเดินทัน'],
 };
+const SHADOW_INFO = {
+  shd_kunai: ['อัศวินเงา', 'กระจาย · 3 ครั้ง · พลัง 70', 'ฟันดาบกลางอากาศ แล้วใบมีดเงาสีม่วงสามใบหมุนพุ่งออกเป็นพัด โค้งเข้าหาเป้าทีละใบ โดนครบสามครั้ง (ชื่อเดิมยังเป็นคุไน รอเปลี่ยน)'],
+  shd_flee: ['ผีเงาขี้อาย', 'ใส่ตัวเอง · หลบเก่งขึ้น + คริขึ้น 4 วิ', 'หน้าแดง ตัวจางโปร่งแสงแล้วลอยถอยหนี มีเงาม่วงตามหลัง ระหว่างนี้ตีธรรมดาที่มาโดนพลาด 40% และตัวเองคริขึ้น'],
+  shd_arrow: ['ภูตตะเกียงเงา', 'ยิง · พลัง 140 · ใบ้ 2 วิ', 'ตะเกียงสว่างขึ้นช้าๆ แล้วไฟวิญญาณสีม่วงพุ่งออกเป็นสายเงียบๆ ไม่มีจอสั่น โดนแล้วศัตรูใบ้ ใช้สกิลไม่ได้ (ชื่อเดิมยังเป็นศร รอเปลี่ยน)'],
+  shd_snake: ['อัศวินเงาเกราะทมิฬ', 'ประชิด · ระยะ 60 · พลัง 120 · พิษ 2 ชั้น', 'กระแทกโล่ก่อน แล้วฟันดาบเงาไขว้เป็นรูปกากบาท มีละอองพิษสีม่วงเขียวกระจาย ติดพิษสองชั้น (ชื่อเดิมยังเป็นเขี้ยวงู รอเปลี่ยน)'],
+  shd_mist: ['ม่านหมอกขี้เกียจ', 'ระเบิดรอบตัว · รัศมี 100 · พลัง 70 · มองไม่เห็น 3.5 วิ', 'พองตัวขึ้นแล้วพ่นหมอกเทาแผ่ออกเป็นวงกว้าง ใครอยู่ในวงมองไม่เห็น ตีธรรมดาพลาดง่าย'],
+  shd_sting: ['ภูตโคมวิญญาณ', 'ติดตัว · ตีธรรมดามีโอกาส 30% ติดพิษ', 'ปุ่มทดลองให้ตีธรรมดาสี่ครั้ง ครั้งไหนติดพิษจะมีไฟวิญญาณม่วงเกาะตัวศัตรูลอยขึ้น (ชื่อเดิมยังเป็นเหล็กใน รอเปลี่ยน)'],
+  shd_end: ['จอมอัศวินเงา', 'ประชิด · ระยะ 62 · พลัง 180 · แรงสองเท่าถ้าศัตรูเลือดต่ำกว่า 35%', 'ท่าไม้ตาย: จอมืดลง เงาไหลลงมารวมที่ดาบใหญ่ แล้วฟันลงทีเดียวเป็นวงโค้งม่วงขนาดใหญ่ มีเสาแสงตกลงกลางตัว ถ้าเลือดศัตรูต่ำจะขึ้นคำว่าประหาร'],
+  shd_void: ['เจ้าภูตเงา', 'ติดตัว · ค่าหลบ +8 · หลบแล้วตีครั้งถัดไปคริและแรงขึ้น 25%', 'ปุ่มทดลอง: ศัตรูเข้ามาตี เจ้าภูตละลายเป็นควันหลบไป แล้วสวนกลับด้วยการตีคริ ระหว่างสู้ตีธรรมดาที่มาโดนพลาด 20%'],
+};
+const shadowCards = document.getElementById('shadow-cards');
+for (const [id, [from, meta, desc]] of Object.entries(SHADOW_INFO)) {
+  const sk = SHADOW[id], card = document.createElement('div'); card.className = 'sk';
+  card.innerHTML = `<h3><span>${sk.icon}</span>${sk.name}</h3><div class="meta">${meta}</div><div class="hint">ได้จาก: ${from}</div><p>${desc}</p>`;
+  const b = document.createElement('button'); b.textContent = 'ลองท่านี้';
+  b.addEventListener('click', () => { document.querySelector('.stage').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' }); run(() => useFire(id, me, foe)); });
+  card.append(b); shadowCards.append(card);
+}
 const darkCards = document.getElementById('dark-cards');
 for (const [id, [from, meta, desc]] of Object.entries(DARK_INFO)) {
   const sk = DARK[id], card = document.createElement('div'); card.className = 'sk';
@@ -5812,7 +5966,7 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
 // Section picker: show one element at a time (the battle stays on top, with only that element's skills); remembered in the address (#fire, #water, #leaf, #earth, #plan).
 {
   const jump = document.getElementById('jump');
-  const ELS = ['fire', 'water', 'leaf', 'earth', 'bolt', 'holy', 'dark', 'shadow'], PICK = { fire: 'sunking', water: 'whaleking', leaf: 'forestdeer', earth: 'mountturtle', bolt: 'thunderking', holy: 'sunqilin', dark: 'spiderqueen' };
+  const ELS = ['fire', 'water', 'leaf', 'earth', 'bolt', 'holy', 'dark', 'shadow'], PICK = { fire: 'sunking', water: 'whaleking', leaf: 'forestdeer', earth: 'mountturtle', bolt: 'thunderking', holy: 'sunqilin', dark: 'spiderqueen', shadow: 'knightlord' };
   const apply = (v) => {
     document.querySelectorAll('section[data-group]').forEach((sec) => { const g = sec.dataset.group; sec.hidden = !(v === 'all' || g === 'battle' || g === v); });
     document.querySelectorAll('.skgroup').forEach((g) => { g.hidden = ELS.includes(v) ? g.dataset.el !== v : g.dataset.el === 'dark'; });

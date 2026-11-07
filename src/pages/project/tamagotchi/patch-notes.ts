@@ -1,5 +1,8 @@
 // Player-facing patch notes, newest first. Hand-written (CHANGELOG.md is generated from commits and
 // reads like a dev log). Add an entry here with every release the players should hear about.
+// Unreleased changes go in one entry with version 'next' (add it at the top if missing). The release
+// (semantic-release prepare step, .releaserc) stamps it with the real version and release time and
+// commits it (scripts/stamp-patch-notes.mjs), so never write either by hand.
 
 export type PatchNoteKind = 'new' | 'update' | 'fix'
 
@@ -12,8 +15,6 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
-    // Unreleased changes go in this one 'next' entry. The Docker/Pages build stamps it with the real
-    // version and release time (scripts/stamp-patch-notes.mjs), so never write either by hand.
     version: 'next',
     releasedAt: '2026-11-06T00:55:00Z',
     changes: [

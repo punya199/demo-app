@@ -1,5 +1,5 @@
 // Release step: turn the unreleased 'next' patch-notes entry into the real version and release time.
-// Usage: node scripts/stamp-patch-notes.mjs <version>   (run by the Docker and Pages builds)
+// Usage: node scripts/stamp-patch-notes.mjs <version>   (run by semantic-release's prepare step, and by the Docker and Pages builds)
 import { readFileSync, writeFileSync } from 'node:fs'
 
 const FILE = 'src/pages/project/tamagotchi/patch-notes.ts'
@@ -11,7 +11,6 @@ const next = /version: 'next',\n(\s*)releasedAt: '[^']*'/
 if (!next.test(src)) {
   console.log("no 'next' patch note, nothing to stamp")
 } else {
-  // ponytail: stamps the build time, a few minutes after the git tag; exact tag time if it matters
   const releasedAt = new Date().toISOString().replace(/\.\d+Z$/, 'Z')
   writeFileSync(FILE, src.replace(next, `version: '${version}',\n$1releasedAt: '${releasedAt}'`))
   console.log(`stamped patch note ${version} @ ${releasedAt}`)

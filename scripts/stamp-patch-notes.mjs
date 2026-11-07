@@ -2,7 +2,7 @@
 // Usage: node scripts/stamp-patch-notes.mjs <version>   (run by semantic-release's prepare step, and by the Docker and Pages builds)
 import { readFileSync, writeFileSync } from 'node:fs'
 
-const FILE = 'src/pages/project/tamagotchi/patch-notes.ts'
+const FILE = 'src/pages/project/tamagotchi/meta/patch-notes.ts'
 const version = process.argv[2]
 if (!/^\d+\.\d+\.\d+$/.test(version ?? '')) throw new Error(`bad version: ${version}`)
 

@@ -58,10 +58,12 @@ interface IEvolutionTreeProps {
   progress?: ITreeProgress | null
   selectedId?: string | null
   onSelect?: (speciesId: string) => void
+  // Species ids already recorded in the Dex; those nodes get a 📖 badge.
+  collected?: ReadonlySet<string>
 }
 
 export const EvolutionTree = (props: IEvolutionTreeProps) => {
-  const { layout, progress = null, selectedId, onSelect } = props
+  const { layout, progress = null, selectedId, onSelect, collected } = props
   const scrollRef = useRef<HTMLDivElement>(null)
   const { nodeStates, edgeStates, edgeKey } = getTreeStates(layout, progress)
   const width = PAD * 2 + (TREE_STAGES.length - 1) * COL_W + NODE_W
@@ -169,6 +171,12 @@ export const EvolutionTree = (props: IEvolutionTreeProps) => {
                   ? `${truncateVisible(node.species.name, MAX_NAME_CHARS)}…`
                   : node.species.name}
               </text>
+              {collected?.has(node.species.id) && (
+                <text x={x + NODE_W - 4} y={y + 13} textAnchor="end" className="text-[11px]">
+                  <title>บันทึกในสมุดภาพแล้ว</title>
+                  📖
+                </text>
+              )}
               {node.isDeadEnd && (
                 <text
                   x={x + NODE_W - 6}
@@ -187,7 +195,7 @@ export const EvolutionTree = (props: IEvolutionTreeProps) => {
   )
 }
 
-export const TreeLegend = () => (
+export const TreeLegend = (props: { showCollected?: boolean }) => (
   <div className="flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400">
     <span>
       <span className="mr-1 inline-block h-3 w-3 rounded border-2 border-emerald-600 bg-emerald-50 align-[-2px]" />
@@ -205,5 +213,6 @@ export const TreeLegend = () => (
       <span className="mr-1 inline-block h-3 w-3 rounded border-2 border-dashed border-red-500 align-[-2px]" />
       ทางตัน (ไปร่างสูงสุดไม่ได้)
     </span>
+    {props.showCollected && <span>📖 บันทึกในสมุดภาพแล้ว</span>}
   </div>
 )

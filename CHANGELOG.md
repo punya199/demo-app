@@ -1,3 +1,14 @@
+# [1.61.0](https://github.com/punya199/demo-app/compare/v1.60.0...v1.61.0) (2026-11-07)
+
+
+### Fix
+
+* point stamp-patch-notes and release assets at tamagotchi/meta/patch-notes.ts (#49) ([e20e2d5](https://github.com/punya199/demo-app/commit/e20e2d55eb4b3d4f0a3b4a6fbc077d82d5c4f8ac)), closes [#49](https://github.com/punya199/demo-app/issues/49)
+
+### Update
+
+* reorganize tamagotchi into feature modules and split oversized files (#48) ([1141d77](https://github.com/punya199/demo-app/commit/1141d771bd1bd46ccc7a419dccd12f9e770a3fa4)), closes [#48](https://github.com/punya199/demo-app/issues/48)
+
 # [1.60.0](https://github.com/punya199/demo-app/compare/v1.59.0...v1.60.0) (2026-11-07)
 
 

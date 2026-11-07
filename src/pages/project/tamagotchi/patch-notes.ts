@@ -15,6 +15,16 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: 'next',
+    releasedAt: '2026-11-07T15:00:00Z',
+    changes: [
+      {
+        kind: 'update',
+        text: 'ปรับหน้าต่างดูการต่อสู้ในสนาม: ปุ่มความเร็ว / ข้าม / ปิด ย้ายขึ้นมาอยู่เหนือบันทึกการต่อสู้ บันทึกแสดงครบทุกเหตุการณ์และเลื่อนดูย้อนหลังได้ (โชว์ทีละ 4 บรรทัด) และจอสนามสูงไม่เกิน 400px บนคอมพิวเตอร์',
+      },
+    ],
+  },
+  {
     version: '1.59.0',
     releasedAt: '2026-11-07T14:52:12Z',
     changes: [

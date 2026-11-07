@@ -1,5 +1,5 @@
 import { Button, Modal, Progress, Segmented } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArenaReplay } from './ArenaReplay'
 import {
   ARENA_TICK,
@@ -74,11 +74,20 @@ export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
   const replay = battle?.replay ?? null
   const lastTick = replay ? (replay.frames.length - 1) * replay.step : 0
   const isFinished = !replay || tick >= lastTick
+  // The log follows the newest line until the player scrolls up to read.
+  const logRef = useRef<HTMLOListElement>(null)
+  const followLog = useRef(true)
 
   useEffect(() => {
     setTick(0)
     setSkipping(false)
+    followLog.current = true
   }, [battle])
+
+  useEffect(() => {
+    const el = logRef.current
+    if (el && followLog.current) el.scrollTop = el.scrollHeight
+  }, [tick])
 
   const skills = useMemo(() => {
     const map: Record<string, IArenaSkill> = {}
@@ -100,8 +109,6 @@ export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
           .filter((e) => e.t <= tick)
           .map((e) => ({ e, line: describeArenaEvent(e, replay.fighters, statuses) }))
           .filter((x) => x.line)
-          .slice(-6)
-          .reverse()
       : []
 
   return (
@@ -113,29 +120,7 @@ export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
         title ??
         `${battle.player.emoji} ${battle.player.name} ปะทะ ${battle.enemy?.emoji ?? ''} ${battle.enemy?.name ?? ''}`
       }
-      footer={
-        isFinished ? (
-          <Button type="primary" onClick={onClose}>
-            ปิด
-          </Button>
-        ) : (
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <Segmented
-              size="small"
-              value={speed}
-              onChange={(value) => setSpeed(Number(value))}
-              options={[
-                { label: '1x', value: 1 },
-                { label: '2x', value: 2 },
-                { label: '4x', value: 4 },
-              ]}
-            />
-            <Button size="small" onClick={() => setSkipping(true)}>
-              ข้าม
-            </Button>
-          </div>
-        )
-      }
+      footer={null}
     >
       {replay && statuses ? (
         <div className="flex flex-col gap-3">
@@ -189,18 +174,56 @@ export const ArenaBattleModal = (props: IArenaBattleModalProps) => {
           <div className="text-right text-xs text-slate-500 tabular-nums dark:text-slate-400">
             {Math.floor(tick / ARENA_TICK)} / {Math.floor(lastTick / ARENA_TICK)} วินาที
           </div>
-          <ol className="flex max-h-36 flex-col gap-0.5 overflow-y-auto text-sm">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {isFinished ? (
+              <Button type="primary" onClick={onClose}>
+                ปิด
+              </Button>
+            ) : (
+              <>
+                <Segmented
+                  size="small"
+                  value={speed}
+                  onChange={(value) => setSpeed(Number(value))}
+                  options={[
+                    { label: '1x', value: 1 },
+                    { label: '2x', value: 2 },
+                    { label: '4x', value: 4 },
+                  ]}
+                />
+                <Button size="small" onClick={() => setSkipping(true)}>
+                  ข้าม
+                </Button>
+              </>
+            )}
+          </div>
+          {/* Every event, oldest first; 4 lines (h-20 / leading-5) visible, the rest scrolls. */}
+          <ol
+            ref={logRef}
+            onScroll={(event) => {
+              const el = event.currentTarget
+              followLog.current = el.scrollTop + el.clientHeight >= el.scrollHeight - 24
+            }}
+            className="h-20 overflow-y-auto text-sm leading-5"
+          >
             {log.map(({ e, line }, i) => (
-              <li key={`${e.t}-${i}`} className={TONE_CLASS[line?.[0] ?? '']}>
+              <li key={`${e.t}-${i}`} className={`truncate ${TONE_CLASS[line?.[0] ?? '']}`}>
                 {line?.[1]}
               </li>
             ))}
           </ol>
         </div>
       ) : (
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          ต่อสู้อัตโนมัติ (ไม่แสดงการต่อสู้)
-        </p>
+        <div className="flex flex-col gap-3">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            ต่อสู้อัตโนมัติ (ไม่แสดงการต่อสู้)
+          </p>
+          <div className="flex justify-end">
+            <Button type="primary" onClick={onClose}>
+              ปิด
+            </Button>
+          </div>
+        </div>
       )}
       {isFinished && summary && (
         <div className="mt-3 rounded-lg bg-slate-100 p-3 text-center text-sm text-slate-700 dark:bg-slate-800 dark:text-slate-200">

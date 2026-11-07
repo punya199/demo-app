@@ -1,3 +1,10 @@
+# [1.55.0](https://github.com/punya199/demo-app/compare/v1.54.0...v1.55.0) (2026-11-07)
+
+
+### Update
+
+* show world boss growth in the wiki, replay and patch notes ([c764c36](https://github.com/punya199/demo-app/commit/c764c363677de00c42ad6f13a576f9b585e7f62f))
+
 # [1.54.0](https://github.com/punya199/demo-app/compare/v1.53.0...v1.54.0) (2026-11-07)
 
 

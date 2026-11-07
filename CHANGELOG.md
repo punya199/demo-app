@@ -1,3 +1,10 @@
+# [1.54.0](https://github.com/punya199/demo-app/compare/v1.53.0...v1.54.0) (2026-11-07)
+
+
+### New
+
+* show Dex-collected badge on the pet evolution tree ([60afb59](https://github.com/punya199/demo-app/commit/60afb599835ff10aec4de651ad6e06a1ab697870))
+
 # [1.53.0](https://github.com/punya199/demo-app/compare/v1.52.1...v1.53.0) (2026-11-06)
 
 

@@ -43,7 +43,7 @@ export const ResetWikiTab = (props: { wiki: IWikiData; now?: Date }) => {
     {
       event: '🏆 PvP: ซีซัน',
       what: `ซีซันใหม่เริ่ม เรตติ้งเก็บ ${percent(pvp.seasonResetKeep)} ของส่วนต่างจากเรตเริ่มต้น และรับรางวัลซีซันที่จบแล้วได้`,
-      schedule: { kind: 'monthly' },
+      schedule: { kind: 'weekly' },
     },
     {
       event: '👹 Boss Raid',

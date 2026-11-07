@@ -748,7 +748,6 @@ export const formatRatingChange = (before: number, after: number) =>
 
 // Mirrors the server's arena rules for set effects (arena-rules.ts).
 const SET_BURN_CHANCE = 0.3
-const SET_REGEN_PER_SEC = 3
 const SET_SHIELD_REFRESH_SEC = 12
 const SET_LAST_STAND_BELOW = 0.35
 
@@ -762,7 +761,7 @@ export const describeSetEffect = (effect: IFighterEffects) =>
     effect.shieldRefresh &&
       `ได้โล่ ${toPercent(effect.shieldRefresh)} ของ HP ทุก ${SET_SHIELD_REFRESH_SEC} วิ`,
     effect.regenPct &&
-      `ฟื้น HP ${Math.round(effect.regenPct * SET_REGEN_PER_SEC * 100) / 100}% ของ HP สูงสุดทุกวินาที`,
+      `ฟื้น HP ${Math.round(effect.regenPct * 10000) / 100}% ของ HP สูงสุดทุกวินาที`,
     effect.doubleStrikeChance && `ตีปกติมีโอกาสตีซ้ำ ${toPercent(effect.doubleStrikeChance)}`,
     effect.cooldownCut && `คูลดาวน์สกิลสั้นลง ${toPercent(effect.cooldownCut)}`,
     effect.lastStandShield &&
@@ -931,7 +930,7 @@ export const passiveEffectLabel: Record<PassiveEffectKey, string> = {
   crit: 'โอกาสคริติคอล',
   critdmg: 'ดาเมจคริติคอล',
   shield: 'โล่เริ่มต้น (% ของ HP)',
-  regen: 'ฟื้น HP ต่อเทิร์น (%)',
+  regen: 'ฟื้น HP ต่อวินาที (%)',
   dbl: 'โอกาสโจมตีซ้ำ',
   burn: 'เทิร์นเผาไหม้ของท่าพิเศษ',
   hunger: 'ความอิ่มลดช้าลง',

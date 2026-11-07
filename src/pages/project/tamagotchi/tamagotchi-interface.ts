@@ -1040,7 +1040,7 @@ export interface IWikiData {
     winsPerPoint: number
     winMaxPoints: number
     pvpSeasonPoints: { maxRank: number | null; points: number }[]
-    arenaRegenPerSecPct: number
+    secondsPerTurn: number
     arenaBurnChance: number
     arenaAttackSpeedPct: number
     arenaAttackSpeedCap: number

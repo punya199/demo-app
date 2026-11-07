@@ -32,6 +32,11 @@ asked for this more than once.
 - When the owner rejects a design twice, stop guessing: offer **three options side by side** (as
   for ราชาวาฬผลึก and อสนีผู้ตื่น) and let them pick. When they send a reference picture, follow
   it closely (they may say "เป๊ะ"); if it faces the viewer, turn it to a side view facing right.
+- A detailed, high-resolution reference picture (like the shadow-line image) does not survive being
+  copied into 48–96 px sprites: the owner called the close copies "ประหลาด". Treat such a picture as
+  a concept only, and design simple, chunky, readable silhouettes in the style of the approved lines
+  (bats, spiders, lions). When the owner likes two of three options, put both in the line (main
+  branch + alt branch), as for the shadow knights and wraiths.
 - Small sketches on a screenshot (a red line, a circle) are exact limits: keep to them.
 - Flyers must move on their wings (the `FLY` rig), not walk.
 - After every change: render the sprite sheet / run the skills in Playwright, look at the
@@ -104,8 +109,9 @@ The prototype uses these; the game data still has the old ones.
 | Skill | `ltn_hoof` | กีบอสนี | โฉบอสนี |
 | Skill | `ltn_vajra` | วัชระผ่าฟ้า | หางปาอสนี |
 | Species | see the plan table on the page | อัคนีพยัคฆ์, ราชาสุริยะ, … | อัคนีแผงคอ, ราชันมังกรสุริยะ, … |
+| Species (shadow) | `shadow_baby2` … `shadow_ultimateAlt` | แมวเงา, นินจาเงา, ผู้ล่าไร้เสียง, พญางูเงา, แมงป่องอาถรรพ์, เจ้าแห่งเงา, ราชันย์ไร้ตัวตน | หมวกผีน้อย, อัศวินเงา, ภูตตะเกียงเงา, อัศวินเงาเกราะทมิฬ, ภูตโคมวิญญาณ, จอมอัศวินเงา, เจ้าภูตเงา (เงาจิ๋ว, ผีเงาขี้อาย, ม่านหมอกขี้เกียจ, เงาผู้ตื่น and the boss ราชาม่านเงา keep their names) |
 
-Still to ask the owner (old animal names left on skills): ดาบรัศมี / ธนูรัศมี (holy: a knight's sword and a bow, now the lion cub's light claw and the qilin's horn arrow), ตรีศูลสมุทร (water), กรงเล็บไพร /
+Still to ask the owner (old animal names left on skills): คุไนเงา / ศรเงียบ / เขี้ยวเงียบ / เหล็กในเงา (shadow: a ninja, an archer, a snake and a scorpion; now the knight's blade fan, the lantern's soul flame, the black knight's shield-and-cross cut and the soul lantern's poison passive), ดาบรัศมี / ธนูรัศมี (holy: a knight's sword and a bow, now the lion cub's light claw and the qilin's horn arrow), ตรีศูลสมุทร (water), กรงเล็บไพร /
 งวงพฤกษา / พิทักษ์พนา (leaf), อุ้งตีนผา / ขนแร่ (earth).
 
 ## Open items and known gaps
@@ -155,3 +161,8 @@ Still to ask the owner (old animal names left on skills): ดาบรัศม�
 - `THEMES` / `floors`: cave, lava (fire boss) and forest (leaf boss) arenas.
 - `STAGES` / `STAGE_OF`: the stage badges.
 - `ROSTER`: what the battle selectors offer.
+- Shadow line: `tf(s, sc, ox, oy)` draws on a design grid at a scale (used to grow `knight` into
+  `knight2` and `lantern` into `soulwraith`); `shEye`, `ribbon`, `arc`; materials `arm`/`arm2` (black
+  steel), `wr`/`wr2`/`cape` (cloth), `vio` (glow), `vten` (purple claws/tendrils). `SHADOW` skills
+  use `shdFly` (several things flying at once), `drawShadeBlade`, `drawSoulFlame`, `evaOn`,
+  `mistBlind`; `lungeHit` handles `evaT`, `voidP`/`critNext` and `venom`. Theme `crypt`.

@@ -39,4 +39,18 @@ describe('ArenaBattleModal', () => {
     rerender(<ArenaBattleModal {...props} battle={fight(2)} />)
     expect(screen.getByTestId('replay-speed').textContent).toBe('1')
   })
+
+  it('keeps a close button above the log once the fight is over', () => {
+    const onClose = vi.fn()
+    render(
+      <ArenaBattleModal
+        statuses={{} as never}
+        catalog={[]}
+        onClose={onClose}
+        battle={{ ...fight(3), replay: undefined } as never}
+      />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'ปิด' }))
+    expect(onClose).toHaveBeenCalled()
+  })
 })

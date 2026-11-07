@@ -367,7 +367,7 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
   return (
     <canvas
       ref={canvasRef}
-      className="block aspect-[16/11] w-full max-w-full rounded-lg bg-[#13142a]"
+      className="mx-auto block aspect-[16/11] w-full max-w-[582px] rounded-lg bg-[#13142a]"
       aria-label="สนามต่อสู้"
     />
   )

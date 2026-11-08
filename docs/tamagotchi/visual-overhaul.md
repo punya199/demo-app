@@ -25,6 +25,8 @@ asked for this more than once.
   skill file. Line files: fire, water, leaf, earth, bolt, holy, dark, shadow. A new script file
   must be added to `index.html` and to the publish `files` list. Open `index.html` in a browser to
   run it.
+- The repo's pre-commit hook runs prettier and eslint --fix on the prototype's JS files, so after
+  committing, republish the formatted files (behaviour is unchanged).
 - The page has a "ดูส่วน" dropdown at the top: all / fire / water / leaf / earth / lightning
   (each "monsters + skills") / holy / dark / plan. The battle scene always
   stays on top. Choosing an element also shows only that element's skill buttons under the arena

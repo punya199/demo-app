@@ -5,6 +5,7 @@ import { drawAura, drawGlows } from '../sprites/fx/auras'
 import { makeParticle, ParticleType, PSys } from '../sprites/fx/particles'
 import { getSpriteFrame, hasSprite, SPRITES } from '../sprites/sprite-registry'
 import type { ISpriteDef } from '../sprites/sprite-types'
+import { buildThemeFloor, floorThemeOf } from '../sprites/fx/floors'
 import { scene } from './skill-fx/runtime'
 import { createSkillStage, IStagePlace } from './skill-fx/stage'
 
@@ -87,6 +88,8 @@ export interface ISpriteLayer {
   drawParticles: (ctx: CanvasRenderingContext2D) => void
   // Screen-wide effects of the skill animations (shake in world px, overlays 0..1).
   screen: () => { shake: number; darken: number; tint: number; flash: number }
+  // The pixel-art floor (a boss fight takes its element's arena), in scene pixels.
+  floor: HTMLCanvasElement
   // Whether a skill animation is drawing team's projectile itself (hide the server's orb).
   hidesProjectiles: (team: number) => boolean
 }
@@ -102,6 +105,11 @@ export const createSpriteLayer = (
     x: x / ARENA_SCALE / PX,
     y: (y / ARENA_SCALE + FOOT_DROP) / PX,
   }))
+  const floor = buildThemeFloor(
+    floorThemeOf(fighters.find((f) => f.boss)?.el),
+    Math.round(ARENA_W / PX),
+    Math.round(ARENA_H / PX)
+  )
   const shown: ({ white: CanvasImageSource } | null)[] = fighters.map(() => null)
   scene.frameOf = (e) => shown[e.idx] ?? null
   // Fighters' casts that have their own animation: the generic particles stay out of their way.
@@ -507,6 +515,7 @@ export const createSpriteLayer = (
       stage.draw(ctx)
       ctx.restore()
     },
+    floor,
     screen: () => ({
       shake: scene.shake * PX,
       darken: scene.darken,

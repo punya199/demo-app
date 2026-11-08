@@ -158,7 +158,11 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
         (Math.random() - 0.5) * shake * scale
       )
       ctx.clearRect(0, 0, ARENA_W, ARENA_H)
-      ctx.drawImage(floor, 0, 0, ARENA_W, ARENA_H)
+      if (layer) {
+        ctx.imageSmoothingEnabled = false
+        ctx.drawImage(layer.floor, 0, 0, ARENA_W, ARENA_H)
+        ctx.imageSmoothingEnabled = true
+      } else ctx.drawImage(floor, 0, 0, ARENA_W, ARENA_H)
       const fi = tick / step
       const i0 = Math.min(frames.length - 1, Math.floor(fi))
       const i1 = Math.min(frames.length - 1, i0 + 1)

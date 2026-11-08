@@ -324,8 +324,10 @@ have moved). Game versions when this was written: frontend 1.61.0, backend 1.48.
    `stage.test.ts` runs every animation through a fake canvas and fails on any script error; all 74 were
    also checked in Chromium on replays from the real engine (one fight per skill, caster = the species
    that owns it). When an animation changes in the prototype, port the change into the matching
-   `skill-fx/<line>.ts` by hand (the converter was one-off). Still open: the floor is the old cave for
-   every fight (the prototype has element themes).
+   `skill-fx/<line>.ts` by hand (the converter was one-off). The floor (done 2026-11-08) is `sprites/fx/floors.ts`: the
+   prototype's eight themes redrawn on the game's flat box (back wall with rocks and crystals, stone tiles,
+   glowing rim, cracks, pools, rubble); a fight with a boss (raid, world or adventure area boss) takes its
+   element's theme, a water boss and every other fight the blue cave.
 3. **Other screens:** `shared/PetSprite.tsx` (home), `PetAvatar.tsx` (`PetCostumeFrame`: costumes are
    emoji layers for backdrop, aura, back item, face item and hat over a 128 px box, so every sprite needs
    a head and face anchor), the Dex, the evolution tree and the return-home (กลับดาว) screen.

@@ -92,101 +92,48 @@ Object.assign(SPRITES, {
     ],
     mouth: [146, 134],
   },
-  // เซราฟรัศมี (holy raid): a six-winged peacock of light, its fan tail spread behind it, each feather with a gold eye
+  // เซราฟรัศมี (holy raid): the owner's AI-made six-winged peacock (bitmap in raid-bitmaps.js), cut into
+  // head, raised wings, middle and low wings and legs (seraphPart). Crest and halo are drawn in code.
   raidseraph: {
     size: 96,
     rig: BIPED,
-    aura: { type: 'bossh', x: 48, y: 90, r: 36 },
+    aura: { type: 'bossh', x: 48, y: 92, r: 36 },
     draw(s, P) {
-      const [bx, by] = P.body,
-        hx = P.head[0] + bx,
-        hy = P.head[1] + by,
-        w = P.wing
-      // fan tail behind everything: nine long feathers, each ending in a big gold-and-sky eye
-      for (let i = 0; i < 9; i++) {
-        const a = Math.PI * (1.04 + i * 0.115),
-          x1 = 40 + Math.cos(a) * 42 + bx,
-          y1 = 66 + Math.sin(a) * 40 + by
-        s.L(42 + bx, 66 + by, x1, y1, 1.4, 'feath2', 4.6)
-        s.E(x1, y1, 4.6, 3.8, 'gold')
-        s.E(x1, y1, 2.8, 2.2, 'sky')
-        s.d(x1, y1, '#1e3a6e')
-      }
-      // six wings, warm ivory so they stand off the cool fan: a raised top pair, a spread middle pair, a low pair over the legs
-      plumeWing(s, 46 + bx, 52 + by, 30, 10, -2.0 - w * 0.1, 'ivory', 1, '#c48a16')
-      plumeWing(s, 54 + bx, 52 + by, 30, 10, -1.15 + w * 0.1, 'ivory', -1, '#c48a16')
-      plumeWing(s, 44 + bx, 60 + by, 22, 8, -2.85, 'ivory2', 1, '#c48a16')
-      plumeWing(s, 56 + bx, 60 + by, 22, 8, -0.3, 'ivory2', -1, '#c48a16')
-      s.L(46 + bx, 72 + by, 44 + P.bl[0], 88 + P.bl[1], 2, 'gold')
-      s.L(54 + bx, 72 + by, 56 + P.bf[0], 88 + P.bf[1], 2, 'gold')
-      s.line(
-        [
-          [40 + P.bl[0], 89 + P.bl[1]],
-          [47 + P.bl[0], 89 + P.bl[1]],
-        ],
-        '#c48a16'
-      )
-      s.line(
-        [
-          [53 + P.bf[0], 89 + P.bf[1]],
-          [60 + P.bf[0], 89 + P.bf[1]],
-        ],
-        '#c48a16'
-      )
-      s.E(50 + bx, 62 + by, 14, 14, 'ivory')
-      s.E(56 + bx, 60 + by, 8, 11, 'sky')
-      plumeWing(s, 42 + bx, 68 + by, 16, 6, 2.6, 'halo', 1, '#c48a16')
-      plumeWing(s, 58 + bx, 68 + by, 16, 6, 0.55, 'halo', -1, '#c48a16')
-      // neck and head: sky-blue throat, halo behind, three crest plumes with gold orbs, hooked gold beak
-      s.L(56 + bx, 54 + by, 64 + hx, 30 + hy, 6, 'ivory', 4.5)
-      s.L(59 + bx, 54 + by, 67 + hx, 32 + hy, 3, 'sky', 2.2)
-      haloRing(s, 63 + hx, 21 + hy, 11, 3.4, 0.1)
-      for (const [x, y] of [
-        [61, 8],
-        [66, 6],
-        [71, 9],
+      const o = seraphOffsets(P),
+        cream = { col: '#f0e8ce', off: o.body, inner: 1 }
+      bmpRig(s, RAID_BMP.raidseraph, 4, 4, seraphPart, o, SERAPH_ORDER, {
+        wingUp: cream,
+        wingMid: cream,
+        wingLow: cream,
+        head: { col: '#40aae8', off: o.body, inner: 1 },
+      })
+      const hx = 4 + o.head[0],
+        hy = 4 + o.head[1],
+        sway = P.head[0] * 0.3
+      // crest: three thin sky stems ending in gold orbs, and the halo ring round them
+      for (const [tx, ty] of [
+        [69, 22],
+        [74, 19],
+        [79, 21],
       ]) {
-        s.line(
-          [
-            [66 + hx, 21 + hy],
-            [x + hx, y + hy],
-          ],
-          '#c48a16'
-        )
-        s.E(x + hx, y + hy, 1.8, 1.8, 'halo')
+        s.L(75 + hx, 29 + hy, tx + hx + sway, ty + hy, 0.5, 'sky', 0.4)
+        s.E(tx + hx + sway, ty + hy, 1.4, 1.4, 'gold')
       }
-      s.E(67 + hx, 25 + hy, 7.5, 6, 'ivory')
-      s.P(
-        [
-          [73 + hx, 23 + hy],
-          [81 + hx, 26 + hy],
-          [74 + hx, 29 + hy],
-        ],
-        'gold'
-      )
-      s.d(70 + hx, 24 + hy, '#1a1a3a')
-        .d(71 + hx, 24 + hy, '#1a1a3a')
-        .d(70 + hx, 23 + hy, '#ffffff')
-      s.line(
-        [
-          [69 + hx, 27 + hy],
-          [72 + hx, 27 + hy],
-        ],
-        '#7ee7ff'
-      )
-      if (P.glow) glowMouth(s, 80 + hx, 26 + hy)
+      haloRing(s, 75 + hx, 26 + hy, 9, 2.6)
+      if (P.glow) glowMouth(s, 83 + hx, 33 + hy)
     },
     glows: [
-      [66, 21, '#fff3a8', 10, 'head'],
-      [50, 60, '#fff3a8', 9, 'body'],
+      [74 + 4, 20 + 4, '#fff3a8', 9, 'head'],
+      [40, 50, '#fff3a8', 10, 'body'],
     ],
     emit: [
       { x: 40, y: 40, type: 'sparkle', rate: 4 },
       { x: 50, y: 60, type: 'glint', rate: 2 },
-      { x: 66, y: 8, type: 'goldleaf', rate: 1 },
+      { x: 30, y: 20, type: 'sparkle', rate: 2 },
     ],
-    mouth: [80, 26],
+    mouth: [87, 37],
   },
+
   // จ้าวมืดมิด (dark raid): Dracula, the vampire count, a person-sized boss: high red-lined collar, slicked hair with a widow's peak, red eyes and fangs
   vampire: {
     size: 72,

@@ -2120,9 +2120,7 @@ addCard(
 addCard(
   document.getElementById('show-raidseraph'),
   'raidseraph',
-  document.getElementById('act-raidseraph'),
-  8,
-  true
+  document.getElementById('act-raidseraph')
 )
 addCard(
   document.getElementById('show-vampire'),
@@ -2558,6 +2556,14 @@ const ROSTER = {
     boss: true,
     kind: 'บอสเรด',
   },
+  raidseraph: {
+    sprite: 'raidseraph',
+    name: 'เซราฟรัศมี',
+    el: 'holy',
+    hp: 6800,
+    boss: true,
+    kind: 'บอสเรด',
+  },
   tortoise: { sprite: 'tortoise', name: 'เต่าศิลา', el: 'earth', hp: 520 },
   worm: { sprite: 'worm', name: 'หนอนดินเกียจคร้าน', el: 'earth', hp: 420 },
   rhino: { sprite: 'rhino', name: 'แรดผา', el: 'earth', hp: 480 },
@@ -2773,6 +2779,7 @@ for (const id of [
   'flora',
   'lavaking',
   'abyssfish',
+  'raidseraph',
   'pangolin',
   'stormbison',
   'holyele',

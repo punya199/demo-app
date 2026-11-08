@@ -193,6 +193,115 @@ const RAID_BMP = {
       '........aaaaaaaa.....aaaaaaaaaaaaaaaaaaaaaaaa..aaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaa......',
     ],
   },
+  raidseraph: {
+    pal: [
+      '#140c26',
+      '#fffce8',
+      '#f0e8ce',
+      '#d6cbae',
+      '#b0a48a',
+      '#80725e',
+      '#ffe260',
+      '#f0b818',
+      '#b2700a',
+      '#8cd6f6',
+      '#40aae8',
+      '#1c6eb4',
+    ],
+    rows: [
+      '...................................a....................................................',
+      '..................................aba...................................................',
+      '..................................aba........................aa.........................',
+      '..................................abba......................aca.........................',
+      '...................................abba.....................aca.........................',
+      '...................................abba....................acca.........................',
+      '...................................abbba...................acca.........................',
+      '...................................abbbaa..aaa.............acca.........................',
+      '...............................aa...abbba.adda..........aaaccca.........................',
+      '...............................abaa.abbbbaddda..a.......acaccca.........................',
+      '.........................aaaaa.aabaaaabbbaadddaahaa.....acaccca.........................',
+      '........................ahhhhhaeabbabcbbbbaadahhhhha...addaccca.........................',
+      '.......................ahhhhhhhdabbbbccbbbbaahhhhhha...adddecca.........................',
+      '.......................ahhhhhhhadabbbccdbbbbaahklhhaa.aadccecca.........................',
+      '.......................ahhkllkhaaaabbcddbbbbcaklllhha.acdccedcca........................',
+      '................aaaaaaaahhllllhabaabbbdddbbbccalklhha.acdccddcca........................',
+      '...............ahhhhhadahhklklhaabbabbbbddbbccbakkhidaacdddddcca........................',
+      '...............ahhhhhhadahhkkkhiabbbbbbbbdddccbbahhidaacddddcccca.......................',
+      '...............ahhhhhhhaaahhhhhbbabbbbbbbddddddbbaacaaacdecccccca.......................',
+      '...............ahhlllkhabbaiaaebbaabbbbbbcccdddbbbacaaeececcdddca.......................',
+      '...............ahhllllhabbbbbbebbbabbbbbccdddffbbbbaaaeeccccddcca.......................',
+      '...............ahhllkkhhbbbbbbbbbbbabbbbcddddfbbbbbaaaeecccccdccca......................',
+      '...............aihhkkhhabbbbbbcbbbbaaabbcccdddbbbbbcaadcccddccccca......................',
+      '...............aaihhhhibbbbbbbcbbbbababccccdddbbbbdccaaffcddccccca......................',
+      '........aaaaaaaaabaiaacbbbbbbbbcdbbabbbddccceeebbbdccbaafdddcccccc......................',
+      '........ahhhhhhabbbbbbcbbbbbbbbcdbbbabbbddccdeebbbbccbbaadcccccccc......................',
+      '.......ahhhhkkhhibbbbbbbbbbbbbbbcbbbbabbbcccddbbbbbcccbbaccccccccc......................',
+      '.......ahhhkllkhibbbbbbbbbcbbbbbccbbccaaccccddfbbcccccbbaadccccccc......................',
+      '.......ahhhlllkhiabbbbbbbbcbbbbbcccbbccaaaccddfbbbcccccbbadccccccca......aaajaa.........',
+      '........ahhklkkhiabbbcbbbbcbbbbcbccbbdaaaadddcccbbbdddcbbaccccccccca....aakjjjjaa.......',
+      '........ahhhkjhhibbbbcbbbbcccbbcbbcccdaaccddddddbbdddccbbaccccccccca....akkblbbja.......',
+      '.........aahhhhicbbbbbbbbbbcccbbbbcdccdaaadccdddccddcccbbaccccccccca...aakkbaabbaa......',
+      '.........aaaaaabcbbbbbbbbbbbccbbbbcdccdadddeeedddddccccbbacccccccca....akkkbbblbhga.....',
+      '......aaaabbbbbbbbbbbbbbbbbbbcbbbccdccdaadddddeeedddcccbbacccccccca....aklkkkbkihha.....',
+      '....aahhhaabbbbbbbbbbbbbbbbbbbbbbcccddddaaadddeeedddddcbbacccccccca...akklllkklaaaha....',
+      '...ahhhhhhhbbbbbbbbbbbbbbbbbbbccdddcddcddaaaaeeeeffdcccbbaccccccca....akkjlllaa...aa....',
+      '..ahhhhkljhibbbbbbbbbbbbbbbbbbccdccdddcddaccdddddfdddccbbaedccccca....akjjlla...........',
+      '..ahhhhlllkhibbbccbbbbbbcbbbcccccdddddcddaaaaddddfdddddbbaedccccca....akjjjla...........',
+      '...ahhhllkkhibbbbbbbbbbbccbbcccccddddddddddaaddddffdddcbbaeecccca.....akkjjla...........',
+      '...ahhhklkkhabbbbbbbbbbbbcbbccccccdaaaaaaaaaaaaeeffddcccbaeeecdda......akjjja...........',
+      '....ahhhhhhhcbbbbbbbbbbbbbbcccaaaaaabbbbbbbbbbbaaeeeccccbbaeecdda......akjjjja..........',
+      '.....aahhhhacbbbbbbbbbbbbaaaaabbbbbbbcccccbbbbbbbaeeccdcbbaaedddda.....akjjjja..........',
+      '.....aaaaabbbbccaaaaaaaaaabbbbbbbeeeeeeccccccbbbbaaeeddcbbbaeeddda.....akjjjja..........',
+      '....adaabbbbbbbbabbbbbbbbbbbbbbbbeeecccccccdcccbbbbaeddccbbaaeedda.....akjjjjja.........',
+      '.aaaaaaaabbbbbbbbaabbbbbbbbbeeeddcdeccccccdddccccbbaaddddcbbaeeeeea....akjjjjja.........',
+      '.ahhhhhhhbbccbbbbbaaaaaaaaddccccdcddffdddccddcccccbbaadddcbbbaeeeea....akjjjjja.........',
+      'ahhhhklkhhbbbbbbbbaaaaaabbbbbbbcdddddddcccdddccccccbbaaadddbbbaaeeea..akjjjjjjja........',
+      'ahhhhlllkhabbbbbbbabbbbbbbbbbbeeddcccdddcddddddcccccbbbaaaddbbbaaeeeaakkjjjjjjja........',
+      'ahhhhllkkhabbbbbbbbaabbbbfffddcccdccddddccdffddddccccbbbbaaaabbbbaeaakkkjjjjjjja........',
+      '.ahhhllkhhibbbbbbbbbbaaaaaccbbbbcdcddccddccddddddcccccbbbbbbaaabbbakkkkjjjjjjjja........',
+      '.aahhhhhhiabbbbbbbbbbbbaabbbbbbacccdddddddccdddddddccccbbbbbbbbabcckkkkjjjjjjjja........',
+      '...aahahiabbbbbbbbbbcbbbddaaaacccccaddcccddccfffdddccddccccbbbbbbccckkkjjjjjjjja........',
+      '....aaabbbbbbbbbbbcccbbddddddaaaaaaacddccdddceefddccdddcccddbbbbccccckkkjjjjjjja........',
+      '....adaaabbbbbbbbbbbbcccccddddddaaddcaaadccdeddeeddddddddcdddbbbccccckkkjjjjjjja........',
+      '....aaaaabbbeebbbbbbbdccccdccdddddaaaddadcaeeeeeeeedddddaaaaabbcccccckkkjjjjjjja........',
+      '..aahhhhhabbbbbbdddbdddccccccdddddddddddaaaeeeaeeeeeeeaaabbbbbbcccccclkkjjjjjjaa........',
+      '.ahhhhjlkhibbbbbbbbbbbbbeeddddddddccddddeeaaaaeeeeeeaaaccbbbbbbcccccclkkkkkjja..........',
+      '.ahhhkllkhhacccccccccbbbbbddddddddddddddeeeeeaaaaeeaaddbbbbbbbddcccccckkkkkkja..........',
+      '.ahhhlllkhiabbbbbbbbbbeeedddddddccddeeeeeeeeeeaaaaaccdbbbbbbabcccccccckkkkkkka..........',
+      '.ahhhkllkhhaccccccccccccddcccddddddeeedddddeeeeeaadddcbbbbbbaaaaaccccclkkkkkka..........',
+      '.ahhhhhhhhabbbbbbbbbbbbbbdddddddcccdddddddeeeeeeaddddcbbbbbbbbbbbaccccckkkkkka..........',
+      '..aahhhhaabbbbbbbbbbbbbbbccddddeedddddddeedddeeaaddddbbbbbbbbbbbbaccccclkkkkaa..........',
+      '....aaaabbbbeeddddbbccccbcccddddddccdeeddddeeaadeeddbbbbbbbbbbbbbacccccclkkfaa..........',
+      '......adaaaaabbbbbbbbbbccdccdbbdddddddddddddaaddeebbbbbbbbbbbbbbbaccccccdddaba..........',
+      '......aaahhhhabbbcccbbbbbddcddddccddddddddddadaddebbbbbbbbbbbbbbbacccccdddaaba..........',
+      '......ahhhhkhhabbbbbccbbbddccddddddddccddddaaaddddddbbbbbbbbbbbbaacccccddaadba..........',
+      '.....ahhhlllkhhabbbbbbbbbbddcdddddcccddddaaadddddfdbbbbbbbbbbbbbaeecddeeaaedba..........',
+      '.....ahhhlllkhhabbbbbbbbbbeedcccccdddddaaa.aaddeeffcbbbbbbbbbbbaeeeeeeeaaeeda...........',
+      '....ahhhhkllkhhbbbbbbbbeebbbdccddddddaa..aaaddddccccbbbbbbccbbaeeeeeeeaeeeeea...........',
+      '....ahhhhhlkhhabbbbbbbbbbbbbbbddddaaa....addddccceebbbbbbbbbbaaeeeeeaaeeeeda............',
+      '.....ahhhhhhhaaaaabbbbbbbbbdddddaaa......aaccdffddffbbbbbbbbaaaeeeaaaeeeeeda............',
+      '......aaaaaaaaadaaaaabbbbeebbbaa.........acccbbbbdfebbbbbbbaadaaaaaaeeeeeda.............',
+      '..............aahhhhhabbbbbbbaa.........acccbbbbbbbebbbbbbaadaafffaeeeeedda.............',
+      '..............ahhlljhhabbbaaaa.........aaabbbddbbbbbbbbbaaaddaeeeaaeeeeeda..............',
+      '.............ahhellkkhabba.........aaaaabbbbbbbbbbbbbbbaadeeaaeeeaeeeeeea...............',
+      '.............ahhjlllkhaaa..........adaacbeebbbbddbbbbaaaeddaaeeeaeeeeeeaa...............',
+      '............ahhhhlllhaa.............aaccbbbbbbbbbbbbaa.aeeaaaaeaeeeeeeaa................',
+      '............ahhhhhhhha...............aabbbbddbbbbbaa...aiaaeaiiaeeeeea..................',
+      '............aihhhhhia...............aabbbbbbbbbbbaa...aiiaeeaaiaeeeea...................',
+      '.............aaaaaaa...............abbcbbbbbbbaaa.....aiiaeeeaiaeeaa....................',
+      '..................................accacbbbbbbaa.......aahaeeeeaaaaa.....................',
+      '..................................aaabbbbbaaa..........ahaeeeeaia.......................',
+      '.................................aabbbbbaa............aahaeeeeaia.......................',
+      '.................................abbaaaa.............aeahaeaaa.aha......................',
+      '.................................aaa.................aaahaa....aia......................',
+      '........................................................aa.....ahha.....................',
+      '........................................................aha....aihaa....................',
+      '.......................................................ahhaa..aiihhiaa..................',
+      '......................................................aiihhha.aaaahhha..................',
+      '......................................................aaaahha.....aaaa..................',
+      '..........................................................aaa...........................',
+    ],
+  },
 }
 
 // Animates a bitmap by cutting it into parts, like a paper puppet. part(x, y) names the part of each
@@ -346,3 +455,36 @@ const SHARK_ORDER = [
   'pec',
   'jaw',
 ]
+
+// เซราฟรัศมี: the owner's AI-made peacock (1024 px, fake checker background removed, reduced by 10.5x to
+// 88 x 91). The crest and halo are drawn in code so they follow the head. Parts: head, the two raised
+// wings (bend sideways from their base), the spread middle wing and the low wing (tips flap up and down,
+// column by column), and two legs (shear from the hip); the fan tail stays with the body.
+const seraphTop = (x) => (x <= 25 ? 42 : x <= 29 ? 41 : x <= 35 ? 40 : x <= 46 ? 39 : 40)
+const seraphBot = (x) => 44 + (x - 16) * 0.29
+function seraphPart(x, y) {
+  if (x >= 67 && y <= 40) return 'head'
+  if ((y >= 77 && y <= 82 && x >= 53 && x <= 59) || (y >= 83 && x >= 50 && x <= 61)) return 'legB'
+  if ((y >= 77 && y <= 82 && x >= 60 && x <= 63) || (y >= 83 && x >= 62)) return 'legF'
+  if (y < 34 && x >= 31 + (y - 8) * 0.3 && x <= 66 && !(x >= 42 && x <= 53 && y >= 8 && y <= 19))
+    return 'wingUp'
+  if (x >= 16 && x <= 57 && y >= seraphTop(x) && y <= seraphBot(x)) return 'wingMid'
+  if (x >= 24 && x <= 52 && y > seraphBot(x) && y <= 85) return 'wingLow'
+  return 'body'
+}
+function seraphOffsets(P) {
+  const clamp = (v, c) => Math.max(-c, Math.min(c, v)),
+    body = [P.body[0] * 0.6, P.body[1] * 0.6],
+    at = (dx, dy) => [body[0] + Math.round(dx), body[1] + Math.round(dy)],
+    w = P.wing
+  return {
+    body,
+    head: at(clamp(P.head[0] * 0.7, 2), clamp(P.head[1] * 0.7, 2)),
+    wingUp: (x, y) => at((clamp(-w * 2.5, 3) * (34 - y)) / 34, 0),
+    wingMid: (x) => at(0, (clamp(-w * 3, 3) * (58 - x)) / 42),
+    wingLow: (x) => at(0, (clamp(w * 1.6, 2) * (52 - x)) / 28),
+    legB: (x, y) => at((P.bl[0] * 0.7 * (y - 77)) / 13, y >= 86 ? clamp(P.bl[1], 2) : 0),
+    legF: (x, y) => at((P.bf[0] * 0.7 * (y - 77)) / 13, y >= 86 ? clamp(P.bf[1], 2) : 0),
+  }
+}
+const SERAPH_ORDER = ['wingLow', 'body', 'legB', 'legF', 'wingMid', 'wingUp', 'head']

@@ -2,188 +2,93 @@
 // raid sprites, added to the shared SPRITES table.
 Object.assign(SPRITES, {
   /* ----- Raid bosses (still drafts): one per element that has a raid boss, each from its line's animal family ----- */
-  // ราชันย์ลาวา (fire raid): a lava golem, basalt boulders stacked into a hunched giant, lava glowing in every seam
+  // ราชันย์ลาวา (fire raid): the owner's AI-made lava golem (bitmap in raid-bitmaps.js), animated by
+  // cutting it into head, arms and legs that follow the BIPED pose; lava shows at the neck when the
+  // head moves. Smoke and embers are particles.
   lavaking: {
     size: 96,
     rig: BIPED,
-    aura: { type: 'boss', x: 48, y: 90, r: 36 },
+    aura: { type: 'boss', x: 48, y: 92, r: 38 },
     draw(s, P) {
-      const [bx, by] = P.body,
-        hx = P.head[0] + bx,
-        hy = P.head[1] + by,
-        a1 = P.arm,
-        a2 = P.arm2,
-        j = P.jaw * 2
-      const m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy])
-      // molten insides first: the stones sit on top, so lava shows in every gap
-      s.L(20 + bx, 40 + by, 18 + a2[0], 76 + a2[1], 4, 'fire')
-      s.L(76 + bx, 40 + by, 82 + a1[0], 76 + a1[1], 4, 'fire')
-      s.E(48 + bx, 50 + by, 22, 20, 'fire')
-      s.L(38 + bx, 66 + by, 36 + P.bl[0], 86 + P.bl[1], 4, 'fire')
-      s.L(58 + bx, 66 + by, 60 + P.bf[0], 86 + P.bf[1], 4, 'fire')
-      // far arm: stacked stones down to a fist on the ground
-      s.E(20 + bx, 50 + by, 6.5, 7.5, 'basalt2')
-      s.E(18 + (bx + a2[0]) / 2, 63 + (by + a2[1]) / 2, 6, 6.5, 'basalt2')
-      s.E(18 + a2[0], 78 + a2[1], 9, 8, 'basalt2')
-      // legs: short thick columns
-      s.E(36 + P.bl[0] * 0.5, 76 + by, 8, 8, 'basalt2')
-      s.E(36 + P.bl[0], 87 + P.bl[1], 9, 4.5, 'basalt2')
-      s.E(60 + P.bf[0] * 0.5, 76 + by, 8, 8, 'basalt')
-      s.E(60 + P.bf[0], 87 + P.bf[1], 9, 4.5, 'basalt')
-      s.E(48 + bx, 67 + by, 15, 6.5, 'basalt2')
-      // the chest boulder with a molten core and glowing cracks
-      s.P(
-        m(
-          [
-            [27, 38],
-            [36, 28],
-            [50, 25],
-            [64, 28],
-            [72, 40],
-            [68, 58],
-            [52, 63],
-            [32, 58],
-          ],
-          bx,
-          by
-        ),
-        'basalt'
+      const k = 0.6,
+        sc = (v) => [v[0] * k, v[1] * k],
+        add = (u, v) => [u[0] + v[0], u[1] + v[1]],
+        body = sc(P.body),
+        lim = (v, m) => [Math.max(-m, Math.min(m, v[0])), Math.max(-m, Math.min(m, v[1]))],
+        half = (v) => [(v[0] + body[0]) / 2, (v[1] + body[1]) / 2],
+        head = add(body, lim(sc(P.head), 2)),
+        armF = add(body, lim(sc(P.arm), 6)),
+        armB = add(body, lim(sc(P.arm2), 5))
+      bmpRig(
+        s,
+        RAID_BMP.lavaking,
+        3,
+        7,
+        (x, y) =>
+          x >= 50 && x <= 72 && y >= 4 && y <= 24
+            ? 'head'
+            : x <= 27 && y >= 22
+              ? 'armB'
+              : x >= 70 && y >= 16
+                ? 'armF'
+                : y >= 56 && x <= 48
+                  ? 'legB'
+                  : y >= 56
+                    ? 'legF'
+                    : 'body',
+        { body, head, armF, armB, legB: sc(P.bl), legF: sc(P.bf) },
+        ['armB', 'legB', 'body', 'head', 'legF', 'armF'],
+        // dark rock fills the joint behind a moving arm, glowing lava the neck behind the head
+        {
+          armB: { col: '#1e1620', off: half(armB) },
+          armF: { col: '#1e1620', off: half(armF) },
+          head: { col: '#4a0804', off: body },
+        }
       )
-      s.E(52 + bx, 45 + by, 6, 6, 'fire')
-      s.E(52 + bx, 45 + by, 3.5, 3.5, 'core')
-      for (const pts of [
-        [
-          [44, 32],
-          [47, 38],
-          [46, 42],
-        ],
-        [
-          [58, 52],
-          [62, 56],
-          [61, 60],
-        ],
-        [
-          [36, 46],
-          [40, 50],
-        ],
-      ])
-        s.line(m(pts, bx, by), '#ff8a24', '#ffd04a')
-      // shoulders, then a small head boulder sunk between them: a glowing visor slit, a jaw that opens on lava
-      s.E(26 + bx, 36 + by, 10, 8.5, 'basalt')
-      s.E(72 + bx, 36 + by, 10, 8.5, 'basalt')
-      s.spike(24 + bx, 30 + by, 6, 2.4, 'basalt2', -2)
-      s.spike(72 + bx, 30 + by, 6, 2.4, 'basalt2', 2)
-      s.E(54 + hx, 24 + hy, 9, 7, 'basalt2')
-      s.P(
-        m(
-          [
-            [46, 20],
-            [54, 17],
-            [63, 20],
-            [61, 23],
-            [48, 23],
-          ],
-          hx,
-          hy
-        ),
-        'basalt'
-      )
-      s.line(
-        m(
-          [
-            [52, 24],
-            [61, 23],
-          ],
-          hx,
-          hy
-        ),
-        '#ffd04a',
-        '#fff3a8'
-      )
-      s.P(
-        m(
-          [
-            [50, 28],
-            [62, 28 + j],
-            [60, 31 + j],
-            [51, 31],
-          ],
-          hx,
-          hy
-        ),
-        'basalt'
-      )
-      if (j > 0.5)
-        s.line(
-          m(
-            [
-              [52, 28.5],
-              [60, 28.5],
-            ],
-            hx,
-            hy
-          ),
-          '#ff8a24'
-        )
-      // near arm: three stones and a huge fist knuckling the ground
-      s.E(77 + bx, 50 + by, 7, 8, 'basalt')
-      s.E(80 + (bx + a1[0]) / 2, 63 + (by + a1[1]) / 2, 6.5, 7, 'basalt')
-      s.E(82 + a1[0], 78 + a1[1], 10.5, 9, 'basalt')
-      for (const x of [77, 82, 87])
-        s.line(
-          [
-            [x + a1[0], 82 + a1[1]],
-            [x + a1[0], 86 + a1[1]],
-          ],
-          '#1a0604'
-        )
-      for (const [x, y] of [
-        [80, 57],
-        [20, 57],
-        [30, 66],
-        [66, 66],
-      ])
-        s.line(
-          [
-            [x + bx, y + by],
-            [x + 3 + bx, y + by],
-          ],
-          '#ff8a24'
-        )
-      if (P.glow) glowMouth(s, 56 + hx, 30 + hy)
+      if (P.glow) glowMouth(s, 60 + body[0], 47 + body[1])
     },
     glows: [
-      [52, 45, '#ff9a2a', 10, 'body'],
-      [57, 23, '#ffd04a', 4, 'head'],
+      [60, 47, '#ff9a2a', 10, 'body'],
+      [66, 22, '#ffd04a', 3, 'head'],
     ],
     emit: [
-      { x: 26, y: 30, type: 'smoke', rate: 2 },
-      { x: 72, y: 30, type: 'smoke', rate: 2 },
-      { x: 52, y: 45, type: 'ember', rate: 3 },
-      { x: 82, y: 86, type: 'drip', rate: 1.2 },
+      { x: 22, y: 10, type: 'smoke', rate: 2 },
+      { x: 70, y: 12, type: 'smoke', rate: 2 },
+      { x: 60, y: 47, type: 'ember', rate: 3 },
+      { x: 84, y: 92, type: 'drip', rate: 1 },
     ],
-    mouth: [56, 30],
+    mouth: [60, 47],
   },
-  // อสูรห้วงลึก (water raid): the owner's AI-made shark (bitmap in raid-bitmaps.js), a long blue shark with a
-  // jagged spine crest. Wider than the other bosses (160 grid) because the picture is 150 x 59.
-  // The tail sways with the pose and the whole body bobs; the jaw itself does not move.
+  // อสูรห้วงลึก (water raid): the owner's AI-made shark (bitmap in raid-bitmaps.js), 150 x 59 on a 160 grid.
+  // Cut into tail, body and lower jaw: the tail sways with the pose and the jaw drops open on a red
+  // mouth in attacks and casts.
   abyssfish: {
     size: 160,
     rig: SWIM,
     hover: 6,
     aura: { type: 'bossw', x: 80, y: 154, r: 52 },
     draw(s, P) {
-      const [bx, by] = P.body,
-        t = P.tail
-      s.bmp(RAID_BMP.abyssfish, 5 + bx, 96 + by, (x) =>
-        x < 36 ? [0, -t * 1.4 * (1 - x / 36)] : [0, 0]
+      const body = P.body,
+        t = P.tail,
+        j = P.jaw
+      const jaw = (x) => [body[0], body[1] + j * (1.5 + (x - 128) * 0.35)]
+      bmpRig(
+        s,
+        RAID_BMP.abyssfish,
+        5,
+        96,
+        (x, y) => (x < 36 ? 'tail' : x >= 128 && y >= 36 ? 'jaw' : 'body'),
+        { body, tail: (x) => [body[0], body[1] - t * 0.8 * (1 - x / 36)], jaw },
+        ['tail', 'body', 'jaw'],
+        { jaw: { col: '#5f1125', off: body } }
       )
+      if (P.glow) glowMouth(s, 146 + body[0], 134 + body[1])
     },
     emit: [
       { x: 90, y: 104, type: 'bubble', rate: 2.5 },
       { x: 12, y: 118, type: 'mist', rate: 2 },
     ],
-    mouth: [150, 132],
+    mouth: [146, 134],
   },
   // เซราฟรัศมี (holy raid): a six-winged peacock of light, its fan tail spread behind it, each feather with a gold eye
   raidseraph: {

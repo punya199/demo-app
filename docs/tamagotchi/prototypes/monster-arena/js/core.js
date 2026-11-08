@@ -2110,16 +2110,12 @@ addCard(document.getElementById('show-flora'), 'flora', document.getElementById(
 addCard(
   document.getElementById('show-lavaking'),
   'lavaking',
-  document.getElementById('act-lavaking'),
-  8,
-  true
+  document.getElementById('act-lavaking')
 )
 addCard(
   document.getElementById('show-abyssfish'),
   'abyssfish',
-  document.getElementById('act-abyssfish'),
-  8,
-  true
+  document.getElementById('act-abyssfish')
 )
 addCard(
   document.getElementById('show-raidseraph'),
@@ -2546,6 +2542,22 @@ const ROSTER = {
   sprout: { sprite: 'sprout', name: 'ต้นอ่อน', el: 'leaf', hp: 160 },
   seed: { sprite: 'seed', name: 'เมล็ดจิ๋ว', el: 'leaf', hp: 90 },
   flora: { sprite: 'flora', name: 'พฤกษาโบราณ', el: 'leaf', hp: 6500, boss: true, kind: 'บอสเรด' },
+  lavaking: {
+    sprite: 'lavaking',
+    name: 'ราชันย์ลาวา',
+    el: 'fire',
+    hp: 6800,
+    boss: true,
+    kind: 'บอสเรด',
+  },
+  abyssfish: {
+    sprite: 'abyssfish',
+    name: 'อสูรห้วงลึก',
+    el: 'water',
+    hp: 6800,
+    boss: true,
+    kind: 'บอสเรด',
+  },
   tortoise: { sprite: 'tortoise', name: 'เต่าศิลา', el: 'earth', hp: 520 },
   worm: { sprite: 'worm', name: 'หนอนดินเกียจคร้าน', el: 'earth', hp: 420 },
   rhino: { sprite: 'rhino', name: 'แรดผา', el: 'earth', hp: 480 },
@@ -2759,6 +2771,8 @@ for (const id of [
   'boss',
   'turtle',
   'flora',
+  'lavaking',
+  'abyssfish',
   'pangolin',
   'stormbison',
   'holyele',

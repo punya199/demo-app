@@ -85,4 +85,137 @@ const RAID_BMP = {
       '...............................................................................pkjjhppppp.............................................................',
     ],
   },
+  // ราชันย์ลาวา: from the owner's AI-made lava golem (reduced from about 860 x 960 to 90 x 87, mapped to a
+  // hand-picked rock + lava palette; the smoke and embers were dropped and come back as particles).
+  lavaking: {
+    pal: [
+      '#0c080c',
+      '#1e1620',
+      '#2e2430',
+      '#42363e',
+      '#5e5056',
+      '#8a7c78',
+      '#d8c4a0',
+      '#4a0804',
+      '#a8200a',
+      '#e8400a',
+      '#f07010',
+      '#f8b818',
+      '#f8e020',
+    ],
+    rows: [
+      '...........................e...aaaaaaa....................................................',
+      '.......................jj..a..aaaaaaaaa...................................................',
+      '......................jjjiaaaaaggggccdaaa.................................................',
+      '.....................jkgjaagggggggddcdddaaa...............................................',
+      '....................jkgjaagggggggddddcddiaaa................aaa...........................',
+      '....................jmmjagggggggdddddccjjcaa..............aaaaaaa.........................',
+      '....................jjkaag..gggdeedddchllccaa..........aaaa...fbaa........................',
+      '....................jjaagggg..gdeddddbciiccca.........aaff.....ccaaa......................',
+      '...................aaaagggggggggddddccchicccaaa......aafffffffbccccaa.....................',
+      '.................aaaggg.gggggdddeddebcchiccccaaa.....addddffbccdcccca.....................',
+      '................aaggggggdggddddddddeccchhccccacaa...aadddddbccccdcccca....................',
+      '...............aaagggggdecddddddddddccbjjacccadca.aaaaaaddabcccccdcccaa...................',
+      '..............aaagggggdeeeddddddddddcbijljaccabbaaaaafffaddccccccccccca...................',
+      '..............aaggeeedeeeebddddddddbbhjllljaaabbaaffaddc.adbcccccccccca...................',
+      '..............aageeeeeeeeeebdddddbbbikkaaajaabbaaafaadbbddchiliacccccba...................',
+      '..............aaeeeeeeeeeeebcbbdbbbbjkbdddaaabaaa.ddaddbddabimmmjjcccaa.....j.............',
+      '..............aaeeceedeeeeeebbbbbbbijbdddddaahajjaddadddddaddbjmmmmhaaa....jjj............',
+      '..............aeeeceeccdcccbcccbbbbjabdddddaaijllaaaaadddabddddimmmjaaaaaaajl.............',
+      '..............aeecheccdddccaccbbbbbjhcdddddajjlljjaibaaaaacdddddbiiaaaaaeaaaj.............',
+      '.............aacccjcddccdcbabbbbbbhjbccddddaklljjjccbbaaaacdddddcbbbaabeeeeaa..j..........',
+      '.............aaaahjjhcccdbaaabbbbbjbccccddaalaakabbbbaaaaaadddddcbbaabbbeeeeaajjj.........',
+      '.............aaaaajkiicababbabbbbihcccccccaaaccalaaaaaiiiaaadddcbbbaabbbbeeeeaajj.........',
+      '............aa..ffaakiiihbbbbabbhbcccccccabbacddajffffbkkiaaaddcbbaabbbbbeeeeeaa..........',
+      '............aaffffdaakkkihbbbbabbcccccccaabbacccbeffffdckkjiaaaabbaaabbbbbeeeeea..........',
+      '............affffdddaakkkibbbbabcccccccaabbaacccbeeefdddclljiiiaaaahibbbbbbeeeeaa.........',
+      '............adffdddddaalljihhhacbcccccaabbbaacddheeedddddbllllljiahiiabbbbbeeeeeaa........',
+      '...........aa.dddddddajllljjjiibbcccaabbbbaaccccheeeedddddhllllllijjjabbbbbbeeeeeaa.......',
+      '..........aaeefdddddddaallljljiabbaaabbbbaaccccheeeedddddddajllhhllkjhabbbbbbeeeeaa.......',
+      '..........aaeeedddddddballlllljiaababaaaaabbccchieeeddddddddakacccbljababbbbbbeeeha.......',
+      '..........aaeeddddcdddbakiaaaajjiiiiiaaaabcddcciaaedddddddddjacccccddabaabbbbbbchha.......',
+      '..........aedfdddddddbbiiacccaajjiiaaabcaccddccjaaaadddddddbjaccccddddababbbbbbbiaa.......',
+      '.........aaeebddddddaaajjcccccaaiaaaacbcaacddccjjiiaadddddakkiccccddddabaabbbbbbiaa.......',
+      '.........aeeeedddddaahijbbcccccaabbabccccadcccajkkkkaabddaikjihccccdddabbacbbbbiaa........',
+      '.........aeeebaaaaabhiibbbbbbccaabbaaccccaaaaiikkkkkjhaaaikiijihcccdcbabbaabbbjjaa........',
+      '.........aaebbaaabbbhjhbbbbbbbaaabbaaccccaaijkkmkkkkkkkkkkkiiijhccbbbaabbhaaaijaa.........',
+      '..........aabaabbbbbhihbbbbbbbaaabbaaccccaijjmmmmjjkkkkkkjjiiijibbbbcaabbiiiiiaa..........',
+      '...........aaaiabbbhiiabbbbbba..aaihacccaijjmmmkjjjjklmmmmkjiijjhcbbbabbbjjiaaaa..........',
+      '............aaijaaaijiabbbbbaa...aaiaccaikkmmmjjkkjjjmmmmmmkjjjjhbccaabbiijaaaa...........',
+      '............aajkjijjlliabbbaa....aajiaaijkmmljjjjjjjjmmmmmmkjjjihbbcaaahiaaabba...........',
+      '..........aaaaaalllmmlljaaaa.....aahjijaaaaaabbhjjjjjlmmmmljjjiaabbaabbaabbabba...........',
+      '.........aaffggaaakmmjjkaa........ahijaaacccccccchjjjjkmmmjjjibbbaaabbbbbbbbabba..........',
+      '........aagggggddakljiaaa.........aaaaaacccccbcccbbjjjjmmmjiibbbcaabbbbbbbbcacba..........',
+      '.......aagggggdddaaljhhaa..........aaabaccccccbcccchjjiijjihbbbaaaabbbbbbbccacca..........',
+      '......aagggggdddddbkiacaa...........abbihccccccccccbjiiiijibbbaa..aaabbbccccabaa..........',
+      '......affcdddddddddkaccca............abhiaacccccccccjjiijibbcaa...aacaacccccaaa...........',
+      '.....aaffdcedddddddhjaccaa...........aahaiiaacccccccajjjiccbaa....aaccccccccaaa...........',
+      '....aaffddccddddddddjhcccaa..........aahaaaiiaccccccajjibbcaa......acccaccccaia...........',
+      '....afffdddcceeddddcajhccaa.........aaaiiiaaaaaaccaahihaaaa........aaaaacbaaijjaa.........',
+      '....affddddcccceddbbbjiccba.......aaaaaaajjjaaaaaaaaiiaaaa..........aaiiaaaijljaaaa.......',
+      '....aeedddddcccceccbbhibbba......aaaeeeeaajaccccaccchjjjaaa.........aijjjijjlliaccaa......',
+      '...aaeedddddhcccbbccbaabbba.....aaeeeeeccajacbbbccccchlllaaa.......aakkkkljlljadccaa......',
+      '...aeeddddddhccccbbcbaabbba.....aeeeeccccajhbbbbbcccccalacaa.......aajaaaallliccccca......',
+      '...aeedddddciccccbbbbabbbba....aaeeeccccccajbbbbbcccccbabbbaa.....aaihccccaljaccccca......',
+      '..aaeddddddhjccccbbbaabbbba....accccccccccbjabbbaccccchibbcaa.....aajccccccalicccccaa.....',
+      '..aaddddddcjjcbbbbbaaabbbba....aacacccccccaaiaaaacccccijhbba......acabbccccclibccccca.....',
+      '..addddddbiljcccbbaababbbaa....aaaaacccaacaaaiiiaccccakkcbaa......abbbbbcccchjaccccca.....',
+      '..aaddddcjlaaaacbaabbbabaa.....aaiiaaaaccccaabjkaabaaikabaaaaa....abbbcbbccchjhcbcccaa....',
+      '...accdbikaabaaiabbbbbaaa.....aafekkacccccccabhlliiilkabaaiaaaa...abbbccbbccaihcccccca....',
+      '...aabbijaaaaijiabbbbbaaa....aaeeeeljcccccccaahilmlllabaabbjbba...aabbbccbbbaihccccccaa...',
+      '....aaiiaaalllljaabbbbaa....aaeeefcjjcccccccaabbilmlabaabbbjjbaa...abbbbcbbbajabcccccca...',
+      '.....aiaaffffccljaaaaaa....aaeefccccjccccccbaabbillbbaabbbbbkibaa..aabbcbbbajjiacccccba...',
+      '....aaaafffccccbljhaaaa....aeeeccccckhccccbccaaabhaaaabbbbbbbkbbaa..abbbbbaajliiaaccbba...',
+      '...aaffffddccccchlibccaaa..aeecccccchihbbbabaa.aaaaaababbbbbbkkbba..aabbbbijlljjjiabbba...',
+      '..affffffdddccccallicccaaa.aeeccccccbjibbbbcaa..aaabbbabbbbbbkkbbaa..aabaajkaaaljjiaaaa...',
+      '.aafffffcccdcccccallicccaa.aecccccccbljaahbaa.....abbbbabbbbbiabbba...aaijjaaaaaljjiaa....',
+      '.affffffddddcccccailjhcccaaacccccccchmljiiaa......aabbbhabbbajbbbba....aiaaaddaaaaaaaaa...',
+      '.aaffffcdddddccccciljhccccadcccccccakllljaa........aabbaiiijkbbbbba....aaabbdddaaddddcaa..',
+      '.aacffcdddddcdddcajlljhcccacccccccajaaaaaaa.........aahiijkliaabbaa....abbbddddaaddddccaa.',
+      'aaeeddddddddcdddaakaaaibccaccccccajaaccbaa...........aaaaalliiaaaaa...aabbbddddaaddddccca.',
+      'aeecddddcdcccaaaaafeeaaaaaacccccaijhcccbaa..........aaeeeiaabbbbbbaa..abbbbddddaadddddcca.',
+      'aeecdddddddcaaaaafddddeaaaaaaccaajkccccbca.........aaeeeeabbbbbbbbba..abbbbddddaadddddcca.',
+      'aeecbddddddaaiiiaddddddeeaaiaaaijlacccccca........aaaeeeeabbbbbbbbba..aabbaaddaaaaccddcca.',
+      'acccaddcaaaajjjiadddddddeeaaijjjllbcccbbbaa.......aeaeeeabbbbbbbbbaa...aaaajaaaikaaaaaaaa.',
+      'acccaiaaaaijffddaadddddccccaabkllabbccbbbba......aaebaaabbbbbbbbbba...aaaafddaaakiajiiaaaa',
+      'aabaajjjiafddddddadddddccccaacalabbbccbabaa......aeeabbbbbbbbabbbaa..aaaaeddddaacjjkcccaca',
+      '.aaiiiabdadddddddaadddccccccabhibbbbbaabba.......aeebbbbbabbabbbaa..aacafddddddabhjcccccca',
+      '..aiaadddadddddddkadddccccccachaaaaaaabaaa.......aebbbbbbbbaibbba...abbaaddddddaahjcccccca',
+      '..aaaadddadddddddjaadcccccccaaaaaiiaaaaaaa.......aabbbbbbbbaibbaa...abbaaddddddaahjcccccca',
+      '..aeeadddaaddddddcjaccabbbbaaaaahbabaaiacaa.....aaiabbbbbaaiaaaaaa..abbbaddddddcahjcccccba',
+      '..adeadddaadddddddjaaaaaabbaaaaaaddddaaccca.....abiihaaaiijjjhaaaaaaabbbadddddddaijcccccba',
+      '..aeeaedbbaddddddbaabbbbbbbaiiiiddddddaccaaa....aahhjijjaaabcccccccaaaaaaabbbbddajjccccaaa',
+      '..aedabbbbaaddbbbbbabbbbbbaadjjiddddddbaaaaa...aabbbaajabbbbbccccccdaaaaaaaabbbbaiiccccaa.',
+      '..aabaabbbaabbbbbbbaabbbbaaddjkcccdddbbaabbba..abbbbbaiabbbbbbcccccbbaaaabbbaaaaaiabbbbaa.',
+      '...abbabbbbaabbbbbbaaaaaaaddcaiccccccbbaabbba.aabbbbbbabbbbbbbcccdbbbbaabbbbbbbaaibbbbaa..',
+      '....abaabbbbaabbbbbaaaaadddccaiccccccbbbabbba.aabbbbbbaabbbbbbccccbbbbaabbbbbbaaiabbbaa...',
+      '....aaaaabbbbaaaaaaa.aabbbbbbajacccccbbaabbba.aabbbbbajabbbbbbbcccbbbbaaaabbaaahabbaaa....',
+      '........aaaaaaaa.....aaaaaaaaaaaaaaaaaaaaaaaa..aaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaa......',
+    ],
+  },
+}
+
+// Animates a bitmap by cutting it into parts, like a paper puppet. part(x, y) names the part of each
+// pixel (worked out once per bitmap); offs[name] is [dx, dy] or (x, y) => [dx, dy]; order lists the
+// parts back to front. under[name] = { col, off } first paints that part's pixels in one colour at
+// offset off, which is what shows where the part has moved away (e.g. the inside of an open mouth).
+function bmpRig(s, b, ox, oy, part, offs, order, under = {}) {
+  if (!b.parts) b.parts = b.rows.map((row, y) => Array.from(row, (_, x) => part(x, y)))
+  const put = (x, y, c) => s.pix.push([Math.round(ox + x), Math.round(oy + y), c])
+  const each = (name, fn) =>
+    b.rows.forEach((row, y) => {
+      for (let x = 0; x < row.length; x++)
+        if (row[x] !== '.' && b.parts[y][x] === name) fn(x, y, row.charCodeAt(x) - 97)
+    })
+  const at = (o, x, y) => (typeof o === 'function' ? o(x, y) : o || [0, 0])
+  for (const [name, u] of Object.entries(under))
+    each(name, (x, y) => {
+      const [dx, dy] = at(u.off, x, y)
+      put(x + dx, y + dy, u.col)
+    })
+  for (const name of order)
+    each(name, (x, y, k) => {
+      const [dx, dy] = at(offs[name], x, y)
+      put(x + dx, y + dy, b.pal[k])
+    })
 }

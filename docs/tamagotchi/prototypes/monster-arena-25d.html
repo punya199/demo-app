@@ -530,7 +530,7 @@ td.st { white-space: nowrap; color: var(--muted) }
         <div class="act" id="act-abyssfish"></div>
         <span class="rank" style="--c:#ff5a5a">บอสเรด</span>
         <h3>อสูรห้วงลึก <span class="chip new">ร่างแรก</span></h3>
-        <p class="hint">ในเกมเป็นอีโมจิ 💧 · แก้ครั้งที่ 1: เป็นฉลามยักษ์ใต้ทะเลลึก หลังสีน้ำเงินดำ ท้องขาว ครีบหลังสูง หางเสี้ยวจันทร์ อ้าปากกว้างเห็นฟันแหลมเป็นซี่เลื่อยทั้งบนล่าง ตาเรืองฟ้า มีรอยแผลเก่าบนตัว ท่า "ขย้ำในหมอก" พุ่งงับ "วังน้ำวน" ว่ายวนรอบจนเกิดน้ำวน ต่างจากฉลามหนามในสายน้ำที่ตัวเล็กและมีหนาม</p>
+        <p class="hint">ในเกมเป็นอีโมจิ 💧 · แก้ครั้งที่ 2 ตามภาพที่ส่งมา (หันขวาให้เข้ากับฉาก): ฉลามตัวยาวสีน้ำเงิน มีหนามหยักเรียงเป็นแผงตั้งแต่คอจนถึงหาง สูงสุดเหนือไหล่แล้วค่อยๆ เล็กลง ท้องขาวยาวตลอดตัว ลายแผ่นเกล็ดบนหลัง ช่องเหงือกสี่เส้น อ้าปากเห็นข้างในแดงและฟันขาวแหลม หางบนสูงหางล่างสั้น มีครีบเล็กใต้ท้องหลายอัน</p>
       </div>
       <div class="show boss holy">
         <canvas id="show-raidseraph" width="128" height="112" aria-label="บอสเรด เซราฟรัศมี"></canvas>
@@ -2180,29 +2180,35 @@ const SPRITES = {
     for (const [x, y] of [[80, 57], [20, 57], [30, 66], [66, 66]]) s.line([[x + bx, y + by], [x + 3 + bx, y + by]], '#ff8a24');
     if (P.glow) glowMouth(s, 56 + hx, 30 + hy);
   }, glows: [[52, 45, '#ff9a2a', 10, 'body'], [57, 23, '#ffd04a', 4, 'head']], emit: [{ x: 26, y: 30, type: 'smoke', rate: 2 }, { x: 72, y: 30, type: 'smoke', rate: 2 }, { x: 52, y: 45, type: 'ember', rate: 3 }, { x: 82, y: 86, type: 'drip', rate: 1.2 }], mouth: [56, 30] },
-  // อสูรห้วงลึก (water raid): a huge abyssal shark, jaws open on rows of jagged teeth
-  abyssfish: { size: 96, rig: SWIM, hover: 8, aura: { type: 'bossw', x: 46, y: 90, r: 34 }, draw(s, P) {
-    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 4;
+  // อสูรห้วงลึก (water raid): after the owner's picture, turned to face right: a long blue shark with a crest of jagged spines from neck to tail, white belly, open toothy jaws
+  abyssfish: { size: 96, rig: SWIM, hover: 8, aura: { type: 'bossw', x: 48, y: 90, r: 34 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 3;
     const m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
-    // crescent tail, far pectoral fin, the tall dorsal fin
-    s.L(20 + bx, 54 + by, 8 + bx, 53 + by - t, 6, 'sharktop', 3);
-    s.P(m([[10, 52], [0, 26], [6, 30], [14, 50], [6, 76], [1, 80], [10, 56]], bx, by - t * 1.6), 'sharktop');
-    s.P(m([[48, 62], [40, 76], [34, 80], [44, 72], [54, 64]], bx, by), 'slate2');
-    s.P(m([[38, 42], [46, 14], [52, 16], [60, 42]], bx, by), 'sharktop'); s.line(m([[46, 18], [44, 38]], bx, by), '#0e2448');
-    // body: dark navy back, white belly with a hard line between, a few old scars
-    s.E(46 + bx, 52 + by, 34, 14, 'sharktop'); s.E(50 + bx, 60 + by, 28, 6, 'seaB');
-    s.P(m([[64, 40], [86, 44], [94, 50], [92, 54], [66, 56]], hx, hy), 'sharktop');
-    for (const x of [62, 66, 70]) s.line(m([[x, 46], [x - 2, 56]], hx, hy), '#0e2448');
-    s.line(m([[30, 46], [40, 50]], bx, by), '#6a96d0').line(m([[34, 44], [42, 47]], bx, by), '#6a96d0');
-    // jaws open wide: a dark maw, big jagged teeth top and bottom, the lower jaw dropped
-    s.P(m([[64, 54], [95, 51], [93, 55], [80, 64 + j], [68, 64 + j], [64, 60]], hx, hy), 'maw');
-    s.P(m([[64, 62 + j], [70, 66 + j], [92, 57 + j], [90, 66 + j], [74, 72 + j], [64, 68 + j]], hx, hy), 'seaB');
-    for (const [x, y] of [[68, 54.5], [73, 54], [78, 53.5], [83, 53], [88, 52.5], [92, 52]]) s.P(m([[x - 2.2, y], [x + .4, y + 6.5], [x + 2.2, y]], hx, hy), 'pearl');
-    for (const [x, y] of [[70, 65.5], [75, 64], [80, 62], [85, 60], [89, 58.5]]) s.P(m([[x - 2.2, y + j], [x - .4, y - 6 + j], [x + 2, y + j]], hx, hy), 'pearl');
-    // near pectoral fin
-    s.P(m([[56, 62], [50, 78], [56, 80], [64, 64]], bx, by), 'sharktop');
-    if (P.glow) glowMouth(s, 92 + hx, 57 + hy);
-  }, glows: [[80, 48, '#7ee7ff', 3, 'head']], emit: [{ x: 60, y: 44, type: 'bubble', rate: 2.5 }, { x: 10, y: 54, type: 'mist', rate: 2 }], mouth: [92, 57] },
+    // tail: tall upper lobe sweeping back, short lower lobe
+    s.P(m([[18, 50], [5, 24], [9, 25], [22, 47], [20, 54], [8, 68], [5, 67], [16, 54]], bx, by - t * 1.4), 'sea');
+    s.line(m([[17, 48], [7, 27]], bx, by - t * 1.4), '#a0dcff');
+    // the crest: separate jagged spines leaning back, tallest over the shoulders, shrinking toward the tail
+    const sp = [[26, 47, 5], [32, 46, 7], [38, 44, 9], [44, 43, 11], [50, 42, 13], [56, 41, 14], [62, 41, 12], [68, 42, 9], [73, 43, 6]];
+    for (const [x, y, h] of sp) { s.P(m([[x - 3.6, y + 2], [x - 3 - h * .35, y - h], [x - .4, y - h * .45], [x + .4, y - h * .55], [x + 3.4, y + 2]], bx, by), 'sea'); s.line(m([[x - .8, y + 1], [x - 2.6 - h * .3, y - h + 1.5]], bx, by), '#a0dcff'); }
+    // far pectoral fin
+    s.P(m([[64, 58], [52, 70], [55, 71], [68, 59]], bx, by), 'sharktop');
+    // body: a long slim hull, the white belly running from under the snout to the tail, plate lines on the back
+    s.P(m([[16, 51], [30, 46], [52, 42], [72, 43], [84, 45], [92, 48], [88, 51], [78, 56], [58, 60], [36, 58], [20, 54]], bx, by), 'sea');
+    s.P(m([[20, 53], [36, 55], [58, 57], [76, 53], [90, 50], [86, 53], [78, 57], [58, 61], [36, 59]], bx, by), 'seaB');
+    for (const x of [34, 42, 50, 58]) s.line(m([[x, 46], [x + 1, 53]], bx, by), '#1b5e9e');
+    s.line(m([[28, 50], [66, 47]], bx, by), '#1b5e9e');
+    // head: pointed snout over a jaw that opens downward, red mouth, sharp white teeth, gill slits, a hard dark eye
+    for (const x of [66, 69, 72]) s.line(m([[x, 46.5], [x - 1, 54]], hx, hy), '#0f3a68');
+    s.P(m([[74, 52], [88, 50], [84, 54 + j], [78, 57 + j], [74, 56]], hx, hy), 'maw');
+    s.P(m([[74, 56], [78, 57 + j], [84, 54 + j], [82, 58 + j], [76, 59]], hx, hy), 'seaB');
+    for (const x of [76, 79, 82, 85]) s.P(m([[x - 1, 51.6 - (x - 76) * .15], [x, 54.5 - (x - 76) * .15], [x + 1, 51.6 - (x - 76) * .15]], hx, hy), 'pearl');
+    for (const x of [77, 80, 83]) s.P(m([[x - 1, 57 + j - (x - 77) * .45], [x, 54.4 + j - (x - 77) * .45], [x + 1, 57 + j - (x - 77) * .45]], hx, hy), 'pearl');
+    s.d(79 + hx, 47 + hy, '#040a14').d(80 + hx, 47 + hy, '#040a14').d(80 + hx, 46 + hy, '#ffffff').d(79 + hx, 46 + hy, '#040a14'); s.line(m([[77, 45], [83, 45.5]], hx, hy), '#061428');
+    // near fins, swept back: the big pectoral, then a pelvic and an anal fin
+    s.P(m([[64, 57], [50, 74], [56, 75], [72, 59]], bx, by), 'sea'); s.line(m([[66, 59], [54, 73]], bx, by), '#a0dcff');
+    s.P(m([[42, 58], [34, 67], [40, 67], [49, 59]], bx, by), 'sea'); s.P(m([[28, 55], [21, 63], [26, 63], [34, 56]], bx, by), 'sea');
+    if (P.glow) glowMouth(s, 86 + hx, 53 + hy);
+  }, glows: [[80, 46.5, '#7ee7ff', 2, 'head']], emit: [{ x: 56, y: 32, type: 'bubble', rate: 2.5 }, { x: 10, y: 50, type: 'mist', rate: 2 }], mouth: [86, 53] },
   // เซราฟรัศมี (holy raid): a six-winged peacock of light, its fan tail spread behind it, each feather with a gold eye
   raidseraph: { size: 96, rig: BIPED, aura: { type: 'bossh', x: 48, y: 90, r: 36 }, draw(s, P) {
     const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, w = P.wing;

@@ -10,10 +10,21 @@ asked for this more than once.
 
 - Live prototype (claude.ai Artifact, private to the owner):
   https://claude.ai/artifact/CjvCJ453cPeJxVzQrsTTDj
-  To change it from a new session, read it with the Artifact tool, edit, and republish to the same
-  URL.
-- Source copy: `docs/tamagotchi/prototypes/monster-arena-25d.html`. It is one self-contained page:
-  open it in a browser to run it. Add a `<!doctype html>` wrapper if a browser renders it oddly.
+  It is published from the local folder with its JS files (`file_path` = `index.html`, `root` =
+  the folder, `files` = every `js/...` path). The repo copy is the source: edit it, check in
+  Playwright, republish. From a new session, compare the live files with the repo first (the
+  Artifact tool shows a diff on the first publish); don't read the whole page.
+- Source: `docs/tamagotchi/prototypes/monster-arena/` (split from the old single
+  `monster-arena-25d.html` on 2026-11-08, behaviour unchanged). `index.html` is the page (styles and
+  HTML), and plain scripts load in this order, sharing globals: `js/engine.js` (palettes, `Spr`,
+  shape helpers, rigs), `js/sprites/<line>.js` (`fire.js` opens `SPRITES`, the rest
+  `Object.assign` into it; `raid.js` holds the raid bosses, `earth.js` also the earth world boss),
+  `js/core.js` (animation, frame baking, auras, cards, arena, rules, basic moves),
+  `js/skills/<line>.js` (each line's game skills) and `js/page.js` (buttons, skill cards, picker,
+  plan tables). To change one creature, open only its line's sprite file; to change a skill, its
+  skill file. Line files: fire, water, leaf, earth, bolt, holy, dark, shadow. A new script file
+  must be added to `index.html` and to the publish `files` list. Open `index.html` in a browser to
+  run it.
 - The page has a "ดูส่วน" dropdown at the top: all / fire / water / leaf / earth / lightning
   (each "monsters + skills") / holy / dark / plan. The battle scene always
   stays on top. Choosing an element also shows only that element's skill buttons under the arena
@@ -98,7 +109,7 @@ asked for this more than once.
 | Awakened fused forms (same line twice), all 8 | Done (one per line, see each line above) |
 | Cross-line fused forms, 13 | On hold: the owner switched cross-line merging off in the game (2026-11-08, `CROSS_LINE_MERGE_ENABLED = false` in backend `monster-rules.ts`; only two monsters of one line merge, hybrids already raised stay) while the hybrid forms are rethought. Don't draw them until the owner reopens it. The 13 are listed in `FUSED_FORMS` (`species-data.ts`) |
 | World bosses, all 7 | Done (fire, water, earth, lightning, holy, dark, shadow; leaf has no world boss) |
-| Raid bosses | พฤกษาโบราณ done. The other 5 are still drafts waiting for the owner (2026-11-08), section "บอสเรด 5 ตัว" (`#raid`), all keep their game names: ราชันย์ลาวา `lavaking` (redrawn on the owner's word: a lava golem of stacked basalt boulders, hunched, small head with a glowing slit, fists on the ground, lava in every seam and a molten chest core; the first serpent draft is in git history), อสูรห้วงลึก `abyssfish` (redrawn: a huge abyssal shark, open jaws with big jagged teeth; the anglerfish draft is in git history), เซราฟรัศมี `raidseraph` (six-winged peacock of light, fan tail of nine eye feathers; its game skills รำแพนสายฟ้า / ขนไฟฟ้าสาด fit a peacock), จ้าวมืดมิด `vampire` (redrawn: Dracula, person-sized on a 72 px grid on purpose, the owner asked for human scale; high red-lined collar, slicked hair with a widow's peak, red eyes, fangs, medallion, two bats; the bat-drake draft is in git history. The owner accepted a person here, an exception to the creatures-only rule), ราชันย์เงานิรนาม `nameless` (headless black knight, violet fire with a blank cracked mask for a head, chain flail). Each is an animal of its line's family and differs from that element's world boss. Once approved: drop the still flag in `addCard`, add them to `ROSTER` as `kind: 'บอสเรด'`, and draw their two arena skills (`arenaSkills` in `raid-data.ts`) |
+| Raid bosses | พฤกษาโบราณ done. The other 5 are still drafts waiting for the owner (2026-11-08), section "บอสเรด 5 ตัว" (`#raid`), all keep their game names: ราชันย์ลาวา `lavaking` (redrawn on the owner's word: a lava golem of stacked basalt boulders, hunched, small head with a glowing slit, fists on the ground, lava in every seam and a molten chest core; the first serpent draft is in git history), อสูรห้วงลึก `abyssfish` (redrawn twice; now after the owner's picture, turned to face right: a long blue shark with a crest of separate jagged spines from neck to tail, tallest over the shoulders, white belly, plate lines, gill slits, red mouth with white teeth under a pointed snout, tall upper tail lobe, small swept-back fins; the anglerfish and first shark are in git history), เซราฟรัศมี `raidseraph` (six-winged peacock of light, fan tail of nine eye feathers; its game skills รำแพนสายฟ้า / ขนไฟฟ้าสาด fit a peacock), จ้าวมืดมิด `vampire` (redrawn: Dracula, person-sized on a 72 px grid on purpose, the owner asked for human scale; high red-lined collar, slicked hair with a widow's peak, red eyes, fangs, medallion, two bats; the bat-drake draft is in git history. The owner accepted a person here, an exception to the creatures-only rule), ราชันย์เงานิรนาม `nameless` (headless black knight, violet fire with a blank cracked mask for a head, chain flail). Each is an animal of its line's family and differs from that element's world boss. Once approved: drop the still flag in `addCard`, add them to `ROSTER` as `kind: 'บอสเรด'`, and draw their two arena skills (`arenaSkills` in `raid-data.ts`) |
 | Adventure enemies, 20, and the training dummy | Not started. `adventure-data.ts` enemies are emoji animals that are not in any line (หนอนใบไม้ 🐛, ปูน้ำจืด 🦀, ค้างคาวถ่าน 🦇, กระต่ายยักษ์ 🐇, … นกยูงอสนี 🦚); the dummy (`dummy-data.ts`) is หุ่นซ้อม 🎯. They need sprites too, or the arena mixes pixel art and emoji |
 | All 8 lines | Done in the prototype |
 | Putting the art into the real game | Not started |

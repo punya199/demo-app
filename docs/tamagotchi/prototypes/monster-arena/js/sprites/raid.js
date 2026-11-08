@@ -11,40 +11,53 @@ Object.assign(SPRITES, {
     aura: { type: 'boss', x: 48, y: 92, r: 38 },
     draw(s, P) {
       const k = 0.6,
-        sc = (v) => [v[0] * k, v[1] * k],
-        add = (u, v) => [u[0] + v[0], u[1] + v[1]],
-        body = sc(P.body),
+        sc = (v, f = 1) => [v[0] * k * f, v[1] * k * f],
         lim = (v, m) => [Math.max(-m, Math.min(m, v[0])), Math.max(-m, Math.min(m, v[1]))],
-        half = (v) => [(v[0] + body[0]) / 2, (v[1] + body[1]) / 2],
-        head = add(body, lim(sc(P.head), 2)),
-        armF = add(body, lim(sc(P.arm), 6)),
-        armB = add(body, lim(sc(P.arm2), 5))
-      bmpRig(
-        s,
-        RAID_BMP.lavaking,
-        3,
-        7,
-        (x, y) =>
-          x >= 50 && x <= 72 && y >= 4 && y <= 24
-            ? 'head'
-            : x <= 27 && y >= 22
-              ? 'armB'
-              : x >= 70 && y >= 16
-                ? 'armF'
-                : y >= 56 && x <= 48
-                  ? 'legB'
-                  : y >= 56
-                    ? 'legF'
-                    : 'body',
-        { body, head, armF, armB, legB: sc(P.bl), legF: sc(P.bf) },
-        ['armB', 'legB', 'body', 'head', 'legF', 'armF'],
-        // dark rock fills the joint behind a moving arm, glowing lava the neck behind the head
-        {
-          armB: { col: '#1e1620', off: half(armB) },
-          armF: { col: '#1e1620', off: half(armF) },
-          head: { col: '#4a0804', off: body },
-        }
+        add = (u, v) => [u[0] + v[0], u[1] + v[1]],
+        mix = (u, v, f) => [u[0] + (v[0] - u[0]) * f, u[1] + (v[1] - u[1]) * f],
+        body = sc(P.body),
+        armF = add(body, lim(sc(P.arm), 4)),
+        armB = add(body, lim(sc(P.arm2), 3.5)),
+        legB = sc(P.bl),
+        legF = sc(P.bf)
+      // every rock the owner circled moves whole: along an arm the shoulder moves a little and the fist the most
+      const offs = {
+        body,
+        head: add(body, lim(sc(P.head), 2)),
+        shoulderB: mix(body, armB, 0.25),
+        upperB: mix(body, armB, 0.5),
+        foreB: mix(body, armB, 0.8),
+        fistB: armB,
+        shoulderF: mix(body, armF, 0.25),
+        upperF: mix(body, armF, 0.5),
+        foreF: mix(body, armF, 0.8),
+        fistF: armF,
+        thighB: mix(body, legB, 0.5),
+        shinB: legB,
+        thighF: mix(body, legF, 0.5),
+        footF: legF,
+      }
+      const order = [
+        'fistB',
+        'foreB',
+        'upperB',
+        'shinB',
+        'thighB',
+        'body',
+        'shoulderB',
+        'head',
+        'thighF',
+        'footF',
+        'upperF',
+        'foreF',
+        'fistF',
+        'shoulderF',
+      ]
+      // molten lava sits behind every rock, so a gap opened by a moving rock glows instead of leaving a hole
+      const under = Object.fromEntries(
+        order.filter((n) => n !== 'body').map((n) => [n, { col: '#6a1206', off: body, inner: 3 }])
       )
+      bmpRig(s, RAID_BMP.lavaking, 3, 7, golemRock, offs, order, under)
       if (P.glow) glowMouth(s, 60 + body[0], 47 + body[1])
     },
     glows: [

@@ -208,8 +208,30 @@ function bmpRig(s, b, ox, oy, part, offs, order, under = {}) {
         if (row[x] !== '.' && b.parts[y][x] === name) fn(x, y, row.charCodeAt(x) - 97)
     })
   const at = (o, x, y) => (typeof o === 'function' ? o(x, y) : o || [0, 0])
+  // depth = how many pixels in from the outline (worked out once); an under fill can skip the rim (u.inner)
+  if (!b.depth) {
+    const W = b.rows[0].length,
+      H = b.rows.length,
+      solid = (x, y) => x >= 0 && y >= 0 && x < W && y < H && b.rows[y][x] !== '.'
+    b.depth = b.rows.map((row, y) => Array.from(row, (c, x) => (c === '.' ? 0 : 1)))
+    for (let d = 1; d < 4; d++)
+      b.depth = b.depth.map((row, y) =>
+        row.map((v, x) =>
+          v === d &&
+          [
+            [1, 0],
+            [-1, 0],
+            [0, 1],
+            [0, -1],
+          ].every(([dx, dy]) => solid(x + dx, y + dy) && b.depth[y + dy][x + dx] >= d)
+            ? d + 1
+            : v
+        )
+      )
+  }
   for (const [name, u] of Object.entries(under))
     each(name, (x, y) => {
+      if (b.depth[y][x] <= (u.inner || 0)) return
       const [dx, dy] = at(u.off, x, y)
       put(x + dx, y + dy, u.col)
     })
@@ -218,4 +240,32 @@ function bmpRig(s, b, ox, oy, part, offs, order, under = {}) {
       const [dx, dy] = at(offs[name], x, y)
       put(x + dx, y + dy, b.pal[k])
     })
+}
+
+// The golem's rocks as the owner circled them on the preview (2026-11-08), as ellipses on the 90 x 87
+// bitmap: name, centre x, centre y, radius x, radius y. Each pixel belongs to the nearest rock, except
+// the chest in the middle, which nobody circled and stays as the body.
+const GOLEM_ROCKS = [
+  ['head', 62, 15, 12, 9],
+  ['shoulderB', 29, 15, 14.4, 12.4],
+  ['upperB', 22, 30, 13, 9],
+  ['foreB', 17, 49, 11, 11],
+  ['fistB', 17, 69, 11, 10],
+  ['thighB', 41, 57, 8, 9],
+  ['shinB', 37, 72, 8, 12],
+  ['thighF', 57, 61, 8, 7],
+  ['footF', 58, 78, 11, 8],
+  ['shoulderF', 74, 28, 8, 7.6],
+  ['upperF', 74, 41, 7.6, 3.6],
+  ['foreF', 76, 56, 9, 8],
+  ['fistF', 77, 75, 9, 8],
+]
+function golemRock(x, y) {
+  let best = Infinity,
+    name = 'body'
+  for (const [n, cx, cy, rx, ry] of GOLEM_ROCKS) {
+    const d = ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2
+    if (d < best) [best, name] = [d, n]
+  }
+  return best > 1 && x >= 36 && x <= 67 && y >= 16 && y <= 52 ? 'body' : name
 }

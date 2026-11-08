@@ -2122,13 +2122,7 @@ addCard(
   'raidseraph',
   document.getElementById('act-raidseraph')
 )
-addCard(
-  document.getElementById('show-vampire'),
-  'vampire',
-  document.getElementById('act-vampire'),
-  8,
-  true
-)
+addCard(document.getElementById('show-vampire'), 'vampire', document.getElementById('act-vampire'))
 addCard(
   document.getElementById('show-nameless'),
   'nameless',
@@ -2564,6 +2558,14 @@ const ROSTER = {
     boss: true,
     kind: 'บอสเรด',
   },
+  vampire: {
+    sprite: 'vampire',
+    name: 'จ้าวมืดมิด',
+    el: 'dark',
+    hp: 6800,
+    boss: true,
+    kind: 'บอสเรด',
+  },
   tortoise: { sprite: 'tortoise', name: 'เต่าศิลา', el: 'earth', hp: 520 },
   worm: { sprite: 'worm', name: 'หนอนดินเกียจคร้าน', el: 'earth', hp: 420 },
   rhino: { sprite: 'rhino', name: 'แรดผา', el: 'earth', hp: 480 },
@@ -2780,6 +2782,7 @@ for (const id of [
   'lavaking',
   'abyssfish',
   'raidseraph',
+  'vampire',
   'pangolin',
   'stormbison',
   'holyele',

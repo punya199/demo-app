@@ -134,264 +134,60 @@ Object.assign(SPRITES, {
     mouth: [87, 37],
   },
 
-  // จ้าวมืดมิด (dark raid): Dracula, the vampire count, a person-sized boss: high red-lined collar, slicked hair with a widow's peak, red eyes and fangs
+  // จ้าวมืดมิด (dark raid): the owner's AI-made Dracula, person-sized on a 72 grid (bitmap in
+  // raid-bitmaps.js), cut into head, hand, cape edges and legs (vampPart); two bats are drawn in code.
   vampire: {
     size: 72,
     rig: BIPED,
     aura: { type: 'bossd', x: 36, y: 68, r: 26 },
     draw(s, P) {
-      const [bx, by] = P.body,
-        hx = P.head[0] + bx,
-        hy = P.head[1] + by,
-        a1 = P.arm
-      const m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy])
-      // the cape behind: black outside, blood-red lining showing on the far side, the high collar standing up behind the head
-      s.P(
-        m(
-          [
-            [24, 22],
-            [46, 22],
-            [56, 52],
-            [60, 68],
-            [8, 68],
-            [14, 46],
-          ],
-          bx,
-          by
-        ),
-        'cloak'
-      )
-      s.P(
-        m(
-          [
-            [25, 24],
-            [15, 48],
-            [10, 67],
-            [20, 66],
-            [27, 34],
-          ],
-          bx,
-          by
-        ),
-        'blood'
-      )
-      s.P(
-        m(
-          [
-            [27, 22],
-            [21, 3],
-            [33, 14],
-          ],
-          hx,
-          hy
-        ),
-        'blood'
-      )
-      s.P(
-        m(
-          [
-            [43, 20],
-            [49, 3],
-            [45, 15],
-          ],
-          hx,
-          hy
-        ),
-        'blood'
-      )
-      s.line(
-        m(
-          [
-            [21, 3],
-            [27, 21],
-          ],
-          hx,
-          hy
-        ),
-        '#120a12'
-      ).line(
-        m(
-          [
-            [49, 3],
-            [44, 20],
-          ],
-          hx,
-          hy
-        ),
-        '#120a12'
-      )
-      // legs and shoes
-      s.L(32 + bx, 48 + by, 31 + P.bl[0], 66 + P.bl[1], 2.6, 'cloak2')
-      s.E(32 + P.bl[0], 67 + P.bl[1], 3.4, 1.4, 'cloak')
-      s.L(40 + bx, 48 + by, 42 + P.bf[0], 66 + P.bf[1], 2.6, 'cloak2')
-      s.E(43 + P.bf[0], 67 + P.bf[1], 3.4, 1.4, 'cloak')
-      // black suit, white shirt front, a red medallion on a gold chain
-      s.P(
-        m(
-          [
-            [28, 24],
-            [44, 24],
-            [45, 50],
-            [27, 50],
-          ],
-          bx,
-          by
-        ),
-        'cloak2'
-      )
-      s.P(
-        m(
-          [
-            [34, 24],
-            [39, 24],
-            [37, 36],
-          ],
-          bx,
-          by
-        ),
-        'pearl'
-      )
-      s.line(
-        m(
-          [
-            [33, 24],
-            [37, 30],
-            [40, 24],
-          ],
-          bx,
-          by
-        ),
-        '#c48a16'
-      )
-      s.E(37 + bx, 31 + by, 2, 2, 'blood')
-      s.d(36.5 + bx, 30.5 + by, '#ff8a8a')
-      // the near arm lifts the cape's edge, a pale clawed hand
-      s.L(43 + bx, 27 + by, 50 + a1[0], 34 + a1[1], 2.4, 'cloak2')
-      s.P(
-        m(
-          [
-            [44, 26],
-            [52, 32],
-            [54, 48],
-            [46, 46],
-          ],
-          a1[0] * 0.5 + bx,
-          a1[1] * 0.5 + by
-        ),
-        'cloak'
-      )
-      s.E(51 + a1[0], 34 + a1[1], 2, 2.2, 'pearl')
-      for (const dy of [0, 1.5]) s.d(53 + a1[0], 34 + dy + a1[1], '#e8f0ff')
-      // head: pale face in profile, slicked-back black hair with a sharp widow's peak, pointed ear, red eye, two fangs
-      s.E(37 + hx, 14 + hy, 6.6, 7.4, 'pearl')
-      s.P(
-        m(
-          [
-            [42, 15],
-            [45.5, 17.5],
-            [42, 19],
-          ],
-          hx,
-          hy
-        ),
-        'pearl'
-      )
-      s.P(
-        m(
-          [
-            [30, 17],
-            [30, 9],
-            [33, 5],
-            [40, 4],
-            [45, 7],
-            [42, 8.5],
-            [40, 11.5],
-            [37.5, 8.5],
-            [34, 11],
-            [32.5, 18],
-          ],
-          hx,
-          hy
-        ),
-        'cloak'
-      )
-      s.P(
-        m(
-          [
-            [33, 13],
-            [30, 9],
-            [35, 15],
-          ],
-          hx,
-          hy
-        ),
-        'pearl'
-      )
-      s.line(
-        m(
-          [
-            [38, 11],
-            [42, 11.5],
-          ],
-          hx,
-          hy
-        ),
-        '#120a12'
-      )
-      s.d(40 + hx, 12.5 + hy, '#ff3b3b').d(41 + hx, 12.5 + hy, '#ff3b3b')
-      s.line(
-        m(
-          [
-            [38, 19],
-            [42, 19],
-          ],
-          hx,
-          hy
-        ),
-        '#5a0a1a'
-      )
-      s.d(39 + hx, 20 + hy, '#ffffff').d(41 + hx, 20 + hy, '#ffffff')
-      s.line(
-        m(
-          [
-            [36, 15],
-            [36, 17],
-          ],
-          hx,
-          hy
-        ),
-        '#a8bcd0'
-      )
-      // two bats circling his shoulders
+      const o = vampOffsets(P),
+        dark = { col: '#08060c', off: o.body, inner: 1 },
+        lining = { col: '#460614', off: o.body, inner: 1 }
+      bmpRig(s, RAID_BMP.vampire, 14, 2, vampPart, o, VAMP_ORDER, {
+        head: dark,
+        hand: { ...lining, inner: 2 },
+        capeL: { col: '#28232c', off: o.body, inner: 1 },
+        capeR: dark,
+      })
+      // two bats flapping by his shoulders
       for (const [x, y, f] of [
-        [14, 14, 1],
-        [56, 10, -1],
-      ])
+        [24, 10, 1],
+        [60, 14, -1],
+      ]) {
+        const bx = x + o.body[0],
+          by = y + o.body[1] + f * P.wing,
+          up = P.wing * f > 0 ? -1 : 1
+        const k = 1.2
         s.P(
-          m(
-            [
-              [x - 4, y - 1],
-              [x - 2, y + 1],
-              [x, y],
-              [x + 2, y + 1],
-              [x + 4, y - 1],
-              [x + 1, y + 2.5],
-              [x, y + 3],
-              [x - 1, y + 2.5],
-            ],
-            bx,
-            by + f * P.wing
-          ),
+          [
+            [-6, -2 + up * 2],
+            [-3, -0.5],
+            [-1, -1.5],
+            [0, -0.5],
+            [1, -1.5],
+            [3, -0.5],
+            [6, -2 + up * 2],
+            [5, 1],
+            [3, 0.5],
+            [1.5, 2],
+            [0, 3],
+            [-1.5, 2],
+            [-3, 0.5],
+            [-5, 1],
+          ].map(([px, py]) => [bx + px * k, by + py * k]),
           'bat'
         )
-      if (P.glow) glowMouth(s, 42 + hx, 19 + hy)
+      }
+      if (P.glow) glowMouth(s, 45 + o.head[0], 12 + o.head[1])
     },
     glows: [
-      [40.5, 12.5, '#ff3b3b', 2.5, 'head'],
-      [37, 31, '#ff3b3b', 2.5, 'body'],
+      [43, 9, '#ff3b3b', 2, 'head'],
+      [46, 9, '#ff3b3b', 2, 'head'],
+      [44, 19, '#ff3b3b', 2, 'body'],
     ],
-    emit: [{ x: 34, y: 60, type: 'mist', rate: 2 }],
-    mouth: [42, 19],
+    emit: [{ x: 34, y: 66, type: 'mist', rate: 2 }],
+    mouth: [45, 12],
   },
   // ราชันย์เงานิรนาม (shadow raid): a giant headless knight; violet fire burns from its collar round a blank cracked mask, a chain flail drags at its side
   nameless: {

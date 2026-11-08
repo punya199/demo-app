@@ -302,6 +302,92 @@ const RAID_BMP = {
       '..........................................................aaa...........................',
     ],
   },
+  vampire: {
+    pal: [
+      '#08060c',
+      '#28232c',
+      '#463e4e',
+      '#460614',
+      '#82101e',
+      '#b42228',
+      '#6c808e',
+      '#a0b6c4',
+      '#bed0dc',
+      '#f4f8f8',
+      '#dea020',
+    ],
+    rows: [
+      '..........................aaaaa............',
+      '........................aaaaaaaaa..........',
+      '........................aaaaaaaaa..........',
+      '.......................aaaaijjjaa..........',
+      '...................aa..aaaaijjjja..........',
+      '...................aa..aaaahgjjjja.........',
+      '...................aba.ajaaiaaahaa.........',
+      '...................abaaaiiajcfijfaaaa......',
+      '....................abddaihijjjijdeea......',
+      '....................abbddahhjjjcadea.......',
+      '.....................abbdagijjjaada........',
+      '......................abbahghjjgda.........',
+      '......................abbahhgajada.........',
+      '....................aabaabajggada..........',
+      '..................aabbbbaaajjajdaa.........',
+      '..................abbbbbaakkjiakkba........',
+      '.................abbbbbbaaaakjjkabba.......',
+      '................abbbbbbbabbaikkababa.......',
+      '................abbbbbabbaabjkkaaaba.......',
+      '...............aaabbaabbaabbajkaabbba......',
+      '...............abbaabbaaaaabbjjjabbba......',
+      '..............abaabbaaaaaaabbajjababa......',
+      '.............aaabbaaaaaaaaaabbjabbaba......',
+      '.............abbaaaaddaaaaaaabaabbbba......',
+      '............abaaaaadddaaaaaaabbaaabba......',
+      '...........abaaaaadddddaaaaaaaabaababa.....',
+      '...........aabbbaddddddaaaaaaaaaaabbba.....',
+      '...........abbbbadddddddaaaaaaaaaababa.....',
+      '..........aabbbaddddddddaaaaaaaaaababa.....',
+      '..........abbbadddddddddaaaaaaaaaabbba.....',
+      '.........aabbbadddddddddaaaaaaaaaabbba.....',
+      '.........aajjadddddddddaaaaaaaaaaabbba.....',
+      '........ajjjaadddddddddaaaaaaaaaaabbba.....',
+      '.......ajjjjjdddddeddddaaaaaaaaaaabbbba....',
+      '......ajjjjjjaddddeddddaaaaaaaaaaabbbba....',
+      '.....ajajjaahjdddeedddaaaaaaaaaaaabbbba....',
+      '.....aajajaddjdddeedddaaaaaaaaaaaabbbba....',
+      '.....aahahdddaddeeedddaaaaaaaaaaaaabbba....',
+      '.....abaahadddddeeeddaaaaaaaaaaaaaabbba....',
+      '.....abbadadddddeeedddaaaaaabaaaaaabbba....',
+      '....abbbdddddddeeeeddddaabbbbaaaaaabbba....',
+      '....abbadddddddeeeedddaabbbbbaaaaaabbbba...',
+      '...abbbadddddddeeeedddaabbbbaaaaaaabbbba...',
+      '..abbbbaddddddeeeeddddaabbbbaaaaaaabbbba...',
+      '..abbbbdddddddeeeeddddabbbbbaaaaaaabbbba...',
+      '..abbbbddddddeeeeeddddabbbbadaaaaaabbaba...',
+      '.abbbbaddddddeeeeeedddabbbbadaaaaaabbaba...',
+      '.abbbbadddddeeeeeeedddabbbbadaaaaaabbaba...',
+      'abbbbbadddddeeeeeeedddabbbaddaaaaaabbabba..',
+      'abbbbbdddddeeeeeeedddaabbbaddaaaaaabbaaba..',
+      'abbbbbdddddeeeeeeedddaabbbaddaaaaadbbaaba..',
+      'abbbbbaaaddeeeeeeedddaabaadddaaaaadbbaaba..',
+      'abbbba...aaeeeeeeedddaaaaadddaaaaadbbbaba..',
+      'abbbba.....aeeeeeedddaaaaadddaaaaadbbbaba..',
+      '.abbbba....aeeedeeddaaaabadddaaaaadbbbabba.',
+      '.abbbba.....aeeeeeddaaabbedddaaaaadbbbabba.',
+      '..abbba......adeedddaaabaeddaaaaaadbbbabba.',
+      '...abba......aaeedddaabbaeddaaaaaddbbbaaba.',
+      '....aaa........aedddaabbaeddaaaaaddbbbaaba.',
+      '................aaadaabbeeddaaaaaaabbbaaba.',
+      '...................aaabaaaaaaaaaa.abbbaaba.',
+      '...................aabba....aaaaa.abbbaaa..',
+      '...................aabba....aaaaa.abbbaa...',
+      '...................aabba....aaaabaabbaa....',
+      '...................aabba....aaabbaaaa......',
+      '..................aaabba....aaaaaa.........',
+      '...................aabaa....aaaabba........',
+      '..................aabba.....aaaaabbaaa.....',
+      '..................aaaaa.....aaaaaaaaaa.....',
+    ],
+  },
 }
 
 // Animates a bitmap by cutting it into parts, like a paper puppet. part(x, y) names the part of each
@@ -488,3 +574,33 @@ function seraphOffsets(P) {
   }
 }
 const SERAPH_ORDER = ['wingLow', 'body', 'legB', 'legF', 'wingMid', 'wingUp', 'head']
+
+// จ้าวมืดมิด: the owner's AI-made Dracula (1024 px JPG with a painted checkerboard, removed by flood fill;
+// the two bats were cut out and are drawn in code), reduced by 13.1x to 43 x 69 on the 72 grid. Parts:
+// head, the reaching hand, the two hanging edges of the cape (they sway row by row, the hem most) and
+// the legs (shear from the knee, the foot lifts).
+function vampPart(x, y) {
+  if ((y <= 3 && x >= 22 && x <= 34) || (y <= 12 && x >= 24 && x <= 32)) return 'head'
+  if (y >= 30 && y <= 39 && x >= 4 && x <= 12) return 'hand'
+  if (y >= 60 && x <= 25) return 'legB'
+  if (y >= 60 && x >= 27 && (x <= 33 || y >= 65)) return 'legF'
+  if (y >= 38 && x <= 10) return 'capeL'
+  if (y >= 30 && x >= 34) return 'capeR'
+  return 'body'
+}
+function vampOffsets(P) {
+  const clamp = (v, c) => Math.max(-c, Math.min(c, v)),
+    body = [P.body[0] * 0.5, P.body[1] * 0.5],
+    at = (dx, dy) => [body[0] + Math.round(dx), body[1] + Math.round(dy)],
+    sway = clamp(P.tail * 1.2 - P.body[0] * 0.8, 3)
+  return {
+    body,
+    head: at(clamp(P.head[0] * 0.6, 1.5), clamp(P.head[1] * 0.6, 1.5)),
+    hand: at(clamp(P.arm[0] * 0.7, 3), clamp(P.arm[1] * 0.7, 3)),
+    capeL: (x, y) => at((-sway * (y - 38)) / 20, 0),
+    capeR: (x, y) => at((sway * 0.6 * (y - 30)) / 33, 0),
+    legB: (x, y) => at((P.bl[0] * 0.6 * (y - 58)) / 10, y >= 66 ? clamp(P.bl[1], 2) : 0),
+    legF: (x, y) => at((P.bf[0] * 0.6 * (y - 58)) / 10, y >= 66 ? clamp(P.bf[1], 2) : 0),
+  }
+}
+const VAMP_ORDER = ['legB', 'capeL', 'body', 'capeR', 'legF', 'hand', 'head']

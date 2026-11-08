@@ -164,9 +164,47 @@ so check it with the `battle-golden-check` skill when renaming).
 
 ## Next steps (suggested order)
 
-1. Wait for the owner's word on the 5 raid boss drafts, then animate them and their skills. After
-   that the owner wants the monsters next (the 20 adventure enemies and the dummy); the cross-line
-   fused forms are on hold.
+### To do (as of 2026-11-08)
+
+How the owner wants art made now: the owner has another AI draw one still picture per creature
+(prompts in the "AI picture prompts" section below); Claude reduces it to a clean bitmap, cuts it into
+parts and animates it (`bmpRig`), and draws the skill effects in code. Ask the owner to circle the
+parts on a preview when the cut is not obvious; never move only part of a rock or limb.
+
+1. **Raid bosses still waiting for the owner's AI pictures:** เซราฟรัศมี (six-winged peacock),
+   จ้าวมืดมิด (Dracula, 72 px, person-sized), ราชันย์เงานิรนาม (headless knight). Their code-drawn
+   drafts stay on the page until the pictures arrive. For each: reduce to the grid and a palette
+   (the golem script: commonest colour per block, nearest of a hand-picked palette, drop detached
+   smoke), add to `RAID_BMP`, cut into parts, animate, add to `ROSTER` and the foe list.
+2. **อสูรห้วงลึก (shark):** only the tail and lower jaw move. Offer to cut more parts (fins,
+   spine crest segments) the same way as the golem if the owner circles them.
+3. **Raid boss skills** (none drawn yet; `arenaSkills` in backend `raid-data.ts`):
+   ราชันย์ลาวา `e_lavacoil` (รัดหลอมละลาย, melee grab) + `e_volcano` (ลมหายใจภูเขาไฟ, beam from the
+   chest core); อสูรห้วงลึก `e_whirlpool` (วังน้ำวน, zone) + `e_mistbite` (ขย้ำในหมอก, melee lunge);
+   เซราฟรัศมี `e_fan` (รำแพนสายฟ้า, burst) + `e_plumes` (ขนไฟฟ้าสาด, spread); จ้าวมืดมิด
+   `e_dragontail` (burst) + `e_orebite` (melee) — rename to fit Dracula; ราชันย์เงานิรนาม
+   `e_sparktail` (multi) + `e_mistbite` (melee). Arena themes: lava for the golem, a deep-sea theme
+   for the shark.
+4. **Then the monsters:** the 20 adventure enemies (`adventure-data.ts`, emoji animals outside the
+   lines) and the training dummy, same AI-picture workflow.
+5. **Cross-line merging is switched off** on branch `claude/tamagotchi-game-expansion-ercfjr` in
+   both repos (backend `CROSS_LINE_MERGE_ENABLED = false`, frontend merge screen, wiki and patch
+   note), tests pass, **no PR yet**: it reaches players only after the owner asks for PRs and they
+   merge. The 13 hybrid fused forms stay on hold until the owner reopens them.
+6. **Older open items:** apply the renames in "Names to apply in the game" when the art goes in;
+   fire line less detailed than the others (64 px grids where others use 80/88); perfect forms have
+   no aura yet.
+
+### AI picture prompts
+
+Give the other AI: original creature, strict side view facing right, true pixel art on an exact grid
+(no anti-aliasing), 1 px dark outline, light from the top-left, at most 16 colours, transparent
+background, exact canvas (48 egg/baby, 56 adult, 64 perfect, 80 ultimate, 88 fused, 96 boss; a long
+shark 160×64; Dracula 72), native size plus an 8× upscale, and a pose with limbs clearly apart from
+the body so it can be cut into parts. Its pictures are not on a clean grid and have ~150+ colours,
+so always reduce them; the shark came out 160×64 as asked, the golem about 860×960 and had to be
+reduced by ~9.5×.
+
 2. Put the art into the game. Read the latest patch notes first
    (`src/pages/project/tamagotchi/meta/patch-notes.ts`; the frontend's tamagotchi folder and the
    backend's monster module were split into feature folders on 2026-11-07, so older paths in these

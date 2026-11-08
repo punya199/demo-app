@@ -214,7 +214,7 @@ parts on a preview when the cut is not obvious; never move only part of a rock o
    status table. They keep the generic element skills (owner's decision). Only per-creature fixes remain.
 5. **Cross-line merging is switched off** on branch `claude/tamagotchi-game-expansion-ercfjr` in
    both repos (backend `CROSS_LINE_MERGE_ENABLED = false`, frontend merge screen, wiki and patch
-   note), tests pass, **no PR yet**: it reaches players only after the owner asks for PRs and they
+   note), tests pass, PRs open (frontend #50, backend #41, 2026-11-08): it reaches players when they
    merge. The 13 hybrid fused forms stay on hold until the owner reopens them.
 6. **Next: put the art into the game**, see "Plan: putting the art into the game" below (waiting for
    the owner to say go).
@@ -357,8 +357,8 @@ have moved). Game versions when this was written: frontend 1.61.0, backend 1.48.
    species in `arena-data.ts` / `species-data.ts`; check PvP history with the `battle-golden-check`
    skill, since the golden file stores `moveName`). The vampire and the headless knight need their own
    raid skill ids (today they share ids with other bosses).
-5. **Release:** a Thai patch-notes entry, the wiki (`WikiPanel.tsx` + backend `wiki.ts`), tests for the
-   new helpers, then PRs in both repos when the owner asks.
+5. **Release. Done (2026-11-08):** Thai patch-notes entry, wiki (`WikiPanel.tsx` + backend `wiki.ts`) and
+   tests are in; PRs opened on the owner's request: frontend #50, backend #41 (merge both together).
 6. **Art still open:** fire line less detailed than the others; perfect forms have no aura; ค้างคาวถ่าน
    is too dark on the dark page (brighten its palette); the 13 cross-line fused forms stay on hold.
 

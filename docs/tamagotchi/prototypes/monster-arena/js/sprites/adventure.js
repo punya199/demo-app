@@ -33,11 +33,39 @@ const ADV_EL = {
   advpeacock: 'bolt',
 }
 
+// The part cuts below were measured on the first reduction (by stage); the bitmaps were later reduced again
+// to each animal's own size, so every cut, pivot, mouth and emitter is given on that first grid and scaled
+// by k = new width / ADV_DESIGN_W.
+const ADV_DESIGN_W = {
+  advworm: 36,
+  advcrab: 44,
+  advbat: 44,
+  advrabbit: 56,
+  advgull: 52,
+  advscorp: 52,
+  advturtle: 52,
+  advmshark: 64,
+  advsnake: 58,
+  advboar: 58,
+  adveagle: 55,
+  advdragon: 72,
+  advbeetle: 64,
+  advcbat: 64,
+  advant: 64,
+  advgolem: 72,
+  advsquirrel: 56,
+  advgoat: 57,
+  advhawk: 64,
+  advpeacock: 71,
+  dummy: 37,
+}
+
 function advRig(id, parts) {
   const b = ADV_BMP[id],
+    k = b.rows[0].length / ADV_DESIGN_W[id],
     tests = parts.filter((p) => p[1])
   const part = (x, y) => {
-    for (const p of tests) if (p[1](x, y)) return p[0]
+    for (const p of tests) if (p[1](x / k, y / k)) return p[0]
     return 'body'
   }
   const clamp = (v, c) => Math.max(-c, Math.min(c, v))
@@ -52,15 +80,19 @@ function advRig(id, parts) {
         o[name] = at(clamp(P[key][0] * k, cap), clamp(P[key][1] * k, cap))
       } else if (kind === 'leg') {
         const [key, y0, y1] = a
-        o[name] = (x, y) =>
-          at(
+        o[name] = (x, y) => {
+          y /= k
+          return at(
             (P[key][0] * 0.7 * Math.max(0, y - y0)) / (y1 - y0),
             y >= y1 - 1 ? clamp(P[key][1] * 0.6, 1.5) : 0
           )
+        }
       } else {
         const [src, px, py, ax, ay, span] = a,
           v = P[src]
         o[name] = (x, y) => {
+          x /= k
+          y /= k
           const dist =
             px == null
               ? Math.abs(y - py)
@@ -75,16 +107,24 @@ function advRig(id, parts) {
     return o
   }
   const order = parts.map((p) => p[0])
-  return { b, part, offs, order, under: order.filter((n) => n !== 'body') }
+  return { b, k, part, offs, order, under: order.filter((n) => n !== 'body') }
 }
 
-// A sprite from a rig: the bitmap sits centred on the grid with its feet 2 px above the bottom. Positions in
-// extra (mouth, emitters) are on the bitmap and are moved onto the grid here.
-function ADV_SPRITE(id, size, rig, parts, extra = {}) {
+// A sprite from a rig: the grid is the bitmap's longer side plus a margin, rounded up to 8, so each animal
+// keeps its own size (a worm is small, a boar big; every card and the arena draw at one pixel scale). The
+// bitmap sits centred with its feet 2 px above the bottom. Positions in extra (mouth, emitters) are on the
+// design grid and are moved onto the sprite grid here.
+function ADV_SPRITE(id, rig, parts, extra = {}) {
   const R = advRig(id, parts),
-    ox = Math.round((size - R.b.rows[0].length) / 2),
-    oy = size - R.b.rows.length - 2,
-    mouth = extra.mouth && [extra.mouth[0] + ox, extra.mouth[1] + oy]
+    w = R.b.rows[0].length,
+    h = R.b.rows.length,
+    size = Math.ceil((Math.max(w, h) + 6) / 8) * 8,
+    ox = Math.round((size - w) / 2),
+    oy = size - h - 2,
+    mouth = extra.mouth && [
+      Math.round(extra.mouth[0] * R.k) + ox,
+      Math.round(extra.mouth[1] * R.k) + oy,
+    ]
   return {
     ...extra,
     size,
@@ -96,7 +136,7 @@ function ADV_SPRITE(id, size, rig, parts, extra = {}) {
       if (P.glow && mouth) glowMouth(s, mouth[0] + o.body[0], mouth[1] + o.body[1])
     },
     mouth: mouth || [size / 2, size / 2],
-    emit: (extra.emit || []).map((e) => ({ ...e, x: e.x + ox, y: e.y + oy })),
+    emit: (extra.emit || []).map((e) => ({ ...e, x: e.x * R.k + ox, y: e.y * R.k + oy })),
   }
 }
 
@@ -106,7 +146,6 @@ Object.assign(SPRITES, {
   // ทุ่งหญ้าเริ่มต้น
   advworm: ADV_SPRITE(
     'advworm',
-    40,
     QUAD,
     [
       ['tail', box(0, 0, 9, 40), 'swing', 'tail', 10, null, 0, -1.5, 10],
@@ -117,7 +156,6 @@ Object.assign(SPRITES, {
   ),
   advcrab: ADV_SPRITE(
     'advcrab',
-    48,
     QUAD,
     [
       ['legB', (x, y) => x <= 15 && y >= 22, 'leg', 'bl', 22, 34],
@@ -129,7 +167,6 @@ Object.assign(SPRITES, {
   ),
   advbat: ADV_SPRITE(
     'advbat',
-    48,
     FLY,
     [
       ['wingL', (x) => x <= 13, 'swing', 'wing', 14, null, 0, -3, 14],
@@ -140,7 +177,6 @@ Object.assign(SPRITES, {
   ),
   advrabbit: ADV_SPRITE(
     'advrabbit',
-    64,
     QUAD,
     [
       ['tail', box(0, 26, 7, 46), 'swing', 'tail', 8, null, 0, -1, 7],
@@ -154,7 +190,6 @@ Object.assign(SPRITES, {
   // ชายฝั่งหมอก
   advgull: ADV_SPRITE(
     'advgull',
-    56,
     BIPED,
     [
       ['legB', (x, y) => x <= 27 && y >= 32, 'leg', 'bl', 32, 42],
@@ -167,7 +202,6 @@ Object.assign(SPRITES, {
   ),
   advscorp: ADV_SPRITE(
     'advscorp',
-    56,
     QUAD,
     [
       ['tail', (x, y) => x <= 20 && y <= 22, 'swing', 'tail', null, 22, 2, 0, 22],
@@ -180,7 +214,6 @@ Object.assign(SPRITES, {
   ),
   advturtle: ADV_SPRITE(
     'advturtle',
-    56,
     QUAD,
     [
       ['legB', (x, y) => x >= 4 && x <= 13 && y >= 31, 'leg', 'bl', 31, 39],
@@ -193,7 +226,6 @@ Object.assign(SPRITES, {
   ),
   advmshark: ADV_SPRITE(
     'advmshark',
-    72,
     SWIM,
     [['tail', (x) => x <= 17, 'swing', 'tail', 18, null, 0, -2.5, 18], ['body']],
     { hover: 6, mouth: [58, 33], emit: [{ x: 30, y: 30, type: 'mist', rate: 1.5 }] }
@@ -201,7 +233,6 @@ Object.assign(SPRITES, {
   // ภูเขาไฟหลับ
   advsnake: ADV_SPRITE(
     'advsnake',
-    64,
     QUAD,
     [
       ['tail', (x, y) => x <= 18 && y <= 34, 'swing', 'tail', null, 34, 2, 0, 20],
@@ -212,7 +243,6 @@ Object.assign(SPRITES, {
   ),
   advboar: ADV_SPRITE(
     'advboar',
-    64,
     QUAD,
     [
       ['tail', (x, y) => x <= 5 && y <= 34, 'swing', 'tail', 6, null, 0, -1.5, 6],
@@ -227,7 +257,6 @@ Object.assign(SPRITES, {
   ),
   adveagle: ADV_SPRITE(
     'adveagle',
-    64,
     FLY,
     [
       ['wingLow', (x, y) => x <= 22 && y >= 38, 'swing', 'wing', 22, 40, 0, 2, 20],
@@ -250,7 +279,6 @@ Object.assign(SPRITES, {
   ),
   advdragon: ADV_SPRITE(
     'advdragon',
-    80,
     QUAD,
     [
       ['wing', (x, y) => x <= 35 && y <= 36, 'swing', 'wing', 36, 22, 0.5, -3, 34],
@@ -263,7 +291,6 @@ Object.assign(SPRITES, {
   // ถ้ำผลึกลึก
   advbeetle: ADV_SPRITE(
     'advbeetle',
-    72,
     FLY,
     [
       ['wingL', (x, y) => x <= 24 && y >= 19 && y <= 32, 'swing', 'wing', 26, 24, 0, 3, 24],
@@ -276,7 +303,6 @@ Object.assign(SPRITES, {
   ),
   advcbat: ADV_SPRITE(
     'advcbat',
-    72,
     FLY,
     [
       ['wingL', (x) => x <= 22, 'swing', 'wing', 23, null, 0, -4, 22],
@@ -287,7 +313,6 @@ Object.assign(SPRITES, {
   ),
   advant: ADV_SPRITE(
     'advant',
-    72,
     QUAD,
     [
       ['abdomen', (x, y) => x <= 20 && y < 38, 'swing', 'tail', 21, null, 0, -1, 20],
@@ -309,7 +334,6 @@ Object.assign(SPRITES, {
   ),
   advgolem: ADV_SPRITE(
     'advgolem',
-    80,
     BIPED,
     [
       ['armB', (x, y) => x <= 14 && y >= 36, 'rigid', 'arm2', 0.6, 3],
@@ -324,7 +348,6 @@ Object.assign(SPRITES, {
   // ยอดผาพายุ
   advsquirrel: ADV_SPRITE(
     'advsquirrel',
-    72,
     BIPED,
     [
       ['tail', (x, y) => x <= 22 && y <= 60, 'swing', 'tail', null, 60, 2.5, 0, 60],
@@ -335,7 +358,6 @@ Object.assign(SPRITES, {
   ),
   advgoat: ADV_SPRITE(
     'advgoat',
-    72,
     QUAD,
     [
       ['tail', (x, y) => x <= 5 && y <= 34, 'swing', 'tail', 6, null, 0, -1.5, 6],
@@ -350,7 +372,6 @@ Object.assign(SPRITES, {
   ),
   advhawk: ADV_SPRITE(
     'advhawk',
-    72,
     BIPED,
     [
       ['tail', (x, y) => x <= 24 && y >= 36, 'swing', 'tail', 26, null, 0, -1.5, 26],
@@ -363,7 +384,6 @@ Object.assign(SPRITES, {
   ),
   advpeacock: ADV_SPRITE(
     'advpeacock',
-    80,
     BIPED,
     [
       ['fan', (x, y) => (y <= 40 && x <= 54) || x <= 18, 'swing', 'tail', null, 52, 1.2, 0, 50],
@@ -375,5 +395,5 @@ Object.assign(SPRITES, {
     { mouth: [66, 18], emit: [{ x: 30, y: 16, type: 'zap', rate: 2 }] }
   ),
   // หุ่นซ้อม: a post that only rocks when hit
-  dummy: ADV_SPRITE('dummy', 56, BLOB, [['body']]),
+  dummy: ADV_SPRITE('dummy', BLOB, [['body']]),
 })

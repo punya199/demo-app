@@ -290,6 +290,7 @@ class Spr {
     this.h = h
     this.m = new Array(w * h).fill(0)
     this.det = []
+    this.pix = []
   }
   set(x, y, k) {
     if (x < 1 || y < 1 || x > this.w - 2 || y > this.h - 2) return
@@ -343,6 +344,24 @@ class Spr {
   }
   d(x, y, c) {
     this.det.push([Math.round(x), Math.round(y), c])
+    return this
+  }
+  // A hand-made bitmap (palette + rows of letters, '.' = empty) placed at (ox, oy). Unlike detail
+  // pixels these count as body: they set the ground line and the white flash. shift(x, y) can move
+  // a part of it with the pose (e.g. the tail).
+  bmp(b, ox, oy, shift) {
+    b.rows.forEach((row, y) => {
+      for (let x = 0; x < row.length; x++) {
+        const ch = row[x]
+        if (ch === '.') continue
+        const [dx, dy] = shift ? shift(x, y) : [0, 0]
+        this.pix.push([
+          Math.round(ox + x + dx),
+          Math.round(oy + y + dy),
+          b.pal[ch.charCodeAt(0) - 97],
+        ])
+      }
+    })
     return this
   }
   line(pts, c, c2) {
@@ -478,6 +497,16 @@ class Spr {
       D[i + 1] = g
       D[i + 2] = b
       D[i + 3] = 255
+    }
+    for (const [x, y, c] of this.pix) {
+      if (x < 0 || y < 0 || x >= w || y >= h) continue
+      const i = (y * w + x) * 4,
+        [r, g, b] = hexRgb(c)
+      D[i] = r
+      D[i + 1] = g
+      D[i + 2] = b
+      D[i + 3] = 255
+      foot = Math.max(foot, y)
     }
     cx.putImageData(img, 0, 0)
     const white = document.createElement('canvas')

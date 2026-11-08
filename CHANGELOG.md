@@ -1,3 +1,161 @@
+# [1.61.0](https://github.com/punya199/demo-app/compare/v1.60.0...v1.61.0) (2026-11-07)
+
+
+### Fix
+
+* point stamp-patch-notes and release assets at tamagotchi/meta/patch-notes.ts (#49) ([e20e2d5](https://github.com/punya199/demo-app/commit/e20e2d55eb4b3d4f0a3b4a6fbc077d82d5c4f8ac)), closes [#49](https://github.com/punya199/demo-app/issues/49)
+
+### Update
+
+* reorganize tamagotchi into feature modules and split oversized files (#48) ([1141d77](https://github.com/punya199/demo-app/commit/1141d771bd1bd46ccc7a419dccd12f9e770a3fa4)), closes [#48](https://github.com/punya199/demo-app/issues/48)
+
+# [1.60.0](https://github.com/punya199/demo-app/compare/v1.59.0...v1.60.0) (2026-11-07)
+
+
+### Update
+
+* arena modal puts actions above a scrollable combat log and caps canvas at 400px (#47) ([aba0da2](https://github.com/punya199/demo-app/commit/aba0da2e150bbab74ee5f291bfeda2db063ab82c)), closes [#47](https://github.com/punya199/demo-app/issues/47)
+
+# [1.59.0](https://github.com/punya199/demo-app/compare/v1.58.0...v1.59.0) (2026-11-07)
+
+
+### Update
+
+* stamp patch notes version and time into the release commit ([04d2b0d](https://github.com/punya199/demo-app/commit/04d2b0d23b8f9b989954bc3c3624c4c992d932ff))
+
+# [1.58.0](https://github.com/punya199/demo-app/compare/v1.57.0...v1.58.0) (2026-11-07)
+
+
+### New
+
+* split pet combat status into Offensive / Defensive / Other tabs ([584abbb](https://github.com/punya199/demo-app/commit/584abbb62efe813fd729f1113a7cd34a9f6f6660))
+
+# [1.57.0](https://github.com/punya199/demo-app/compare/v1.56.0...v1.57.0) (2026-11-07)
+
+
+### Update
+
+* show tree and gear regen as % of max HP per second ([98139be](https://github.com/punya199/demo-app/commit/98139bee1e7b634216540dc0467de1da733bac2d))
+
+# [1.56.0](https://github.com/punya199/demo-app/compare/v1.55.0...v1.56.0) (2026-11-07)
+
+
+### Update
+
+* make PvP seasons weekly in the wiki and patch notes ([84f7e84](https://github.com/punya199/demo-app/commit/84f7e84329d806c8b7ff79ff79955c95f4d2b780))
+
+# [1.55.0](https://github.com/punya199/demo-app/compare/v1.54.0...v1.55.0) (2026-11-07)
+
+
+### Update
+
+* show world boss growth in the wiki, replay and patch notes ([c764c36](https://github.com/punya199/demo-app/commit/c764c363677de00c42ad6f13a576f9b585e7f62f))
+
+# [1.54.0](https://github.com/punya199/demo-app/compare/v1.53.0...v1.54.0) (2026-11-07)
+
+
+### New
+
+* show Dex-collected badge on the pet evolution tree ([60afb59](https://github.com/punya199/demo-app/commit/60afb599835ff10aec4de651ad6e06a1ab697870))
+
+# [1.53.0](https://github.com/punya199/demo-app/compare/v1.52.1...v1.53.0) (2026-11-06)
+
+
+### New
+
+* add "usable by this monster" filter to the equipment bag ([0269484](https://github.com/punya199/demo-app/commit/02694844f23627a50f7453476656b048688cb543))
+
+## [1.52.1](https://github.com/punya199/demo-app/compare/v1.52.0...v1.52.1) (2026-11-06)
+
+
+### Fix
+
+* stack worn equipment card buttons under item info on mobile ([478ea1f](https://github.com/punya199/demo-app/commit/478ea1f75ed6c856edabd3b2f6a1ffb95528133e))
+
+# [1.52.0](https://github.com/punya199/demo-app/compare/v1.51.0...v1.52.0) (2026-11-06)
+
+
+### Fix
+
+* move the return-home patch note under released 1.51.0 with its real time ([356a558](https://github.com/punya199/demo-app/commit/356a558ad5be9dd2baae8f39f4ce3a6ceb24eba0))
+
+### New
+
+* unread red-dot badge on the patch notes menu button, fix patch release times ([94660a4](https://github.com/punya199/demo-app/commit/94660a4783ac6d2b6b7ccacf6bd13fe654b4f3ff))
+
+### Update
+
+* stamp the real version and release time into patch notes at build ([8099994](https://github.com/punya199/demo-app/commit/8099994573ff798f58203aa3bb4968f81d26fc53))
+
+# [1.51.0](https://github.com/punya199/demo-app/compare/v1.50.0...v1.51.0) (2026-11-06)
+
+
+### New
+
+* return pet home (กลับดาว) button, modal and core bag ([948f4a1](https://github.com/punya199/demo-app/commit/948f4a1cfbe3c01fe222c0743deec8bd53d4d71e))
+
+# [1.50.0](https://github.com/punya199/demo-app/compare/v1.49.0...v1.50.0) (2026-11-06)
+
+
+### New
+
+* boss stats and skill tooltips, training dummy screen ([99a9e92](https://github.com/punya199/demo-app/commit/99a9e92b2730282e6c6e201e0ddb0ab362fb03d3))
+
+# [1.49.0](https://github.com/punya199/demo-app/compare/v1.48.0...v1.49.0) (2026-11-05)
+
+
+### Fix
+
+* ignore local claude-flow state ([ea65b8a](https://github.com/punya199/demo-app/commit/ea65b8a9c7ab0407ac8fd3cb05dfd75bcb90ce2b))
+
+### Update
+
+* show reset times, craft set status and mobile bag cards ([55246c6](https://github.com/punya199/demo-app/commit/55246c65740d696178c15a748be3b6efa53fbb75))
+
+# [1.48.0](https://github.com/punya199/demo-app/compare/v1.47.0...v1.48.0) (2026-11-05)
+
+
+### Fix
+
+* correct the craft wiki patch note to the real 1.47.0 release ([353ade4](https://github.com/punya199/demo-app/commit/353ade46a38d69e6d9839934f0583bd3d86e095a)), closes [#31](https://github.com/punya199/demo-app/issues/31) [#32](https://github.com/punya199/demo-app/issues/32)
+* rewrite the wiki battle tab for the real-time arena ([06cc920](https://github.com/punya199/demo-app/commit/06cc9207564945a8e7948e15896d8f9d9fdb664c))
+
+### Update
+
+* add a skills tab to the in-game wiki ([31d2ef5](https://github.com/punya199/demo-app/commit/31d2ef5841b235d18e23bad59762044f021d9669))
+
+# [1.47.0](https://github.com/punya199/demo-app/compare/v1.46.0...v1.47.0) (2026-11-05)
+
+
+### Update
+
+* add the craft and materials-tab patch notes ([76dbe54](https://github.com/punya199/demo-app/commit/76dbe543e952478a08a1617858b6d4f7de9e8c79))
+* document craft, Mythic and arena statuses in the in-game wiki ([b1c4e83](https://github.com/punya199/demo-app/commit/b1c4e834dfa065f3dce6eb08e219452c5c555c29))
+
+# [1.46.0](https://github.com/punya199/demo-app/compare/v1.45.0...v1.46.0) (2026-11-05)
+
+
+### New
+
+* show materials in the bag with a materials tab ([050d106](https://github.com/punya199/demo-app/commit/050d1062c50510836d189529d61e9f54a1e9677f))
+
+# [1.45.0](https://github.com/punya199/demo-app/compare/v1.44.1...v1.45.0) (2026-11-05)
+
+
+### Fix
+
+* show craft material names in the expedition summary ([8c13caa](https://github.com/punya199/demo-app/commit/8c13caa192c646abc72e270e516a23287aef3c1c))
+
+### New
+
+* add craft items plan spec and roadmap entry ([ff0a917](https://github.com/punya199/demo-app/commit/ff0a917d1c3ae65d5962029abea66be1efa19c0b))
+* craft panel with queue, catalyst and recipes by set ([f578d20](https://github.com/punya199/demo-app/commit/f578d206399943fc41eabb6eb7d17d133aebb41c))
+* Mythic grade, craft-set effect labels and bag set filter ([ced6a95](https://github.com/punya199/demo-app/commit/ced6a950726639f650a6cc7d5da0d50119375f9b))
+
+### Update
+
+* record tuned craft set numbers and mark phase 5.6 done ([a38accb](https://github.com/punya199/demo-app/commit/a38accb66a40af17433a532c9ff34fc27ac21d5b))
+
 ## [1.44.1](https://github.com/punya199/demo-app/compare/v1.44.0...v1.44.1) (2026-11-05)
 
 

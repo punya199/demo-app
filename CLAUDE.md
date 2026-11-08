@@ -61,6 +61,7 @@ React 18 + TypeScript SPA (Vite 6) — a multi-tool app bundling several unrelat
 - Styling: Tailwind CSS v4 utility classes by default; Emotion's `css` prop (via `@emotion/react` jsxImportSource) for cases needing dynamic/computed styles. Ant Design v5 (`antd`) is the component library — theme is centralized in `App.tsx`'s `ConfigProvider`.
 - Some user-facing strings (auth/permission messages) are Thai — match existing locale/tone when adding similar messages rather than switching to English.
 - Tests use Vitest + Testing Library (`jsdom` env, setup file `src/test/setup.ts`); co-locate `*.test.ts(x)` next to the file under test.
+- **Tamagotchi changes (any player-visible change):** (1) add a Thai player-facing entry to `src/pages/project/tamagotchi/meta/patch-notes.ts`; (2) update the in-game wiki (`wiki.ts` in the backend + `WikiPanel.tsx` here); (3) add or update tests for any new helper or engine code.
 
 ## Agent skills
 

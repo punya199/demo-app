@@ -112,6 +112,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      - name: Stamp patch notes
+        run: node scripts/stamp-patch-notes.mjs "${{ needs.release.outputs.new_release_version }}"
+
       - name: Build
         run: yarn build
         env:

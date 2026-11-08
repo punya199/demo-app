@@ -43,3 +43,6 @@ package-lock.json
 
 .claude/*
 !.claude/skills/
+
+# ruflo / claude-flow local state
+.claude-flow/

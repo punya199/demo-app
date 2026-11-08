@@ -73,29 +73,18 @@ Object.assign(SPRITES, {
     mouth: [60, 47],
   },
   // อสูรห้วงลึก (water raid): the owner's AI-made shark (bitmap in raid-bitmaps.js), 150 x 59 on a 160 grid.
-  // Cut into tail, body and lower jaw: the tail sways with the pose and the jaw drops open on a red
-  // mouth in attacks and casts.
+  // Cut into tail, eight crest spikes, pectoral fin, three belly fins and the lower jaw (sharkPart):
+  // the tail sways, the spikes ripple in a wave, the fins paddle and the jaw drops open on a red mouth.
   abyssfish: {
     size: 160,
     rig: SWIM,
     hover: 6,
     aura: { type: 'bossw', x: 80, y: 154, r: 52 },
     draw(s, P) {
-      const body = P.body,
-        t = P.tail,
-        j = P.jaw
-      const jaw = (x) => [body[0], body[1] + j * (1.5 + (x - 128) * 0.35)]
-      bmpRig(
-        s,
-        RAID_BMP.abyssfish,
-        5,
-        96,
-        (x, y) => (x < 36 ? 'tail' : x >= 128 && y >= 36 ? 'jaw' : 'body'),
-        { body, tail: (x) => [body[0], body[1] - t * 0.8 * (1 - x / 36)], jaw },
-        ['tail', 'body', 'jaw'],
-        { jaw: { col: '#5f1125', off: body } }
-      )
-      if (P.glow) glowMouth(s, 146 + body[0], 134 + body[1])
+      bmpRig(s, RAID_BMP.abyssfish, 5, 96, sharkPart, sharkOffsets(P), SHARK_ORDER, {
+        jaw: { col: '#5f1125', off: P.body },
+      })
+      if (P.glow) glowMouth(s, 146 + P.body[0], 134 + P.body[1])
     },
     emit: [
       { x: 90, y: 104, type: 'bubble', rate: 2.5 },

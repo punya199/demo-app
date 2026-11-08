@@ -269,3 +269,80 @@ function golemRock(x, y) {
   }
   return best > 1 && x >= 36 && x <= 67 && y >= 16 && y <= 52 ? 'body' : name
 }
+
+// The shark's parts on the 150 x 59 bitmap. The crest is cut into its spikes along the line of the back
+// (backY); each spike bends from its base, so the base row never moves and nothing tears. The pectoral
+// fin and the small belly fins bend only below the belly line, for the same reason.
+const SHARK_CREST = [
+  ['c1', 28, 38],
+  ['c2', 39, 48],
+  ['c3', 49, 57],
+  ['c4', 58, 80],
+  ['dorsal', 81, 97],
+  ['c5', 98, 106],
+  ['c6', 107, 113],
+  ['c7', 114, 127],
+]
+const SHARK_PEC_L = [102, 98, 96, 94, 92, 91, 91, 90, 91, 90, 90]
+const SHARK_PEC_R = [105, 106, 107, 108, 108, 107, 107, 107, 106, 105, 105]
+const sharkBackY = (x) => 29 - (x - 28) * 0.08
+function sharkPart(x, y) {
+  if (x >= 28 && x <= 127 && y < sharkBackY(x))
+    for (const [n, a, b] of SHARK_CREST) if (x >= a && x <= b) return n
+  if (x < 36) return 'tail'
+  if (x >= 128 && y >= 36) return 'jaw'
+  if (y >= 36 && y <= 46 && x >= SHARK_PEC_L[y - 36] && x <= SHARK_PEC_R[y - 36]) return 'pec'
+  if (y >= 46 && y <= 52 && x >= 76 && x < 85) return 'fin3'
+  if (y >= 47 && x >= 78 && x < 115) return 'pec'
+  if (y >= 39 && x >= 39 && x <= 46) return 'fin1'
+  if (y >= 41 && x >= 55 && x <= 69 && (y >= 43 || x >= 61)) return 'fin2'
+  return 'body'
+}
+// Offsets for each part from the SWIM pose: spikes bend back and forth in a wave from tail to head,
+// the fins row by row (a shear), capped at cap px.
+function sharkOffsets(P) {
+  const body = P.body,
+    t = P.tail,
+    w = P.wing,
+    clamp = (v, cap) => Math.max(-cap, Math.min(cap, v)),
+    o = {
+      body,
+      tail: (x) => [body[0], body[1] - t * 0.8 * (1 - x / 36)],
+      jaw: (x) => [body[0], body[1] + P.jaw * (1.5 + (x - 128) * 0.35)],
+    }
+  SHARK_CREST.forEach(([n], i) => {
+    const ph = i * 0.55,
+      sway = t * Math.cos(ph) * 0.9 - body[1] * Math.sin(ph) * 1.6 - w * 0.6,
+      tall = n === 'dorsal' ? 22 : 14
+    o[n] = (x, y) => {
+      const h = Math.min(1, (sharkBackY(x) - y) / tall)
+      return [body[0] + Math.round(clamp(-sway * h * 1.4, 3)), body[1]]
+    }
+  })
+  const fin = (top, len, amp, cap) => (x, y) => {
+    const d = Math.max(0, Math.min(1, (y - top) / len))
+    return [body[0] + Math.round(clamp(amp * d, cap)), body[1]]
+  }
+  o.pec = fin(45, 13, -w * 3 + P.ff[0] * 1.2, 3)
+  o.fin1 = fin(41, 7, P.bf[0] * 1.2 - w * 1.5, 2)
+  o.fin2 = fin(43, 8, P.ff[0] * 1.2 - w * 1.5, 2)
+  o.fin3 = fin(46, 5, P.bf[0] - w, 1)
+  return o
+}
+const SHARK_ORDER = [
+  'tail',
+  'c1',
+  'c2',
+  'c3',
+  'c4',
+  'dorsal',
+  'c5',
+  'c6',
+  'c7',
+  'body',
+  'fin1',
+  'fin2',
+  'fin3',
+  'pec',
+  'jaw',
+]

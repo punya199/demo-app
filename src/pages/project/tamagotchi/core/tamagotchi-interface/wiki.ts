@@ -92,6 +92,8 @@ export interface IWikiData {
     // Spiritual elements only merge with each other, natural ones with natural ones.
     spiritualLines: EnumMonsterLine[]
     lifespanMinutes: number
+    // False while only two monsters of the same line can merge (the server then lists only those forms).
+    crossLineEnabled?: boolean
     forms: IMergeForm[]
   }
   // Spiritual eggs are rare: hatching one costs Raid Tokens.

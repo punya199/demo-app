@@ -64,7 +64,9 @@ export const getMergeBlocker = (
   second: IMonsterData | undefined,
   wallet: { coin: number; gem: number } | undefined,
   cost: { coin: number; gem: number },
-  spiritualLines: EnumMonsterLine[] = []
+  spiritualLines: EnumMonsterLine[] = [],
+  // Off while the cross-line forms are redesigned: only two of the same line merge.
+  crossLineEnabled = true
 ): string | null => {
   if (!first || !second) {
     return 'เลือกมอนสองตัว'
@@ -75,6 +77,9 @@ export const getMergeBlocker = (
   }
   if (spiritualLines.includes(first.line) !== spiritualLines.includes(second.line)) {
     return 'ธาตุธรรมชาติกับธาตุจิตวิญญาณรวมกันไม่ได้'
+  }
+  if (!crossLineEnabled && first.line !== second.line) {
+    return 'ตอนนี้รวมร่างได้เฉพาะมอนสายเดียวกัน'
   }
   if ((wallet?.coin ?? 0) < cost.coin) {
     return 'เหรียญไม่พอ'

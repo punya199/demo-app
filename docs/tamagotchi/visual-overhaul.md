@@ -208,9 +208,8 @@ parts on a preview when the cut is not obvious; never move only part of a rock o
    both repos (backend `CROSS_LINE_MERGE_ENABLED = false`, frontend merge screen, wiki and patch
    note), tests pass, **no PR yet**: it reaches players only after the owner asks for PRs and they
    merge. The 13 hybrid fused forms stay on hold until the owner reopens them.
-6. **Older open items:** apply the renames in "Names to apply in the game" when the art goes in;
-   fire line less detailed than the others (64 px grids where others use 80/88); perfect forms have
-   no aura yet.
+6. **Next: put the art into the game**, see "Plan: putting the art into the game" below (waiting for
+   the owner to say go).
 
 ### AI picture prompts
 
@@ -226,42 +225,53 @@ Adventure enemies (2026-11-08): the owner asked for one sheet with all 20 plus t
 prompt given in chat asks for a 5 × 5 grid (21 cells used, reading order = `adventure-data.ts` order, then
 the dummy), every creature alone in its cell with empty space round it, on a flat solid #FF00FF magenta
 background (not a checkerboard, which costs a cleanup every time), no text or numbers. Each creature is
-cut from its cell and reduced to its stage size (baby 40–48, adult 56, perfect 64, ultimate 72, area boss +8).
+cut from its cell and reduced to its animal's size (see the status table; first done by stage size, then
+redone by species on the owner's request).
 Look-alikes kept apart on purpose: ฉลามหมอก is a small round grey mist shark (not the raid shark),
 มังกรหลับใหล a chubby sleepy dragon (not the fire world boss), โกเลมผลึก crystals with no lava (not
 ราชันย์ลาวา), นกยูงอสนี a navy storm peacock (not the white holy เซราฟรัศมี).
 
-2. Put the art into the game. Read the latest patch notes first
-   (`src/pages/project/tamagotchi/meta/patch-notes.ts`; the frontend's tamagotchi folder and the
-   backend's monster module were split into feature folders on 2026-11-07, so older paths in these
-   notes may have moved). What the game looks like now (frontend 1.61.0, backend 1.48.0):
-   - `arena/ArenaReplay.tsx` draws each fighter as a 44 px emoji on a fixed `ARENA_W` × `ARENA_H`
-     canvas (at most 400 px tall on a computer), with no camera. The prototype's arena is three
-     screens wide with a camera; the game version only needs the sprites, the poses and the skill
-     effects, not the camera or the minimap.
-   - Positions, projectiles (`frame.p`) and zones (`frame.z`) come from the server replay. Each
-     fighter row is `[x, y, hp, act, kind, actT, inv, face, shield, statusBits]` (`act` 1 = winding
-     up a skill, 2 = dodging). Events: `hit` (crit, `parried`, element bonus), `dot`, `heal`,
-     `dodge`, `miss`, `skill`, `status` / `resist` / `seize`, `burst` / `zoneHit` / `beam`,
-     `thorns`, `rage` and `grow`. The prototype's skill scripts (`useFire`) move the fighters
-     themselves (`approach`, `lungeHit`); in the game they must not: keep only the visual part,
-     started by the `skill` event and the wind-up (`act` 1), at the server's positions.
+## Plan: putting the art into the game (agreed with the owner 2026-11-08, not started)
+
+Today every screen in the game still shows emoji; all the art lives only in the prototype. Read the latest
+patch notes first (`src/pages/project/tamagotchi/meta/patch-notes.ts`; the frontend's tamagotchi folder
+and the backend's monster module were split into feature folders on 2026-11-07, so older paths here may
+have moved). Game versions when this was written: frontend 1.61.0, backend 1.48.0. Steps, in order:
+
+1. **Shared sprite module + sprite ids.** Port `Spr` / `bmpRig` / `ANIM` / the rigs and every sprite
+   (lines, fused, world and raid bosses, adventure enemies, dummy) to TypeScript in the frontend, baked
+   lazily per sprite id; bitmaps stay data files. Backend: give every species, adventure enemy
+   (`adventure-data.ts`), raid / world boss and the dummy (`dummy-data.ts`) a sprite id next to its
+   `emoji`, and send it in the API and the arena replay; keep the emoji as a fallback.
+2. **`ArenaReplay` (the biggest step).** `arena/ArenaReplay.tsx` draws each fighter as a 44 px emoji on a
+   fixed `ARENA_W` × `ARENA_H` canvas (at most 400 px tall on a computer), no camera. The game needs only
+   the sprites, poses and skill effects, not the prototype's camera or minimap.
+   - Positions, projectiles (`frame.p`) and zones (`frame.z`) come from the server replay. Each fighter
+     row is `[x, y, hp, act, kind, actT, inv, face, shield, statusBits]` (`act` 1 = winding up a skill,
+     2 = dodging). Events: `hit` (crit, `parried`, element bonus), `dot`, `heal`, `dodge`, `miss`,
+     `skill`, `status` / `resist` / `seize`, `burst` / `zoneHit` / `beam`, `thorns`, `rage`, `grow`.
+   - The prototype's skill scripts (`useFire`) move the fighters themselves (`approach`, `lungeHit`); in
+     the game they must not: keep only the visual part, started by the `skill` event and the wind-up
+     (`act` 1), at the server's positions.
    - Pose map: walk while the position changes, attack on a basic `hit`, cast during `act` 1 and at
      `skill`, hurt on being hit, the parry pose on `dodge` / `parried`, a KO pose at `hp` 0.
-   - New since the prototype: the world boss grows twice in a fight (`grow` event at 20 s and
-     40 s, ATK/DEF +30%) and has an arena-wide attack with a 1 s warning, so the boss sprite needs
-     a bigger, angrier look per stage and a warning effect. World boss fights are team battles
-     (rented friend support units), so several sprites share the arena. The game has 19 statuses
-     (`StatusId` in `arena/arena-interface.ts`); the prototype draws most of them, check `evaDown`,
-     `defUp`, `regen`, `slow` and `immune`.
-   - Emoji also show the pet outside the arena: `shared/PetSprite.tsx` (home screen),
-     `PetAvatar.tsx` (`PetCostumeFrame`: costumes are emoji layers for backdrop, aura, back item,
-     face item and hat over a 128 px box, so a sprite needs a face and head anchor for them), the
-     Dex, the evolution tree and the return-home (กลับดาว) screen.
-   - Suggested order: a shared sprite module in the frontend (the `Spr` / `SPRITES` / `ANIM` code
-     as TypeScript, baked lazily per species id), then `ArenaReplay`, then the home screen and
-     cards, then the skill effects line by line. Apply the renames above in the same release, with
-     a patch-notes entry and the wiki (`WikiPanel` + backend `wiki.ts`).
+   - World boss: on `grow` make the same sprite 10% bigger per stage (the owner's choice, as `growBoss`
+     in the prototype), plus a warning effect for its arena-wide attack (1 s). World boss fights are team
+     battles (rented support units), so several sprites share the arena.
+   - Statuses: the game has 19 (`StatusId` in `arena/arena-interface.ts`); the prototype draws most;
+     still to draw: `evaDown`, `defUp`, `regen`, `slow`, `immune`.
+   - Adventure enemies use the generic skills of their element (owner's decision): no own animations.
+3. **Other screens:** `shared/PetSprite.tsx` (home), `PetAvatar.tsx` (`PetCostumeFrame`: costumes are
+   emoji layers for backdrop, aura, back item, face item and hat over a 128 px box, so every sprite needs
+   a head and face anchor), the Dex, the evolution tree and the return-home (กลับดาว) screen.
+4. **Renames in the game data**, in the same release: "Names to apply in the game" above (skills and
+   species in `arena-data.ts` / `species-data.ts`; check PvP history with the `battle-golden-check`
+   skill, since the golden file stores `moveName`). The vampire and the headless knight need their own
+   raid skill ids (today they share ids with other bosses).
+5. **Release:** a Thai patch-notes entry, the wiki (`WikiPanel.tsx` + backend `wiki.ts`), tests for the
+   new helpers, then PRs in both repos when the owner asks.
+6. **Art still open:** fire line less detailed than the others; perfect forms have no aura; ค้างคาวถ่าน
+   is too dark on the dark page (brighten its palette); the 13 cross-line fused forms stay on hold.
 
 ## How the prototype code is organised (inside the HTML)
 

@@ -222,6 +222,15 @@ the body so it can be cut into parts. Its pictures are not on a clean grid and h
 so always reduce them; the shark came out 160×64 as asked, the golem about 860×960 and had to be
 reduced by ~9.5×.
 
+Adventure enemies (2026-11-08): the owner asked for one sheet with all 20 plus the training dummy, so the
+prompt given in chat asks for a 5 × 5 grid (21 cells used, reading order = `adventure-data.ts` order, then
+the dummy), every creature alone in its cell with empty space round it, on a flat solid #FF00FF magenta
+background (not a checkerboard, which costs a cleanup every time), no text or numbers. Each creature is
+cut from its cell and reduced to its stage size (baby 40–48, adult 56, perfect 64, ultimate 72, area boss +8).
+Look-alikes kept apart on purpose: ฉลามหมอก is a small round grey mist shark (not the raid shark),
+มังกรหลับใหล a chubby sleepy dragon (not the fire world boss), โกเลมผลึก crystals with no lava (not
+ราชันย์ลาวา), นกยูงอสนี a navy storm peacock (not the white holy เซราฟรัศมี).
+
 2. Put the art into the game. Read the latest patch notes first
    (`src/pages/project/tamagotchi/meta/patch-notes.ts`; the frontend's tamagotchi folder and the
    backend's monster module were split into feature folders on 2026-11-07, so older paths in these

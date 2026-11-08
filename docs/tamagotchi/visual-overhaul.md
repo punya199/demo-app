@@ -304,10 +304,27 @@ have moved). Game versions when this was written: frontend 1.61.0, backend 1.48.
    below. A boss winding up a skill with radius ≥ 200 turns the arena edge red with "ระวัง! โจมตีทั้งสนาม".
    Fighters without art (cross-line hybrids, NPCs, old snapshots) keep the emoji path unchanged. Checked in
    Playwright on adventure, PvP, raid and world-boss replays from the real engine.
-   **Not done yet:** the prototype's own animation for each skill (`js/skills/*.js`, about 70 skills plus
-   the raid bosses' 10): the game shows the server's geometry (rings, beams, projectiles) with element
-   particles instead. Porting them means keeping only their visual part, started by the `skill` event at
-   the server's positions. The floor is still the old cave for every fight (the prototype has themes).
+   **Skill animations (done 2026-11-08):** every line skill (8 × 8) and the 10 raid boss skills play the
+   prototype's own animation, in `arena/skill-fx/`. The prototype scripts were converted file by file
+   (`fire.ts` … `raid.ts`, same names and helpers) onto `runtime.ts`, which keeps the prototype's API but
+   makes the game-mechanic calls puppets: `damage`, `approach`, `walkTo`, `lungeHit`, `closeIn` do nothing,
+   `tween`/`wait` run on the replay clock, `castPose(...).charged` resolves at the server's release,
+   `meleeStrike` calls `onHit` at each of the cast's server hits, `inRange` asks whether the server hit that
+   fighter, `projectileOf(att, …)` lands on the first hit (and hides the server's orb for that side), and
+   `zoneDelay(att, ms)` waits for the server's `zoneHit`. `casts.ts` reads each cast from the replay
+   (wind-up stretch, `skill` release, its `hit`s, the zone landing, the target); `stage.ts` starts each
+   script at its wind-up, applies the scripts' `ox/oy`, squash, alpha, flashes and after-images to the
+   sprite, the screen shake/darken/fire tint/white flash, and binds passives to replay events: `rebirth`
+   (ปีกอัคนี), `laststand` (ปีกขาวเจิดจ้า), the ent's bark on hits taken, static and jelly retorts on
+   basic hits taken, the void step on `dodge`, the soul lantern's venom flame, the zombie rat's `rage`.
+   Basic hits use the prototype's impact burst. Scenes are in sprite pixels (world / 1.5). Skills the
+   prototype never drew (dodges, adventure enemy `e_*`, NPC `n_*`, world boss `wb_quake_*`) keep the
+   generic element particles. A replay holds its first frame up to 1.5 s for the sprite chunk to load.
+   `stage.test.ts` runs every animation through a fake canvas and fails on any script error; all 74 were
+   also checked in Chromium on replays from the real engine (one fight per skill, caster = the species
+   that owns it). When an animation changes in the prototype, port the change into the matching
+   `skill-fx/<line>.ts` by hand (the converter was one-off). Still open: the floor is the old cave for
+   every fight (the prototype has element themes).
 3. **Other screens:** `shared/PetSprite.tsx` (home), `PetAvatar.tsx` (`PetCostumeFrame`: costumes are
    emoji layers for backdrop, aura, back item, face item and hat over a 128 px box, so every sprite needs
    a head and face anchor), the Dex, the evolution tree and the return-home (กลับดาว) screen.

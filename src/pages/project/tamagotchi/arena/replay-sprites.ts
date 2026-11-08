@@ -1,10 +1,12 @@
 import { ARENA_H, ARENA_SCALE, ARENA_W } from './arena-helper'
-import { IArenaEvent, IArenaReplay, StatusId } from './arena-interface'
-import { IFighterPose } from './replay-anim'
+import { IArenaEvent, IArenaReplay, IArenaSkill, StatusId } from './arena-interface'
+import { BASIC_NAME, IFighterPose } from './replay-anim'
 import { drawAura, drawGlows } from '../sprites/fx/auras'
 import { makeParticle, ParticleType, PSys } from '../sprites/fx/particles'
 import { getSpriteFrame, hasSprite, SPRITES } from '../sprites/sprite-registry'
 import type { ISpriteDef } from '../sprites/sprite-types'
+import { scene } from './skill-fx/runtime'
+import { createSkillStage, IStagePlace } from './skill-fx/stage'
 
 // The pixel-art layer of the arena replay: sprites, their auras, glows and particles, status
 // effects drawn on the body, and element particles for hits, skills and projectiles. Loaded on
@@ -83,11 +85,41 @@ export interface ISpriteLayer {
   // Advances particles to `tick` (spawning for every event passed) and draws them.
   step: (dt: number, tick: number, places: IPlace[]) => void
   drawParticles: (ctx: CanvasRenderingContext2D) => void
+  // Screen-wide effects of the skill animations (shake in world px, overlays 0..1).
+  screen: () => { shake: number; darken: number; tint: number; flash: number }
+  // Whether a skill animation is drawing team's projectile itself (hide the server's orb).
+  hidesProjectiles: (team: number) => boolean
 }
 
-export const createSpriteLayer = (replay: IArenaReplay): ISpriteLayer => {
+export const createSpriteLayer = (
+  replay: IArenaReplay,
+  skills: Record<string, IArenaSkill>
+): ISpriteLayer => {
   const { fighters, events, frames, step } = replay
   const ps = new PSys()
+  // The prototype's skill animations, played along the replay (skill-fx/).
+  const stage = createSkillStage(replay, skills, ARENA_W / PX, ARENA_H / PX)
+  const shown: ({ white: CanvasImageSource } | null)[] = fighters.map(() => null)
+  scene.frameOf = (e) => shown[e.idx] ?? null
+  // Fighters' casts that have their own animation: the generic particles stay out of their way.
+  const animated = new Set(
+    events
+      .filter((e) => e.kind === 'skill' && e.who !== undefined)
+      .filter((e) => stage.animates(e.who as number, e.skill ?? ''))
+      .map((e) => `${e.who}:${e.skill}`)
+  )
+  const busyUntil: number[][] = fighters.map(() => [])
+  for (const e of events)
+    if (e.kind === 'skill' && animated.has(`${e.who}:${e.skill}`))
+      busyUntil[e.who as number].push(e.t)
+  const covered = (e: IArenaEvent) => {
+    if (e.who === undefined) return false
+    if (e.kind === 'hit') return e.skill === BASIC_NAME || animated.has(`${e.who}:${e.skill}`)
+    if (e.kind === 'skill') return animated.has(`${e.who}:${e.skill}`)
+    if (e.kind === 'burst' || e.kind === 'beam' || e.kind === 'zoneHit')
+      return busyUntil[e.who].some((t) => e.t >= t - 2 && e.t <= t + 3 * 20)
+    return false
+  }
   const drawn: (IDrawn | null)[] = fighters.map((f) => {
     if (!hasSprite(f.sprite)) return null
     const def = SPRITES[f.sprite]
@@ -111,6 +143,7 @@ export const createSpriteLayer = (replay: IArenaReplay): ISpriteLayer => {
     frames[Math.min(frames.length - 1, Math.floor(t / step))].f[idx]
 
   const onEvent = (e: IArenaEvent) => {
+    if (covered(e)) return
     const who = e.who !== undefined ? fighters[e.who] : undefined
     const el = e.el ?? who?.el
     const at = (i: number) => {
@@ -189,16 +222,27 @@ export const createSpriteLayer = (replay: IArenaReplay): ISpriteLayer => {
       if (!d || !id) return
       const img = getSpriteFrame(id, pose.anim, pose.frame)
       if (!img) return
+      shown[idx] = img
       const { def } = d
+      const v = stage.ents[idx]
+      x += v.ox * PX
+      alpha *= Math.max(0, Math.min(1, v.alpha))
+      const flash = Math.max(pose.flash, v.flash)
       const k = d.px * pose.scale
       const w = def.size * k
       const flip = face < 0
       const hover = def.hover ? (def.hover + Math.sin(clock * 2.2 + idx) * 1.4) * k : 0
-      const feet = y + FOOT_DROP
+      const feet = y + FOOT_DROP + v.oy * PX
       const left = x - w / 2
       const top = feet - d.foot * k - hover
       ctx.save()
       ctx.imageSmoothingEnabled = false
+      // after-images a skill left behind (scene units, feet anchored)
+      for (const g of v.ghosts) {
+        ctx.globalAlpha = Math.max(0, g.a) * 0.5 * alpha
+        const src = g.img?.white ?? img.white
+        drawImage(ctx, src, g.x * PX - w / 2, g.y * PX - d.foot * k - hover, w, w, flip)
+      }
       // shadow on the ground
       ctx.globalAlpha = 0.4 * alpha
       ctx.fillStyle = '#000'
@@ -220,6 +264,12 @@ export const createSpriteLayer = (replay: IArenaReplay): ISpriteLayer => {
         ctx.restore()
       }
       ctx.globalAlpha = alpha
+      if (v.sx !== 1 || v.sy !== 1) {
+        // a script's squash and stretch, from the feet
+        ctx.translate(x, feet)
+        ctx.scale(v.sx, v.sy)
+        ctx.translate(-x, -feet)
+      }
       if (pose.ko) {
         // topple backwards and sink a little
         const fall = Math.min(1, pose.koSec / 0.5)
@@ -229,8 +279,8 @@ export const createSpriteLayer = (replay: IArenaReplay): ISpriteLayer => {
       }
       drawImage(ctx, img.cv, left, top, w, w, flip)
       drawGlows(ctx, def, left, top, k, k, flip, clock, alpha, img)
-      if (pose.flash > 0) {
-        ctx.globalAlpha = pose.flash * alpha
+      if (flash > 0) {
+        ctx.globalAlpha = Math.min(1, flash) * alpha
         drawImage(ctx, img.white, left, top, w, w, flip)
       }
       ctx.restore()
@@ -392,6 +442,25 @@ export const createSpriteLayer = (replay: IArenaReplay): ISpriteLayer => {
     },
 
     step(dt, tick, places) {
+      const stagePlaces = places.map((place, idx): IStagePlace => {
+        const d = drawn[idx]
+        const row = rowAt(tick, idx)
+        const k = (d ? d.px : PX) / PX
+        return {
+          x: place.x / PX,
+          y: (place.y + FOOT_DROP) / PX,
+          flip: place.face < 0,
+          grow: place.scale,
+          size: d ? d.def.size * k : 30,
+          foot: d ? d.foot * k : 26,
+          mouth: d ? d.def.mouth.map((m) => m * k) : [22, 12],
+          hover: d?.def.hover ?? 0,
+          hp: row[2],
+          hpMax: fighters[idx].maxHp,
+          dead: place.dead,
+        }
+      })
+      stage.step(tick, stagePlaces)
       for (const e of events) {
         if (e.t <= seen || e.t > tick) continue
         onEvent(e)
@@ -432,8 +501,16 @@ export const createSpriteLayer = (replay: IArenaReplay): ISpriteLayer => {
       ctx.save()
       ctx.scale(PX, PX)
       ps.draw(ctx)
+      stage.draw(ctx)
       ctx.restore()
     },
+    screen: () => ({
+      shake: scene.shake * PX,
+      darken: scene.darken,
+      tint: scene.tintA,
+      flash: scene.flashScreen,
+    }),
+    hidesProjectiles: (team) => stage.hidesProjectiles(team),
   }
 }
 

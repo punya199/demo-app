@@ -308,6 +308,9 @@ export class PSys {
       this.list.push(p)
     }
   }
+  burst(n: number, fn: (i: number) => IParticle | undefined) {
+    for (let i = 0; i < n; i++) this.add(fn(i))
+  }
   update(dt: number) {
     const L = this.list
     for (let i = L.length - 1; i >= 0; i--) {

@@ -25,6 +25,8 @@ interface IArenaReplayProps {
 const S = ARENA_SCALE
 // A boss skill this wide warns the whole arena while it winds up.
 const ARENA_WIDE_RADIUS = 200
+// How long the replay waits on its first frame for the sprite layer to load.
+const LAYER_WAIT_SEC = 1.5
 const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'
 const colorOf = (el: unknown) =>
   ARENA_ELEMENT_COLOR[(el as ArenaElement) ?? 'neutral'] ?? ARENA_ELEMENT_COLOR.neutral
@@ -102,10 +104,11 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
     let cancelled = false
     void import('./replay-sprites')
       .then((m) => {
-        if (!cancelled) layer = m.createSpriteLayer(replay)
+        if (!cancelled) layer = m.createSpriteLayer(replay, skills)
       })
       .catch(() => {})
     let places: IPlace[] = []
+    let waited = 0
     let tick = 0
     let lastTime = 0
     let lastReported = -1
@@ -144,7 +147,16 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
 
     const render = () => {
       const scale = canvas.width / ARENA_W
-      ctx.setTransform(scale, 0, 0, scale, 0, 0)
+      const fx = layer?.screen()
+      const shake = fx && !reduceMotion ? fx.shake : 0
+      ctx.setTransform(
+        scale,
+        0,
+        0,
+        scale,
+        (Math.random() - 0.5) * shake * scale,
+        (Math.random() - 0.5) * shake * scale
+      )
       ctx.clearRect(0, 0, ARENA_W, ARENA_H)
       ctx.drawImage(floor, 0, 0, ARENA_W, ARENA_H)
       const fi = tick / step
@@ -203,7 +215,8 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
         }
       }
       for (const p of f0.p) {
-        const [x, y, , el] = p as [number, number, number, string]
+        const [x, y, team, el] = p as [number, number, number, string]
+        if (layer?.hidesProjectiles(team)) continue
         ctx.fillStyle = colorOf(el)
         ctx.beginPath()
         ctx.arc(x / S, y / S, 8, 0, Math.PI * 2)
@@ -373,6 +386,21 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
         }
       }
       layer?.drawParticles(ctx)
+      if (fx && (fx.darken > 0 || fx.tint > 0 || fx.flash > 0)) {
+        // a skill darkening the arena, tinting it with fire, or flashing it white
+        if (fx.darken > 0) {
+          ctx.fillStyle = `rgba(4,2,12,${fx.darken})`
+          ctx.fillRect(0, 0, ARENA_W, ARENA_H)
+        }
+        if (fx.tint > 0) {
+          ctx.fillStyle = `rgba(255,120,30,${fx.tint * 0.22})`
+          ctx.fillRect(0, 0, ARENA_W, ARENA_H)
+        }
+        if (fx.flash > 0 && !reduceMotion) {
+          ctx.fillStyle = `rgba(255,255,255,${fx.flash * 0.6})`
+          ctx.fillRect(0, 0, ARENA_W, ARENA_H)
+        }
+      }
       if (warn > 0) {
         // the world boss is about to hit the whole arena
         const pulse = 0.35 + 0.35 * Math.abs(Math.sin(now * 8))
@@ -464,7 +492,10 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
     const frame = (time: number) => {
       const dt = lastTime ? Math.min(0.1, (time - lastTime) / 1000) : 0
       lastTime = time
-      tick = Math.min(lastTick, tick + dt * ARENA_TICK * speedRef.current)
+      // hold the first frame briefly while the pixel-art chunk loads, so the fight starts drawn
+      waited += dt
+      if (layer || waited > LAYER_WAIT_SEC)
+        tick = Math.min(lastTick, tick + dt * ARENA_TICK * speedRef.current)
       render()
       layer?.step(dt * speedRef.current, tick, places)
       const shown = Math.floor(tick)

@@ -9,6 +9,8 @@ import {
   statusesFromBits,
 } from './arena-helper'
 import { ArenaElement, IArenaReplay, IArenaSkill, StatusId } from './arena-interface'
+import { fighterPose, indexReplay } from './replay-anim'
+import type { IPlace, ISpriteLayer } from './replay-sprites'
 
 interface IArenaReplayProps {
   replay: IArenaReplay
@@ -21,6 +23,10 @@ interface IArenaReplayProps {
 }
 
 const S = ARENA_SCALE
+// A boss skill this wide warns the whole arena while it winds up.
+const ARENA_WIDE_RADIUS = 200
+// How long the replay waits on its first frame for the sprite layer to load.
+const LAYER_WAIT_SEC = 1.5
 const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'
 const colorOf = (el: unknown) =>
   ARENA_ELEMENT_COLOR[(el as ArenaElement) ?? 'neutral'] ?? ARENA_ELEMENT_COLOR.neutral
@@ -90,6 +96,19 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const { frames, events, fighters, step } = replay
     const lastTick = (frames.length - 1) * step
+    const index = indexReplay(replay)
+    const stunIdx = statusOrder.indexOf('stun')
+    const stunBit = stunIdx >= 0 ? 1 << stunIdx : 0
+    // The pixel-art layer loads on demand; until then (or for a fighter without art) the emoji shows.
+    let layer: ISpriteLayer | null = null
+    let cancelled = false
+    void import('./replay-sprites')
+      .then((m) => {
+        if (!cancelled) layer = m.createSpriteLayer(replay, skills)
+      })
+      .catch(() => {})
+    let places: IPlace[] = []
+    let waited = 0
     let tick = 0
     let lastTime = 0
     let lastReported = -1
@@ -128,9 +147,22 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
 
     const render = () => {
       const scale = canvas.width / ARENA_W
-      ctx.setTransform(scale, 0, 0, scale, 0, 0)
+      const fx = layer?.screen()
+      const shake = fx && !reduceMotion ? fx.shake : 0
+      ctx.setTransform(
+        scale,
+        0,
+        0,
+        scale,
+        (Math.random() - 0.5) * shake * scale,
+        (Math.random() - 0.5) * shake * scale
+      )
       ctx.clearRect(0, 0, ARENA_W, ARENA_H)
-      ctx.drawImage(floor, 0, 0, ARENA_W, ARENA_H)
+      if (layer) {
+        ctx.imageSmoothingEnabled = false
+        ctx.drawImage(layer.floor, 0, 0, ARENA_W, ARENA_H)
+        ctx.imageSmoothingEnabled = true
+      } else ctx.drawImage(floor, 0, 0, ARENA_W, ARENA_H)
       const fi = tick / step
       const i0 = Math.min(frames.length - 1, Math.floor(fi))
       const i1 = Math.min(frames.length - 1, i0 + 1)
@@ -187,25 +219,71 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
         }
       }
       for (const p of f0.p) {
-        const [x, y, , el] = p as [number, number, number, string]
+        const [x, y, team, el] = p as [number, number, number, string]
+        if (layer?.hidesProjectiles(team)) continue
         ctx.fillStyle = colorOf(el)
         ctx.beginPath()
         ctx.arc(x / S, y / S, 8, 0, Math.PI * 2)
         ctx.fill()
       }
 
-      fighters.forEach((info, idx) => {
+      let warn = 0
+      places = fighters.map((_, idx) => {
         const a = f0.f[idx]
         const b = f1.f[idx]
-        const x = (a[0] + (b[0] - a[0]) * k) / S
-        const y = (a[1] + (b[1] - a[1]) * k) / S
+        return {
+          x: (a[0] + (b[0] - a[0]) * k) / S,
+          y: (a[1] + (b[1] - a[1]) * k) / S,
+          face: a[7] || 1,
+          scale: 1,
+          dead: a[2] === 0,
+        }
+      })
+      const order = fighters
+        .map((_, idx) => idx)
+        .sort(
+          (p, q) => Number(places[q].dead) - Number(places[p].dead) || places[p].y - places[q].y
+        )
+      for (const idx of order) {
+        const info = fighters[idx]
+        const a = f0.f[idx]
         const [, , hp, act, kind, actT, inv, face, shield, bits] = a
-        const size = 44
+        const sprite = layer?.has(idx) ? layer : null
+        const pose = sprite
+          ? fighterPose(replay, index, idx, tick, {
+              stride: sprite.strideOf(idx),
+              clock: now,
+              stunBit,
+            })
+          : null
+        if (sprite && pose) {
+          places[idx].scale = pose.scale
+          ;[places[idx].x, places[idx].y] = sprite.keepInside(
+            idx,
+            places[idx].x,
+            places[idx].y,
+            pose.scale
+          )
+        }
+        const { x, y } = places[idx]
+        const top = sprite && pose ? sprite.topOf(idx, pose.scale) : 22
+        const size = sprite ? Math.max(44, top * 1.4) : 44
         const ko = hp === 0
         const skill = kind >= 0 ? skills[info.skills[kind]] : undefined
+        if (info.boss && act === 1 && (skill?.radius ?? 0) >= ARENA_WIDE_RADIUS) {
+          warn = Math.max(warn, 1 - actT / (skill?.wind ?? 20))
+        }
         ctx.fillStyle = info.team === 0 ? 'rgba(73,220,255,.28)' : 'rgba(255,93,98,.28)'
         ctx.beginPath()
-        ctx.ellipse(x, y + size * 0.45, size * 0.5, 7, 0, 0, Math.PI * 2)
+        ctx.ellipse(
+          x,
+          y + (sprite ? 18 : size * 0.45),
+          Math.min(size, 70) * 0.5,
+          7,
+          0,
+          0,
+          Math.PI * 2
+        )
         ctx.fill()
         if (act === 1 && !ko) {
           const total = skill?.wind ?? 7
@@ -232,12 +310,49 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
             ctx.stroke()
           }
         }
+        if (sprite && pose) {
+          const fade = pose.ko ? Math.max(0.35, 1 - pose.koSec) : inv && act !== 2 ? 0.45 : 1
+          sprite.drawFighter(ctx, idx, x, y, face, pose, now, fade)
+          if (!ko && bits)
+            sprite.drawStatuses(
+              ctx,
+              idx,
+              x,
+              y,
+              pose.scale,
+              statusesFromBits(bits, statusOrder),
+              now
+            )
+        }
         if (shield > 0 && !ko) {
-          ctx.strokeStyle = 'rgba(150,230,255,.85)'
-          ctx.lineWidth = 3
+          const cy = sprite ? y + 18 - top * 0.55 : y
+          ctx.globalCompositeOperation = 'lighter'
+          ctx.globalAlpha = 0.25 + 0.08 * Math.sin(now * 6)
+          ctx.fillStyle = '#3a90d2'
           ctx.beginPath()
-          ctx.arc(x, y, size * 0.7, 0, Math.PI * 2)
+          ctx.ellipse(x, cy, size * 0.62, size * 0.66, 0, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.globalAlpha = 0.85
+          ctx.strokeStyle = 'rgba(150,230,255,.85)'
+          ctx.lineWidth = 2
           ctx.stroke()
+          ctx.globalAlpha = 1
+          ctx.globalCompositeOperation = 'source-over'
+        }
+        if (sprite) {
+          if (!ko && bits) {
+            ctx.font = `13px ${EMOJI_FONT}`
+            ctx.textAlign = 'center'
+            ctx.fillText(
+              statusesFromBits(bits, statusOrder)
+                .slice(0, 5)
+                .map((id) => statuses[id].icon)
+                .join(''),
+              x,
+              y - top - 6
+            )
+          }
+          continue
         }
         const bob = act === 0 && !ko && !reduceMotion ? Math.sin(now * 10 + idx) * 2 : 0
         ctx.save()
@@ -273,7 +388,40 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
             y - size * 0.62
           )
         }
-      })
+      }
+      layer?.drawParticles(ctx)
+      if (fx && (fx.darken > 0 || fx.tint > 0 || fx.flash > 0)) {
+        // a skill darkening the arena, tinting it with fire, or flashing it white
+        if (fx.darken > 0) {
+          ctx.fillStyle = `rgba(4,2,12,${fx.darken})`
+          ctx.fillRect(0, 0, ARENA_W, ARENA_H)
+        }
+        if (fx.tint > 0) {
+          ctx.fillStyle = `rgba(255,120,30,${fx.tint * 0.22})`
+          ctx.fillRect(0, 0, ARENA_W, ARENA_H)
+        }
+        if (fx.flash > 0 && !reduceMotion) {
+          ctx.fillStyle = `rgba(255,255,255,${fx.flash * 0.6})`
+          ctx.fillRect(0, 0, ARENA_W, ARENA_H)
+        }
+      }
+      if (warn > 0) {
+        // the world boss is about to hit the whole arena
+        const pulse = 0.35 + 0.35 * Math.abs(Math.sin(now * 8))
+        const edge = ctx.createRadialGradient(
+          ARENA_W / 2,
+          ARENA_H / 2,
+          ARENA_H * 0.35,
+          ARENA_W / 2,
+          ARENA_H / 2,
+          ARENA_W * 0.65
+        )
+        edge.addColorStop(0, 'rgba(255,40,40,0)')
+        edge.addColorStop(1, `rgba(255,40,40,${(pulse * Math.min(1, warn + 0.3)).toFixed(2)})`)
+        ctx.fillStyle = edge
+        ctx.fillRect(0, 0, ARENA_W, ARENA_H)
+        drawText('ระวัง! โจมตีทั้งสนาม', ARENA_W / 2, 46, 22, '#ff8b8f', 0.6 + pulse * 0.5)
+      }
 
       for (const e of events) {
         const age = (tick - e.t) / ARENA_TICK
@@ -348,8 +496,12 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
     const frame = (time: number) => {
       const dt = lastTime ? Math.min(0.1, (time - lastTime) / 1000) : 0
       lastTime = time
-      tick = Math.min(lastTick, tick + dt * ARENA_TICK * speedRef.current)
+      // hold the first frame briefly while the pixel-art chunk loads, so the fight starts drawn
+      waited += dt
+      if (layer || waited > LAYER_WAIT_SEC)
+        tick = Math.min(lastTick, tick + dt * ARENA_TICK * speedRef.current)
       render()
+      layer?.step(dt * speedRef.current, tick, places)
       const shown = Math.floor(tick)
       if (shown - lastReported >= 2 || (tick >= lastTick && lastReported !== lastTick)) {
         lastReported = tick >= lastTick ? lastTick : shown
@@ -359,6 +511,7 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
     }
     raf = requestAnimationFrame(frame)
     return () => {
+      cancelled = true
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', fit)
     }

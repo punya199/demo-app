@@ -8,6 +8,7 @@ import {
   TreeNodeState,
 } from './evolution-tree'
 import { stageLabel } from '../core/tamagotchi-helper'
+import { MonsterSprite } from '../shared/MonsterSprite'
 
 const NODE_W = 156
 const NODE_H = 48
@@ -158,9 +159,9 @@ export const EvolutionTree = (props: IEvolutionTreeProps) => {
                 strokeDasharray={state === 'next' || state === 'next-dead' ? '5 4' : undefined}
                 className={`${nodeClass[state]} ${isSelected ? '!stroke-sky-500' : ''}`}
               />
-              <text x={x + 10} y={y + 31} className="text-lg">
-                {node.species.emoji}
-              </text>
+              <foreignObject x={x + 4} y={y + 6} width={30} height={30}>
+                <MonsterSprite sprite={node.species.sprite} emoji={node.species.emoji} size={30} />
+              </foreignObject>
               <text
                 x={x + 38}
                 y={y + 29}

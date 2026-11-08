@@ -68,6 +68,11 @@ describe('merge helpers', () => {
     expect(getMergeBlocker(a, b, { coin: 1999, gem: 50 }, cost)).toBe('เหรียญไม่พอ')
     expect(getMergeBlocker(a, b, { coin: 5000, gem: 19 }, cost)).toBe('เพชรไม่พอ')
     expect(getMergeBlocker(a, b, rich, cost)).toBeNull()
+    const tide = ultimate({ line: EnumMonsterLine.TIDE })
+    expect(getMergeBlocker(a, tide, rich, cost, [], false)).toBe(
+      'ตอนนี้รวมร่างได้เฉพาะมอนสายเดียวกัน'
+    )
+    expect(getMergeBlocker(a, b, rich, cost, [], false)).toBeNull()
     const spirit = [EnumMonsterLine.HOLY, EnumMonsterLine.DARK, EnumMonsterLine.SHADOW]
     expect(getMergeBlocker(a, ultimate({ line: EnumMonsterLine.HOLY }), rich, cost, spirit)).toBe(
       'ธาตุธรรมชาติกับธาตุจิตวิญญาณรวมกันไม่ได้'

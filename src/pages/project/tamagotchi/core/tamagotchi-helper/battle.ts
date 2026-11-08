@@ -90,6 +90,7 @@ const serverMessageLabel: Record<string, string> = {
   'Battle not found': 'ไม่พบการต่อสู้',
   'Not enough raid tokens': 'Raid Token ไม่พอ',
   'Natural and spiritual elements cannot be merged': 'ธาตุธรรมชาติกับธาตุจิตวิญญาณรวมกันไม่ได้',
+  'Only two monsters of the same line can be merged for now': 'ตอนนี้รวมร่างได้เฉพาะมอนสายเดียวกัน',
   'Not enough boss tokens': 'Boss Token ไม่พอ',
   'Raid attempts used up until the next reset': 'สู้บอสครบจำนวนแล้ว รอรีเซ็ต',
   'Your monster is not strong enough for this difficulty': 'ร่างของมอนยังไม่ถึงเกณฑ์ของระดับนี้',

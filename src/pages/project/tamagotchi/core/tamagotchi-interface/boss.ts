@@ -40,6 +40,7 @@ export interface IWorldBossStatus {
     id: string
     name: string
     emoji: string
+    sprite?: string
     setId: string
     setName: string
     element: EnumMonsterLine
@@ -76,7 +77,7 @@ export interface IWorldBossAttackResponse {
   battle: IArenaFight & { damage: number; survived: boolean }
   // The renter's own damage (what the ranking counts).
   damage: number
-  ally: { name: string; emoji: string; damage: number; fee: number } | null
+  ally: { name: string; emoji: string; sprite?: string | null; damage: number; fee: number } | null
   bossHp: number
   maxHp: number
   isKillingBlow: boolean
@@ -111,6 +112,7 @@ export interface IRaidBossInfo {
   id: string
   name: string
   emoji: string
+  sprite?: string
   element: EnumMonsterLine
   setId: string
   setName: string
@@ -127,9 +129,9 @@ export interface IDummyPresets {
   defDefault: number
   defMax: number
   elements: string[]
-  raidBosses: { id: string; name: string; emoji: string }[]
+  raidBosses: { id: string; name: string; emoji: string; sprite?: string }[]
   difficulties: string[]
-  worldBosses: { id: string; name: string; emoji: string }[]
+  worldBosses: { id: string; name: string; emoji: string; sprite?: string }[]
 }
 
 export interface IDummyFightInput {

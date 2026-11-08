@@ -36,7 +36,8 @@ export const MergeModal = (props: IMergeModalProps) => {
     second,
     wallet,
     { coin: merge.coinCost, gem: merge.gemCost },
-    merge.spiritualLines
+    merge.spiritualLines,
+    merge.crossLineEnabled ?? true
   )
 
   const reset = () => {

@@ -1,0 +1,614 @@
+<title>มอนอารีนา โฉมใหม่</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Silkscreen&display=swap">
+<style>
+/* Layout: one dark "cave arena" world. Live battle first, then the redesigned line, then the plan. */
+:root {
+  --bg: #0d0b14;
+  --panel: #17141f;
+  --panel-2: #201c2b;
+  --line: #322c40;
+  --fg: #ece6f4;
+  --muted: #a49cb4;
+  --accent: #ffb43a;
+  --accent-2: #39c6ff;
+  --keep: #5ad38a;
+  --tweak: #ffc94a;
+  --new: #ff6a4a;
+  --display: "Chakra Petch", "IBM Plex Sans Thai", system-ui, sans-serif;
+  --body: "IBM Plex Sans Thai", "Chakra Petch", system-ui, sans-serif;
+  --pixel: "Silkscreen", "Chakra Petch", monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box }
+html, body { background: var(--bg); color: var(--fg) }
+body {
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 64px;
+}
+.wrap { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.2 }
+h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 700; letter-spacing: .01em }
+h1 .tag { color: var(--accent); font-style: italic }
+h2 { font-size: clamp(22px, 3.2vw, 30px); font-weight: 700 }
+h3 { font-size: 18px; font-weight: 600 }
+p { margin: 0; max-width: 68ch }
+.lede { color: var(--muted); font-size: 16px }
+.eyebrow { font-family: var(--display); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2) }
+header { display: flex; flex-direction: column; gap: 10px }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg) }
+.jump { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; order: -1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 12px; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: 10px }
+.jump label { font-family: var(--display); font-weight: 700; font-size: 14px }
+.jump select { width: auto; min-width: 200px }
+section[hidden] { display: none !important }
+section { display: flex; flex-direction: column; gap: 18px }
+
+/* Battle stage */
+.stage { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: #000 }
+.skgroup { display: flex; flex-direction: column; gap: 10px }
+.skgroup[hidden] { display: none }
+/* On a phone the arena stays pinned under the section picker while the skill buttons scroll. */
+@media (max-width: 760px) { .stage { position: sticky; top: var(--navh, 64px); z-index: 4 } }
+.show.fused.earth canvas { background: radial-gradient(ellipse at 50% 75%, #3a2a14 0%, #14100a 72%) }
+.bolt-opts .show canvas, .show.fused.bolt canvas { background: radial-gradient(ellipse at 50% 75%, #1c2448 0%, #0c0e1a 72%) }
+.show.fused.holy canvas { background: radial-gradient(ellipse at 50% 75%, #3a3420 0%, #12100c 72%) }
+.show.boss.holy canvas { background: radial-gradient(ellipse at 50% 75%, #3a3018 0%, #14100a 72%) }
+.show.fused.dark canvas { background: radial-gradient(ellipse at 50% 75%, #2a1840 0%, #0c0812 72%) }
+.show.boss.dark canvas { background: radial-gradient(ellipse at 50% 75%, #2a1438 0%, #0a0610 72%) }
+.show.fused.shadow canvas { background: radial-gradient(ellipse at 50% 75%, #1a2238 0%, #090c14 72%) }
+.show.boss.shadow canvas { background: radial-gradient(ellipse at 50% 75%, #1c2640 0%, #080b14 72%) }
+.show.boss.bolt canvas { background: radial-gradient(ellipse at 50% 75%, #22264a 0%, #0c0c18 72%) }
+.show.boss.earth canvas { background: radial-gradient(ellipse at 50% 75%, #3a2a12 0%, #140e08 72%) }
+.stage canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; aspect-ratio: 16 / 9 }
+.controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px }
+.ctl { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0 }
+.ctl-title { font-family: var(--display); font-size: 13px; letter-spacing: .08em; color: var(--muted) }
+.row { display: flex; flex-wrap: wrap; gap: 8px }
+button, select {
+  font-family: var(--display); font-size: 14px; font-weight: 600; color: var(--fg);
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer;
+}
+button:hover { border-color: var(--accent) }
+button:focus-visible, select:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px }
+button:disabled { opacity: .45; cursor: default }
+button.primary { background: var(--accent); color: #1b0f02; border-color: var(--accent) }
+button.el { display: inline-flex; align-items: center; gap: 6px }
+button.el i { width: 10px; height: 10px; border-radius: 2px; display: inline-block }
+button[aria-pressed="true"] { background: var(--accent-2); color: #04121c; border-color: var(--accent-2) }
+select { width: 100%; cursor: pointer }
+label.sel { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); flex: 1; min-width: 140px }
+.hint { font-size: 13px; color: var(--muted) }
+
+/* Evolution board */
+.evo { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; align-items: start }
+.evo-col { display: flex; flex-direction: column; gap: 12px; min-width: 0 }
+.evo-head { font-family: var(--display); font-size: 12px; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; border-bottom: 1px solid var(--line); padding-bottom: 6px }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 6px; min-width: 0 }
+.card canvas { width: 100%; aspect-ratio: 1; image-rendering: pixelated; background: radial-gradient(ellipse at 50% 80%, #2a2338 0%, #17141f 70%); border-radius: 6px; display: block }
+.rank { font-family: var(--display); font-size: 12px; font-weight: 700; color: var(--c); border: 1px solid var(--c); border-radius: 6px; padding: 1px 7px; align-self: flex-start; letter-spacing: .02em }
+.rank b { font-weight: 700; letter-spacing: .08em }
+.lineup { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px }
+.lineup canvas { width: 100%; image-rendering: pixelated; display: block; background: linear-gradient(#17141f 0 78%, #221d2c 78%) }
+.lineup .labels { display: flex; gap: 0 }
+.lineup .labels > div { display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; min-width: 0; font-size: 12px; line-height: 1.25 }
+.lineup .labels .nm2 { font-family: var(--display); font-weight: 600; color: var(--fg) }
+.lineup .arrow-row { font-size: 12px; color: var(--muted) }
+.act { font-family: var(--display); font-size: 11px; letter-spacing: .06em; color: var(--accent-2); min-height: 1.2em }
+.card .nm { font-family: var(--display); font-weight: 600; font-size: 14px; line-height: 1.25 }
+.card .old { font-size: 12px; color: var(--muted); line-height: 1.35 }
+.chip { font-family: var(--display); font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 1px 7px; border-radius: 99px; align-self: flex-start; color: #0d0b14 }
+.chip.keep { background: var(--keep) }
+.chip.tweak { background: var(--tweak) }
+.chip.new { background: var(--new) }
+@media (max-width: 860px) { .evo { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
+@media (max-width: 520px) { .evo { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+
+.skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px }
+.sk { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0 }
+.sk h3 { display: flex; gap: 8px; align-items: center }
+.sk .meta { font-size: 12px; color: var(--accent-2); font-family: var(--display); letter-spacing: .03em }
+.sk p { font-size: 14px; color: var(--muted) }
+.sk button { align-self: flex-start }
+.whale-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px }
+.show.fused.water canvas { background: radial-gradient(ellipse at 50% 75%, #0e3a48 0%, #0a1218 72%) }
+.whale-opts .show canvas { background: radial-gradient(ellipse at 50% 75%, #12304a 0%, #0c0f1a 72%) }
+.showcase { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px }
+.show { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0 }
+.show canvas { width: 100%; aspect-ratio: 1; image-rendering: pixelated; border-radius: 8px; display: block }
+.show.fused.leaf canvas { background: radial-gradient(ellipse at 50% 75%, #1e3a18 0%, #0e140c 72%) }
+.show.boss.leaf canvas { background: radial-gradient(ellipse at 50% 75%, #1e3a14 0%, #0c140a 72%) }
+.show.boss.water canvas { background: radial-gradient(ellipse at 50% 75%, #0e3a58 0%, #0a1420 72%) }
+.show.boss canvas { aspect-ratio: 4 / 3; background: radial-gradient(ellipse at 50% 75%, #3a1208 0%, #120a0c 72%) }
+.show.fused canvas { background: radial-gradient(ellipse at 50% 70%, #3a2a10 0%, #14101a 72%) }
+@media (max-width: 760px) { .showcase { grid-template-columns: 1fr } }
+
+/* Plan */
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px }
+.rule { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px }
+.rule b { font-family: var(--display); font-size: 15px }
+.rule span { color: var(--muted); font-size: 14px }
+.lines { display: flex; flex-direction: column; gap: 10px }
+details { background: var(--panel); border: 1px solid var(--line); border-radius: 10px }
+summary { cursor: pointer; padding: 12px 14px; font-family: var(--display); font-weight: 600; font-size: 16px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap }
+summary .sum { font-family: var(--body); font-weight: 400; font-size: 13px; color: var(--muted) }
+summary:focus-visible { outline: 2px solid var(--accent-2); outline-offset: -2px; border-radius: 10px }
+.tbl { overflow-x: auto; padding: 0 14px 14px }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px }
+th, td { text-align: left; padding: 7px 8px; border-top: 1px solid var(--line); vertical-align: top }
+th { font-family: var(--display); font-size: 12px; letter-spacing: .06em; color: var(--muted); font-weight: 600 }
+td.st { white-space: nowrap; color: var(--muted) }
+.arrow { color: var(--accent) }
+.keep-list { padding: 0 14px 14px; color: var(--muted); font-size: 14px }
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px }
+.q { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px }
+.q b { font-family: var(--display) }
+.q span { color: var(--muted); font-size: 14px }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto } }
+</style>
+
+<div class="wrap">
+  <nav class="jump" aria-label="เลือกส่วนที่จะดู">
+    <label for="jump">ดูส่วน</label>
+    <select id="jump">
+      <option value="all">ทั้งหมด</option>
+      <option value="fire">มอนธาตุไฟ + สกิล</option>
+      <option value="water">มอนธาตุน้ำ + สกิล</option>
+      <option value="leaf">มอนธาตุพฤกษ์ + สกิล</option>
+      <option value="earth">มอนธาตุศิลา + สกิล</option>
+      <option value="bolt">มอนธาตุอสนี + สกิล</option>
+      <option value="holy">มอนธาตุรัศมี + สกิล</option>
+      <option value="dark">มอนธาตุรัตติกาล + สกิล</option>
+      <option value="shadow">มอนธาตุเงา + สกิล</option>
+      <option value="raid">บอสเรด 5 ตัว</option>
+      <option value="adv">ศัตรูผจญภัย 20 ตัว + หุ่นซ้อม</option>
+      <option value="plan">แผนออกแบบทั้ง 8 สาย</option>
+    </select>
+    <span class="hint" id="jump-hint">ฉากต่อสู้อยู่บนสุดเสมอ</span>
+  </nav>
+  <header style="order:0">
+    <div class="eyebrow">ข้อเสนองานภาพ · ตัวอย่างให้ดูก่อน</div>
+    <h1>มอนอารีนา <span class="tag">โฉมใหม่</span></h1>
+    <p class="lede">ตอนนี้ทำครบ 8 สาย: เพลิง วารี พฤกษ์ ศิลา อสนี รัศมี รัตติกาล และเงา สนามมุมเฉียงแบบ 2.5D สไตล์พิกเซลอาร์ต มอนมีเงาและแสงจากมุมซ้ายบน ท่าโจมตี หลบ ตั้งรับ และสกิลมีเอฟเฟกต์ของแต่ละธาตุ ทุกอย่างในหน้านี้วาดด้วยโค้ด ไม่มีรูปจากที่อื่น กดปุ่มด้านล่างฉากเพื่อลองได้เลย</p>
+  </header>
+
+  <section aria-labelledby="battle-h" data-group="battle" style="order:1">
+    <h2 id="battle-h">ฉากต่อสู้</h2>
+    <div class="stage"><canvas id="stage" width="1152" height="648" aria-label="ฉากต่อสู้ตัวอย่าง มอนของเราอยู่ซ้าย คู่ต่อสู้อยู่ขวา"></canvas></div>
+    <div class="controls">
+      <div class="ctl">
+        <div class="ctl-title">ท่าพื้นฐาน</div>
+        <div class="row">
+          <button id="b-atk" class="primary">โจมตี</button>
+          <button id="b-dodge">ศัตรูตี → เราหลบ</button>
+          <button id="b-guard">ศัตรูตี → เราตั้งรับ</button>
+        </div>
+        <div class="row">
+          <button id="b-auto" aria-pressed="false">โหมดสาธิตอัตโนมัติ</button>
+          <button id="b-grow">บอสโลกขยายร่าง (ข้ามไปวินาทีที่ 20/40)</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <div class="skgroup" data-el="fire"><div class="ctl-title">สกิลธาตุไฟในเกม 8 ท่า (มอนของเราใช้)</div>
+        <div class="row" id="fire-skills"></div></div>
+        <div class="skgroup" data-el="water"><div class="ctl-title">สกิลธาตุน้ำในเกม 8 ท่า</div>
+        <div class="row" id="water-skills"></div></div>
+        <div class="skgroup" data-el="leaf"><div class="ctl-title">สกิลธาตุพฤกษ์ในเกม 8 ท่า</div>
+        <div class="row" id="leaf-skills"></div></div>
+        <div class="skgroup" data-el="bolt"><div class="ctl-title">สกิลธาตุอสนีในเกม 8 ท่า</div>
+        <div class="row" id="bolt-skills"></div></div>
+        <div class="skgroup" data-el="holy"><div class="ctl-title">สกิลธาตุรัศมีในเกม 8 ท่า</div>
+        <div class="row" id="holy-skills"></div></div>
+        <div class="skgroup" data-el="dark"><div class="ctl-title">สกิลธาตุรัตติกาลในเกม 8 ท่า</div>
+        <div class="row" id="dark-skills"></div></div>
+        <div class="skgroup" data-el="shadow"><div class="ctl-title">สกิลธาตุเงาในเกม 8 ท่า</div>
+        <div class="row" id="shadow-skills"></div></div>
+        <div class="skgroup" data-el="earth"><div class="ctl-title">สกิลธาตุศิลาในเกม 8 ท่า</div>
+        <div class="row" id="earth-skills"></div></div>
+        <div class="skgroup" data-el="raid"><div class="ctl-title">สกิลบอสเรด ตัวละ 2 ท่า (บอสใช้ใส่มอนของเรา)</div>
+        <div class="row" id="raid-skills"></div></div>
+        <div class="skgroup" data-el="other"><div class="ctl-title">เอฟเฟกต์ธาตุอื่น (ร่างแรก รอออกแบบ)</div>
+        <div class="row" id="skills"></div></div>
+      </div>
+      <div class="ctl">
+        <div class="ctl-title">เลือกตัวละคร</div>
+        <div class="row">
+          <label class="sel">มอนของเรา<select id="pick-me"></select></label>
+          <label class="sel">คู่ต่อสู้<select id="pick-foe"></select></label>
+        </div>
+        <div class="hint">สนามกว้างกว่าจอสามเท่าทั้งสองด้าน กล้องเลื่อนตามการต่อสู้ ดูตำแหน่งได้จากแผนที่ย่อมุมขวาล่าง · ในโหมดสาธิต มอนจะเดินไปทั่วสนามเอง เข้าประชิดเพื่อตี และถอยไปยืนห่างเพื่อใช้สกิล · เลือกบอสไฟแล้วสนามเปลี่ยนเป็นธีมลาวา บอสพฤกษ์เป็นธีมป่า บอสศิลาเป็นธีมหุบผา บอสรัศมีเป็นธีมวิหาร บอสเงาเป็นธีมสุสาน</div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="fire-h" data-group="fire" style="order:4">
+    <div class="eyebrow">สกิลธาตุไฟทุกท่าในเกม</div>
+    <h2 id="fire-h">อนิเมชันสกิลธาตุไฟ</h2>
+    <p class="lede">ทุกท่าออกแบบจากการทำงานจริงในเกม (ระยะ รัศมี จำนวนครั้งที่ตี และสถานะ) เพื่อให้ผู้เล่นอ่านออกจากภาพว่าท่านี้ทำอะไร กดปุ่ม "ลองท่านี้" เพื่อดูในฉากต่อสู้ด้านบน</p>
+    <div class="skills-grid" id="fire-cards"></div>
+  </section>
+
+  <section aria-labelledby="water-h" data-group="water" style="order:8">
+    <div class="eyebrow">สกิลธาตุน้ำทุกท่าในเกม</div>
+    <h2 id="water-h">อนิเมชันสกิลธาตุน้ำ</h2>
+    <p class="lede">หลักเดียวกับธาตุไฟ ท่าน้ำเน้นการไหล คลื่น ฟอง และการป้องกัน มีโล่น้ำ ล้างสถานะ และฟื้นเลือดต่อเนื่อง ซึ่งสายไฟไม่มี</p>
+    <div class="skills-grid" id="water-cards"></div>
+  </section>
+
+  <section aria-labelledby="line-h" data-group="fire" style="order:2">
+    <div class="eyebrow">ตัวอย่างครบหนึ่งสาย</div>
+    <h2 id="line-h">สายเพลิง 11 ร่าง</h2>
+    <p class="lede">ทุกร่างอยู่ในตระกูลเดียวกันคือสัตว์เลื้อยคลานไฟจนถึงมังกร แต่แต่ละร่างมีสีตัวและรูปทรงของตัวเองให้แยกออกได้ทันที การ์ดแต่ละใบวนแสดงท่า ยืน เดิน (ขาก้าวสลับ) โจมตี (ง้าง ตะปบ อ้าปากกัด) และใช้สกิล (ชาร์จพลังที่ปากแล้วปล่อย) ร่างยิ่งสูงยิ่งใหญ่และมีรายละเอียดมากขึ้น ป้ายสีบอกว่าคงแนวเดิม (วาดใหม่ให้ละเอียด) หรือเปลี่ยนแนวคิดใหม่</p>
+    <div class="lineup" id="lineup-fire"></div>
+    <div class="evo" id="evo"></div>
+  </section>
+
+  <section aria-labelledby="whale-h" data-group="water" style="order:6">
+    <div class="eyebrow">เลือกแล้ว · แบบ C ปรับ</div>
+    <h2 id="whale-h">ราชาวาฬผลึก</h2>
+    <p class="lede">แทนวาฬราชันตรีศูลแล้วทั้งหน้า (แถววิวัฒนาการ การ์ด และฉากต่อสู้) เขาผลึกแทนตรีศูล ตัดส่วนที่ดูเหมือนมือออกเป็นครีบข้างลำตัว และเพิ่มเกราะหนาซ้อนกันบนหลังให้ต่อจากร่างวาฬเกราะ ด้านขวาเป็นแบบ A กับ B ที่ไม่ได้เลือกไว้เทียบ</p>
+    <div class="whale-opts" id="whale-opts"></div>
+  </section>
+
+  <section aria-labelledby="wline-h" data-group="water" style="order:5">
+    <div class="eyebrow">สายที่สอง</div>
+    <h2 id="wline-h">สายวารี 11 ร่าง</h2>
+    <p class="lede">ตระกูลสัตว์ทะเล วาดใหม่ให้สีสดขึ้น มีลวดลาย จุดเรืองแสงใต้ทะเลที่เต้นเป็นจังหวะ และครีบโปร่งแสง ร่างสุดท้ายใหญ่ขึ้นและมีเครื่องประดับ สัตว์ที่ว่ายน้ำจะลอยเหนือพื้นและว่ายแทนการเดิน (ตัวขยับเป็นคลื่น หางและครีบพัด) ทุกตัวมีสีของตัวเอง ตัวที่เดิมเป็นอาวุธหรือคนเปลี่ยนเป็นสัตว์ทะเล</p>
+    <div class="lineup" id="lineup-water"></div>
+    <div class="evo" id="evo-water"></div>
+  </section>
+
+  <section aria-labelledby="show-h" data-group="fire" style="order:3">
+    <div class="eyebrow">ร่างผสมและบอส</div>
+    <h2 id="show-h">ต้องอลังการกว่าตัวปกติ</h2>
+    <div class="showcase">
+      <div class="show fused">
+        <canvas id="show-fused" width="96" height="96" aria-label="ร่างผสม อวตารสุริยะ"></canvas>
+        <div class="act" id="act-fused"></div>
+        <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
+        <h3>อวตารสุริยะ <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">เดิมเป็นอีโมจิดาวหาง ☄️ ใหม่เป็นไททันเกราะทองกึ่งมังกร มีแกนลาวาเรืองกลางอก มีวงตะวันซ้อนสองชั้นหมุนหลังหัว และเศษเกราะทองลอยรอบตัว ร่างผสมทุกตัวจะได้วงแหวนออร่าของทั้งสองธาตุ</p>
+      </div>
+      <div class="show boss">
+        <canvas id="show-boss" width="128" height="112" aria-label="บอสโลก มังกรเพลิงกัลป์"></canvas>
+        <div class="act" id="act-boss"></div>
+        <span class="rank" style="--c:#ff5a5a">บอส</span>
+        <h3>บอสโลก · มังกรเพลิงกัลป์ <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ตัวใหญ่ราวสองเท่าของมอนร่างสุดท้าย มังกรสี่ขา ปีกคู่กางขึ้นหลังตัวมีกระดูกปีกชัด เขาคู่โค้งไปด้านหลัง คอโค้งสองท่อน หนามตามสันหลัง ผิวเป็นหินลาวามีรอยแตกเรือง อ้าปากแล้วเห็นไฟในปาก ลาวาหยดและไฟลอยออกจากตัวตลอดเวลา และมีออร่าแดงใต้ตัว ในฉากต่อสู้ลองเลือก "บอส" ที่ช่องคู่ต่อสู้</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="wshow-h" data-group="water" style="order:7">
+    <div class="eyebrow">ร่างผสมและบอสสายน้ำ</div>
+    <h2 id="wshow-h">สมุทรผู้ตื่น และเต่ายักษ์วารี</h2>
+    <div class="showcase">
+      <div class="show fused water">
+        <canvas id="show-wfused" width="112" height="112" aria-label="ร่างผสม สมุทรผู้ตื่น"></canvas>
+        <div class="act" id="act-wfused"></div>
+        <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
+        <h3>สมุทรผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ร่างผสมวารี+วารี เดิมเป็นอีโมจิคลื่น 🌊 ใหม่เป็นมังกรทะเลดุดัน ตัวหนาโค้งรูปตัว S ลอยขึ้นจากน้ำ ท้องเกล็ดทองอยู่ด้านหน้าตลอดตัว ครีบหลังเป็นแผ่นใสต่อเนื่อง มีครีบปีกที่ไหล่ เส้นเรืองแสงข้างตัว หัวมังกรปากยาวอ้าคำราม หนวดยาว เขาผลึกต่อจากราชาวาฬผลึก และวงน้ำสองวง (ฟ้ากับทอง) หมุนสวนกันตามแบบร่างผสม</p>
+      </div>
+      <div class="show boss water">
+        <canvas id="show-turtle" width="128" height="112" aria-label="บอสโลก เต่ายักษ์วารี"></canvas>
+        <div class="act" id="act-turtle"></div>
+        <span class="rank" style="--c:#ff5a5a">บอส</span>
+        <h3>บอสโลก · เต่ายักษ์วารี <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">เต่ายักษ์ กระดองเป็นแผ่นหกเหลี่ยมมีมอส มีปะการังและหินบนหลัง น้ำตกไหลลงจากขอบกระดองตลอดเวลา ละอองน้ำที่ฐาน ตาเรืองฟ้า และออร่าฟ้าใต้ตัว ในเกมมีความสามารถลดดาเมจที่ได้รับ ลองเลือก "บอส · เต่ายักษ์วารี" ที่ช่องคู่ต่อสู้</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="lline-h" data-group="leaf" style="order:9">
+    <div class="eyebrow">สายที่สาม</div>
+    <h2 id="lline-h">สายพฤกษ์ 11 ร่าง</h2>
+    <p class="lede">ตระกูลสัตว์ป่าที่มีพืชงอกบนตัว สายหลักเป็นกวาง (กวางใบไม้ → กวางเขาพฤกษา → เทพพนาลัย) สายรองเป็นหมาป่า (หมาป่าไพร → หมาป่าเปลือกไม้ → ราชาหมาป่าพงไพร) ยิ่งโตยิ่งมีพืชมากขึ้น จากใบอ่อนบนหัว ไปเป็นเขากิ่งไม้มีดอก จนถึงป่าทั้งผืนบนหลัง ร่างแย่ (เห็ดง่วง ตอไม้แก่) ยังตลกและตาปรือ ร่างสุดท้ายมีใบไม้หมุนรอบเท้า</p>
+    <div class="lineup" id="lineup-leaf"></div>
+    <div class="evo" id="evo-leaf"></div>
+  </section>
+
+  <section aria-labelledby="lshow-h" data-group="leaf" style="order:10">
+    <div class="eyebrow">ร่างผสมและบอสสายพฤกษ์</div>
+    <h2 id="lshow-h">พนาผู้ตื่น และพฤกษาโบราณ</h2>
+    <div class="showcase">
+      <div class="show fused leaf">
+        <canvas id="show-lfused" width="112" height="112" aria-label="ร่างผสม พนาผู้ตื่น"></canvas>
+        <div class="act" id="act-lfused"></div>
+        <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
+        <h3>พนาผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ร่างผสมพฤกษ์+พฤกษ์ เดิมเป็นอีโมจิต้นมะพร้าว 🌴 ใหม่เป็นกวางเทพที่ตื่นแล้ว ตัวสีเขียวมิ้นต์ขาว สวมเกราะทองที่หน้า อก และหลัง เขาเป็นกิ่งไม้สีทองแตกกิ่งสูง ปลายกิ่งเป็นใบไม้เรืองแสง มีต้นไม้เรืองแสงสามต้นบนหลัง ใบไม้สีทองร่วงตลอดเวลา และวงใบไม้สองวง (เขียวกับทอง) หมุนสวนกันตามแบบร่างผสม</p>
+      </div>
+      <div class="show boss leaf">
+        <canvas id="show-flora" width="128" height="112" aria-label="บอสเรด พฤกษาโบราณ"></canvas>
+        <div class="act" id="act-flora"></div>
+        <span class="rank" style="--c:#ff5a5a">บอส</span>
+        <h3>บอสเรด · พฤกษาโบราณ <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">สายพฤกษ์ไม่มีบอสโลก จึงทำบอสเรดธาตุพฤกษ์แทน (เดิมเป็นอีโมจิใบไม้ 🌿) ใหม่เป็นหมียักษ์โบราณ ขนเป็นมอส มีต้นซากุระใหญ่และป่าเล็กงอกบนหลัง เถาวัลย์ห้อยลงข้างตัว ตาเรืองสีอำพัน กลีบดอกไม้ ใบไม้ และหิ่งห้อยลอยรอบตัวตลอดเวลา ออร่าเขียวใต้ตัว ลองเลือก "บอส · พฤกษาโบราณ" ที่ช่องคู่ต่อสู้ สนามจะเปลี่ยนเป็นธีมป่า</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="leaf-h" data-group="leaf" style="order:11">
+    <div class="eyebrow">สกิลธาตุพฤกษ์ทุกท่าในเกม</div>
+    <h2 id="leaf-h">อนิเมชันสกิลธาตุพฤกษ์</h2>
+    <p class="lede">ท่าพฤกษ์เน้นราก เถาวัลย์ ใบมีด และสปอร์ มีสถานะใหม่ที่สายอื่นไม่มี: ติดราก (เดินไม่ได้ เถาวัลย์พันขา) ใบ้ (ใช้สกิลไม่ได้ มีป้ายคำพูดขีดฆ่าบนหัว) พิษ (ฟองเขียวลอยและเสียเลือดทุกวินาที) ดูดเลือด (แสงเขียวไหลกลับเข้าตัว) และติดตัวฟื้นเลือดกับลดดาเมจ</p>
+    <div class="skills-grid" id="leaf-cards"></div>
+  </section>
+
+  <section aria-labelledby="eline-h" data-group="earth" style="order:12">
+    <div class="eyebrow">สายที่สี่</div>
+    <h2 id="eline-h">สายศิลา 11 ร่าง</h2>
+    <p class="lede">ตระกูลสัตว์เกราะหิน สายหลักเป็นเต่าบก (เต่าศิลา → เต่าผาหิน → เต่าภูเขา) สายรองเป็นแรด (แรดผา → แรดเกราะแร่ → ไททันแรดคริสตัล) ยิ่งโตยิ่งมีหินและแร่มากขึ้น ร่างแย่ (หนอนดินเกียจคร้าน ก้อนหินขี้เกียจ) ยังตลกและหลับ เดินหนักแน่นและช้ากว่าสายอื่น เดินแล้วฝุ่นลอย</p>
+    <div class="lineup" id="lineup-earth"></div>
+    <div class="evo" id="evo-earth"></div>
+  </section>
+
+  <section aria-labelledby="eshow-h" data-group="earth" style="order:13">
+    <div class="eyebrow">ร่างผสมและบอสสายศิลา</div>
+    <h2 id="eshow-h">ธรณีผู้ตื่น และบอสโลกธาตุศิลา</h2>
+    <div class="showcase">
+      <div class="show fused earth">
+        <canvas id="show-efused" width="112" height="112" aria-label="ร่างผสม ธรณีผู้ตื่น"></canvas>
+        <div class="act" id="act-efused"></div>
+        <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
+        <h3>ธรณีผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ร่างผสมศิลา+ศิลา เดิมเป็นอีโมจิภูเขา ⛰️ ใหม่เป็นสัตว์หินตัวเพรียว เกล็ดหินสีดำเป็นกระจุกมีลายขวางสีส้มอิฐ หางยาวม้วนขึ้นเหนือหลังจนปลายชี้ฟ้า ท้องสีอำพันอยู่ครึ่งล่างของลำตัวเท่านั้น เท้าสีอำพัน หน้าเป็นหน้ากากกระดูกสามแฉก มีตาเดียวเรืองฟ้ากลางหน้ากาก และวงฝุ่นทองสองวงหมุนสวนกันตามแบบร่างผสม</p>
+      </div>
+      <div class="show boss earth">
+        <canvas id="show-pangolin" width="128" height="112" aria-label="บอสโลกธาตุศิลา ตัวนิ่มศิลาโบราณ"></canvas>
+        <div class="act" id="act-pangolin"></div>
+        <span class="rank" style="--c:#ff5a5a">บอส</span>
+        <h3>บอสโลก · ตัวนิ่มศิลาโบราณ <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ในเกมคือ "ต้นไม้โบราณ" 🌳 ซึ่งเป็นธาตุศิลา แต่ต้นไม้ไม่ใช่สัตว์และซ้ำกับสายพฤกษ์ จึงเสนอเป็นตัวนิ่มยักษ์ เกล็ดเป็นแผ่นหินซ้อนกัน แถวบนมีหนามหิน หางม้วนรอบตัว กรงเล็บยาว ตาเรืองสีอำพัน หนามบนเกล็ดเข้ากับความสามารถในเกม (สะท้อนดาเมจกลับ) ชื่อใหม่เป็นแค่ข้อเสนอ</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="earth-h" data-group="earth" style="order:14">
+    <div class="eyebrow">สกิลธาตุศิลาทุกท่าในเกม</div>
+    <h2 id="earth-h">อนิเมชันสกิลธาตุศิลา</h2>
+    <p class="lede">ท่าศิลาเน้นน้ำหนัก แผ่นดินแยก หินพุ่ง และฝุ่น จอสั่นแรงกว่าสายอื่น มีสถานะใหม่: มึน (ดาวหมุนเหนือหัว เดินไม่ได้) โล่หิน (ก้อนหินลอยล้อมตัว) พลังโจมตีขึ้น และผิวหินของก้อนหินขี้เกียจ (รับดาเมจน้อยลง ติดสถานะสั้นลง แต่เดินช้า)</p>
+    <div class="skills-grid" id="earth-cards"></div>
+  </section>
+
+  <section aria-labelledby="bline-h" data-group="bolt" style="order:15">
+    <div class="eyebrow">สายที่ห้า</div>
+    <h2 id="bline-h">สายอสนี 11 ร่าง</h2>
+    <p class="lede">ตระกูลสัตว์พายุ สายหลักเป็นนก (นกฟ้าผ่า → เหยี่ยวพายุ → วิหคราชาอสนีที่ปีกเป็นเมฆพายุ) สายรองเป็นจิ้งจอก (จิ้งจอกพายุ → จิ้งจอกอสนี สองหาง → ราชาจิ้งจอกอสนี ห้าหาง) สีหลักเป็นน้ำเงินกรมท่ากับเหลืองสายฟ้า ร่างแย่ (แมวไฟสถิตขนพอง เมฆหม่นขี้เกียจ) ยังตลก นกทุกตัวในสายบินด้วยปีก (ท่าบินชุดเดียวกับอสนีผู้ตื่น) ตัวที่ลอยได้ (ประกายไฟฟ้า ลูกเมฆฟ้า เมฆหม่น) ลอยเหนือพื้น</p>
+    <div class="lineup" id="lineup-bolt"></div>
+    <div class="evo" id="evo-bolt"></div>
+  </section>
+
+  <section aria-labelledby="bshow-h" data-group="bolt" style="order:16">
+    <div class="eyebrow">ร่างผสมและบอสสายอสนี</div>
+    <h2 id="bshow-h">อสนีผู้ตื่น และบอสโลกธาตุอสนี</h2>
+    <p class="lede">ร่างผสมขยับให้ดูแล้ว ลองบินในฉากต่อสู้ได้ที่ช่องมอนของเรา "สายอสนี"</p>
+    <div class="whale-opts bolt-opts" id="bolt-opts"></div>
+    <div class="showcase">
+      <div class="show boss bolt">
+        <canvas id="show-bison" width="128" height="112" aria-label="บอสโลกธาตุอสนี กระทิงพายุคำราม"></canvas>
+        <div class="act" id="act-bison"></div>
+        <span class="rank" style="--c:#ff5a5a">บอส</span>
+        <h3>บอสโลก · กระทิงพายุคำราม <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ในเกมคือ "จักรกลพายุ" ⚡ ซึ่งเป็นเครื่องจักร ไม่ใช่สัตว์ จึงเสนอเป็นกระทิงยักษ์ แผงคอและหนอกเป็นเมฆพายุมีสายฟ้าวิ่ง เขาโค้งมีสายฟ้าแลบระหว่างเขา ตาเรืองเหลือง ในเกมบอสตัวนี้ตีเร็ว จึงให้ท่าทางดุดันพร้อมพุ่ง ชื่อใหม่เป็นแค่ข้อเสนอ</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="bolt-h" data-group="bolt" style="order:17">
+    <div class="eyebrow">สกิลธาตุอสนีทุกท่าในเกม</div>
+    <h2 id="bolt-h">อนิเมชันสกิลธาตุอสนี</h2>
+    <p class="lede">ท่าอสนีเน้นความเร็ว สายฟ้าซิกแซกที่กะพริบทุกเฟรม และจอแวบขาว มีสถานะใหม่: ไฟฟ้าสถิต (มีประกายไฟวิ่งบนตัว ทุกวินาทีมีโอกาส 30% ช็อตค้าง 0.4 วินาที) เร็วขึ้น (เดินเร็วขึ้น มีเงาสีเหลืองตามหลัง) และคริขึ้น (มีเป้าเล็งเหนือหัว)</p>
+    <div class="skills-grid" id="bolt-cards"></div>
+  </section>
+
+  <section aria-labelledby="hline-h" data-group="holy" style="order:18">
+    <div class="eyebrow">สายที่หก</div>
+    <h2 id="hline-h">สายรัศมี 11 ร่าง</h2>
+    <p class="lede">ตระกูลสัตว์เทพ สีหลักเป็นขาวงาช้าง ทอง และฟ้าอ่อน ทุกตัวมีแสงหรือวงรัศมี สายหลักเป็นแกะต่อไปถึงกิเลน (ลูกแกะแสง → แกะปีกทิพย์ → กิเลนรัศมี เกล็ดทองเขาเดียว → กิเลนสุริยเทพ มีวงแสงซ้อนหลังหัว) สายรองเป็นสิงห์ (สิงห์น้อยรัศมี แผงคอเป็นแสง → ราชสีห์ปีกขาว หกปีก → มหาราชสีห์เทวะ สวมมงกุฎทอง ปีกแสง) ร่างแย่ยังตลก: ทูตน้อยขี้เซาเป็นก้อนขนปุยมีปีกจิ๋ว หลับ วงรัศมีเอียงหลุด ระฆังแตกเป็นปูเสฉวนง่วงๆ ที่อาศัยในระฆังร้าว ตัวที่มีปีกขยับปีกตอนยืนและตอนใช้สกิล ตัวที่ลอยได้ (ประกายแสง ทูตน้อยขี้เซา) ลอยเหนือพื้น</p>
+    <div class="lineup" id="lineup-holy"></div>
+    <div class="evo" id="evo-holy"></div>
+  </section>
+
+  <section aria-labelledby="hshow-h" data-group="holy" style="order:19">
+    <div class="eyebrow">ร่างผสมและบอสสายรัศมี</div>
+    <h2 id="hshow-h">ศักดิ์สิทธิ์ผู้ตื่น และบอสโลกธาตุรัศมี</h2>
+    <p class="lede">ลองในฉากต่อสู้ได้ที่ช่องมอนของเรา "สายรัศมี" และเลือก "บอส · คชสารรัศมี" ที่ช่องคู่ต่อสู้ สนามจะเปลี่ยนเป็นธีมวิหารสีทอง</p>
+    <div class="showcase">
+      <div class="show fused holy">
+        <canvas id="show-hfused" width="112" height="112" aria-label="ร่างผสม ศักดิ์สิทธิ์ผู้ตื่น"></canvas>
+        <div class="act" id="act-hfused"></div>
+        <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
+        <h3>ศักดิ์สิทธิ์ผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ร่างผสมรัศมี+รัศมี เดิมเป็นอีโมจิ 🔆 ใหม่เป็นกิเลนสุริยเทพที่ตื่นแล้ว ใส่เกราะทองที่หน้า คอ หลัง และขา แผงคอและหางเป็นแสงสีขาวปนฟ้า เขาเดียวเรืองแสง มีปีกขนนกกับปีกแสงซ้อนกัน กีบเป็นแสงทอง และวงแสงสองวง (ทองกับขาวฟ้า) หมุนสวนกันตามแบบร่างผสม</p>
+      </div>
+      <div class="show boss holy">
+        <canvas id="show-holyele" width="128" height="112" aria-label="บอสโลกธาตุรัศมี คชสารรัศมี"></canvas>
+        <div class="act" id="act-holyele"></div>
+        <span class="rank" style="--c:#ff5a5a">บอส</span>
+        <h3>บอสโลก · คชสารรัศมี <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ในเกมคือ "เทวทูตรัศมี" ✨ ซึ่งเป็นคน (เทวดา) จึงเสนอเป็นช้างเผือกยักษ์ ยกงวงขึ้น งายาว สวมเครื่องทรงทองเป็นชั้น ผ้าคลุมหลังสีแดงขอบทองมีพู่ ปีกขนนกกับปีกแสงที่ไหล่ และวงรัศมีลอยเหนือหัว ในเกมตีธรรมดาแล้วทำให้ใบ้ จึงคิดว่าตอนทำสกิลจะให้เสียงแตรช้างเป็นคลื่นแสงที่ทำให้ใบ้ ชื่อใหม่เป็นแค่ข้อเสนอ</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="holy-h" data-group="holy" style="order:20">
+    <div class="eyebrow">สกิลธาตุรัศมีทุกท่าในเกม</div>
+    <h2 id="holy-h">อนิเมชันสกิลธาตุรัศมี</h2>
+    <p class="lede">ท่ารัศมีเน้นแสง ขนนก วงรัศมี และเสาแสงจากฟ้า มีสถานะใหม่: ตาพร่า (แสงจ้าเป็นประกายบนตา ตีธรรมดาพลาด 35%) โล่แสงสีทอง และติดตัวของราชสีห์ปีกขาว (เลือดต่ำกว่า 35% ครั้งแรก ได้โล่ 28% ล้างสถานะ และคุ้มกันสถานะ 2 วินาที มีวงแสงทองหมุนรอบเท้า) ท่าพิพากษาสวรรค์แรงขึ้น 60% ถ้าเป้าเลือดต่ำกว่า 35%</p>
+    <div class="skills-grid" id="holy-cards"></div>
+  </section>
+
+  <section aria-labelledby="dline-h" data-group="dark" style="order:21">
+    <div class="eyebrow">สายที่เจ็ด</div>
+    <h2 id="dline-h">สายรัตติกาล 11 ร่าง</h2>
+    <p class="lede">ตระกูลค้างคาวและแมงมุม สีหลักเป็นม่วงดำกับแดงเลือด มีแสงม่วงของคำสาป สายหลักเป็นแมงมุม (แมงมุมคำสาป มีอักขระคำสาปบนท้อง → แมงมุมอสูรตาแดง ตาแดงแปดดวงและลายนาฬิกาทรายสีเลือด → ราชินีแมงมุมรัตติกาล ท้องเป็นท้องฟ้ากลางคืนมีดาวและพระจันทร์เสี้ยว สวมมงกุฎเขา) สายรองเป็นค้างคาว (ลูกค้างคาว → ค้างคาวเขี้ยวโลหิต ปีกมีเส้นเลือด → ค้างคาวอสูรราชันย์ มีเขา → จักรพรรดิค้างคาวคำสาป ปีกขาด มีกะโหลกเป็นเกราะอก) ค้างคาวทุกตัวบินด้วยปีก ร่างแย่ยังตลก: หนูท่อมืดตัวมอมแมมง่วงนอน หนูซากศพขี้เกียจมีรอยเย็บ ซี่โครงโผล่ ตาข้างหนึ่งเย็บเป็นกากบาท ลิ้นห้อย ค้างคาวทุกตัวขยับปีกตอนยืนและตอนใช้สกิล ตัวที่ลอยได้ (ละอองมืด) ลอยเหนือพื้น</p>
+    <div class="lineup" id="lineup-dark"></div>
+    <div class="evo" id="evo-dark"></div>
+  </section>
+
+  <section aria-labelledby="dshow-h" data-group="dark" style="order:22">
+    <div class="eyebrow">ร่างผสมและบอสสายรัตติกาล</div>
+    <h2 id="dshow-h">รัตติกาลผู้ตื่น และบอสโลกธาตุรัตติกาล</h2>
+    <div class="showcase">
+      <div class="show fused dark">
+        <canvas id="show-dfused" width="112" height="112" aria-label="ร่างผสม รัตติกาลผู้ตื่น"></canvas>
+        <div class="act" id="act-dfused"></div>
+        <span class="rank" style="--c:#d08aff">ร่างผสม <b>★★★★★</b></span>
+        <h3>รัตติกาลผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ร่างผสมรัตติกาล+รัตติกาล เดิมเป็นอีโมจิหลุมดำ 🕳️ ใหม่เป็นราชินีแมงมุมที่ตื่นแล้ว ท้องใหญ่ขึ้นเป็นท้องฟ้ากลางคืนมีกาแล็กซีหมุนเป็นเกลียว ใส่เกราะทองที่หลัง อก และข้อขา มงกุฎทองมีพระจันทร์เสี้ยว เขี้ยวทอง และวงแสงสองวง (ม่วงกับแดง) หมุนสวนกันตามแบบร่างผสม</p>
+      </div>
+      <div class="show boss dark">
+        <canvas id="show-darksoul" width="128" height="112" aria-label="บอสโลกธาตุรัตติกาล วิญญาณจันทร์ดับ"></canvas>
+        <div class="act" id="act-darksoul"></div>
+        <span class="rank" style="--c:#ff5a5a">บอส</span>
+        <h3>บอสโลก · วิญญาณจันทร์ดับ <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ในเกมคือ "จอมราตรี" 🌑 ซึ่งเป็นอีโมจิพระจันทร์ จึงเสนอเป็นดวงวิญญาณยักษ์สีม่วงอ่อนโปร่งแสง ตัวเป็นหยดน้ำยาวลอยเหนือพื้น ปลายตัวเป็นริ้วแสงแทนขา มีแขนแสงเล็บแหลม มงกุฎเป็นเปลวแสงเย็นห้าแฉก ตาสองข้างกลวงเรืองสีอำพันเหมือนสุริยุปราคา มีสุริยุปราคาดำขอบทองอยู่หลังหัว และมีใบหน้าเล็กๆ ของวิญญาณที่ถูกกลืนลอยอยู่บนตัว ในเกมตีธรรมดาแล้วลดเกราะ มีโล่ และคลั่งเมื่อสู้นาน จึงให้ท่าทางนิ่งลอยน่ากลัว ชื่อใหม่เป็นแค่ข้อเสนอ</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="dark-h" data-group="dark" style="order:23">
+    <div class="eyebrow">สกิลธาตุรัตติกาลทุกท่าในเกม</div>
+    <h2 id="dark-h">อนิเมชันสกิลธาตุรัตติกาล</h2>
+    <p class="lede">ท่ารัตติกาลเน้นความมืด คำสาป และการดูดชีวิต จอมืดลงก่อนท่าแรงๆ มีสถานะใหม่: คำสาป (วงอักขระม่วงหมุนเหนือหัว ฮีลและโล่ที่ได้ลดลงครึ่งหนึ่ง) พลังโจมตีลด (ลูกศรแดงชี้ลง ทำดาเมจน้อยลง 20%) และเกราะลด (ไอคอนโล่แตก รับดาเมจมากขึ้น) รวมถึงติดตัวของหนูซากศพขี้เกียจที่ดูดเลือดทุกครั้งที่ตีและโกรธเมื่อเลือดต่ำกว่า 50%</p>
+    <div class="skills-grid" id="dark-cards"></div>
+  </section>
+
+  <section aria-labelledby="sline-h" data-group="shadow" style="order:24">
+    <div class="eyebrow">สายที่แปด</div>
+    <h2 id="sline-h">สายเงา 11 ร่าง</h2>
+    <p class="lede">คุณเลือกแบบ A กับ B จึงรวมเป็นสายเดียว สายหลักเป็นอัศวินเงา (ชุดเกราะที่มีเงาเป็นตัวข้างใน) และสายรองเป็นภูตฮู้ดเงา สีหลักเป็นเหล็กดำ ผ้าม่วงเทา และแสงม่วง เงาจิ๋วเป็นภูตผ้าคลุมตัวกลม โตแล้วไปสวมหมวกเหล็กเป็นหมวกผีน้อย จากนั้นแยกเป็นอัศวินเงา → อัศวินเงาเกราะทมิฬ → จอมอัศวินเงา หรือถอดหมวกกลับเป็นภูต: ภูตตะเกียงเงา → ภูตโคมวิญญาณ → เจ้าภูตเงา ถือเคียว ร่างแย่ยังตลก (ผีเงาขี้อาย ม่านหมอกขี้เกียจ) อัศวินเดินด้วยขา ภูตทุกตัวลอยเหนือพื้น ลองในฉากต่อสู้ได้ที่ช่องมอนของเรา "สายเงา" และเลือก "บอส · ราชาม่านเงา" ที่ช่องคู่ต่อสู้ สนามจะเปลี่ยนเป็นธีมสุสาน</p>
+    <div class="lineup" id="lineup-shadow"></div>
+    <div class="evo" id="evo-shadow"></div>
+  </section>
+
+  <section aria-labelledby="sshow-h" data-group="shadow" style="order:25">
+    <div class="eyebrow">ร่างผสมและบอสสายเงา</div>
+    <h2 id="sshow-h">เงาผู้ตื่น และบอสโลกธาตุเงา</h2>
+    <div class="showcase">
+      <div class="show fused shadow">
+        <canvas id="show-sfused" width="112" height="112" aria-label="ร่างผสม เงาผู้ตื่น"></canvas>
+        <div class="act" id="act-sfused"></div>
+        <span class="rank" style="--c:#9cc0ec">ร่างผสม <b>★★★★★</b></span>
+        <h3>เงาผู้ตื่น <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ร่างผสมเงา+เงา เดิมเป็นอีโมจิกระจก 🪞 ใหม่เป็นอัศวินกับภูตรวมร่างกัน ท่อนบนเป็นเกราะดำ หมวกมงกุฎมีเขาและช่องตาม่วง อกมีแกนม่วงเรือง ถือดาบใหญ่คมม่วง ท่อนล่างเป็นหางควันแบบภูต ผ้าคลุมแผ่เป็นปีกขาดวิ่น มือหลังลุกเป็นไฟม่วง และวงแสงม่วงสองวงหมุนรอบตัว</p>
+      </div>
+      <div class="show boss shadow">
+        <canvas id="show-veilking" width="128" height="112" aria-label="บอสโลกธาตุเงา ราชาม่านเงา"></canvas>
+        <div class="act" id="act-veilking"></div>
+        <span class="rank" style="--c:#ff5a5a">บอส</span>
+        <h3>บอสโลก · ราชาม่านเงา <span class="chip new">ออกแบบใหม่</span></h3>
+        <p class="hint">ในเกมคือ "ราชาม่านเงา" 👻 (ผี หลบเก่งและหายตัวได้) ชื่อเดิมเข้ากับสายภูตอยู่แล้วจึงคงชื่อไว้ เป็นภูตยักษ์สวมมงกุฎเหล็กดำ ผ้าคลุมกว้างเหมือนม่านที่ชายจางเป็นควัน หน้าเป็นช่องดำ ตาม่วงโตและยิ้มฟันเลื่อย แขนยาวสองข้าง มือเป็นกรงเล็บม่วงถือไฟม่วงไว้ในฝ่ามือ</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="shadow-h" data-group="shadow" style="order:26">
+    <div class="eyebrow">สกิลธาตุเงาทุกท่าในเกม</div>
+    <h2 id="shadow-h">อนิเมชันสกิลธาตุเงา</h2>
+    <p class="lede">ท่าอัศวินเป็นดาบและใบมีดเงา ท่าภูตเป็นตะเกียง ไฟวิญญาณ และหมอก มีสถานะใหม่: หลบเก่งขึ้น (มีเงาม่วงตามหลัง ตีธรรมดาที่มาโดนพลาด 40%) มองไม่เห็นจากหมอก (ตีธรรมดาพลาด 35%) ติดตัวของภูตโคมวิญญาณ (ตีธรรมดาติดพิษ 30%) และติดตัวของเจ้าภูตเงา (ตีธรรมดาที่มาโดนพลาด 20% หลบแล้วสวนกลับคริ) ชื่อสกิลตั้งใหม่ให้เข้ากับอัศวินและภูต (พัดดาบเงา ไฟโคมเงียบ โล่ทมิฬ เปลวพิษวิญญาณ)</p>
+    <div class="skills-grid" id="shadow-cards"></div>
+  </section>
+
+  <section aria-labelledby="raid-h" data-group="raid" style="order:27">
+    <div class="eyebrow">บอสเรด · ภาพนิ่งให้เลือกก่อน</div>
+    <h2 id="raid-h">บอสเรด 5 ตัวที่เหลือ</h2>
+    <p class="lede">บอสเรดในเกมมี 6 ตัว พฤกษาโบราณทำไปแล้ว อีก 5 ตัวใช้ภาพที่คุณให้ AI ออกแบบ ขยับได้และลงสู้ได้ทุกตัว ใต้ฉากต่อสู้มีปุ่มสกิลบอสเรดตัวละ 2 ท่า กดแล้วบอสตัวนั้นจะเข้าสนามและใช้ท่าใส่มอนของเรา ในโหมดสาธิตอัตโนมัติ บอสเรดจะใช้ท่าของตัวเอง ท่าระเบิดรอบตัว (รำแพนสายฟ้า ฝูงค้างคาวโลหิต) บอสจะกระโดดเข้าหาก่อน เพราะบอสเดินช้า · ปุ่ม "บอสโลกขยายร่าง" ด้านบนข้ามไปวินาทีที่ 20 และ 40 ของการสู้บอสโลก บอสจะตัวใหญ่ขึ้นทีละ 10% (ร่างเดิม) และพลังโจมตีกับป้องกัน +30%</p>
+    <div class="showcase">
+      <div class="show boss">
+        <canvas id="show-lavaking" width="128" height="112" aria-label="บอสเรด ราชันย์ลาวา"></canvas>
+        <div class="act" id="act-lavaking"></div>
+        <span class="rank" style="--c:#ff5a5a">บอสเรด</span>
+        <h3>ราชันย์ลาวา <span class="chip new">ร่างแรก</span></h3>
+        <p class="hint">ในเกมเป็นอีโมจิ 🔥 · แก้ครั้งที่ 2: ใช้ภาพโกเลมลาวาที่คุณให้ AI ออกแบบ ย่อเป็น 90 × 87 พิกเซล ใช้สีหินกับลาวาชุดเดียวกับสายไฟ ควันกับสะเก็ดไฟลอยจริง ขยับได้แล้ว: หัว แขนสองข้าง และขาแยกกันขยับ เดินสลับขา ท่าโจมตีต่อยด้วยแขนหน้า ตอนหัวขยับเห็นลาวาที่คอ ลองสู้ได้ที่ช่องคู่ต่อสู้ "บอส · ราชันย์ลาวา"</p>
+      </div>
+      <div class="show boss water">
+        <canvas id="show-abyssfish" width="176" height="132" aria-label="บอสเรด อสูรห้วงลึก"></canvas>
+        <div class="act" id="act-abyssfish"></div>
+        <span class="rank" style="--c:#ff5a5a">บอสเรด</span>
+        <h3>อสูรห้วงลึก <span class="chip new">ร่างแรก</span></h3>
+        <p class="hint">ในเกมเป็นอีโมจิ 💧 · แก้ครั้งที่ 3: ใช้ภาพที่คุณให้ AI ออกแบบ (160×64) ลดเหลือ 16 สี ตัวจริงกว้าง 150 × สูง 59 พิกเซล ยาวกว่าบอสอื่นราว 1.6 เท่า ขยับได้แล้ว: หางแกว่งตามจังหวะว่าย หนามบนหลังแยกเป็น 8 ชิ้น โยกเป็นคลื่นจากหางไปหัว ครีบอกและครีบท้อง 3 อันพัดตามจังหวะว่าย (โค้งจากโคน โคนไม่ขยับ ภาพจึงไม่ฉีก) ขากรรไกรล่างอ้าเห็นในปากแดงตอนโจมตีและใช้สกิล ลองสู้ได้ที่ช่องคู่ต่อสู้ "บอส · อสูรห้วงลึก"</p>
+      </div>
+      <div class="show boss holy">
+        <canvas id="show-raidseraph" width="128" height="112" aria-label="บอสเรด เซราฟรัศมี"></canvas>
+        <div class="act" id="act-raidseraph"></div>
+        <span class="rank" style="--c:#ff5a5a">บอสเรด</span>
+        <h3>เซราฟรัศมี <span class="chip new">ร่างแรก</span></h3>
+        <p class="hint">ในเกมเป็นอีโมจิ ✨ · แก้ครั้งที่ 1: ใช้ภาพนกยูงที่คุณให้ AI ออกแบบ ลบพื้นหลังลายตารางออก ย่อเป็น 88 × 91 พิกเซล หงอนสามเส้นกับวงรัศมีวาดด้วยโค้ดให้ตามหัว ขยับได้แล้ว: ปีกคู่บนโยกซ้ายขวา ปีกกลางกับปีกล่างกระพือ หัวผงก เดินสลับขา ลองสู้ได้ที่ช่องคู่ต่อสู้ "บอส · เซราฟรัศมี" สนามเปลี่ยนเป็นธีมวิหาร</p>
+      </div>
+      <div class="show boss dark">
+        <canvas id="show-vampire" width="128" height="112" aria-label="บอสเรด จ้าวมืดมิด"></canvas>
+        <div class="act" id="act-vampire"></div>
+        <span class="rank" style="--c:#ff5a5a">บอสเรด</span>
+        <h3>จ้าวมืดมิด <span class="chip new">ร่างแรก</span></h3>
+        <p class="hint">ในเกมเป็นอีโมจิ 🌑 · แก้ครั้งที่ 2: ใช้ภาพแดร็กคูล่าที่คุณให้ AI ออกแบบ ลบพื้นหลังลายตารางออก ย่อเป็น 43 × 69 พิกเซล (ตัวขนาดคน เล็กกว่าบอสอื่น) ค้างคาวสองตัววาดใหม่ด้วยโค้ดให้กระพือปีก ขยับได้แล้ว: หัวผงก มือเอื้อม ชายผ้าคลุมสองข้างพลิ้ว เดินสลับขา ลองสู้ได้ที่ช่องคู่ต่อสู้ "บอส · จ้าวมืดมิด" สนามเปลี่ยนเป็นธีมสุริยุปราคา</p>
+      </div>
+      <div class="show boss shadow">
+        <canvas id="show-nameless" width="128" height="112" aria-label="บอสเรด ราชันย์เงานิรนาม"></canvas>
+        <div class="act" id="act-nameless"></div>
+        <span class="rank" style="--c:#ff5a5a">บอสเรด</span>
+        <h3>ราชันย์เงานิรนาม <span class="chip new">ร่างแรก</span></h3>
+        <p class="hint">ในเกมเป็นอีโมจิ 🌫️ · แก้ครั้งที่ 1: ใช้ภาพอัศวินไร้หัวที่คุณให้ AI ออกแบบ ลบพื้นหลังลายตารางสีเทาเข้มออก ย่อเป็น 85 × 91 พิกเซล โซ่เส้นเล็กเกินจะย่อได้จึงวาดใหม่ด้วยโค้ดจากกำปั้นถึงลูกตุ้ม ขยับได้แล้ว: หัวไฟผงก กำปั้นเหวี่ยง ลูกตุ้มแกว่งตามโซ่ ชายผ้าคลุมพลิ้ว เดินสลับขา ลองสู้ได้ที่ช่องคู่ต่อสู้ "บอส · ราชันย์เงานิรนาม" สนามเปลี่ยนเป็นธีมสุสาน</p>
+      </div>
+    </div>
+  </section>
+  <section aria-labelledby="adv-h" data-group="adv" style="order:27">
+    <div class="eyebrow">โหมดผจญภัย</div>
+    <h2 id="adv-h">ศัตรูผจญภัย 20 ตัว + หุ่นซ้อม</h2>
+    <p class="lede">จากภาพแผ่นเดียวที่คุณให้ AI วาด (ตาราง 5 × 5 พื้นชมพู) ตัดทีละช่อง ย่อเป็นพิกเซลตามขนาดของสัตว์แต่ละชนิด (หนอน ปู นก กระรอก ตัวเล็ก หมูป่า แพะ นกยูง ตัวใหญ่ มังกรกับโกเลมใหญ่สุด) ทุกการ์ดวาดที่สเกลเดียวกันจึงเทียบขนาดกันได้ ป้ายบอกร่างยังตามด่านในเกม เหลือตัวละไม่เกิน 15 สี เรียงตามลำดับด่านใน adventure-data.ts ตัดเป็นชิ้นให้ขยับ: หัวผงก ขาก้าวสลับ ปีกกระพือ หางแกว่ง ก้ามเหวี่ยง ลองสู้ได้ที่ช่องคู่ต่อสู้ กลุ่ม "ศัตรูผจญภัย" ใช้สกิลกลางของธาตุตัวเอง (หุ่นซ้อมไม่ตีกลับ)</p>
+    <div class="showcase" id="adv-cards"></div>
+  </section>
+  <section aria-labelledby="plan-h" data-group="plan" style="order:27">
+    <div class="eyebrow">แผนทั้งเกม</div>
+    <h2 id="plan-h">ออกแบบมอนใหม่ทั้ง 8 สาย</h2>
+    <p class="lede">มอนที่ดูไม่สมเหตุสมผลส่วนใหญ่มีปัญหาแบบเดียวกัน คือเป็นสิ่งของหรือคนแทนที่จะเป็นสัตว์ (ดวงอาทิตย์ ตรีศูล ภูเขา หน้ากาก นินจา) หรือเปลี่ยนชนิดสัตว์กลางสาย (กิ้งก่ากลายเป็นเสือ หมาป่ากลายเป็นช้าง) แผนนี้ใช้กติกา 4 ข้อ</p>
+    <div class="rules">
+      <div class="rule"><b>เป็นสัตว์ ไม่ใช่สิ่งของ</b><span>ทุกร่างต้องเป็นสิ่งมีชีวิตที่มีตา มีท่าทาง และขยับได้ ร่างวิญญาณอย่างละอองหรือผีใช้ได้</span></div>
+      <div class="rule"><b>หนึ่งสาย หนึ่งตระกูล</b><span>เพลิง = กิ้งก่าและมังกร · วารี = สัตว์ทะเล · พฤกษ์ = สัตว์ป่ามีพืชงอก · ศิลา = สัตว์เกราะหิน · อสนี = สัตว์พายุ · รัศมี = สัตว์เทพ · รัตติกาล = ค้างคาวและแมงมุม · เงา = อัศวินเงาและภูตคลุมฮู้ด</span></div>
+      <div class="rule"><b>ยิ่งสูงยิ่งอลังการ</b><span>ไข่ถึงร่างเด็กขนาดเล็กและน่ารัก ร่างโตเต็มวัยใช้กรอบ 56 พิกเซล ร่างสุดท้ายและร่างผสม 64 พิกเซล มีออร่าและอนุภาคลอย บอส 96 พิกเซล</span></div>
+      <div class="rule"><b>ร่างแย่ยังตลก</b><span>ร่างที่ได้จากการเลี้ยงไม่ดี (ควันกรุ่น ลาวาอ้วน หมึกขี้เกียจ) คงความตลกไว้ เป็นรางวัลปลอบใจที่น่าเก็บ</span></div>
+    </div>
+    <div class="lines" id="lines"></div>
+  </section>
+
+  <section aria-labelledby="next-h" data-group="plan" style="order:28">
+    <h2 id="next-h">ต้องตัดสินใจก่อนลงมือ</h2>
+    <div class="next">
+      <div class="q"><b>1. สไตล์ภาพนี้ใช้ได้ไหม</b><span>พิกเซลอาร์ตมุมเฉียงแบบในหน้านี้ หรืออยากลองแบบอื่น เช่น ภาพวาดเส้นเรียบความละเอียดสูง</span></div>
+      <div class="q"><b>2. แนวคิดมอนแต่ละสาย</b><span>ดูตารางด้านบน ตัวไหนอยากคงไว้หรืออยากเปลี่ยนชื่อ บอกได้เลย ชื่อในตารางเป็นแค่ข้อเสนอ</span></div>
+      <div class="q"><b>3. ลำดับการทำ</b><span>เสนอให้ทำทีละสายครั้งละ 11 ร่าง แล้วต่อด้วยร่างผสม 21 ตัว และบอส 13 ตัว แต่ละรอบปล่อยขึ้นเกมได้เลย ไม่ต้องรอครบทุกตัว</span></div>
+    </div>
+  </section>
+</div>
+
+<script src="js/engine.js"></script>
+<script src="js/sprites/fire.js"></script>
+<script src="js/sprites/water.js"></script>
+<script src="js/sprites/leaf.js"></script>
+<script src="js/sprites/raid-bitmaps.js"></script>
+<script src="js/sprites/raid.js"></script>
+<script src="js/sprites/adventure-bitmaps.js"></script>
+<script src="js/sprites/adventure.js"></script>
+<script src="js/sprites/earth.js"></script>
+<script src="js/sprites/bolt.js"></script>
+<script src="js/sprites/holy.js"></script>
+<script src="js/sprites/dark.js"></script>
+<script src="js/sprites/shadow.js"></script>
+<script src="js/core.js"></script>
+<script src="js/skills/fire.js"></script>
+<script src="js/skills/water.js"></script>
+<script src="js/skills/leaf.js"></script>
+<script src="js/skills/earth.js"></script>
+<script src="js/skills/bolt.js"></script>
+<script src="js/skills/holy.js"></script>
+<script src="js/skills/dark.js"></script>
+<script src="js/skills/shadow.js"></script>
+<script src="js/skills/raid.js"></script>
+<script src="js/page.js"></script>

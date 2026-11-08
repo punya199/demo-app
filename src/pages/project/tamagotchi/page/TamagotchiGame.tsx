@@ -19,6 +19,7 @@ import {
 import { MergeModal } from '../equipment/MergeModal'
 import { MonsterScreen } from './MonsterScreen'
 import { showError } from './show-error'
+import { MonsterSprite } from '../shared/MonsterSprite'
 
 const EggPicker = () => {
   const { mutate: hatch, isPending } = useHatchMonster()
@@ -91,7 +92,7 @@ export const HallOfFame = () => {
             key={monster.id}
             className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900"
           >
-            <span className="text-2xl">{monster.emoji}</span>
+            <MonsterSprite sprite={monster.sprite} emoji={monster.emoji} size={36} />
             <div className="flex-1">
               <div className="font-medium text-slate-900 dark:text-slate-100">
                 {petLabel(monster.name, monster.nickname)}

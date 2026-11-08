@@ -97,7 +97,12 @@ export interface IProfile {
 export interface IFriend {
   relationId: string
   displayName: string
-  monster: { emoji: string; stage: EnumMonsterStage; costume: ILoadout | null } | null
+  monster: {
+    emoji: string
+    sprite?: string | null
+    stage: EnumMonsterStage
+    costume: ILoadout | null
+  } | null
   points: number
   hasSupport: boolean
   canGreet: boolean
@@ -122,6 +127,7 @@ export interface IFriendVisit {
   monster: {
     emoji: string
     name: string
+    sprite?: string | null
     nickname: string | null
     costume: ILoadout | null
     stage: EnumMonsterStage

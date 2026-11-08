@@ -206,6 +206,7 @@ export const PvpPanel = (props: IPvpPanelProps) => {
           <div className="flex items-center gap-3">
             <PetAvatar
               emoji={opponent.emoji}
+              sprite={opponent.sprite}
               costume={opponent.costume}
               scale={0.4}
               label={opponent.displayName}

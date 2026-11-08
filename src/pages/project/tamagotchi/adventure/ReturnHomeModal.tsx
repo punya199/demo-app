@@ -2,6 +2,7 @@ import { Button, message, Modal } from 'antd'
 import { stageLabel } from '../core/tamagotchi-helper'
 import { IMonsterData, IWikiData } from '../core/tamagotchi-interface'
 import { useReturnHome } from '../core/tamagotchi-service'
+import { MonsterSprite } from '../shared/MonsterSprite'
 
 interface IReturnHomeModalProps {
   open: boolean
@@ -41,7 +42,9 @@ export const ReturnHomeModal = (props: IReturnHomeModalProps) => {
           แกนสัตว์เลี้ยงของสายพันธุ์นี้ ไว้ใช้คราฟต์ในภายหลัง
         </p>
         <div className="rounded border border-slate-200 p-3 text-center dark:border-slate-700">
-          <div className="text-4xl">{monster.emoji}</div>
+          <div className="flex justify-center">
+            <MonsterSprite sprite={monster.sprite} emoji={monster.emoji} size={72} />
+          </div>
           <div className="font-semibold">{monster.displayName}</div>
           <div className="text-xs text-slate-500 dark:text-slate-400">
             {monster.name} · {stageLabel[monster.stage]}

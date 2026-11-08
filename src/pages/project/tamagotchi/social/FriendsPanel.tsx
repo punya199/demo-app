@@ -148,6 +148,7 @@ const VisitModal = (props: { visit: IFriendVisit | null; onClose: () => void }) 
         <div className="flex items-center gap-4">
           <PetAvatar
             emoji={monster.emoji}
+            sprite={monster.sprite}
             costume={monster.costume}
             label={petLabel(monster.name, monster.nickname)}
           />
@@ -201,6 +202,7 @@ const FriendRow = (props: {
       <div className="flex flex-wrap items-center gap-2">
         <PetAvatar
           emoji={friend.monster?.emoji ?? '❔'}
+          sprite={friend.monster?.sprite}
           costume={friend.monster?.costume}
           scale={0.4}
           label={friend.displayName}

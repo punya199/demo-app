@@ -17,6 +17,8 @@ export interface IDexEntry {
   discovered: boolean
   name: string | null
   emoji: string | null
+  // Pixel-art sprite id (sprites/sprite-registry.ts); null = no art yet, show the emoji.
+  sprite?: string | null
 }
 
 export interface IWikiSpecies {
@@ -25,6 +27,8 @@ export interface IWikiSpecies {
   stage: EnumMonsterStage
   name: string
   emoji: string
+  // Pixel-art sprite id; null for a form without art (cross-line hybrids).
+  sprite?: string | null
   minWeight: number
   stats: IBattleStats
   skill: { name: string; power: number }
@@ -37,6 +41,8 @@ export interface IMergeForm {
   lines: [EnumMonsterLine, EnumMonsterLine]
   name: string
   emoji: string
+  // Pixel-art sprite id; null for a hybrid of two lines (no art yet).
+  sprite?: string | null
   stats: IBattleStats
 }
 
@@ -92,6 +98,8 @@ export interface IWikiData {
     // Spiritual elements only merge with each other, natural ones with natural ones.
     spiritualLines: EnumMonsterLine[]
     lifespanMinutes: number
+    // False while only two monsters of the same line can merge (the server then lists only those forms).
+    crossLineEnabled?: boolean
     forms: IMergeForm[]
   }
   // Spiritual eggs are rare: hatching one costs Raid Tokens.

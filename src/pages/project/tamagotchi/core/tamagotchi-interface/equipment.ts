@@ -126,7 +126,7 @@ export interface IEquipmentData {
   items: IEquipmentItem[]
   // The pet this screen is about (the selected one) and every living pet, to name who wears what.
   monsterId: string | null
-  pets: { id: string; name: string; emoji: string }[]
+  pets: { id: string; name: string; emoji: string; sprite?: string | null }[]
   // Battle effects of the worn four-piece sets.
   activeEffects: IFighterEffects
   setBonuses: { setId: string; name: string; pieces: number }[]

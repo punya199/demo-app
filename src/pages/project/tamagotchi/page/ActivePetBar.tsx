@@ -4,6 +4,7 @@ import { elementLabel, MAX_HEARTS, stageLabel, toHearts } from '../core/tamagotc
 import { EnumMonsterStage, IMonsterData } from '../core/tamagotchi-interface'
 import { useSelectMonster } from '../core/tamagotchi-service'
 import { showError } from './show-error'
+import { MonsterSprite } from '../shared/MonsterSprite'
 
 // One slot per monster the player can raise at once; tapping a slot selects it.
 const MonsterSlots = (props: {
@@ -47,7 +48,11 @@ const MonsterSlots = (props: {
             }
           >
             <span className="flex flex-col items-center leading-tight">
-              <span className="text-xl">{monster.isSick ? '🤒' : monster.emoji}</span>
+              {monster.isSick ? (
+                <span className="text-xl">🤒</span>
+              ) : (
+                <MonsterSprite sprite={monster.sprite} emoji={monster.emoji} size={30} />
+              )}
               <span className="w-full truncate text-xs">{monster.displayName}</span>
             </span>
           </Button>
@@ -72,7 +77,15 @@ export const ActivePetBar = (props: {
     <div className="rounded-xl border border-slate-200 bg-white/95 p-2 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/95">
       <div className="flex items-center gap-2">
         <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-lime-100 text-2xl dark:bg-lime-200">
-          {monster ? (monster.isSick ? '🤒' : monster.emoji) : '🥚'}
+          {monster ? (
+            monster.isSick ? (
+              '🤒'
+            ) : (
+              <MonsterSprite sprite={monster.sprite} emoji={monster.emoji} size={40} />
+            )
+          ) : (
+            '🥚'
+          )}
         </div>
         <div className="min-w-0 flex-1">
           {monster ? (

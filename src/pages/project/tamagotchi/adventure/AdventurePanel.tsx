@@ -14,6 +14,7 @@ import {
   useGetWallet,
   useGetWiki,
 } from '../core/tamagotchi-service'
+import { MonsterSprite } from '../shared/MonsterSprite'
 
 interface IAdventurePanelProps {
   monster: IMonsterData | null
@@ -81,7 +82,15 @@ export const AdventurePanel = (props: IAdventurePanelProps) => {
                   key={stage.id}
                   className={`flex items-center gap-3 ${stage.unlocked ? '' : 'opacity-50'}`}
                 >
-                  <span className="text-2xl">{stage.unlocked ? stage.enemy?.emoji : '🔒'}</span>
+                  {stage.unlocked && stage.enemy ? (
+                    <MonsterSprite
+                      sprite={stage.enemy.sprite}
+                      emoji={stage.enemy.emoji}
+                      size={36}
+                    />
+                  ) : (
+                    <span className="text-2xl">🔒</span>
+                  )}
                   <div className="flex-1">
                     <div className="font-medium text-slate-900 dark:text-slate-100">
                       {stage.enemy?.name}

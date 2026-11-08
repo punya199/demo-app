@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { GAME_MENU, parseMenuHash } from './game-menu'
+import { COSTUMES_ENABLED, GAME_MENU, parseMenuHash } from './game-menu'
 
 describe('game menu', () => {
   it('lists every screen once', () => {
     const keys = GAME_MENU.flatMap((group) => group.items.map((item) => item.key))
-    expect(keys).toHaveLength(18)
+    expect(keys).toHaveLength(COSTUMES_ENABLED ? 18 : 17)
     expect(new Set(keys).size).toBe(keys.length)
   })
 
@@ -13,5 +13,11 @@ describe('game menu', () => {
     expect(parseMenuHash('world-boss')).toBe('world-boss')
     expect(parseMenuHash('')).toBe('care')
     expect(parseMenuHash('#nope')).toBe('care')
+  })
+
+  it('hides the costume screen while costumes are switched off', () => {
+    const keys = GAME_MENU.flatMap((group) => group.items.map((item) => item.key))
+    expect(keys.includes('costume')).toBe(COSTUMES_ENABLED)
+    if (!COSTUMES_ENABLED) expect(parseMenuHash('#costume')).toBe('care')
   })
 })

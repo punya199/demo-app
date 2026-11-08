@@ -140,6 +140,7 @@ export const MonsterScreen = (props: {
         <div className="rounded-2xl bg-lime-100 p-4 dark:bg-lime-200">
           <PetSprite
             emoji={monster.emoji}
+            sprite={monster.sprite}
             isSick={monster.isSick}
             isEgg={isEgg}
             costume={monster.costume}

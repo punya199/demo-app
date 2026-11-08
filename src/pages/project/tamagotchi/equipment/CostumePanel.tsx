@@ -74,6 +74,7 @@ export const CostumePanel = (props: ICostumePanelProps) => {
       <div className="flex flex-col items-center gap-1">
         <PetAvatar
           emoji={monster.emoji}
+          sprite={monster.sprite}
           costume={preview}
           scale={1.4}
           label={monster.displayName}

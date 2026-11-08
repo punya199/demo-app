@@ -27,6 +27,8 @@ export interface IWikiSpecies {
   stage: EnumMonsterStage
   name: string
   emoji: string
+  // Pixel-art sprite id; null for a form without art (cross-line hybrids).
+  sprite?: string | null
   minWeight: number
   stats: IBattleStats
   skill: { name: string; power: number }

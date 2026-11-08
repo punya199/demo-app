@@ -1,6 +1,7 @@
 import { Spin, Tooltip } from 'antd'
 import { elementLabel, lineOptions, stageLabel } from '../core/tamagotchi-helper'
 import { useGetMonsterDex } from '../core/tamagotchi-service'
+import { MonsterSprite } from '../shared/MonsterSprite'
 
 export const DexPanel = () => {
   const { data, isLoading } = useGetMonsterDex()
@@ -27,9 +28,11 @@ export const DexPanel = () => {
               .map((entry) => (
                 <Tooltip key={entry.id} title={stageLabel[entry.stage]}>
                   <div className="flex flex-col items-center rounded-lg border border-slate-200 bg-white p-2 text-center dark:border-slate-700 dark:bg-slate-900">
-                    <span className={`text-3xl ${entry.discovered ? '' : 'opacity-30 grayscale'}`}>
-                      {entry.emoji ?? '❓'}
-                    </span>
+                    {entry.discovered && entry.emoji ? (
+                      <MonsterSprite sprite={entry.sprite} emoji={entry.emoji} size={48} />
+                    ) : (
+                      <span className="text-3xl leading-[48px] opacity-30 grayscale">❓</span>
+                    )}
                     <span className="mt-1 text-[11px] leading-tight text-slate-600 dark:text-slate-300">
                       {entry.name ?? '???'}
                     </span>

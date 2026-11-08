@@ -104,3 +104,46 @@ export function getSpriteFrame(id: string, name: AnimName, i: number): ISpriteFr
   }
   return list[k]
 }
+
+// Where a costume sits on a sprite, as fractions (0..1) of its square grid: the hat on top of the
+// head, the face item over the eyes. Worked out once per sprite from its standing frame: the head
+// is around the mouth (designs face right), the hat goes on the highest painted pixel above it.
+export interface ISpriteAnchors {
+  hat: [number, number]
+  face: [number, number]
+}
+
+const anchors = new Map<string, ISpriteAnchors>()
+
+export function spriteAnchors(id: string): ISpriteAnchors | null {
+  const def = SPRITES[id]
+  if (!def) return null
+  const known = anchors.get(id)
+  if (known) return known
+  const { w, h, data } = drawFrame(id, 'idle', 0).bakePixels()
+  const [mx, my] = def.mouth
+  const painted = (x: number, y: number) => data[(y * w + x) * 4 + 3] > 0
+  // the head: columns from a little behind the mouth to just past it
+  const x0 = Math.max(0, Math.round(mx - def.size * 0.22))
+  const x1 = Math.min(w - 1, Math.round(mx + 2))
+  let top = h
+  let sum = 0
+  let n = 0
+  for (let y = 0; y < h && top === h; y++)
+    for (let x = x0; x <= x1; x++)
+      if (painted(x, y)) {
+        top = y
+        sum += x
+        n++
+      }
+  const hatX = n ? sum / n : mx
+  const hatY = top === h ? my - def.size * 0.2 : top
+  const faceX = mx - def.size * 0.08
+  const faceY = Math.min(my, (hatY + my) / 2 + 1)
+  const result: ISpriteAnchors = {
+    hat: [hatX / def.size, hatY / def.size],
+    face: [faceX / def.size, faceY / def.size],
+  }
+  anchors.set(id, result)
+  return result
+}

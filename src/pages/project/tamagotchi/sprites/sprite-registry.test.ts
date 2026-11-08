@@ -6,6 +6,7 @@ import {
   hasSprite,
   SPRITES,
   spriteAmp,
+  spriteAnchors,
   spriteLine,
 } from './sprite-registry'
 import { SPRITE_FRAME_HASHES as golden } from './sprite-frames.golden'
@@ -57,6 +58,21 @@ describe('sprite registry', () => {
     expect(a?.w).toBe(SPRITES.sunking.size)
     expect(a?.pose.head).not.toEqual([0, 0])
     vi.restoreAllMocks()
+  })
+
+  it('puts the hat on top of the head and the face below it, for every sprite', () => {
+    expect(spriteAnchors('nope')).toBeNull()
+    for (const id of Object.keys(SPRITES)) {
+      const a = spriteAnchors(id)
+      expect(a, id).not.toBeNull()
+      const [hx, hy] = a!.hat
+      const [fx, fy] = a!.face
+      for (const v of [hx, hy, fx, fy]) expect(v, id).toBeGreaterThanOrEqual(0)
+      for (const v of [hx, hy, fx, fy]) expect(v, id).toBeLessThanOrEqual(1)
+      expect(fy, id).toBeGreaterThanOrEqual(hy)
+    }
+    // the gecko faces right: its head is in the right half
+    expect(spriteAnchors('gecko')!.hat[0]).toBeGreaterThan(0.5)
   })
 
   // The golden hashes were baked from the prototype (docs/tamagotchi/prototypes/monster-arena), so

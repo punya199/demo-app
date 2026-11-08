@@ -328,7 +328,18 @@ have moved). Game versions when this was written: frontend 1.61.0, backend 1.48.
    prototype's eight themes redrawn on the game's flat box (back wall with rocks and crystals, stone tiles,
    glowing rim, cracks, pools, rubble); a fight with a boss (raid, world or adventure area boss) takes its
    element's theme, a water boss and every other fight the blue cave.
-3. **Other screens:** `shared/PetSprite.tsx` (home), `PetAvatar.tsx` (`PetCostumeFrame`: costumes are
+3. **Other screens. Done (2026-11-08).** `shared/MonsterSprite.tsx` draws a sprite (still, or the idle
+   loop with `animate`) with its aura and glows, from the lazily loaded chunk (`shared/sprite-loader.ts`,
+   one load for every caller), and shows the emoji until it loads or when there is no art. Costumes:
+   `spriteAnchors(id)` (sprite-registry) finds the hat spot (highest painted pixel above the head, around
+   the mouth: designs face right) and the face spot; `PetCostumeFrame` takes them as `anchor`
+   (`shared/costume-anchor.ts`, the sprite fills `SPRITE_FRAC` 80% of the frame). Used on: home
+   (`PetSprite`, idle loop instead of the emoji hop; egg wobble and sick shake kept), `PetAvatar`
+   (friends, PvP opponents, costume screen), the pet picker bar, Dex (48 px, undiscovered stay ❓), the
+   evolution tree (SVG `foreignObject`), return-home, adventure stage enemies, the Hall of Fame. Still
+   emoji: rankings and support-unit lists (their stored snapshots carry no sprite) and text lines in the
+   wiki. Before this the plan read:
+   **Other screens:** `shared/PetSprite.tsx` (home), `PetAvatar.tsx` (`PetCostumeFrame`: costumes are
    emoji layers for backdrop, aura, back item, face item and hat over a 128 px box, so every sprite needs
    a head and face anchor), the Dex, the evolution tree and the return-home (กลับดาว) screen.
 4. **Renames in the game data**, in the same release: "Names to apply in the game" above (skills and

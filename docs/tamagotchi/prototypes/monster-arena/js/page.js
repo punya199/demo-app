@@ -179,7 +179,8 @@ async function autoLoop() {
           await approach(me, foe)
           await lungeHit(me, foe, Math.random() < 0.25 ? react() : undefined)
         })
-      else if (r < 0.5)
+      // the training dummy never hits back
+      else if (r < 0.5 && !foe.dummy)
         await run(async () => {
           await approach(foe, me)
           await lungeHit(foe, me, react())
@@ -210,7 +211,7 @@ async function autoLoop() {
         const fk = Object.keys(set).filter((k) => !set[k].passive)
         const k = fk[Math.floor(Math.random() * fk.length)]
         await run(() => useFire(k, me, foe))
-      } else {
+      } else if (!foe.dummy) {
         const list =
           foe.el === 'water'
             ? ['tide_whirl', 'tide_trident', 'tide_fang', 'tide_ink', 'tide_sword']
@@ -1888,6 +1889,7 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
             : g.dataset.el === 'dark'
     })
     if (v === 'raid' && !RAID_OF[foe.rid] && !busy) setFoe('lavaking')
+    if (v === 'adv' && !ADV_STAGE[foe.rid] && foe.rid !== 'dummy' && !busy) setFoe('advworm')
     if (PICK[v] && me.el !== v && !busy) {
       pickMe.value = PICK[v]
       me = makeEnt(PICK[v], 0)
@@ -1907,6 +1909,7 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
       'dark',
       'shadow',
       'raid',
+      'adv',
       'plan',
     ].includes(h)
       ? h

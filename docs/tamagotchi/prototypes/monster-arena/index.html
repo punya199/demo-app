@@ -166,6 +166,7 @@ td.st { white-space: nowrap; color: var(--muted) }
       <option value="dark">มอนธาตุรัตติกาล + สกิล</option>
       <option value="shadow">มอนธาตุเงา + สกิล</option>
       <option value="raid">บอสเรด 5 ตัว</option>
+      <option value="adv">ศัตรูผจญภัย 20 ตัว + หุ่นซ้อม</option>
       <option value="plan">แผนออกแบบทั้ง 8 สาย</option>
     </select>
     <span class="hint" id="jump-hint">ฉากต่อสู้อยู่บนสุดเสมอ</span>
@@ -558,6 +559,12 @@ td.st { white-space: nowrap; color: var(--muted) }
       </div>
     </div>
   </section>
+  <section aria-labelledby="adv-h" data-group="adv" style="order:27">
+    <div class="eyebrow">โหมดผจญภัย</div>
+    <h2 id="adv-h">ศัตรูผจญภัย 20 ตัว + หุ่นซ้อม</h2>
+    <p class="lede">จากภาพแผ่นเดียวที่คุณให้ AI วาด (ตาราง 5 × 5 พื้นชมพู) ตัดทีละช่อง ย่อเป็นพิกเซลตามขนาดร่างที่สู้ในเกม ร่างเด็ก 40–48 · โตเต็มวัย 56 · สมบูรณ์ 64 · สุดท้าย 72 · บอสพื้นที่ +8 เหลือตัวละไม่เกิน 15 สี เรียงตามลำดับด่านใน adventure-data.ts ตัดเป็นชิ้นให้ขยับ: หัวผงก ขาก้าวสลับ ปีกกระพือ หางแกว่ง ก้ามเหวี่ยง ลองสู้ได้ที่ช่องคู่ต่อสู้ กลุ่ม "ศัตรูผจญภัย" (หุ่นซ้อมไม่ตีกลับ)</p>
+    <div class="showcase" id="adv-cards"></div>
+  </section>
   <section aria-labelledby="plan-h" data-group="plan" style="order:27">
     <div class="eyebrow">แผนทั้งเกม</div>
     <h2 id="plan-h">ออกแบบมอนใหม่ทั้ง 8 สาย</h2>
@@ -587,6 +594,8 @@ td.st { white-space: nowrap; color: var(--muted) }
 <script src="js/sprites/leaf.js"></script>
 <script src="js/sprites/raid-bitmaps.js"></script>
 <script src="js/sprites/raid.js"></script>
+<script src="js/sprites/adventure-bitmaps.js"></script>
+<script src="js/sprites/adventure.js"></script>
 <script src="js/sprites/earth.js"></script>
 <script src="js/sprites/bolt.js"></script>
 <script src="js/sprites/holy.js"></script>

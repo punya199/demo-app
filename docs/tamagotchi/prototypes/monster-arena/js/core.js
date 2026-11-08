@@ -276,39 +276,41 @@ for (const [id, def] of Object.entries(SPRITES)) {
   def.frames = Object.fromEntries(Object.keys(ANIM).map((n) => [n, new Array(ANIM[n].n)]))
   def.img = getFrame(def, 'idle', 0)
   def.id = id
-  def.el = SHADOW_IDS.includes(id)
-    ? 'shadow'
-    : DARK_IDS.includes(id)
-      ? 'dark'
-      : HOLY_IDS.includes(id)
-        ? 'holy'
-        : BOLT_IDS.includes(id)
-          ? 'bolt'
-          : EARTH_IDS.includes(id)
-            ? 'earth'
-            : LEAF_IDS.includes(id)
-              ? 'leaf'
-              : [
-                    'abyssfish',
-                    'wfused',
-                    'whaleA',
-                    'whaleB',
-                    'whaleC',
-                    'wegg',
-                    'drop',
-                    'bubble',
-                    'swordwhale',
-                    'jelly',
-                    'shark',
-                    'armorwhale',
-                    'octopus',
-                    'seadragon',
-                    'whaleking',
-                    'leviathan',
-                    'turtle',
-                  ].includes(id)
-                ? 'water'
-                : 'fire'
+  def.el = ADV_EL[id]
+    ? ADV_EL[id]
+    : SHADOW_IDS.includes(id)
+      ? 'shadow'
+      : DARK_IDS.includes(id)
+        ? 'dark'
+        : HOLY_IDS.includes(id)
+          ? 'holy'
+          : BOLT_IDS.includes(id)
+            ? 'bolt'
+            : EARTH_IDS.includes(id)
+              ? 'earth'
+              : LEAF_IDS.includes(id)
+                ? 'leaf'
+                : [
+                      'abyssfish',
+                      'wfused',
+                      'whaleA',
+                      'whaleB',
+                      'whaleC',
+                      'wegg',
+                      'drop',
+                      'bubble',
+                      'swordwhale',
+                      'jelly',
+                      'shark',
+                      'armorwhale',
+                      'octopus',
+                      'seadragon',
+                      'whaleking',
+                      'leviathan',
+                      'turtle',
+                    ].includes(id)
+                  ? 'water'
+                  : 'fire'
 }
 // The frame an entity shows: an action wins, then walking (phase follows the distance walked), then idle.
 function frameOf(e, t) {
@@ -1030,8 +1032,32 @@ const STAGES = {
   fused: ['ร่างผสม', '★★★★★', '#d08aff'],
   boss: ['บอส', '', '#ff5a5a'],
 }
+// Adventure enemies show the stage they fight at in the game (adventure-data.ts); area bosses included.
+const ADV_STAGE = {
+  advworm: 'b1',
+  advcrab: 'b2',
+  advbat: 'b2',
+  advrabbit: 'adult',
+  advgull: 'adult',
+  advscorp: 'adult',
+  advturtle: 'adult',
+  advmshark: 'perfect',
+  advsnake: 'perfect',
+  advboar: 'perfect',
+  adveagle: 'perfect',
+  advdragon: 'ultimate',
+  advbeetle: 'ultimate',
+  advcbat: 'ultimate',
+  advant: 'ultimate',
+  advgolem: 'ultimate',
+  advsquirrel: 'ultimate',
+  advgoat: 'ultimate',
+  advhawk: 'ultimate',
+  advpeacock: 'ultimate',
+}
 const STAGE_OF = {
   ...RAID_STAGE,
+  ...ADV_STAGE,
   egg: 'egg',
   wisp: 'b1',
   coal: 'b2',
@@ -2572,6 +2598,62 @@ const ROSTER = {
     boss: true,
     kind: 'บอสเรด',
   },
+  advworm: { sprite: 'advworm', name: 'หนอนใบไม้', el: ADV_EL.advworm, hp: 120 },
+  advcrab: { sprite: 'advcrab', name: 'ปูน้ำจืด', el: ADV_EL.advcrab, hp: 180 },
+  advbat: { sprite: 'advbat', name: 'ค้างคาวถ่าน', el: ADV_EL.advbat, hp: 170 },
+  advrabbit: {
+    sprite: 'advrabbit',
+    name: 'กระต่ายยักษ์',
+    el: ADV_EL.advrabbit,
+    hp: 900,
+    boss: true,
+    kind: 'บอสพื้นที่',
+  },
+  advgull: { sprite: 'advgull', name: 'นกนางนวลซ่า', el: ADV_EL.advgull, hp: 400 },
+  advscorp: { sprite: 'advscorp', name: 'แมงป่องเพลิง', el: ADV_EL.advscorp, hp: 420 },
+  advturtle: { sprite: 'advturtle', name: 'เต่าหินผา', el: ADV_EL.advturtle, hp: 480 },
+  advmshark: {
+    sprite: 'advmshark',
+    name: 'ฉลามหมอก',
+    el: ADV_EL.advmshark,
+    hp: 1300,
+    boss: true,
+    kind: 'บอสพื้นที่',
+  },
+  advsnake: { sprite: 'advsnake', name: 'งูลาวา', el: ADV_EL.advsnake, hp: 620 },
+  advboar: { sprite: 'advboar', name: 'หมูป่าเกราะหิน', el: ADV_EL.advboar, hp: 680 },
+  adveagle: { sprite: 'adveagle', name: 'อินทรีพายุ', el: ADV_EL.adveagle, hp: 600 },
+  advdragon: {
+    sprite: 'advdragon',
+    name: 'มังกรหลับใหล',
+    el: ADV_EL.advdragon,
+    hp: 1900,
+    boss: true,
+    kind: 'บอสพื้นที่',
+  },
+  advbeetle: { sprite: 'advbeetle', name: 'ด้วงหินแร่', el: ADV_EL.advbeetle, hp: 900 },
+  advcbat: { sprite: 'advcbat', name: 'ค้างคาวถ้ำฟ้า', el: ADV_EL.advcbat, hp: 820 },
+  advant: { sprite: 'advant', name: 'มดยักษ์ใต้ดิน', el: ADV_EL.advant, hp: 880 },
+  advgolem: {
+    sprite: 'advgolem',
+    name: 'โกเลมผลึก',
+    el: ADV_EL.advgolem,
+    hp: 2000,
+    boss: true,
+    kind: 'บอสพื้นที่',
+  },
+  advsquirrel: { sprite: 'advsquirrel', name: 'กระรอกฟ้าผ่า', el: ADV_EL.advsquirrel, hp: 860 },
+  advgoat: { sprite: 'advgoat', name: 'แพะภูผา', el: ADV_EL.advgoat, hp: 920 },
+  advhawk: { sprite: 'advhawk', name: 'เหยี่ยวอสนี', el: ADV_EL.advhawk, hp: 880 },
+  advpeacock: {
+    sprite: 'advpeacock',
+    name: 'นกยูงอสนี',
+    el: ADV_EL.advpeacock,
+    hp: 2100,
+    boss: true,
+    kind: 'บอสพื้นที่',
+  },
+  dummy: { sprite: 'dummy', name: 'หุ่นซ้อม', el: 'fire', hp: 99999, dummy: true },
   tortoise: { sprite: 'tortoise', name: 'เต่าศิลา', el: 'earth', hp: 520 },
   worm: { sprite: 'worm', name: 'หนอนดินเกียจคร้าน', el: 'earth', hp: 420 },
   rhino: { sprite: 'rhino', name: 'แรดผา', el: 'earth', hp: 480 },
@@ -2799,6 +2881,48 @@ for (const id of [
   'sboss',
 ])
   pickFoe.add(new Option(ROSTER[id].boss ? 'บอส · ' + ROSTER[id].name : ROSTER[id].name, id))
+{
+  const ga = document.createElement('optgroup')
+  ga.label = 'ศัตรูผจญภัย (ตามลำดับด่าน)'
+  for (const id of Object.keys(ADV_STAGE).concat('dummy'))
+    ga.append(new Option(ROSTER[id].boss ? 'บอสพื้นที่ · ' + ROSTER[id].name : ROSTER[id].name, id))
+  pickFoe.append(ga)
+}
+// Adventure enemies, in the game's stage order, with the area each one guards.
+{
+  const AREAS = [
+    ['ทุ่งหญ้าเริ่มต้น', ['advworm', 'advcrab', 'advbat', 'advrabbit']],
+    ['ชายฝั่งหมอก', ['advgull', 'advscorp', 'advturtle', 'advmshark']],
+    ['ภูเขาไฟหลับ', ['advsnake', 'advboar', 'adveagle', 'advdragon']],
+    ['ถ้ำผลึกลึก', ['advbeetle', 'advcbat', 'advant', 'advgolem']],
+    ['ยอดผาพายุ', ['advsquirrel', 'advgoat', 'advhawk', 'advpeacock']],
+    ['ลานซ้อม', ['dummy']],
+  ]
+  const box = document.getElementById('adv-cards')
+  for (const [area, ids] of AREAS)
+    for (const id of ids) {
+      const r = ROSTER[id],
+        st = STAGES[STAGE_OF[id]]
+      const d = document.createElement('div')
+      d.className = 'show' + (r.boss ? ' boss' : '')
+      const cv = document.createElement('canvas')
+      // one canvas size for all, so every enemy draws at the same pixel scale
+      cv.width = 104
+      cv.height = 104
+      cv.setAttribute('aria-label', r.name)
+      const act = document.createElement('div')
+      act.className = 'act'
+      d.append(cv, act)
+      const rank = r.boss
+        ? `<span class="rank" style="--c:#ff5a5a">บอสพื้นที่ · ${st[0]} <b>${st[1]}</b></span>`
+        : st
+          ? `<span class="rank" style="--c:${st[2]}">${st[0]} <b>${st[1]}</b></span>`
+          : '<span class="rank" style="--c:#a49cb4">หุ่นซ้อม</span>'
+      d.insertAdjacentHTML('beforeend', `${rank}<h3>${r.name}</h3><p class="hint">${area}</p>`)
+      box.append(d)
+      addCard(cv, id, act)
+    }
+}
 
 function makeEnt(rid, side) {
   const r = ROSTER[rid]
@@ -2811,6 +2935,7 @@ function makeEnt(rid, side) {
     el: r.el,
     boss,
     bossKind: r.kind || 'บอสโลก',
+    dummy: !!r.dummy,
     ent: !!r.ent,
     stoneSkin: !!r.stoneSkin,
     lastStand: !!r.lastStand,

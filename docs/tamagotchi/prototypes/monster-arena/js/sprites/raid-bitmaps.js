@@ -504,7 +504,8 @@ const RAID_BMP = {
 // Animates a bitmap by cutting it into parts, like a paper puppet. part(x, y) names the part of each
 // pixel (worked out once per bitmap); offs[name] is [dx, dy] or (x, y) => [dx, dy]; order lists the
 // parts back to front. under[name] = { col, off } first paints that part's pixels in one colour at
-// offset off, which is what shows where the part has moved away (e.g. the inside of an open mouth).
+// offset off, which is what shows where the part has moved away (e.g. the inside of an open mouth);
+// without col the part's own pixels are painted there, so the gap shows the part itself, not a hole.
 function bmpRig(s, b, ox, oy, part, offs, order, under = {}) {
   if (!b.parts) b.parts = b.rows.map((row, y) => Array.from(row, (_, x) => part(x, y)))
   const put = (x, y, c) => s.pix.push([Math.round(ox + x), Math.round(oy + y), c])
@@ -536,10 +537,10 @@ function bmpRig(s, b, ox, oy, part, offs, order, under = {}) {
       )
   }
   for (const [name, u] of Object.entries(under))
-    each(name, (x, y) => {
+    each(name, (x, y, k) => {
       if (b.depth[y][x] <= (u.inner || 0)) return
       const [dx, dy] = at(u.off, x, y)
-      put(x + dx, y + dy, u.col)
+      put(x + dx, y + dy, u.col || b.pal[k]) // no col: the part's own pixels stay behind at rest
     })
   for (const name of order)
     each(name, (x, y, k) => {

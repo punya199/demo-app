@@ -189,224 +189,42 @@ Object.assign(SPRITES, {
     emit: [{ x: 34, y: 66, type: 'mist', rate: 2 }],
     mouth: [45, 12],
   },
-  // ราชันย์เงานิรนาม (shadow raid): a giant headless knight; violet fire burns from its collar round a blank cracked mask, a chain flail drags at its side
+  // ราชันย์เงานิรนาม (shadow raid): the owner's AI-made headless knight (bitmap in raid-bitmaps.js), cut
+  // into flaming head, fist, swinging flail ball, cape edge and legs (namelessPart); the chain is drawn.
   nameless: {
     size: 96,
     rig: BIPED,
     aura: { type: 'bosss', x: 48, y: 90, r: 36 },
     draw(s, P) {
-      const [bx, by] = P.body,
-        hx = P.head[0] + bx,
-        hy = P.head[1] + by,
-        a2 = P.arm2,
-        a1 = P.arm
-      const m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy])
-      // tattered banner cape behind
-      s.P(
-        m(
-          [
-            [30, 32],
-            [64, 32],
-            [72, 72],
-            [70, 88],
-            [64, 82],
-            [58, 90],
-            [50, 82],
-            [42, 90],
-            [34, 82],
-            [26, 88],
-            [22, 72],
-          ],
-          bx,
-          by
-        ),
-        'cape'
-      )
-      s.line(
-        m(
-          [
-            [36, 40],
-            [30, 80],
-          ],
-          bx,
-          by
-        ),
-        '#3a2a48'
-      ).line(
-        m(
-          [
-            [58, 40],
-            [64, 80],
-          ],
-          bx,
-          by
-        ),
-        '#3a2a48'
-      )
-      // far arm hanging, a gauntlet with claws
-      s.L(32 + bx, 40 + by, 26 + a2[0], 62 + a2[1], 4.5, 'arm2')
-      s.E(25 + a2[0], 64 + a2[1], 4, 4, 'arm2')
-      // legs: greaves and pointed sabatons
-      s.L(42 + bx, 64 + by, 40 + P.bl[0], 86 + P.bl[1], 5, 'arm2')
-      s.P(
-        [
-          [34 + P.bl[0], 90 + P.bl[1]],
-          [40 + P.bl[0], 84 + P.bl[1]],
-          [47 + P.bl[0], 90 + P.bl[1]],
-        ],
-        'arm2'
-      )
-      s.L(54 + bx, 64 + by, 56 + P.bf[0], 86 + P.bf[1], 5, 'arm')
-      s.P(
-        [
-          [50 + P.bf[0], 90 + P.bf[1]],
-          [56 + P.bf[0], 84 + P.bf[1]],
-          [64 + P.bf[0], 90 + P.bf[1]],
-        ],
-        'arm'
-      )
-      // torso: breastplate with a violet crack, tassets, wide spiked pauldrons
-      s.P(
-        m(
-          [
-            [34, 34],
-            [62, 34],
-            [60, 58],
-            [52, 66],
-            [44, 66],
-            [36, 58],
-          ],
-          bx,
-          by
-        ),
-        'arm'
-      )
-      s.line(
-        m(
-          [
-            [48, 38],
-            [46, 46],
-            [50, 52],
-            [47, 60],
-          ],
-          bx,
-          by
-        ),
-        '#a04aff',
-        '#d070e8'
-      )
-      s.P(
-        m(
-          [
-            [36, 60],
-            [60, 60],
-            [62, 70],
-            [34, 70],
-          ],
-          bx,
-          by
-        ),
-        'arm2'
-      )
-      s.line(
-        m(
-          [
-            [48, 61],
-            [48, 70],
-          ],
-          bx,
-          by
-        ),
-        '#0c0c14'
-      )
-      s.E(32 + bx, 36 + by, 9, 6.5, 'arm2')
-      s.E(64 + bx, 36 + by, 9, 6.5, 'arm')
-      s.spike(28 + bx, 32 + by, 7, 1.8, 'arm2', -3)
-      s.spike(34 + bx, 31 + by, 6, 1.6, 'arm2', -1)
-      s.spike(62 + bx, 31 + by, 6, 1.6, 'arm', 1)
-      s.spike(68 + bx, 32 + by, 7, 1.8, 'arm', 3)
-      s.E(48 + bx, 31 + by, 10, 3.5, 'arm2')
-      // no head: violet fire rises from the collar, a blank mask with one crack floats in it
-      s.P(
-        m(
-          [
-            [39, 30],
-            [41, 18],
-            [44, 22],
-            [46, 6],
-            [49, 16],
-            [52, 4],
-            [54, 20],
-            [57, 16],
-            [57, 30],
-          ],
-          hx,
-          hy
-        ),
-        'vio'
-      )
-      s.P(
-        m(
-          [
-            [43, 30],
-            [45, 20],
-            [48, 24],
-            [51, 12],
-            [53, 24],
-            [54, 30],
-          ],
-          hx,
-          hy
-        ),
-        'soulc'
-      )
-      s.E(49 + hx, 19 + hy, 5, 6.5, 'bone')
-      s.line(
-        m(
-          [
-            [50, 13],
-            [49, 17],
-            [51, 20],
-            [49, 25],
-          ],
-          hx,
-          hy
-        ),
-        '#2a2620'
-      )
-      // near arm holding the chain flail; the chain sags to a spiked orb on the ground
-      s.L(64 + bx, 40 + by, 72 + a1[0], 58 + a1[1], 5, 'arm')
-      s.E(73 + a1[0], 60 + a1[1], 4.5, 4.5, 'arm')
-      const ch = [
-        [75, 63],
-        [78, 67],
-        [80, 71],
-        [81, 75],
-        [80, 79],
-        [79, 82],
-      ]
-      for (const [x, y] of ch) s.E(x + a1[0], y + a1[1] * 0.5, 1.4, 1.2, 'iron')
-      s.E(78 + a1[0] * 0.3, 86, 6, 5.5, 'arm2')
-      for (const [dx, dy] of [
-        [0, -7],
-        [6, -3],
-        [-6, -3],
-        [4, 4],
-        [-4, 4],
-      ])
-        s.d(78 + dx + a1[0] * 0.3, 86 + dy, '#8a8aa8')
-      s.E(78 + a1[0] * 0.3, 86, 2.4, 2.2, 'vio')
-      if (P.glow) glowMouth(s, 49 + hx, 19 + hy)
+      const o = namelessOffsets(P),
+        dark = { col: '#1e1a26', off: o.body, inner: 1 }
+      bmpRig(s, RAID_BMP.nameless, 5, 3, namelessPart, o, NAMELESS_ORDER, {
+        head: dark,
+        fist: dark,
+        cape: { col: '#4e4258', off: o.body, inner: 1 },
+      })
+      // the chain: links from the fist to the top of the ball, sagging in the middle
+      const x0 = 66 + o.fist[0],
+        y0 = 52 + o.fist[1],
+        x1 = 80 + o.ball[0],
+        y1 = 76 + o.ball[1],
+        n = 16
+      for (let i = 0; i <= n; i++) {
+        const t = i / n,
+          x = x0 + (x1 - x0) * t,
+          y = y0 + (y1 - y0) * t + Math.sin(t * Math.PI) * 4
+        s.d(x, y, i % 2 ? '#8a8aa8' : '#2a2632')
+      }
+      if (P.glow) glowMouth(s, 45 + o.head[0], 18 + o.head[1])
     },
     glows: [
-      [49, 14, '#a04aff', 10, 'head'],
-      [78, 86, '#a04aff', 5],
-      [48, 48, '#a04aff', 4, 'body'],
+      [45, 12, '#a04aff', 10, 'head'],
+      [47, 37, '#a04aff', 4, 'body'],
     ],
     emit: [
-      { x: 49, y: 8, type: 'ember', rate: 4 },
+      { x: 42, y: 5, type: 'ember', rate: 4 },
       { x: 46, y: 88, type: 'mist', rate: 2 },
     ],
-    mouth: [49, 19],
+    mouth: [45, 18],
   },
 })

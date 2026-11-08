@@ -2126,9 +2126,7 @@ addCard(document.getElementById('show-vampire'), 'vampire', document.getElementB
 addCard(
   document.getElementById('show-nameless'),
   'nameless',
-  document.getElementById('act-nameless'),
-  8,
-  true
+  document.getElementById('act-nameless')
 )
 
 function emitFor(def, ps, acc, dt, ox, oy, flip, scale = 1) {
@@ -2566,6 +2564,14 @@ const ROSTER = {
     boss: true,
     kind: 'บอสเรด',
   },
+  nameless: {
+    sprite: 'nameless',
+    name: 'ราชันย์เงานิรนาม',
+    el: 'shadow',
+    hp: 6800,
+    boss: true,
+    kind: 'บอสเรด',
+  },
   tortoise: { sprite: 'tortoise', name: 'เต่าศิลา', el: 'earth', hp: 520 },
   worm: { sprite: 'worm', name: 'หนอนดินเกียจคร้าน', el: 'earth', hp: 420 },
   rhino: { sprite: 'rhino', name: 'แรดผา', el: 'earth', hp: 480 },
@@ -2783,6 +2789,7 @@ for (const id of [
   'abyssfish',
   'raidseraph',
   'vampire',
+  'nameless',
   'pangolin',
   'stormbison',
   'holyele',

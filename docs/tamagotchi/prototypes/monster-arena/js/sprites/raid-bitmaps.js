@@ -388,6 +388,117 @@ const RAID_BMP = {
       '..................aaaaa.....aaaaaaaaaa.....',
     ],
   },
+  nameless: {
+    pal: [
+      '#08060c',
+      '#1e1a26',
+      '#343040',
+      '#545064',
+      '#7c788e',
+      '#4e425c',
+      '#75657f',
+      '#9c8ea6',
+      '#6826a4',
+      '#a052de',
+      '#cc8cf4',
+      '#eeceff',
+      '#a8a29a',
+      '#e8e4d8',
+    ],
+    rows: [
+      '...................................aa................................................',
+      '...................................aa....aa..........................................',
+      '..................................aija.a.aa..........................................',
+      '..................................ajjiaa.aja.........................................',
+      '................................aahjjjia..aa.........................................',
+      '................................aifjkjjiaaa..........................................',
+      '................................ajijkjjjija..........................................',
+      '..............................aaijjjkkkjjjja.a.......................................',
+      '..............................afijkjkkkkkkjiaa.......................................',
+      '..............................aiijkkkkkkkkkjia.......................................',
+      '..............................aiijkkkknnnnkkija......................................',
+      '............................a.ajjjkkknnnnnnaija......................................',
+      '............................aa.ajjkkmnnnnnnnjja......................................',
+      '............................aia.ajkkmnnnnnnnjja......................................',
+      '.............................aa.aikkmnnnnnnaja.......................................',
+      '...............................aijkkmnaannaaja.......................................',
+      '..............................aijkkkannnnnnnjia......................................',
+      '..............................aijkkkannnnmnnkia......................................',
+      '..............................aiijkkkannnnnakja......................................',
+      '...........................aaa.aiikkkknnnnnkkja......................................',
+      '.....................aa...abbfaaaakkkkknnnkkiaa......aa..............................',
+      '.....................aca.accbccgagakkkkkkkkkacea....afa..............................',
+      '.....................aagaabbbcccgaeakkkkkkkiacca.a.aga...............................',
+      '.....................abcgfabcbbcceagaikkkkjabaceabagba...............................',
+      '.....................aabcggacccacgabbgajjjjcbaafagcbba...............................',
+      '.....................aaaccgaccdcacfbbbciaahcbaacacgca................................',
+      '.....................abbbcbccggccafabbccchhcbaacabccaa...............................',
+      '.....................abbbbcccgcaaccaabcccccbababcaacca...............................',
+      '....................aabbbcccgcadgacacbaacacabbabbdaaca...............................',
+      '...................aaaaaabccccbbbacacffbaaabcbaabbacbba..............................',
+      '...................accaaaaabccbbbccccfcccfjcccbabbbbba.a.............................',
+      '....................aaabbaaafccccabcccjfcfjkkcbbabcddaa..............................',
+      '.....................aabcbbaaaaaabccccckkfjkcccbaaaaa................................',
+      '.....................aaaacbbaaaaabcccccfkklkcccbabbaa................................',
+      '....................aabbcaabbaaabbbccccccllkcbbbabbba................................',
+      '...................aaabbcccbabbbbbbcccccalllabbbabbba................................',
+      '...................abaabdcbbaabbbbbbccaagjllcababbcca................................',
+      '..................aabbaaabbafabbbbbbaadccclljbaabccbaa...............................',
+      '................aadbcdbbaaafffabaaacccckkckkcjbabbaaca...............................',
+      '................acbbbcbcfbafffaacbbbbbccccckcbbaaaccaa...............................',
+      '.................aabccaaabaffffabbbbbbiccccccbaabcbaaca..............................',
+      '..................acaaabaafffffabbbbbbbccbbcbbabbaaacaca.............................',
+      '.................acaaacdcaaffffaaaaaabbbbbbbbaaabaccacda.............................',
+      '.................aaabcaaacafffabbbcccaaabbbbabbaabbbccdca............................',
+      '...................abccgcaafffaaaaacfccaaaaaccaaabbbcccda............................',
+      '..................aabccgbbafffabbbbaaacccccccabbaabbbccbba...........................',
+      '..................agaccgbafffabbbccbbaaaccaaabbcacabbbcbdaaaaa.......................',
+      '..................agabcgbafffabbcccdcbcaaaaaacbcbafabbbaaaccaa.......................',
+      '.................aggabcaaaffabbbaffbbbdabbbbadbcbaffabaaaabbaa.......................',
+      '.................aggaaaaaafaabbbccdbbbabbcccbabbdaffaaabbabbaa.......................',
+      '.................aggaaaaaaaabbbcccdbbaabccdcbadbdcafacaabaaaaa.......................',
+      '.................agaaaaaacdaaacccdcbcaabccdccacbdcafaefaaaaaaa.......................',
+      '................aggafabccaccabbbcdcbdabbccdccbafbbafacaaaaaaaa.......................',
+      '................aggafabcdaababcccacbcabcccdccbadbfafaaccaaaaa........................',
+      '................agaffabccaacabccffbdaaccccdcbcacbfafadaba............................',
+      '...............aggaffabaacbabbccfbbdaaabccdbcaacbfcacaca.............................',
+      '...............aggaffaabbababcccbbgcabacbbbdabbadbcafaa..............................',
+      '...............aggafffaaaaabbbbbddcabbaaaddabbbacdbaga...............................',
+      '..............aggafffffffabbcfggcaabbbafaaabbbbbacdaga...............................',
+      '..............aggafffffffaccccaabbcbbaffaabbbbcbbacaga...............................',
+      '..............aggafffffffaaaaabbcccbbaffabbbbbccbbaaga...............................',
+      '.............agggafffffgffabbccccccbbafffabbbbcccbaffa...............................',
+      '.............aggaffffffgffabbaaaccbbaffffabbbbccbaaffga..............................',
+      '.............aggaffggffgffaaabccacbbaffffabbbbcbabcafga..............................',
+      '............agggaffggffgffabbccdcabaffffffabbbbabdfafga..............................',
+      '............agggaffggfggfabbccddfaafffffffaaaaabcdgafga..............................',
+      '...........agggaffggggfgfabbccddfbafffgfffabbabccdgafga..............................',
+      '...........agggaffggggggfaabbccccbafffgfffaaaabbccgafga..............................',
+      '..........aggggafgggggggfaaabbbbaaffffgfffaaaaaabbafffga.............................',
+      '..........aggggafggaagggaabcaaaaaafffggfffabaaadaaafffga.............................',
+      '.........agggggafgaaagggaaabcddcaafffgfffabbbbaaddafffga.............................',
+      '.........aggggaffaecggggabbaaaaaaffffgaffabbcbbbaaffffga.............................',
+      '.........aggggaffafggggabbbbbbcbaffffgaffabbcbbccafdfffa.............................',
+      '.........aggggaffahggggabbbcbcbbaffffgaffabbcbccdafddffga............................',
+      '.........aggggaffdaggggabbcbgccbafffgaaffabbcbcgaffddffga..........aa..aaaaa..aa.....',
+      '.........aggggaffdgggggabbcbgcbaffffga.afabbcbcgaffaaffga..........afaabbbbbaaaa.....',
+      '.........aggggaffaaggggabbcdccbaffffgaafffabbbcdaffa.afga...........aabcbcccbaa......',
+      '..........agggaffa.agggabbcgcbaffffgga.affabbbcgaffa.afgga..........abcgcddbbba......',
+      '..........agggaaa...agaabcbdcbaffbgga.aafaabbbcdaffa.affga.........abcdciiiiccba.....',
+      '...........agga.....aa.abcbccaaafaga...aa..abbcdaaa..affga........aabcdikkkiidbaaa...',
+      '...........agga........abcdcca.aa.a........abbcdaa...aafga......aacabccilllkddbagba..',
+      '...........agga........aaaacba..a..........abbccga.....aaa.......aaabccikllkicbaaa...',
+      '............aga........aabbaba.............abbccaa......aa.........abbccikkiccbaa....',
+      '............aga.......aabbdba..............abbbafaa................abbbcciiccbba.....',
+      '.............aa.......abbbccba.............aabacfgaa................abbbccccbba......',
+      '......................aaaaaaaa.............aaabcaacbaa..............aabbbbbbbaaa.....',
+      '.....................aabbbdcbaa...........abbbbaacaaaa.............aaaaaaaaaaaaa.....',
+      '.....................abbcddccba...........abbbbaba.....................aaaaa.........',
+      '.....................abbbddcbba............aaaaaaa......................aaa..........',
+      '.....................aaaaaaaaa.......................................................',
+      '.....................aaaaaaaaa.......................................................',
+    ],
+  },
 }
 
 // Animates a bitmap by cutting it into parts, like a paper puppet. part(x, y) names the part of each
@@ -604,3 +715,35 @@ function vampOffsets(P) {
   }
 }
 const VAMP_ORDER = ['legB', 'capeL', 'body', 'capeR', 'legF', 'hand', 'head']
+
+// ราชันย์เงานิรนาม: the owner's AI-made headless knight (1024 px JPG on a dark grey painted checkerboard,
+// removed by flood-filling the neutral greys; the armour is tinted violet so it survives), reduced by
+// 10.8x to 85 x 91. The thin chain did not survive the shrink, so it is cut out and drawn in code
+// between the fist and the spiked ball, which swings on its own. Parts: the flaming head, the fist, the
+// ball, the outer cape edge (sways row by row) and the two legs.
+function namelessPart(x, y) {
+  if (y <= 19 && x <= 47) return 'head'
+  if (x >= 63 && y >= 74) return 'ball'
+  if (x >= 53 && y >= 43 && y <= 53) return 'fist'
+  if (y >= 79 && x <= 33) return 'legB'
+  if (y >= 79 && x >= 38 && x <= 58) return 'legF'
+  if (y >= 45 && x <= 15) return 'cape'
+  return 'body'
+}
+function namelessOffsets(P) {
+  const clamp = (v, c) => Math.max(-c, Math.min(c, v)),
+    body = [P.body[0] * 0.6, P.body[1] * 0.6],
+    at = (dx, dy) => [body[0] + Math.round(dx), body[1] + Math.round(dy)],
+    fist = at(clamp(P.arm[0] * 0.6, 3), clamp(P.arm[1] * 0.6, 2)),
+    swing = clamp(P.arm[0] * 1.4 + P.tail * 1.5, 5)
+  return {
+    body,
+    head: at(clamp(P.head[0] * 0.6, 1.5), clamp(P.head[1] * 0.6, 1.5)),
+    fist,
+    ball: [fist[0] + Math.round(swing), fist[1] - Math.round(Math.abs(swing) * 0.35)],
+    cape: (x, y) => at((-clamp(P.tail * 1.2 - P.body[0], 2.5) * (y - 45)) / 46, 0),
+    legB: (x, y) => at((P.bl[0] * 0.6 * (y - 77)) / 14, y >= 86 ? clamp(P.bl[1], 2) : 0),
+    legF: (x, y) => at((P.bf[0] * 0.6 * (y - 77)) / 14, y >= 86 ? clamp(P.bf[1], 2) : 0),
+  }
+}
+const NAMELESS_ORDER = ['legB', 'cape', 'body', 'legF', 'head', 'fist', 'ball']

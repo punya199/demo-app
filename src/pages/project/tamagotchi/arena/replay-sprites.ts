@@ -98,7 +98,10 @@ export const createSpriteLayer = (
   const { fighters, events, frames, step } = replay
   const ps = new PSys()
   // The prototype's skill animations, played along the replay (skill-fx/).
-  const stage = createSkillStage(replay, skills, ARENA_W / PX, ARENA_H / PX)
+  const stage = createSkillStage(replay, skills, ARENA_W / PX, ARENA_H / PX, (x, y) => ({
+    x: x / ARENA_SCALE / PX,
+    y: (y / ARENA_SCALE + FOOT_DROP) / PX,
+  }))
   const shown: ({ white: CanvasImageSource } | null)[] = fighters.map(() => null)
   scene.frameOf = (e) => shown[e.idx] ?? null
   // Fighters' casts that have their own animation: the generic particles stay out of their way.

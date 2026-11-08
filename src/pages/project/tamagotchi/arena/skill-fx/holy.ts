@@ -3,6 +3,7 @@ import {
   TAU,
   anchor,
   approach,
+  beamAngle,
   castPose,
   centerOf,
   clock,
@@ -23,6 +24,7 @@ import {
   tag,
   tween,
   wait,
+  zoneAt,
   zoneDelay,
 } from './runtime'
 import { cursed } from './dark'
@@ -492,7 +494,7 @@ export const HOLY: Record<string, ISkillFx> = {
       const p = castPose(att, 600, 600, 'holy')
       await p.charged
       p.release()
-      const z = { x: def.x, y: def.y },
+      const z = zoneAt(att, def),
         R = 100 * SCALE,
         delay = zoneDelay(att, 1600),
         sy = z.y - 86
@@ -615,7 +617,7 @@ export const HOLY: Record<string, ISkillFx> = {
         Wd = 30 * SCALE,
         m0 = mouthOf(att),
         t0 = centerOf(def),
-        ang = Math.atan2(t0.y - m0.y, t0.x - m0.x),
+        ang = beamAngle(att, Math.atan2(t0.y - m0.y, t0.x - m0.x)),
         low = def.hp < def.hpMax * 0.35
       scene.flashScreen = 0.7
       scene.shake = 6

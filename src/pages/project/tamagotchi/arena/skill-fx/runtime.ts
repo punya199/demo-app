@@ -49,6 +49,12 @@ export interface ICast {
   releaseT: number
   zoneT: number | null
   hits: ICastHit[]
+  // Server geometry (arena units): where the zone was aimed, the beam's start and end.
+  zone?: { x: number; y: number }
+  beam?: { x: number; y: number; x2: number; y2: number }
+  // The same in scene units, filled in by the stage when the cast starts.
+  zonePt?: { x: number; y: number }
+  beamAng?: number
 }
 
 export interface IFxDef {
@@ -358,6 +364,11 @@ export function projectileOf(
     }
   })
 }
+
+// Where the cast's zone is (the server's aim point), else under the target.
+export const zoneAt = (att: IEnt, def: IEnt) => att.cast?.zonePt ?? { x: def.x, y: def.y }
+// The server's beam direction, else the prototype's own aim.
+export const beamAngle = (att: IEnt, fallback: number) => att.cast?.beamAng ?? fallback
 
 // How long until the cast's zone lands (the server's zoneHit), or the prototype's own delay.
 export const zoneDelay = (e: IEnt, ms: number) =>

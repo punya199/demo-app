@@ -97,6 +97,8 @@ export const createSkillStage = (
   skills: Record<string, IArenaSkill>,
   width: number,
   height: number,
+  // Arena units (the server's x, y) to scene units, for zones and beams.
+  toScene: (x: number, y: number) => { x: number; y: number },
   // A script that throws only loses its animation; tests pass a collector here.
   onError: (err: unknown) => void = () => {}
 ): ISkillStage => {
@@ -203,6 +205,12 @@ export const createSkillStage = (
         if (cast.releaseT < now - 0.5 || !fx) continue
         const att = ents[cast.who]
         const def = ents[cast.target] ?? att
+        if (cast.zone) cast.zonePt = toScene(cast.zone.x, cast.zone.y)
+        if (cast.beam) {
+          const a = toScene(cast.beam.x, cast.beam.y)
+          const b = toScene(cast.beam.x2, cast.beam.y2)
+          if (a.x !== b.x || a.y !== b.y) cast.beamAng = Math.atan2(b.y - a.y, b.x - a.x)
+        }
         att.cast = cast
         void fx.run(att, def).catch(onError)
       }

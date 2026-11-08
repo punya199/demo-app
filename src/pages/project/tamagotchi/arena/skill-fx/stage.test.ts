@@ -52,6 +52,8 @@ const castReplay = (id: string, name: string, sprite: string | null = null): IAr
     { t: 14, kind: 'hit', who: 0, target: 1, skill: name, dmg: 5, crit: true },
     { t: 18, kind: 'hit', who: 0, target: 1, skill: name, dmg: 5 },
     { t: 30, kind: 'zoneHit', who: 0, x: 30000, y: 15000, r: 60 },
+    { t: 10, kind: 'zone', who: 0, x: 31000, y: 16000, r: 60 },
+    { t: 10, kind: 'beam', who: 0, x: 20000, y: 15000, x2: 40000, y2: 15000, w: 20 },
     { t: 40, kind: 'hit', who: 1, target: 0, skill: BASIC_NAME, dmg: 3 },
     { t: 50, kind: 'rebirth', who: 0 },
     { t: 60, kind: 'laststand', who: 1 },
@@ -93,6 +95,9 @@ describe('castsOf', () => {
     expect(cast.hits.map((h) => h.t)).toEqual([0.5, 0.7, 0.9])
     expect(cast.hits[1].crit).toBe(true)
     expect(cast.zoneT).toBe(1.5)
+    // the server's aim point and beam line come along for the animation
+    expect(cast.zone).toEqual({ x: 31000, y: 16000 })
+    expect(cast.beam).toEqual({ x: 20000, y: 15000, x2: 40000, y2: 15000 })
   })
 
   it('skips basic attacks and skills it cannot name', () => {
@@ -130,8 +135,13 @@ describe('skill stage', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.42)
     const skills = { [id]: { id, name } as IArenaSkill }
     const errors: unknown[] = []
-    const stage = createSkillStage(castReplay(id, name, sprite), skills, 427, 293, (err) =>
-      errors.push(err)
+    const stage = createSkillStage(
+      castReplay(id, name, sprite),
+      skills,
+      427,
+      293,
+      (x, y) => ({ x: x / 150, y: y / 150 }),
+      (err) => errors.push(err)
     )
     const ctx = fakeCtx()
     for (let tick = 0; tick <= 119; tick++) {

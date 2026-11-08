@@ -311,7 +311,8 @@ have moved). Game versions when this was written: frontend 1.61.0, backend 1.48.
    `tween`/`wait` run on the replay clock, `castPose(...).charged` resolves at the server's release,
    `meleeStrike` calls `onHit` at each of the cast's server hits, `inRange` asks whether the server hit that
    fighter, `projectileOf(att, …)` lands on the first hit (and hides the server's orb for that side), and
-   `zoneDelay(att, ms)` waits for the server's `zoneHit`. `casts.ts` reads each cast from the replay
+   `zoneDelay(att, ms)` waits for the server's `zoneHit`, `zoneAt(att, def)` puts a zone at the server's aim
+   point (the `zone` event) and `beamAngle(att, …)` aims a beam along the server's `beam` event. `casts.ts` reads each cast from the replay
    (wind-up stretch, `skill` release, its `hit`s, the zone landing, the target); `stage.ts` starts each
    script at its wind-up, applies the scripts' `ox/oy`, squash, alpha, flashes and after-images to the
    sprite, the screen shake/darken/fire tint/white flash, and binds passives to replay events: `rebirth`

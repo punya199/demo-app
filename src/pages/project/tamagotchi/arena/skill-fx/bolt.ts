@@ -4,6 +4,7 @@ import {
   TAU,
   anchor,
   approach,
+  beamAngle,
   castPose,
   centerOf,
   clock,
@@ -23,6 +24,7 @@ import {
   tag,
   tween,
   wait,
+  zoneAt,
   zoneDelay,
 } from './runtime'
 import { SCALE, slashFx } from './fire'
@@ -258,7 +260,7 @@ export const BOLT: Record<string, ISkillFx> = {
       const p = castPose(att, 500, 500, 'bolt')
       await p.charged
       p.release()
-      const z = { x: def.x, y: def.y },
+      const z = zoneAt(att, def),
         R = 90 * SCALE,
         delay = zoneDelay(att, 700)
       fxs.push({
@@ -431,7 +433,7 @@ export const BOLT: Record<string, ISkillFx> = {
         Wd = 30 * SCALE,
         m0 = mouthOf(att),
         t0 = centerOf(def),
-        ang = Math.atan2(t0.y - m0.y, t0.x - m0.x)
+        ang = beamAngle(att, Math.atan2(t0.y - m0.y, t0.x - m0.x))
       scene.flashScreen = 0.7
       scene.shake = 7
       fxs.push({

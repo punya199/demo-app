@@ -2,6 +2,7 @@ import type { ISkillFx, IEnt } from './runtime'
 import {
   TAU,
   anchor,
+  beamAngle,
   castPose,
   centerOf,
   clock,
@@ -18,6 +19,7 @@ import {
   scene,
   tween,
   wait,
+  zoneAt,
 } from './runtime'
 import { SCALE, burnOn, lavaSplash, slashFx } from './fire'
 import { WATER_COLS, splash } from './water'
@@ -230,7 +232,7 @@ export const RAID: Record<string, ISkillFx> = {
         Wd = 34 * SCALE * 0.7,
         m0 = mouthOf(att),
         t0 = centerOf(def),
-        ang = Math.atan2(t0.y - m0.y, t0.x - m0.x),
+        ang = beamAngle(att, Math.atan2(t0.y - m0.y, t0.x - m0.x)),
         hitIt = Math.hypot(t0.x - m0.x, t0.y - m0.y) <= L
       scene.shake = 5
       scene.flashScreen = 0.3
@@ -323,7 +325,7 @@ export const RAID: Record<string, ISkillFx> = {
       const p = castPose(att, 600, 600, 'water')
       await p.charged
       p.release()
-      const z = { x: def.x, y: def.y },
+      const z = zoneAt(att, def),
         R = 90 * SCALE
       splash(mouthOf(att).x, mouthOf(att).y, 16, 40)
       fxs.push({

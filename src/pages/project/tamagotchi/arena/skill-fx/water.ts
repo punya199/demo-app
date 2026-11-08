@@ -22,6 +22,7 @@ import {
   tag,
   tween,
   wait,
+  zoneAt,
   zoneDelay,
 } from './runtime'
 import { SCALE } from './fire'
@@ -379,7 +380,7 @@ export const WATER: Record<string, ISkillFx> = {
       const p = castPose(att, 500, 500, 'water')
       await p.charged
       p.release()
-      const z = { x: def.x, y: def.y },
+      const z = zoneAt(att, def),
         R = 90 * SCALE,
         delay = zoneDelay(att, 700)
       fxs.push({

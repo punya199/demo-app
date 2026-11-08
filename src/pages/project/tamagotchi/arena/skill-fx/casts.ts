@@ -44,6 +44,8 @@ export const castsOf = (replay: IArenaReplay, skills: Record<string, IArenaSkill
     const zone = events.find(
       (z) => z.kind === 'zoneHit' && z.who === who && z.t >= e.t && z.t < until
     )
+    const aim = events.find((z) => z.kind === 'zone' && z.who === who && z.t >= e.t && z.t < until)
+    const beam = events.find((b) => b.kind === 'beam' && b.who === who && b.t >= e.t && b.t < until)
     // wind-up start: walk back over the frames winding up this slot
     const slot = fighters[who]?.skills.indexOf(id) ?? -1
     let fi = Math.min(frames.length - 1, Math.floor(e.t / step))
@@ -74,6 +76,11 @@ export const castsOf = (replay: IArenaReplay, skills: Record<string, IArenaSkill
       releaseT: sec(e.t),
       zoneT: zone ? sec(zone.t) : null,
       hits,
+      ...(aim?.x !== undefined && aim.y !== undefined && { zone: { x: aim.x, y: aim.y } }),
+      ...(beam?.x !== undefined &&
+        beam.y !== undefined && {
+          beam: { x: beam.x, y: beam.y, x2: beam.x2 ?? beam.x, y2: beam.y2 ?? beam.y },
+        }),
     })
   })
   return casts.sort((a, b) => a.startT - b.startT)

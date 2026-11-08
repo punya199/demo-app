@@ -2,6 +2,7 @@ import type { ISkillFx, IEnt } from './runtime'
 import {
   FLAME_COLS,
   anchor,
+  beamAngle,
   cam,
   castPose,
   centerOf,
@@ -22,6 +23,7 @@ import {
   tag,
   tween,
   wait,
+  zoneAt,
   zoneDelay,
 } from './runtime'
 
@@ -278,7 +280,7 @@ export const FIRE: Record<string, ISkillFx> = {
       p.release()
       scene.shake = Math.max(scene.shake, 3)
       lavaSplash(anchor(att).x, anchor(att).y, 10)
-      const z = { x: def.x, y: def.y },
+      const z = zoneAt(att, def),
         R = 80 * SCALE,
         delay = zoneDelay(att, 800)
       fxs.push({
@@ -388,7 +390,7 @@ export const FIRE: Record<string, ISkillFx> = {
         Wd = 34 * SCALE,
         t0 = centerOf(def),
         m0 = mouthOf(att),
-        ang = Math.atan2(t0.y - m0.y, t0.x - m0.x)
+        ang = beamAngle(att, Math.atan2(t0.y - m0.y, t0.x - m0.x))
       let hits = 0
       const done = tween(850, (k) => {
         const m = mouthOf(att),

@@ -27,6 +27,7 @@ import {
   tween,
   wait,
   walkTo,
+  zoneAt,
   zoneDelay,
 } from './runtime'
 import { SCALE, slashFx } from './fire'
@@ -446,7 +447,7 @@ export const LEAF: Record<string, ISkillFx> = {
         size: 1,
         cols: ['#86582e', '#5e3c1e'],
       }))
-      const z = { x: def.x, y: def.y },
+      const z = zoneAt(att, def),
         R = 85 * SCALE,
         delay = zoneDelay(att, 600)
       fxs.push({

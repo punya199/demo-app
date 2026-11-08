@@ -594,7 +594,7 @@ export const RAID: Record<string, ISkillFx> = {
     icon: '🦇',
     el: 'dark',
     boss: 'vampire',
-    game: 'e_dragontail',
+    game: 'e_batswarm',
     async run(att, def) {
       await closeIn(att, def, 110 * SCALE)
       const p = castPose(att, 900, 800, 'dark')
@@ -650,7 +650,7 @@ export const RAID: Record<string, ISkillFx> = {
     icon: '🩸',
     el: 'dark',
     boss: 'vampire',
-    game: 'e_orebite',
+    game: 'e_vampbite',
     async run(att, def) {
       const a0 = centerOf(att)
       darkBurst(a0.x, a0.y, 16, 50)
@@ -713,7 +713,7 @@ export const RAID: Record<string, ISkillFx> = {
     icon: '⛓️',
     el: 'shadow',
     boss: 'nameless',
-    game: 'e_sparktail',
+    game: 'e_flail',
     async run(att, def) {
       await meleeStrike(att, def, {
         wind: 380,
@@ -766,7 +766,7 @@ export const RAID: Record<string, ISkillFx> = {
     icon: '🌫️',
     el: 'shadow',
     boss: 'nameless',
-    game: 'e_mistbite',
+    game: 'e_mistcut',
     async run(att, def) {
       const a0 = anchor(att),
         fog = ['#b8a8d8', '#8a7aa8', '#5a4a7a']

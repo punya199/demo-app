@@ -117,7 +117,9 @@ describe('skillFxOf', () => {
 
   it('gives each raid boss its own version of a shared skill', () => {
     for (const s of Object.values(RAID)) expect(skillFxOf(s.game as string, s.boss)).toBe(s)
-    expect(skillFxOf('e_mistbite', 'abyssfish')).not.toBe(skillFxOf('e_mistbite', 'nameless'))
+    expect(skillFxOf('e_mistcut', 'nameless')?.name).toBe('ฟันจากหมอก')
+    // a world boss with the same skill id does not borrow a raid boss's animation
+    expect(skillFxOf('e_mistbite', 'sboss')).toBeNull()
   })
 })
 

@@ -116,9 +116,17 @@ asked for this more than once.
 | All 8 lines | Done in the prototype |
 | Putting the art into the real game | Steps 1 and 2 done (2026-11-08): sprite module + ids, and the arena replay draws the sprites (generic element effects; per-skill animations still to port). Home, Dex and other screens still show emoji (step 3) |
 
-## Names to apply in the game (when the art goes in)
+## Names to apply in the game (applied 2026-11-08)
 
-The prototype uses these; the game data still has the old ones.
+All applied on branch `claude/tamagotchi-game-expansion-ercfjr`: the 36 species in `species-data.ts`
+(names and fallback emoji, per the line boards on the page), the 14 skills in both `arena-data.ts` and the
+species tuples (and the water entry of `FUSED_SKILLS`), and the raid bosses' own skills: จ้าวมืดมิด uses
+`e_batswarm` / `e_vampbite`, ราชันย์เงานิรนาม `e_flail` / `e_mistcut` (copies of the shared skills with the
+same numbers). `battle-engine.golden.json` was regenerated on purpose: the only differences are 66
+`moveName` strings (กรงเล็บไพร, ตรีศูลสมุทร), no roll or result. Stored PvP snapshots keep the names they
+were recorded with. A raid animation now plays only for its own boss sprite (`skillFxOf`), so world
+bosses that share e_mistbite / e_dragontail / e_orebite / e_sparktail keep the generic look. The table
+below is the record of what changed.
 
 | Kind | Game id | Old name | New name |
 |---|---|---|---|
@@ -345,7 +353,7 @@ have moved). Game versions when this was written: frontend 1.61.0, backend 1.48.
    **Other screens:** `shared/PetSprite.tsx` (home), `PetAvatar.tsx` (`PetCostumeFrame`: costumes are
    emoji layers for backdrop, aura, back item, face item and hat over a 128 px box, so every sprite needs
    a head and face anchor), the Dex, the evolution tree and the return-home (กลับดาว) screen.
-4. **Renames in the game data**, in the same release: "Names to apply in the game" above (skills and
+4. **Renames in the game data. Done (2026-11-08)**, see "Names to apply in the game". Originally: "Names to apply in the game" above (skills and
    species in `arena-data.ts` / `species-data.ts`; check PvP history with the `battle-golden-check`
    skill, since the golden file stores `moveName`). The vampire and the headless knight need their own
    raid skill ids (today they share ids with other bosses).

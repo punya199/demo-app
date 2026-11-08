@@ -58,12 +58,9 @@ const LINE_FX: Record<string, ISkillFx> = {
 // The animation for a game skill id cast by a fighter drawn as `sprite` (raid bosses that share an
 // id each have their own version).
 export const skillFxOf = (id: string, sprite?: string | null): ISkillFx | null => {
-  const raid = Object.values(RAID).filter((s) => s.game === id)
-  return (
-    raid.find((s) => s.boss === sprite) ??
-    raid[0] ??
-    (LINE_FX[id] && !LINE_FX[id].passive ? LINE_FX[id] : null)
-  )
+  // a raid boss's animation is its own: a world boss sharing the skill id keeps the generic look
+  const raid = Object.values(RAID).find((s) => s.game === id && s.boss === sprite)
+  return raid ?? (LINE_FX[id] && !LINE_FX[id].passive ? LINE_FX[id] : null)
 }
 
 // What the stage needs to know about a fighter each frame (scene units: sprite pixels).

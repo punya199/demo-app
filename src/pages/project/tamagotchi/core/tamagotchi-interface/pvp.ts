@@ -14,6 +14,8 @@ export interface IPvpOpponent {
   id: string
   displayName: string
   emoji: string
+  // Pixel-art sprite id (sprites/sprite-registry.ts); null = no art yet, show the emoji.
+  sprite?: string | null
   name: string
   nickname: string | null
   costume: ILoadout | null

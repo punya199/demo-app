@@ -126,7 +126,13 @@ export interface IArenaSkill {
   passive?: IArenaPassive
   dodge?: IArenaDodge
   // Catalog only: the species that unlocks it.
-  source?: { speciesId: string; name: string; emoji: string; stage: EnumMonsterStage } | null
+  source?: {
+    speciesId: string
+    name: string
+    emoji: string
+    sprite?: string | null
+    stage: EnumMonsterStage
+  } | null
 }
 
 export interface IArenaLoadout {
@@ -156,6 +162,8 @@ export interface ISkillState {
 export interface IArenaEnemy {
   name: string
   emoji: string
+  // Pixel-art sprite id (sprites/sprite-registry.ts); null = no art yet, show the emoji.
+  sprite?: string | null
   element: EnumMonsterLine
   isBoss: boolean
   stats: { hp: number; atk: number; def: number; spd: number }
@@ -204,6 +212,8 @@ export interface IArenaFighterSummary {
   team: number
   name: string
   emoji: string
+  // Pixel-art sprite id (sprites/sprite-registry.ts); null = no art yet, show the emoji.
+  sprite?: string | null
   el: `${EnumMonsterLine}`
   maxHp: number
   hp: number
@@ -242,7 +252,7 @@ export interface IArenaFight {
   rounds: number
   // Null for auto-battles (not recorded).
   replay: IArenaReplay | null
-  player: { name: string; emoji: string; element: EnumMonsterLine }
+  player: { name: string; emoji: string; sprite?: string | null; element: EnumMonsterLine }
   enemy: IArenaEnemy | null
 }
 

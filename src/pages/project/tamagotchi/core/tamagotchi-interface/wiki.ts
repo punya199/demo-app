@@ -17,6 +17,8 @@ export interface IDexEntry {
   discovered: boolean
   name: string | null
   emoji: string | null
+  // Pixel-art sprite id (sprites/sprite-registry.ts); null = no art yet, show the emoji.
+  sprite?: string | null
 }
 
 export interface IWikiSpecies {
@@ -37,6 +39,8 @@ export interface IMergeForm {
   lines: [EnumMonsterLine, EnumMonsterLine]
   name: string
   emoji: string
+  // Pixel-art sprite id; null for a hybrid of two lines (no art yet).
+  sprite?: string | null
   stats: IBattleStats
 }
 

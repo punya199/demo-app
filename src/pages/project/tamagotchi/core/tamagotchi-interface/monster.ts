@@ -45,6 +45,8 @@ export interface ISpeciesSummary {
   id: string
   name: string
   emoji: string
+  // Pixel-art sprite id (sprites/sprite-registry.ts); null = no art yet, show the emoji.
+  sprite?: string | null
   stage: EnumMonsterStage
 }
 
@@ -108,6 +110,8 @@ export interface IMonsterData {
   // What it wears: slot -> costume id.
   costume: ILoadout
   emoji: string
+  // Pixel-art sprite id (sprites/sprite-registry.ts); null = no art yet, show the emoji.
+  sprite?: string | null
   fullness: number
   strength: number
   // Adventure stamina (0-100): regained over time, spent by adventure fights.

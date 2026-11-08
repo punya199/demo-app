@@ -32,7 +32,11 @@ export interface IGameMenuGroup {
   items: IGameMenuItem[]
 }
 
-export const GAME_MENU: IGameMenuGroup[] = [
+// The costume (fashion) system is switched off for now, as on the server (COSTUMES_ENABLED in
+// backend monster-rules.ts): its screen and wiki tab are hidden, costumes players own are kept.
+export const COSTUMES_ENABLED = false
+
+const ALL_MENU: IGameMenuGroup[] = [
   {
     title: 'ดูแล',
     items: [
@@ -67,6 +71,11 @@ export const GAME_MENU: IGameMenuGroup[] = [
     ],
   },
 ]
+
+export const GAME_MENU: IGameMenuGroup[] = ALL_MENU.map((group) => ({
+  ...group,
+  items: group.items.filter((item) => COSTUMES_ENABLED || item.key !== 'costume'),
+}))
 
 const MENU_KEYS = new Set<string>(GAME_MENU.flatMap((group) => group.items.map((item) => item.key)))
 

@@ -328,7 +328,10 @@ have moved). Game versions when this was written: frontend 1.61.0, backend 1.48.
    prototype's eight themes redrawn on the game's flat box (back wall with rocks and crystals, stone tiles,
    glowing rim, cracks, pools, rubble); a fight with a boss (raid, world or adventure area boss) takes its
    element's theme, a water boss and every other fight the blue cave.
-3. **Other screens. Done (2026-11-08).** `shared/MonsterSprite.tsx` draws a sprite (still, or the idle
+3. **Other screens. Done (2026-11-08).** (The costume system was then switched off, 2026-11-08, at the
+   owner's request: `COSTUMES_ENABLED = false` in backend `monster-rules.ts` and frontend `game-menu.ts`;
+   no costume reaches any screen, buy/equip are refused, the menu entry and wiki tab are hidden, owned
+   costumes and stored loadouts are kept. The anchors below still work when it comes back.) `shared/MonsterSprite.tsx` draws a sprite (still, or the idle
    loop with `animate`) with its aura and glows, from the lazily loaded chunk (`shared/sprite-loader.ts`,
    one load for every caller), and shows the emoji until it loads or when there is no art. Costumes:
    `spriteAnchors(id)` (sprite-registry) finds the hat spot (highest painted pixel above the head, around

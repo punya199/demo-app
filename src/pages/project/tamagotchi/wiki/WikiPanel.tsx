@@ -11,6 +11,7 @@ import { PassiveWikiTab, ReturnHomeWikiTab, CostumeWikiTab, EconomyWikiTab } fro
 import { EquipmentWikiTab, RaidWikiTab } from './WikiEquipment'
 import { WorldBossWikiTab, BossDetailWikiTab } from './WikiBosses'
 import { SocialWikiTab, PvpWikiTab } from './WikiSocialPvp'
+import { COSTUMES_ENABLED } from '../core/game-menu'
 
 // The in-game guide. Every number comes from GET /monster/wiki (the server's rule constants), so
 // this page explains the rules exactly as the server applies them.
@@ -32,7 +33,9 @@ const buildSections = (wiki: IWikiData) => [
     label: '🌠 กลับดาว (แกนสัตว์เลี้ยง)',
     children: <ReturnHomeWikiTab wiki={wiki} />,
   },
-  { key: 'costume', label: '👗 ชุดแต่งตัว', children: <CostumeWikiTab /> },
+  ...(COSTUMES_ENABLED
+    ? [{ key: 'costume', label: '👗 ชุดแต่งตัว', children: <CostumeWikiTab /> }]
+    : []),
   { key: 'equipment', label: '🛡️ อุปกรณ์และตีบวก', children: <EquipmentWikiTab wiki={wiki} /> },
   { key: 'craft', label: '🔨 คราฟต์', children: <CraftWikiTab wiki={wiki} /> },
   { key: 'raid', label: '👹 บอสและชุดเซ็ต', children: <RaidWikiTab wiki={wiki} /> },

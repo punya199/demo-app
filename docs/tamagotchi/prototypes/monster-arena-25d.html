@@ -165,6 +165,7 @@ td.st { white-space: nowrap; color: var(--muted) }
       <option value="holy">มอนธาตุรัศมี + สกิล</option>
       <option value="dark">มอนธาตุรัตติกาล + สกิล</option>
       <option value="shadow">มอนธาตุเงา + สกิล</option>
+      <option value="raid">บอสเรด 5 ตัว (ภาพนิ่ง)</option>
       <option value="plan">แผนออกแบบทั้ง 8 สาย</option>
     </select>
     <span class="hint" id="jump-hint">ฉากต่อสู้อยู่บนสุดเสมอ</span>
@@ -512,6 +513,48 @@ td.st { white-space: nowrap; color: var(--muted) }
     <div class="skills-grid" id="shadow-cards"></div>
   </section>
 
+  <section aria-labelledby="raid-h" data-group="raid" style="order:27">
+    <div class="eyebrow">บอสเรด · ภาพนิ่งให้เลือกก่อน</div>
+    <h2 id="raid-h">บอสเรด 5 ตัวที่เหลือ</h2>
+    <p class="lede">บอสเรดในเกมมี 6 ตัว พฤกษาโบราณทำไปแล้ว อีก 5 ตัวยังเป็นอีโมจิ ทุกตัวเป็นสัตว์ในตระกูลของธาตุตัวเอง และไม่ซ้ำกับบอสโลกของธาตุเดียวกัน ขนาด 96 พิกเซลเท่าบอสอื่น ตอนนี้เป็นภาพนิ่ง ถ้าแบบไหนผ่านจะทำท่าขยับ เอาเข้าฉากต่อสู้ และทำท่าโจมตีของบอสต่อ</p>
+    <div class="showcase">
+      <div class="show boss">
+        <canvas id="show-lavaking" width="128" height="112" aria-label="บอสเรด ราชันย์ลาวา"></canvas>
+        <div class="act" id="act-lavaking"></div>
+        <span class="rank" style="--c:#ff5a5a">บอสเรด</span>
+        <h3>ราชันย์ลาวา <span class="chip new">ร่างแรก</span></h3>
+        <p class="hint">ในเกมเป็นอีโมจิ 🔥 · ชื่อเดิมใช้ต่อได้ งูหินภูเขาไฟตัวมหึมาขดอยู่บนพื้นสองขด เกล็ดออบซิเดียนดำมีรอยแตกลาวาเรือง ท้องเป็นลาวาหลอมสีอำพัน บนหัวมีกรวยภูเขาไฟเป็นมงกุฎ ปากปล่องมีลาวาเดือดและควันลอยตลอด ปลายหางเป็นเปลวไฟ ท่าในเกม "รัดหลอมละลาย" ใช้ขดตัวรัด และ "ลมหายใจภูเขาไฟ" พ่นลาวาจากปากเป็นลำ ต่างจากบอสโลกมังกรเพลิงกัลป์ที่เป็นมังกรสี่ขามีปีก</p>
+      </div>
+      <div class="show boss water">
+        <canvas id="show-abyssfish" width="128" height="112" aria-label="บอสเรด อสูรห้วงลึก"></canvas>
+        <div class="act" id="act-abyssfish"></div>
+        <span class="rank" style="--c:#ff5a5a">บอสเรด</span>
+        <h3>อสูรห้วงลึก <span class="chip new">ร่างแรก</span></h3>
+        <p class="hint">ในเกมเป็นอีโมจิ 💧 · ชื่อเดิมใช้ต่อได้ ปลาตกเบ็ดใต้ทะเลลึกตัวยักษ์ ลอยเหนือพื้น ลำตัวกลมสีน้ำเงินดำมีจุดเรืองแสง กรามล่างยื่นยาวเต็มไปด้วยฟันเข็ม มีก้านล่อแสงชมพูโค้งจากหน้าผากมาห้อยหน้าปาก ครีบใสขาดเป็นริ้ว ท่าในเกม "วังน้ำวน" ให้ก้านล่อหมุนวนน้ำใต้ศัตรู และ "ขย้ำในหมอก" พุ่งงับจากหมอก ต่างจากบอสโลกเต่ายักษ์วารี</p>
+      </div>
+      <div class="show boss holy">
+        <canvas id="show-raidseraph" width="128" height="112" aria-label="บอสเรด เซราฟรัศมี"></canvas>
+        <div class="act" id="act-raidseraph"></div>
+        <span class="rank" style="--c:#ff5a5a">บอสเรด</span>
+        <h3>เซราฟรัศมี <span class="chip new">ร่างแรก</span></h3>
+        <p class="hint">ในเกมเป็นอีโมจิ ✨ · ชื่อเดิมใช้ต่อได้ (เซราฟคือเทวดาหกปีก) เป็นนกยูงแสงหกปีก ปีกบนชูขึ้น ปีกกลางกาง ปีกล่างคลุมขา หางรำแพนเป็นพัดแสงสิบสองเส้น ปลายขนแต่ละเส้นมีดวงตาสีทองกับฟ้า หงอนสามเส้นมีลูกแก้วทอง และวงรัศมีหลังหัว ท่าในเกม "รำแพนสายฟ้า" กับ "ขนไฟฟ้าสาด" เข้ากับนกยูงพอดี (รำแพนแล้วแสงระเบิดรอบตัว สะบัดขนเป็นพัดยิงออกไป) ต่างจากบอสโลกคชสารรัศมี</p>
+      </div>
+      <div class="show boss dark">
+        <canvas id="show-voidbat" width="128" height="112" aria-label="บอสเรด จ้าวมืดมิด"></canvas>
+        <div class="act" id="act-voidbat"></div>
+        <span class="rank" style="--c:#ff5a5a">บอสเรด</span>
+        <h3>จ้าวมืดมิด <span class="chip new">ร่างแรก</span></h3>
+        <p class="hint">ในเกมเป็นอีโมจิ 🌑 · ชื่อเดิมใช้ต่อได้ ค้างคาวมังกรตัวมหึมาที่เดินสี่ขาโดยใช้ปีกที่พับไว้เป็นขาหน้า เยื่อปีกตั้งขึ้นบนหลังเหมือนผ้าคลุม กลางอกมีหลุมดำล้อมด้วยแสงม่วง เขี้ยวเป็นผลึกม่วง หางยาวปลายเป็นผลึกแหลม หูสูงตาแดง ท่าในเกม "หางมังกรฟาด" ใช้หางผลึกกวาดรอบตัว และ "กัดบดแร่" ใช้เขี้ยวผลึกงับ ต่างจากค้างคาวในสายที่บินอยู่ ตัวนี้ใหญ่จนต้องเดิน</p>
+      </div>
+      <div class="show boss shadow">
+        <canvas id="show-nameless" width="128" height="112" aria-label="บอสเรด ราชันย์เงานิรนาม"></canvas>
+        <div class="act" id="act-nameless"></div>
+        <span class="rank" style="--c:#ff5a5a">บอสเรด</span>
+        <h3>ราชันย์เงานิรนาม <span class="chip new">ร่างแรก</span></h3>
+        <p class="hint">ในเกมเป็นอีโมจิ 🌫️ · ชื่อเดิมใช้ต่อได้ "นิรนาม" จึงไม่มีหน้า เป็นอัศวินเกราะดำยักษ์ไร้หัว ไฟม่วงลุกจากคอเสื้อเกราะ ในไฟมีหน้ากากขาวเปล่าไม่มีตา มีรอยร้าวเส้นเดียว อกเกราะมีรอยแตกเรืองม่วง ผ้าคลุมเป็นธงขาดวิ่น มือขวาถือโซ่ลากลูกตุ้มหนามไปตามพื้น ท่าในเกม "หางสปาร์ก" (ตีหลายครั้ง) เป็นการเหวี่ยงลูกตุ้มโซ่หลายรอบ และ "ขย้ำในหมอก" เป็นการหายเข้าหมอกแล้วโผล่ฟัน ต่างจากบอสโลกราชาม่านเงาที่เป็นภูตผ้าคลุม</p>
+      </div>
+    </div>
+  </section>
   <section aria-labelledby="plan-h" data-group="plan" style="order:27">
     <div class="eyebrow">แผนทั้งเกม</div>
     <h2 id="plan-h">ออกแบบมอนใหม่ทั้ง 8 สาย</h2>
@@ -2107,6 +2150,148 @@ const SPRITES = {
     s.d(80 + hx, 53 + hy, '#fff6b0').d(81 + hx, 53 + hy, '#ffb02a').d(82 + hx, 53 + hy, '#ffb02a').d(79 + hx, 52 + hy, '#120a06').d(80 + hx, 52 + hy, '#120a06').d(81 + hx, 52 + hy, '#120a06').d(82 + hx, 52 + hy, '#120a06');
     if (P.glow) glowSap(s, 92 + hx, 64 + hy + j * .5);
   }, glows: [[81, 53, '#ffb02a', 4], [37, 14, '#ffb0d0', 9]], emit: [{ x: 37, y: 12, type: 'petal', rate: 4 }, { x: 40, y: 50, type: 'leaf', rate: 2 }, { x: 60, y: 46, type: 'firefly', rate: 2 }, { x: 24, y: 48, type: 'spore', rate: 1.5 }], mouth: [92, 64] },
+  /* ----- Raid bosses (still drafts): one per element that has a raid boss, each from its line's animal family ----- */
+  // ราชันย์ลาวา (fire raid): a crowned magma serpent coiled on the ground, a smoking volcano cone on its head
+  lavaking: { size: 96, rig: SWIM, aura: { type: 'boss', x: 46, y: 88, r: 36 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 4;
+    const m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
+    // the coil, back to front: the tail tip with its flame, the back loop, the thick front loop
+    s.P(m([[4, 50], [7, 38], [10, 44], [13, 36], [14, 49], [9, 53]], bx, by - t * 1.5), 'fire');
+    ribbon(s, m([[10, 52 - t], [12, 62], [20, 70], [34, 72], [52, 70], [68, 72]], bx, by), 2, 7, 'char2');
+    ribbon(s, m([[66, 72], [76, 78], [72, 86], [52, 89], [30, 88], [16, 82], [20, 76]], bx, by), 9, 8, 'char');
+    ribbon(s, m([[74, 82], [70, 88], [52, 91], [30, 90], [18, 86]], bx, by), 3, 2.5, 'amber');
+    for (const [x0, y0, x1, y1] of [[24, 82, 30, 86], [42, 84, 50, 86], [60, 84, 66, 82], [28, 68, 36, 70], [50, 67, 56, 69]]) s.line([[x0 + bx, y0 + by], [x1 + bx, y1 + by]], '#ff8a24', '#ffd04a');
+    // the neck rears up out of the front loop in an S, molten belly on its front edge
+    const nk = m([[64, 80], [72, 70], [70, 60], [64, 52], [66, 44]], bx, by).map(([x, y], i, a) => i === a.length - 1 ? [x + hx - bx, y + hy - by] : [x, y]);
+    ribbon(s, nk, 9, 7, 'char');
+    ribbon(s, nk.map(([x, y], i) => [x + 5 - i * .4, y + 2]), 3.2, 2.4, 'amber');
+    for (const [x, y] of nk.slice(1, 4)) s.P([[x - 6, y + 2], [x - 10, y - 4], [x - 2, y - 2]], 'basalt');
+    // head: a flat viper wedge with a lava stripe, the volcano cone as its crown
+    s.P(m([[58, 42], [66, 33], [82, 32], [94, 38], [92, 44], [80, 47], [62, 47]], hx, hy), 'char');
+    s.P(m([[64, 46], [92, 44 + j], [90, 50 + j], [70, 50]], hx, hy), 'char2');
+    if (j > 1) s.P(m([[66, 46], [91, 44], [89, 44 + j], [70, 47 + j * .5]], hx, hy), 'fire');
+    for (const x of [78, 83, 88]) s.d(x + hx, 46 + hy, '#fff3a8');
+    s.line(m([[66, 44], [88, 41]], hx, hy), '#ff8a24');
+    s.P(m([[60, 36], [66, 24], [78, 24], [86, 34]], hx, hy), 'basalt'); s.E(72 + hx, 24 + hy, 6, 2, 'fire'); s.E(72 + hx, 24 + hy, 3.4, 1.1, 'core');
+    s.line(m([[68, 25], [66, 31]], hx, hy), '#ff5a14', '#ffc444').line(m([[76, 25], [78, 32]], hx, hy), '#ff5a14', '#ffc444');
+    s.d(82 + hx, 37 + hy, '#fff3a8').d(83 + hx, 37 + hy, '#ffc444').d(84 + hx, 37 + hy, '#ff8a24').d(81 + hx, 36 + hy, '#0a0809').d(82 + hx, 36 + hy, '#0a0809').d(83 + hx, 36 + hy, '#0a0809').d(84 + hx, 36 + hy, '#0a0809');
+    if (P.glow) glowMouth(s, 93 + hx, 45 + hy);
+  }, glows: [[72, 23, '#ff9a2a', 8, 'head'], [83, 37, '#ffc444', 3, 'head']], emit: [{ x: 72, y: 20, type: 'smoke', rate: 3 }, { x: 72, y: 22, type: 'ember', rate: 3 }, { x: 50, y: 90, type: 'drip', rate: 1.2 }, { x: 8, y: 42, type: 'flame', rate: 5 }], mouth: [93, 45] },
+  // อสูรห้วงลึก (water raid): an abyssal anglerfish, a glowing lure over a huge needle-toothed underbite
+  abyssfish: { size: 96, rig: SWIM, hover: 8, aura: { type: 'bossw', x: 46, y: 90, r: 34 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 4, w = P.wing;
+    const m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
+    // tail fin and far pectoral fin, see-through
+    s.L(22 + bx, 54 + by, 12 + bx, 52 + by - t, 6, 'abyss2', 3.5);
+    s.P(m([[13, 52], [1, 34], [5, 50], [0, 60], [4, 72], [13, 56]], bx, by - t * 1.6), 'finglass');
+    s.P(m([[44, 66], [36, 78 + w * 2], [30, 82 + w * 3], [40, 76]], bx, by), 'finglass');
+    // body: a round dark hull, paler belly, bioluminescent spots
+    s.E(40 + bx, 52 + by, 26, 20, 'abyss2'); s.E(42 + bx, 64 + by, 20, 7, 'navy');
+    s.P(m([[24, 36], [30, 22], [38, 30], [44, 18], [50, 28], [54, 32]], bx, by), 'finglass');
+    for (const [x, y] of [[26, 50], [32, 56], [38, 60], [46, 62], [30, 44], [52, 58]]) s.d(x + bx, y + by, '#7ee7ff');
+    // head: the jaw juts far forward, needle teeth up and down
+    s.E(64 + hx, 48 + hy, 20, 17, 'abyss'); s.E(70 + hx, 40 + hy, 12, 7, 'abyss2');
+    s.P(m([[48, 60], [90, 54 + j], [88, 68 + j], [76, 74 + j], [54, 72]], hx, hy), 'abyss2');
+    s.P(m([[56, 58], [88, 56 + j * .6], [84, 62 + j], [60, 64]], hx, hy), 'maw');
+    for (const x of [62, 67, 72, 77, 82, 86]) s.P(m([[x - 1, 55], [x, 61 + (x % 2)], [x + 1, 55]], hx, hy), 'pearl');
+    for (const x of [64, 70, 76, 82]) s.P(m([[x - 1, 62 + j * .8], [x, 56 + j * .6], [x + 1, 62 + j * .8]], hx, hy), 'pearl');
+    s.P(m([[58, 52], [86, 50], [90, 54], [60, 56]], hx, hy), 'abyss');
+    s.E(72 + hx, 42 + hy, 3.2, 3.2, 'pearl'); s.d(73 + hx, 42 + hy, '#0a1018').d(72 + hx, 41 + hy, '#ffffff');
+    // the lure: a stalk from the brow bending forward to a glowing bulb
+    s.line(m([[62, 32], [64, 22], [72, 14], [82, 14], [88, 20]], hx, hy), '#3044a8', '#6a84e0');
+    s.E(89 + hx, 24 + hy, 4, 4, 'jglow'); s.E(89 + hx, 24 + hy, 2, 2, 'core');
+    // near pectoral fin
+    s.P(m([[50, 66], [44, 80 + w * 3], [52, 84 + w * 3], [56, 70]], bx, by), 'finglass');
+    if (P.glow) glowMouth(s, 86 + hx, 60 + hy);
+  }, glows: [[89, 24, '#ff7ae0', 9, 'head'], [72, 42, '#c8f0ff', 3, 'head']], emit: [{ x: 89, y: 24, type: 'sparkle', rate: 3 }, { x: 40, y: 40, type: 'bubble', rate: 2.5 }, { x: 20, y: 70, type: 'mist', rate: 2 }], mouth: [86, 60] },
+  // เซราฟรัศมี (holy raid): a six-winged peacock of light, its fan tail spread behind it, each feather with a gold eye
+  raidseraph: { size: 96, rig: BIPED, aura: { type: 'bossh', x: 48, y: 90, r: 36 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, w = P.wing;
+    // fan tail behind everything: nine long feathers, each ending in a big gold-and-sky eye
+    for (let i = 0; i < 9; i++) {
+      const a = Math.PI * (1.04 + i * .115), x1 = 40 + Math.cos(a) * 42 + bx, y1 = 66 + Math.sin(a) * 40 + by;
+      s.L(42 + bx, 66 + by, x1, y1, 1.4, 'feath2', 4.6);
+      s.E(x1, y1, 4.6, 3.8, 'gold'); s.E(x1, y1, 2.8, 2.2, 'sky'); s.d(x1, y1, '#1e3a6e');
+    }
+    // six wings, warm ivory so they stand off the cool fan: a raised top pair, a spread middle pair, a low pair over the legs
+    plumeWing(s, 46 + bx, 52 + by, 30, 10, -2.0 - w * .1, 'ivory', 1, '#c48a16'); plumeWing(s, 54 + bx, 52 + by, 30, 10, -1.15 + w * .1, 'ivory', -1, '#c48a16');
+    plumeWing(s, 44 + bx, 60 + by, 22, 8, -2.85, 'ivory2', 1, '#c48a16'); plumeWing(s, 56 + bx, 60 + by, 22, 8, -.3, 'ivory2', -1, '#c48a16');
+    s.L(46 + bx, 72 + by, 44 + P.bl[0], 88 + P.bl[1], 2, 'gold'); s.L(54 + bx, 72 + by, 56 + P.bf[0], 88 + P.bf[1], 2, 'gold');
+    s.line([[40 + P.bl[0], 89 + P.bl[1]], [47 + P.bl[0], 89 + P.bl[1]]], '#c48a16'); s.line([[53 + P.bf[0], 89 + P.bf[1]], [60 + P.bf[0], 89 + P.bf[1]]], '#c48a16');
+    s.E(50 + bx, 62 + by, 14, 14, 'ivory'); s.E(56 + bx, 60 + by, 8, 11, 'sky');
+    plumeWing(s, 42 + bx, 68 + by, 16, 6, 2.6, 'halo', 1, '#c48a16'); plumeWing(s, 58 + bx, 68 + by, 16, 6, .55, 'halo', -1, '#c48a16');
+    // neck and head: sky-blue throat, halo behind, three crest plumes with gold orbs, hooked gold beak
+    s.L(56 + bx, 54 + by, 64 + hx, 30 + hy, 6, 'ivory', 4.5); s.L(59 + bx, 54 + by, 67 + hx, 32 + hy, 3, 'sky', 2.2);
+    haloRing(s, 63 + hx, 21 + hy, 11, 3.4, .1);
+    for (const [x, y] of [[61, 8], [66, 6], [71, 9]]) { s.line([[66 + hx, 21 + hy], [x + hx, y + hy]], '#c48a16'); s.E(x + hx, y + hy, 1.8, 1.8, 'halo'); }
+    s.E(67 + hx, 25 + hy, 7.5, 6, 'ivory'); s.P([[73 + hx, 23 + hy], [81 + hx, 26 + hy], [74 + hx, 29 + hy]], 'gold');
+    s.d(70 + hx, 24 + hy, '#1a1a3a').d(71 + hx, 24 + hy, '#1a1a3a').d(70 + hx, 23 + hy, '#ffffff');
+    s.line([[69 + hx, 27 + hy], [72 + hx, 27 + hy]], '#7ee7ff');
+    if (P.glow) glowMouth(s, 80 + hx, 26 + hy);
+  }, glows: [[66, 21, '#fff3a8', 10, 'head'], [50, 60, '#fff3a8', 9, 'body']], emit: [{ x: 40, y: 40, type: 'sparkle', rate: 4 }, { x: 50, y: 60, type: 'glint', rate: 2 }, { x: 66, y: 8, type: 'goldleaf', rate: 1 }], mouth: [80, 26] },
+  // จ้าวมืดมิด (dark raid): a colossal bat-drake that walks on its folded wings, a void heart in its chest, crystal fangs and a barbed tail
+  voidbat: { size: 96, rig: QUAD, aura: { type: 'bossd', x: 48, y: 90, r: 36 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, t = P.tail, j = P.jaw * 4;
+    const m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
+    // the barbed tail swinging up behind
+    ribbon(s, m([[28, 66], [16, 64], [8, 54], [6, 42 - t], [10, 32 - t]], bx, by), 4.5, 1.6, 'bat2');
+    s.P(m([[10, 26], [16, 32], [10, 40], [4, 32]], bx, by - t), 'crys'); s.d(10 + bx, 32 + by - t, '#ffffff');
+    // far folded wing: the arm is the back leg of a walking stance
+    s.L(36 + bx, 50 + by, 26 + P.bf[0] * .5, 66 + by, 3.6, 'batw2'); s.L(26 + P.bf[0] * .5, 66 + by, 30 + P.bf[0], 88 + P.bf[1], 3, 'batw2');
+    s.P(m([[34, 48], [24, 64], [30, 84], [40, 62]], bx, by), 'batw2');
+    // body with the folded membranes rising off the back like a cloak
+    s.P(m([[30, 52], [34, 22], [44, 36], [52, 18], [58, 40], [62, 54]], bx, by), 'batw');
+    for (const [x0, y0, x1, y1] of [[34, 24, 40, 50], [52, 20, 52, 48]]) s.line([[x0 + bx, y0 + by], [x1 + bx, y1 + by]], '#3a0a48');
+    s.E(46 + bx, 60 + by, 20, 14, 'bat'); s.E(50 + bx, 66 + by, 14, 7, 'bat2');
+    s.L(34 + bx, 66 + by, 36 + P.bl[0], 88 + P.bl[1], 3.6, 'bat'); s.E(37 + P.bl[0], 90 + P.bl[1], 4, 1.6, 'bat2');
+    // the void heart: a black hole ringed with violet light
+    s.E(56 + bx, 60 + by, 6.5, 6.5, 'eclipse'); s.E(56 + bx, 60 + by, 4.5, 4.5, 'void'); s.d(54 + bx, 58 + by, '#d070e8');
+    // near folded wing as the front leg, claws on the ground
+    s.L(62 + bx, 50 + by, 74 + P.ff[0] * .5, 64 + by, 4, 'batw'); s.L(74 + P.ff[0] * .5, 64 + by, 70 + P.ff[0], 88 + P.ff[1], 3.4, 'batw');
+    s.P(m([[60, 48], [74, 62], [68, 84], [58, 64]], bx, by), 'batw2');
+    for (const x of [67, 70, 73]) s.d(x + P.ff[0], 90 + P.ff[1], '#d070e8');
+    s.spike(74 + P.ff[0] * .5, 62 + by, 5, 1.3, 'crys', 2);
+    // head: tall torn ears, red eyes, crystal fangs
+    s.E(76 + hx, 44 + hy, 10, 8.5, 'bat'); s.E(85 + hx, 48 + hy, 5.5, 4, 'bat');
+    s.P(m([[68, 40], [64, 20], [74, 36]], hx, hy), 'batw'); s.P(m([[76, 38], [80, 18], [84, 38]], hx, hy), 'batw');
+    s.d(67 + hx, 30 + hy, '#0c0812').d(80 + hx, 26 + hy, '#0c0812');
+    s.P(m([[78, 51], [91, 51 + j], [88, 54 + j], [80, 54]], hx, hy), 'bat2');
+    if (j > 1) s.P(m([[80, 51], [90, 51], [88, 51 + j], [81, 52 + j * .5]], hx, hy), 'maw');
+    for (const x of [82, 87]) s.P(m([[x - 1.2, 51], [x, 57], [x + 1.2, 51]], hx, hy), 'crys');
+    s.d(79 + hx, 43 + hy, '#ff3b3b').d(80 + hx, 43 + hy, '#ff8a8a').d(84 + hx, 44 + hy, '#ff3b3b').d(79 + hx, 42 + hy, '#1a0408').d(84 + hx, 43 + hy, '#1a0408');
+    if (P.glow) glowMouth(s, 90 + hx, 52 + hy);
+  }, glows: [[56, 60, '#b05aff', 8, 'body'], [81, 43, '#ff3b3b', 3, 'head'], [10, 32, '#d070e8', 4]], emit: [{ x: 56, y: 60, type: 'mist', rate: 2.5 }, { x: 46, y: 26, type: 'sparkle', rate: 1 }], mouth: [90, 52] },
+  // ราชันย์เงานิรนาม (shadow raid): a giant headless knight; violet fire burns from its collar round a blank cracked mask, a chain flail drags at its side
+  nameless: { size: 96, rig: BIPED, aura: { type: 'bosss', x: 48, y: 90, r: 36 }, draw(s, P) {
+    const [bx, by] = P.body, hx = P.head[0] + bx, hy = P.head[1] + by, a2 = P.arm2, a1 = P.arm;
+    const m = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
+    // tattered banner cape behind
+    s.P(m([[30, 32], [64, 32], [72, 72], [70, 88], [64, 82], [58, 90], [50, 82], [42, 90], [34, 82], [26, 88], [22, 72]], bx, by), 'cape');
+    s.line(m([[36, 40], [30, 80]], bx, by), '#3a2a48').line(m([[58, 40], [64, 80]], bx, by), '#3a2a48');
+    // far arm hanging, a gauntlet with claws
+    s.L(32 + bx, 40 + by, 26 + a2[0], 62 + a2[1], 4.5, 'arm2'); s.E(25 + a2[0], 64 + a2[1], 4, 4, 'arm2');
+    // legs: greaves and pointed sabatons
+    s.L(42 + bx, 64 + by, 40 + P.bl[0], 86 + P.bl[1], 5, 'arm2'); s.P([[34 + P.bl[0], 90 + P.bl[1]], [40 + P.bl[0], 84 + P.bl[1]], [47 + P.bl[0], 90 + P.bl[1]]], 'arm2');
+    s.L(54 + bx, 64 + by, 56 + P.bf[0], 86 + P.bf[1], 5, 'arm'); s.P([[50 + P.bf[0], 90 + P.bf[1]], [56 + P.bf[0], 84 + P.bf[1]], [64 + P.bf[0], 90 + P.bf[1]]], 'arm');
+    // torso: breastplate with a violet crack, tassets, wide spiked pauldrons
+    s.P(m([[34, 34], [62, 34], [60, 58], [52, 66], [44, 66], [36, 58]], bx, by), 'arm');
+    s.line(m([[48, 38], [46, 46], [50, 52], [47, 60]], bx, by), '#a04aff', '#d070e8');
+    s.P(m([[36, 60], [60, 60], [62, 70], [34, 70]], bx, by), 'arm2'); s.line(m([[48, 61], [48, 70]], bx, by), '#0c0c14');
+    s.E(32 + bx, 36 + by, 9, 6.5, 'arm2'); s.E(64 + bx, 36 + by, 9, 6.5, 'arm');
+    s.spike(28 + bx, 32 + by, 7, 1.8, 'arm2', -3); s.spike(34 + bx, 31 + by, 6, 1.6, 'arm2', -1); s.spike(62 + bx, 31 + by, 6, 1.6, 'arm', 1); s.spike(68 + bx, 32 + by, 7, 1.8, 'arm', 3);
+    s.E(48 + bx, 31 + by, 10, 3.5, 'arm2');
+    // no head: violet fire rises from the collar, a blank mask with one crack floats in it
+    s.P(m([[39, 30], [41, 18], [44, 22], [46, 6], [49, 16], [52, 4], [54, 20], [57, 16], [57, 30]], hx, hy), 'vio');
+    s.P(m([[43, 30], [45, 20], [48, 24], [51, 12], [53, 24], [54, 30]], hx, hy), 'soulc');
+    s.E(49 + hx, 19 + hy, 5, 6.5, 'bone'); s.line(m([[50, 13], [49, 17], [51, 20], [49, 25]], hx, hy), '#2a2620');
+    // near arm holding the chain flail; the chain sags to a spiked orb on the ground
+    s.L(64 + bx, 40 + by, 72 + a1[0], 58 + a1[1], 5, 'arm'); s.E(73 + a1[0], 60 + a1[1], 4.5, 4.5, 'arm');
+    const ch = [[75, 63], [78, 67], [80, 71], [81, 75], [80, 79], [79, 82]];
+    for (const [x, y] of ch) s.E(x + a1[0], y + a1[1] * .5, 1.4, 1.2, 'iron');
+    s.E(78 + a1[0] * .3, 86, 6, 5.5, 'arm2'); for (const [dx, dy] of [[0, -7], [6, -3], [-6, -3], [4, 4], [-4, 4]]) s.d(78 + dx + a1[0] * .3, 86 + dy, '#8a8aa8');
+    s.E(78 + a1[0] * .3, 86, 2.4, 2.2, 'vio');
+    if (P.glow) glowMouth(s, 49 + hx, 19 + hy);
+  }, glows: [[49, 14, '#a04aff', 10, 'head'], [78, 86, '#a04aff', 5], [48, 48, '#a04aff', 4, 'body']], emit: [{ x: 49, y: 8, type: 'ember', rate: 4 }, { x: 46, y: 88, type: 'mist', rate: 2 }], mouth: [49, 19] },
   /* ----- Earth line (static drafts for the owner to choose from): stone-armoured animals, tortoise and rhino ----- */
   eegg: { size: 48, rig: BLOB, draw(s, P) {
     const bx = P.body[0] * .6, by = P.body[1] * .3, m = (pts) => pts.map(([x, y]) => [x + bx, y + by]);
@@ -3148,9 +3333,9 @@ function getFrame(def, name, i) {
   }
   return list[i];
 }
-const SHADOW_IDS = ['kbaby', 'knight', 'knight2', 'knightlord', 'lantern', 'mistblob', 'sboss', 'segg', 'sfused', 'shyghost', 'soulwraith', 'wbaby', 'wraithlord'];
-const DARK_IDS = ['degg', 'mote', 'batling', 'spider', 'rat', 'vampbat', 'eyespider', 'zrat', 'batlord', 'spiderqueen', 'batemperor', 'dfused', 'darksoul'];
-const HOLY_IDS = ['hegg', 'glint', 'lamb', 'wingsheep', 'cherub', 'lioncub', 'qilin', 'bellcrab', 'winglion', 'sunqilin', 'lionking', 'hfused', 'holyele'];
+const SHADOW_IDS = ['nameless', 'kbaby', 'knight', 'knight2', 'knightlord', 'lantern', 'mistblob', 'sboss', 'segg', 'sfused', 'shyghost', 'soulwraith', 'wbaby', 'wraithlord'];
+const DARK_IDS = ['voidbat', 'degg', 'mote', 'batling', 'spider', 'rat', 'vampbat', 'eyespider', 'zrat', 'batlord', 'spiderqueen', 'batemperor', 'dfused', 'darksoul'];
+const HOLY_IDS = ['raidseraph', 'hegg', 'glint', 'lamb', 'wingsheep', 'cherub', 'lioncub', 'qilin', 'bellcrab', 'winglion', 'sunqilin', 'lionking', 'hfused', 'holyele'];
 const BOLT_IDS = ['begg', 'spark', 'cloudpuff', 'tbird', 'staticcat', 'stormfox', 'hawk', 'gloomcloud', 'boltfox', 'thunderking', 'foxking', 'bfused', 'stormbison'];
 const EARTH_IDS = ['eegg', 'pebble', 'clay', 'tortoise', 'worm', 'rhino', 'pillarturtle', 'boulder', 'orerhino', 'mountturtle', 'crystalrhino', 'efused', 'pangolin'];
 const LEAF_IDS = ['legg', 'seed', 'sprout', 'leafdeer', 'mushroom', 'wolf', 'stag', 'stump', 'barkwolf', 'forestdeer', 'wolfking', 'lfused', 'flora'];
@@ -3158,7 +3343,7 @@ for (const [id, def] of Object.entries(SPRITES)) {
   def.amp = (def.size >= 96 ? 2.2 : def.size >= 64 ? 1.3 : def.size >= 56 ? 1.15 : 1) * 1.6;
   def.frames = Object.fromEntries(Object.keys(ANIM).map((n) => [n, new Array(ANIM[n].n)]));
   def.img = getFrame(def, 'idle', 0); def.id = id;
-  def.el = SHADOW_IDS.includes(id) ? 'shadow' : DARK_IDS.includes(id) ? 'dark' : HOLY_IDS.includes(id) ? 'holy' : BOLT_IDS.includes(id) ? 'bolt' : EARTH_IDS.includes(id) ? 'earth' : LEAF_IDS.includes(id) ? 'leaf' : ['wfused', 'whaleA', 'whaleB', 'whaleC', 'wegg', 'drop', 'bubble', 'swordwhale', 'jelly', 'shark', 'armorwhale', 'octopus', 'seadragon', 'whaleking', 'leviathan', 'turtle'].includes(id) ? 'water' : 'fire';
+  def.el = SHADOW_IDS.includes(id) ? 'shadow' : DARK_IDS.includes(id) ? 'dark' : HOLY_IDS.includes(id) ? 'holy' : BOLT_IDS.includes(id) ? 'bolt' : EARTH_IDS.includes(id) ? 'earth' : LEAF_IDS.includes(id) ? 'leaf' : ['abyssfish', 'wfused', 'whaleA', 'whaleB', 'whaleC', 'wegg', 'drop', 'bubble', 'swordwhale', 'jelly', 'shark', 'armorwhale', 'octopus', 'seadragon', 'whaleking', 'leviathan', 'turtle'].includes(id) ? 'water' : 'fire';
 }
 // The frame an entity shows: an action wins, then walking (phase follows the distance walked), then idle.
 function frameOf(e, t) {
@@ -3384,11 +3569,12 @@ const FLAME_LINE = [
     { id: 'phoenix', name: 'มังกรปีกฟีนิกซ์', old: 'เดิม ฟีนิกซ์อมตะ 🦅 (นก ไม่ใช่สัตว์เลื้อยคลาน) · ตัวสีชมพูแดง ปีกไฟ', st: 'new' } ] },
 ];
 // Which stage every design is, so cards, the line-up and the battle HUD can say it.
+const RAID_STAGE = { lavaking: 'boss', abyssfish: 'boss', raidseraph: 'boss', voidbat: 'boss', nameless: 'boss' };
 const STAGES = {
   egg: ['ไข่', '', '#a49cb4'], b1: ['ร่างเด็ก 1', '★', '#7ac8f0'], b2: ['ร่างเด็ก 2', '★', '#7ac8f0'], adult: ['โตเต็มวัย', '★★', '#5ad38a'],
   perfect: ['ร่างสมบูรณ์', '★★★', '#ffc94a'], ultimate: ['ร่างสุดท้าย', '★★★★', '#ff8a4a'], fused: ['ร่างผสม', '★★★★★', '#d08aff'], boss: ['บอส', '', '#ff5a5a'],
 };
-const STAGE_OF = {
+const STAGE_OF = { ...RAID_STAGE,
   egg: 'egg', wisp: 'b1', coal: 'b2', gecko: 'adult', smoke: 'adult', raptor: 'adult', frill: 'perfect', lava: 'perfect', dragon: 'perfect', sunking: 'ultimate', phoenix: 'ultimate', avatar: 'fused', boss: 'boss',
   whaleA: 'ultimate', whaleB: 'ultimate', whaleC: 'ultimate', wfused: 'fused',
   segg: 'egg', wbaby: 'b1', kbaby: 'b2', knight: 'adult', shyghost: 'adult', lantern: 'adult', knight2: 'perfect', mistblob: 'perfect', soulwraith: 'perfect', knightlord: 'ultimate', wraithlord: 'ultimate', sfused: 'fused', sboss: 'boss',
@@ -3721,6 +3907,11 @@ addCard(document.getElementById('show-efused'), 'efused', document.getElementByI
 addCard(document.getElementById('show-pangolin'), 'pangolin', document.getElementById('act-pangolin'));
 addCard(document.getElementById('show-lfused'), 'lfused', document.getElementById('act-lfused'));
 addCard(document.getElementById('show-flora'), 'flora', document.getElementById('act-flora'));
+addCard(document.getElementById('show-lavaking'), 'lavaking', document.getElementById('act-lavaking'), 8, true);
+addCard(document.getElementById('show-abyssfish'), 'abyssfish', document.getElementById('act-abyssfish'), 8, true);
+addCard(document.getElementById('show-raidseraph'), 'raidseraph', document.getElementById('act-raidseraph'), 8, true);
+addCard(document.getElementById('show-voidbat'), 'voidbat', document.getElementById('act-voidbat'), 8, true);
+addCard(document.getElementById('show-nameless'), 'nameless', document.getElementById('act-nameless'), 8, true);
 
 function emitFor(def, ps, acc, dt, ox, oy, flip, scale = 1) {
   for (let i = 0; i < (def.emit || []).length; i++) {
@@ -5981,7 +6172,7 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
     if (PICK[v] && me.el !== v && !busy) { pickMe.value = PICK[v]; me = makeEnt(PICK[v], 0); showBanner('FIGHT!'); }
     jump.value = v;
   };
-  const fromHash = () => { const h = location.hash.slice(1); return ['fire', 'water', 'leaf', 'earth', 'bolt', 'holy', 'dark', 'shadow', 'plan'].includes(h) ? h : 'all'; };
+  const fromHash = () => { const h = location.hash.slice(1); return ['fire', 'water', 'leaf', 'earth', 'bolt', 'holy', 'dark', 'shadow', 'raid', 'plan'].includes(h) ? h : 'all'; };
   jump.addEventListener('change', () => { apply(jump.value); try { history.replaceState(null, '', jump.value === 'all' ? location.pathname : '#' + jump.value); } catch (e) { location.hash = jump.value === 'all' ? '' : jump.value; } document.getElementById('battle-h').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }); });
   window.addEventListener('hashchange', () => apply(fromHash()));
   apply(fromHash());

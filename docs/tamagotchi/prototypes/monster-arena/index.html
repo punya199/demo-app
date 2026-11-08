@@ -189,6 +189,7 @@ td.st { white-space: nowrap; color: var(--muted) }
         </div>
         <div class="row">
           <button id="b-auto" aria-pressed="false">โหมดสาธิตอัตโนมัติ</button>
+          <button id="b-grow">บอสโลกขยายร่าง (ข้ามไปวินาทีที่ 20/40)</button>
         </div>
       </div>
       <div class="ctl">
@@ -208,6 +209,8 @@ td.st { white-space: nowrap; color: var(--muted) }
         <div class="row" id="shadow-skills"></div></div>
         <div class="skgroup" data-el="earth"><div class="ctl-title">สกิลธาตุศิลาในเกม 8 ท่า</div>
         <div class="row" id="earth-skills"></div></div>
+        <div class="skgroup" data-el="raid"><div class="ctl-title">สกิลบอสเรด ตัวละ 2 ท่า (บอสใช้ใส่มอนของเรา)</div>
+        <div class="row" id="raid-skills"></div></div>
         <div class="skgroup" data-el="other"><div class="ctl-title">เอฟเฟกต์ธาตุอื่น (ร่างแรก รอออกแบบ)</div>
         <div class="row" id="skills"></div></div>
       </div>
@@ -516,7 +519,7 @@ td.st { white-space: nowrap; color: var(--muted) }
   <section aria-labelledby="raid-h" data-group="raid" style="order:27">
     <div class="eyebrow">บอสเรด · ภาพนิ่งให้เลือกก่อน</div>
     <h2 id="raid-h">บอสเรด 5 ตัวที่เหลือ</h2>
-    <p class="lede">บอสเรดในเกมมี 6 ตัว พฤกษาโบราณทำไปแล้ว อีก 5 ตัวยังเป็นอีโมจิ ทุกตัวเป็นสัตว์ในตระกูลของธาตุตัวเอง และไม่ซ้ำกับบอสโลกของธาตุเดียวกัน ขนาด 96 พิกเซลเท่าบอสอื่น ตอนนี้เป็นภาพนิ่ง ถ้าแบบไหนผ่านจะทำท่าขยับ เอาเข้าฉากต่อสู้ และทำท่าโจมตีของบอสต่อ</p>
+    <p class="lede">บอสเรดในเกมมี 6 ตัว พฤกษาโบราณทำไปแล้ว อีก 5 ตัวใช้ภาพที่คุณให้ AI ออกแบบ ขยับได้และลงสู้ได้ทุกตัว ใต้ฉากต่อสู้มีปุ่มสกิลบอสเรดตัวละ 2 ท่า กดแล้วบอสตัวนั้นจะเข้าสนามและใช้ท่าใส่มอนของเรา ในโหมดสาธิตอัตโนมัติ บอสเรดจะใช้ท่าของตัวเอง ท่าระเบิดรอบตัว (รำแพนสายฟ้า ฝูงค้างคาวโลหิต) บอสจะกระโดดเข้าหาก่อน เพราะบอสเดินช้า · ปุ่ม "บอสโลกขยายร่าง" ด้านบนข้ามไปวินาทีที่ 20 และ 40 ของการสู้บอสโลก บอสจะตัวใหญ่ขึ้นทีละ 10% (ร่างเดิม) และพลังโจมตีกับป้องกัน +30%</p>
     <div class="showcase">
       <div class="show boss">
         <canvas id="show-lavaking" width="128" height="112" aria-label="บอสเรด ราชันย์ลาวา"></canvas>
@@ -598,4 +601,5 @@ td.st { white-space: nowrap; color: var(--muted) }
 <script src="js/skills/holy.js"></script>
 <script src="js/skills/dark.js"></script>
 <script src="js/skills/shadow.js"></script>
+<script src="js/skills/raid.js"></script>
 <script src="js/page.js"></script>

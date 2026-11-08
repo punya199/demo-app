@@ -2828,6 +2828,8 @@ function makeEnt(rid, side) {
     oy: 0,
     sx: 1,
     sy: 1,
+    grow: 1, // world boss size: the same sprite, a step bigger at each grow stage
+    grown: 0,
     alpha: 1,
     flash: 0,
     shield: 0,
@@ -2867,12 +2869,13 @@ function anchor(e) {
 function mouthOf(e) {
   const d = e.def,
     a = anchor(e)
-  const mx = e.flip ? d.size - d.mouth[0] : d.mouth[0]
-  return { x: a.x - d.size / 2 + mx, y: a.y - d.img.foot + d.mouth[1] }
+  const mx = e.flip ? d.size - d.mouth[0] : d.mouth[0],
+    g = e.grow || 1
+  return { x: a.x + (mx - d.size / 2) * g, y: a.y - (d.img.foot - d.mouth[1]) * g }
 }
 function centerOf(e) {
   const a = anchor(e)
-  return { x: a.x, y: a.y - e.def.img.foot * 0.45 }
+  return { x: a.x, y: a.y - e.def.img.foot * 0.45 * (e.grow || 1) }
 }
 function sayAt(e, text, col, big = false) {
   const c = centerOf(e)
@@ -2929,6 +2932,56 @@ function impactBurst(x, y, col = '#ffffff', n = 14) {
       }
     },
   })
+}
+// World boss grow (game: WORLD_BOSS_GROW_SECS 20 s and 40 s, ATK and DEF +30% each stage). The owner chose to
+// keep the same sprite and make it a little bigger each time (+10% per stage) instead of a new, angrier form.
+const GROW_SECS = [20, 40],
+  GROW_STEP = 0.1
+async function growBoss(e) {
+  e.grown++
+  const g0 = e.grow,
+    g1 = 1 + GROW_STEP * e.grown
+  showBanner('บอสขยายร่าง!', '#ff6a4a', 1300)
+  sayAt(e, 'โจมตี/ป้องกัน +30%', '#ff8a6a', true)
+  darken = 0.3
+  const c = anchor(e)
+  fxs.push({
+    age: 0,
+    life: 1.2,
+    draw(cx, k) {
+      cx.globalCompositeOperation = 'lighter'
+      for (let i = 0; i < 3; i++) {
+        const q = (k * 1.4 - i * 0.18 + 1) % 1
+        cx.globalAlpha = (1 - q) * 0.8 * (1 - k * 0.5)
+        cx.strokeStyle = i % 2 ? '#ffb43a' : '#ff5a4a'
+        cx.lineWidth = 2
+        cx.beginPath()
+        cx.ellipse(c.x, c.y, 20 + q * 70, (20 + q * 70) * 0.4, 0, 0, 7)
+        cx.stroke()
+      }
+    },
+  })
+  // three pulses, each a little bigger, then it settles at the new size
+  await tween(1100, (k) => {
+    const pulse = Math.sin(k * Math.PI * 3) * 0.04 * (1 - k)
+    e.grow = g0 + (g1 - g0) * ease(k) + pulse
+    shake = Math.max(shake, 3 * (1 - k))
+    e.flash = 0.5 * Math.max(0, Math.sin(k * Math.PI * 3))
+  })
+  e.grow = g1
+  e.flash = 0
+  tween(600, (k) => {
+    darken = 0.3 * (1 - k)
+  })
+}
+function checkGrow(e) {
+  if (!e.boss || e.bossKind !== 'บอสโลก' || e.growing) return
+  if (GROW_SECS.filter((s) => timer >= s).length > e.grown) {
+    e.growing = true
+    growBoss(e).then(() => {
+      e.growing = false
+    })
+  }
 }
 async function damage(def, amount, opts = {}) {
   opts.from = opts.from || other(def)

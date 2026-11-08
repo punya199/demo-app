@@ -136,6 +136,10 @@ The prototype uses these; the game data still has the old ones.
 | Skill | `shd_arrow` | ศรเงียบ | ไฟโคมเงียบ |
 | Skill | `shd_snake` | เขี้ยวเงียบ | โล่ทมิฬ |
 | Skill | `shd_sting` | เหล็กในเงา | เปลวพิษวิญญาณ |
+| Skill (raid boss) | `e_dragontail` (จ้าวมืดมิด) | หางมังกรฟาด | ฝูงค้างคาวโลหิต (the fire world boss also uses e_dragontail: give the vampire its own id) |
+| Skill (raid boss) | `e_orebite` (จ้าวมืดมิด) | กัดบดแร่ | เขี้ยวดูดเลือด (the dark world boss also uses e_orebite: give the vampire its own id) |
+| Skill (raid boss) | `e_sparktail` (ราชันย์เงานิรนาม) | หางสปาร์ก | เหวี่ยงตุ้มโซ่ (the lightning world boss also uses e_sparktail: give the knight its own id) |
+| Skill (raid boss) | `e_mistbite` (ราชันย์เงานิรนาม) | ขย้ำในหมอก | ฟันจากหมอก (the shark keeps ขย้ำในหมอก: give the knight its own id) |
 | Species | see the plan table on the page | อัคนีพยัคฆ์, ราชาสุริยะ, … | อัคนีแผงคอ, ราชันมังกรสุริยะ, … |
 | Species (shadow) | `shadow_baby2` … `shadow_ultimateAlt` | แมวเงา, นินจาเงา, ผู้ล่าไร้เสียง, พญางูเงา, แมงป่องอาถรรพ์, เจ้าแห่งเงา, ราชันย์ไร้ตัวตน | หมวกผีน้อย, อัศวินเงา, ภูตตะเกียงเงา, อัศวินเงาเกราะทมิฬ, ภูตโคมวิญญาณ, จอมอัศวินเงา, เจ้าภูตเงา (เงาจิ๋ว, ผีเงาขี้อาย, ม่านหมอกขี้เกียจ, เงาผู้ตื่น and the boss ราชาม่านเงา keep their names) |
 
@@ -178,13 +182,26 @@ parts on a preview when the cut is not obvious; never move only part of a rock o
 2. **อสูรห้วงลึก (shark):** done (2026-11-08) without the owner circling: `sharkPart` cuts tail,
    eight crest spikes, pectoral fin, three belly fins and the jaw. If the owner wants a different
    cut, they circle it on the parts preview and the ranges in `SHARK_CREST` / `sharkPart` change.
-3. **Raid boss skills** (none drawn yet; `arenaSkills` in backend `raid-data.ts`):
-   ราชันย์ลาวา `e_lavacoil` (รัดหลอมละลาย, melee grab) + `e_volcano` (ลมหายใจภูเขาไฟ, beam from the
-   chest core); อสูรห้วงลึก `e_whirlpool` (วังน้ำวน, zone) + `e_mistbite` (ขย้ำในหมอก, melee lunge);
-   เซราฟรัศมี `e_fan` (รำแพนสายฟ้า, burst) + `e_plumes` (ขนไฟฟ้าสาด, spread); จ้าวมืดมิด
-   `e_dragontail` (burst) + `e_orebite` (melee) — rename to fit Dracula; ราชันย์เงานิรนาม
-   `e_sparktail` (multi) + `e_mistbite` (melee). Arena themes: lava for the golem, a deep-sea theme
-   for the shark.
+3. **Raid boss skills:** done in the prototype (2026-11-08), `js/skills/raid.js` (`RAID`, ids `raid_*`,
+   `game` = the arena-data id, `boss` = the sprite; `RAID_OF[boss]` lists a boss's skills). Buttons under the
+   arena (group `raid`) put that boss in the foe slot and make it use the skill on our monster; in auto mode a
+   raid boss uses its own two. Burst skills call `closeIn` (a heavy hop) first because bosses walk slowly.
+   รัดหลอมละลาย: three molten rings wrap and squeeze the target (burn + slow). ลมหายใจภูเขาไฟ: the chest core
+   swells, then a straight molten beam with flying rock and a scorched line on the floor (burn). วังน้ำวน:
+   warning ring, then a spinning whirlpool that turns the target round (slow). ขย้ำในหมอก: fog rolls out, the
+   shark lunges out of it and two rows of teeth snap shut (blind). รำแพนสายฟ้า: nine charged rays fan out,
+   then a ring of lightning bolts (stun). ขนไฟฟ้าสาด: five electric feathers in a fan (static 40%).
+   ฝูงค้างคาวโลหิต (game e_dragontail): the cape flares and a swarm of bats spirals out (defence down).
+   เขี้ยวดูดเลือด (game e_orebite): dissolves into bats, bites, blood flows back to him (defence down).
+   เหวี่ยงตุ้มโซ่ (game e_sparktail): four swings of the flail (static 30%). ฟันจากหมอก (game e_mistbite,
+   shared with the shark): sinks into violet fog, appears beside the target and cuts (blind). The new names
+   are in "Names to apply in the game"; the knight needs its own skill id in the game, since e_mistbite is
+   also the shark's.
+   **World boss grow:** the owner chose (2026-11-08) to keep the same sprite and make it bigger at each grow
+   stage, not to draw an angrier form: `growBoss` in `core.js` scales the sprite +10% per stage (1.1 at
+   20 s, 1.2 at 40 s, `GROW_SECS`/`GROW_STEP`) with three pulses, a red ring and a banner; `e.grow` scales the
+   drawing, shadow, glows, `centerOf` and `mouthOf`. The button บอสโลกขยายร่าง skips ahead to the next stage.
+   In the game, `ArenaReplay` should do the same on the `grow` event.
 4. **Then the monsters:** the 20 adventure enemies (`adventure-data.ts`, emoji animals outside the
    lines) and the training dummy, same AI-picture workflow.
 5. **Cross-line merging is switched off** on branch `claude/tamagotchi-game-expansion-ercfjr` in

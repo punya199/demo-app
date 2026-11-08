@@ -1,9 +1,19 @@
 'use strict'
 // Page wiring: skill buttons, skill cards, the section picker and the plan tables.
-const GAME_SKILLS = { ...FIRE, ...WATER, ...LEAF, ...EARTH, ...BOLT, ...HOLY, ...DARK, ...SHADOW }
+const GAME_SKILLS = {
+  ...FIRE,
+  ...WATER,
+  ...LEAF,
+  ...EARTH,
+  ...BOLT,
+  ...HOLY,
+  ...DARK,
+  ...SHADOW,
+  ...RAID,
+}
 async function useFire(id, att, def) {
   const s = GAME_SKILLS[id]
-  if (!s.passive) tag(att, s.icon + ' ' + s.name, skillEl(id))
+  if (!s.passive) tag(att, s.icon + ' ' + s.name, s.el || skillEl(id))
   if (s.reach && !inRange(att, def, s.reach)) await keepRange(att, def, s.reach * 0.7)
   await s.run(att, def)
 }
@@ -101,6 +111,36 @@ for (const [id, sk] of Object.entries(LEAF)) {
   b.addEventListener('click', () => run(() => useFire(id, me, foe)))
   leafRow.append(b)
 }
+// Raid boss skills: the button puts that skill's boss in the foe slot, then the boss uses it on our monster.
+const raidRow = document.getElementById('raid-skills')
+function setFoe(id, again = false) {
+  if (foe.rid === id && !again) return
+  pickFoe.value = id
+  foe = makeEnt(id, 1)
+  timer = 0
+  showBanner('BOSS!', '#ff6a4a', 1000)
+}
+// Skip ahead to the next grow stage of a world boss (in a real fight it happens at 20 s and 40 s).
+document.getElementById('b-grow').addEventListener('click', () => {
+  if (!foe.boss || foe.bossKind !== 'บอสโลก') setFoe('boss')
+  else if (foe.grown >= GROW_SECS.length) setFoe(foe.rid, true)
+  timer = Math.max(timer, GROW_SECS[foe.grown] || 0)
+})
+for (const [id, sk] of Object.entries(RAID)) {
+  const b = document.createElement('button')
+  b.className = 'el'
+  b.textContent = `${sk.icon} ${ROSTER[sk.boss].name} · ${sk.name}`
+  b.addEventListener('click', () =>
+    run(async () => {
+      if (foe.rid !== sk.boss) {
+        setFoe(sk.boss)
+        await wait(700)
+      }
+      await useFire(id, foe, me)
+    })
+  )
+  raidRow.append(b)
+}
 const fireRow = document.getElementById('fire-skills')
 for (const [id, sk] of Object.entries(FIRE)) {
   const b = document.createElement('button')
@@ -115,6 +155,7 @@ pickMe.addEventListener('change', () => {
 })
 pickFoe.addEventListener('change', () => {
   foe = makeEnt(pickFoe.value, 1)
+  timer = 0
   showBanner(foe.boss ? 'BOSS!' : 'FIGHT!', foe.boss ? '#ff6a4a' : '#ffd34a', 1200)
 })
 let autoOn = false
@@ -200,7 +241,9 @@ async function autoLoop() {
                             'holy_blade',
                           ]
                         : ['flame_breath', 'flame_lava', 'flame_claw', 'flame_sun']
-        const k = list[Math.floor(Math.random() * list.length)]
+        const own = RAID_OF[foe.rid],
+          pool = own || list
+        const k = pool[Math.floor(Math.random() * pool.length)]
         await run(() => useFire(k, foe, me))
       }
       if (autoOn) await roam(2600 + Math.random() * 1600)
@@ -215,18 +258,19 @@ function drawEnt(c, e, t) {
     img = frameOf(e, t)
   const a = anchor(e)
   const bob = 0
-  const w = d.size * e.sx,
-    h = d.size * e.sy
+  const g = e.grow || 1,
+    w = d.size * e.sx * g,
+    h = d.size * e.sy * g
   const hv = d.hover ? d.hover + Math.sin(t * 2.2 + e.side) * 1.4 : 0
   const x = a.x - w / 2,
-    y = a.y - d.img.foot * e.sy + bob - 1 - hv
+    y = a.y - d.img.foot * e.sy * g + bob - 1 - hv
   c.globalAlpha = 0.4 * e.alpha
   c.fillStyle = '#000'
   c.beginPath()
   c.ellipse(
     e.x + e.ox,
     e.y + e.oy - 1,
-    d.size * (d.hover ? 0.22 : 0.3) * (1 - Math.min(0.5, -e.oy / 40)),
+    d.size * g * (d.hover ? 0.22 : 0.3) * (1 - Math.min(0.5, -e.oy / 40)),
     3,
     0,
     0,
@@ -251,7 +295,7 @@ function drawEnt(c, e, t) {
   if (d.aura) drawAura(c, d.aura, a.x - d.size / 2, y, t, e.flip, d.size)
   c.globalAlpha = e.alpha
   drawImg(c, img.cv, x, y, w, h, e.flip)
-  drawGlows(c, d, x, y, e.sx, e.sy, e.flip, t, e.alpha, img)
+  drawGlows(c, d, x, y, e.sx * g, e.sy * g, e.flip, t, e.alpha, img)
   if (e.flash > 0) {
     c.globalAlpha = e.flash * e.alpha
     drawImg(c, img.white, x, y, w, h, e.flip)
@@ -807,6 +851,7 @@ function hud(t) {
 function frame(dt) {
   clock += dt
   timer += dt
+  checkGrow(foe)
   if (hitstop > 0) {
     hitstop -= dt
     dt = 0
@@ -1835,8 +1880,14 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
       sec.hidden = !(v === 'all' || g === 'battle' || g === v)
     })
     document.querySelectorAll('.skgroup').forEach((g) => {
-      g.hidden = ELS.includes(v) ? g.dataset.el !== v : g.dataset.el === 'dark'
+      g.hidden =
+        v === 'raid'
+          ? g.dataset.el !== 'raid'
+          : ELS.includes(v)
+            ? g.dataset.el !== v
+            : g.dataset.el === 'dark'
     })
+    if (v === 'raid' && !RAID_OF[foe.rid] && !busy) setFoe('lavaking')
     if (PICK[v] && me.el !== v && !busy) {
       pickMe.value = PICK[v]
       me = makeEnt(PICK[v], 0)

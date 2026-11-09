@@ -1,3 +1,10 @@
+# [1.64.0](https://github.com/punya199/demo-app/compare/v1.63.2...v1.64.0) (2026-11-09)
+
+
+### Update
+
+* move Hall of Fame to its own menu ([20f781a](https://github.com/punya199/demo-app/commit/20f781a677aa6d68d76c53c85fb767222c30f329))
+
 ## [1.63.2](https://github.com/punya199/demo-app/compare/v1.63.1...v1.63.2) (2026-11-09)
 
 

@@ -15,6 +15,16 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: 'next',
+    releasedAt: '2026-11-09T12:30:00Z',
+    changes: [
+      {
+        kind: 'update',
+        text: 'ย้ายหอเกียรติยศ (Hall of Fame) จากหน้าเลี้ยงไปอยู่ในเมนูใหม่ "หอเกียรติยศ" 🏆 หมวดอื่น ๆ แล้ว',
+      },
+    ],
+  },
+  {
     version: '1.63.1',
     releasedAt: '2026-11-09T12:25:45Z',
     changes: [

@@ -18,6 +18,7 @@ export type GameMenuKey =
   | 'quests'
   | 'friends'
   | 'dex'
+  | 'hall-of-fame'
   | 'wiki'
   | 'patch-notes'
 
@@ -66,6 +67,7 @@ const ALL_MENU: IGameMenuGroup[] = [
       { key: 'quests', label: 'ภารกิจ', emoji: '📜' },
       { key: 'friends', label: 'เพื่อน', emoji: '👥' },
       { key: 'dex', label: 'Dex', emoji: '📖' },
+      { key: 'hall-of-fame', label: 'หอเกียรติยศ', emoji: '🏆' },
       { key: 'wiki', label: 'คู่มือ', emoji: '📘' },
       { key: 'patch-notes', label: 'อัปเดต', emoji: '📰' },
     ],

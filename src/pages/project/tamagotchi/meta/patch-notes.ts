@@ -15,6 +15,16 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: 'next',
+    releasedAt: '',
+    changes: [
+      {
+        kind: 'update',
+        text: 'เกมรีโหลดตัวเองเมื่อมีเวอร์ชันใหม่ 🔄 ถ้ากำลังเล่นอยู่จะขึ้นแถบให้กดรีโหลด ถ้าพักหน้าจอไว้เกิน 5 นาทีจะอัปเดตให้อัตโนมัติ ไม่ต้องกดรีเฟรชเอง',
+      },
+    ],
+  },
+  {
     version: '1.65.0',
     releasedAt: '2026-11-09T13:17:51Z',
     changes: [

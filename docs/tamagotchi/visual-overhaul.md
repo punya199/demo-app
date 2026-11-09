@@ -5,6 +5,11 @@ Working notes for the next session on the monster game's art. Condensed on 2026-
 
 **Talk to the owner in Thai**, short and concrete: say what changed and where to look on the page.
 
+**Open work (2026-11-09):** branch `claude/tamagotchi-game-expansion-ercfjr` in both repos holds the skill
+tiers, Fused skills, boss zoom, skill grandeur and the hybrid prototype; pushed, **no PR yet**. Ask the
+owner whether to open PRs and merge (deploy the backend first). Next art step the owner may ask for: port
+the 13 hybrids and their skill animations into the game.
+
 ## How the owner wants to work
 
 - **New creatures = still pictures first.** Show stills, wait for approval, then animate and do skills.

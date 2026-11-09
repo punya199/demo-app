@@ -1911,6 +1911,7 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
       'raid',
       'adv',
       'plan',
+      'pfx',
     ].includes(h)
       ? h
       : 'all'

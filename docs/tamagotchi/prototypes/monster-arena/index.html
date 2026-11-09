@@ -118,6 +118,7 @@ label.sel { display: flex; flex-direction: column; gap: 4px; font-size: 13px; co
 .whale-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px }
 .show.fused.water canvas { background: radial-gradient(ellipse at 50% 75%, #0e3a48 0%, #0a1218 72%) }
 .whale-opts .show canvas { background: radial-gradient(ellipse at 50% 75%, #12304a 0%, #0c0f1a 72%) }
+.pfx-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-top: 12px }
 .showcase { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px }
 .show { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0 }
 .show canvas { width: 100%; aspect-ratio: 1; image-rendering: pixelated; border-radius: 8px; display: block }
@@ -168,6 +169,7 @@ td.st { white-space: nowrap; color: var(--muted) }
       <option value="raid">บอสเรด 5 ตัว</option>
       <option value="adv">ศัตรูผจญภัย 20 ตัว + หุ่นซ้อม</option>
       <option value="plan">แผนออกแบบทั้ง 8 สาย</option>
+      <option value="pfx">ทดลอง PixelFX (สถานะ + โดนตี)</option>
     </select>
     <span class="hint" id="jump-hint">ฉากต่อสู้อยู่บนสุดเสมอ</span>
   </nav>
@@ -565,6 +567,13 @@ td.st { white-space: nowrap; color: var(--muted) }
     <p class="lede">จากภาพแผ่นเดียวที่คุณให้ AI วาด (ตาราง 5 × 5 พื้นชมพู) ตัดทีละช่อง ย่อเป็นพิกเซลตามขนาดของสัตว์แต่ละชนิด (หนอน ปู นก กระรอก ตัวเล็ก หมูป่า แพะ นกยูง ตัวใหญ่ มังกรกับโกเลมใหญ่สุด) ทุกการ์ดวาดที่สเกลเดียวกันจึงเทียบขนาดกันได้ ป้ายบอกร่างยังตามด่านในเกม เหลือตัวละไม่เกิน 15 สี เรียงตามลำดับด่านใน adventure-data.ts ตัดเป็นชิ้นให้ขยับ: หัวผงก ขาก้าวสลับ ปีกกระพือ หางแกว่ง ก้ามเหวี่ยง ลองสู้ได้ที่ช่องคู่ต่อสู้ กลุ่ม "ศัตรูผจญภัย" ใช้สกิลกลางของธาตุตัวเอง (หุ่นซ้อมไม่ตีกลับ)</p>
     <div class="showcase" id="adv-cards"></div>
   </section>
+  <section aria-labelledby="pfx-h" data-group="pfx" id="pfx-sec" style="order:27">
+    <div class="eyebrow">ทดลองไลบรารีเอฟเฟกต์</div>
+    <h2 id="pfx-h">PixelFX บนมอนของเรา: สถานะ 7 แบบ + โดนตี 2 แบบ</h2>
+    <p class="lede">เอฟเฟกต์จาก PixelFX (โอเพนซอร์ส MIT) ที่ตรงกับสถานะในเกม เอฟเฟกต์สถานะของ PixelFX วาดตามเงาร่างของตัวละคร เราจึงส่งรูปมอนของเราให้แทนหุ่นของเขา ไฟ พิษ และดาวจึงเกาะตามรูปร่างมอนแต่ละตัว ยังไม่ได้ปรับสีหรือขนาดใด ๆ เป็นค่าตั้งต้นของเขาทั้งหมด มอนยืนนิ่ง เอฟเฟกต์เล่นวน เลือกมอนได้ด้านล่าง</p>
+    <label class="sel">มอน<select id="pfx-pick"></select></label>
+    <div class="pfx-grid" id="pfx-cards"></div>
+  </section>
   <section aria-labelledby="plan-h" data-group="plan" style="order:27">
     <div class="eyebrow">แผนทั้งเกม</div>
     <h2 id="plan-h">ออกแบบมอนใหม่ทั้ง 8 สาย</h2>
@@ -612,3 +621,5 @@ td.st { white-space: nowrap; color: var(--muted) }
 <script src="js/skills/shadow.js"></script>
 <script src="js/skills/raid.js"></script>
 <script src="js/page.js"></script>
+<script src="js/vendor/pixelfx.js"></script>
+<script src="js/pixelfx-trial.js"></script>

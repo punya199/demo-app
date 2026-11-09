@@ -158,6 +158,26 @@ its name: "forest guardian" already fits the wolf king. Skill names live in two 
 skill, also stored in PvP history: the golden file `battle-engine.golden.json` records `moveName`,
 so check it with the `battle-golden-check` skill when renaming).
 
+## PixelFX trial (2026-11-09)
+
+The owner asked whether [PixelFX](https://github.com/patch-gg/pixelfx) (MIT, code-drawn pixel
+effects) helps this project. Verdict: partly. Most of its 244 effects are drawn for a side view with
+a flat floor line, so floor effects (frost nova, earth spike, ground slam) look wrong in our 3/4
+arena; effects on the body, in the air and in the UI fit. Trial on the prototype page ("ดูส่วน" →
+"ทดลอง PixelFX", `#pfx`): its seven status effects that match the game's statuses (burn, poison,
+stun, slow, haste, rage, curse) and two hit effects (hit-spark, crit-hit), on one top form per line.
+
+- `js/vendor/pixelfx.js` is an esbuild IIFE (`window.PixelFX`) of PixelFX's core plus those nine
+  effects, with its LICENSE and NOTICE in the header. Rebuild it from a clone: an entry file
+  re-exporting `createFrame, clearFrame, createFx, composite` and `FX = { burning, … }`, then
+  `node_modules/.bin/esbuild entry.js --bundle --format=iife --global-name=PixelFX`.
+- `js/pixelfx-trial.js` turns a monster's idle frame into a PixelFX actor (`mask`, `pixels`,
+  `head`, `chest`, feet at 0,0), so the status effects wrap our silhouette instead of PixelFX's
+  dummy. Each tile draws the effect's back layer, our sprite, then its front layer.
+- Colours and sizes are PixelFX's defaults; nothing tuned. Waiting for the owner's verdict before
+  anything goes into the game (it would need a canvas bridge in `ArenaReplay`, the actor built from
+  each sprite, and shield/regen drawn by us or from its holy effects).
+
 ## Open items and known gaps
 
 - Weapon/equipment sets: the boss-set arena rebalance (backend PR #27) and the 12 craft sets with the Mythic grade (backend PR #29, frontend PRs #29 and #30) are merged, released (backend 1.38.0, frontend 1.46.0) and deployed (Cloud Run and Cloudflare Pages) as of 2026-11-05. Frontend PR #31 (craft patch notes) is still open.

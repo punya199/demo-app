@@ -267,7 +267,16 @@ their root, the swamp's tree and reeds and the stone forest's tree sway, the ott
 stone as its arm, the ray SWIM, the phoenix and owl FLY) and `js/hybrid-page.js` (cards, pickers).
 Particles: steam (mist), lava embers and smoke, antler and tail flames, zaps, drips, smoke. Every hybrid has
 the twin aura of the fused forms in both parents' colours (`drawAura` type `twinx`, `HYBRID_AURA_COL`).
-Their own skill animations are not drawn yet (the arena uses the line skills).
+Their own skills (backend `fz_<a>_<b>`, 2026-11-09, an effect from each parent line) are animated in
+`js/skills/hybrid.js` (`HYBRID`, `HYBRID_OF[sprite]`): buttons in the "hybrid" skill group put that form
+in our slot and cast; in auto mode a hybrid uses its own skill half the time. Not yet in the game's
+`skill-fx/` (the game falls back to element particles for fz_<a>_<b>; the awakened fz_<line>_<line>
+play their line Ultimate animation via `AWAKENED_FX_OF`).
+
+Boss fights (2026-11-09, owner): bosses draw 30% bigger (`BOSS_SCALE` in core.js, world boss growth on top)
+and the camera zooms out to `BOSS_ZOOM` 1.45 view widths (`cam.zoom`, eased in page.js) with more room
+above the fighters. The game does the same without a camera: in a boss fight monsters draw at 0.72x and
+the boss at 1.3x (`fightPxOf` in `arena/replay-sprites.ts`, capped at 230 world px wide).
 
 Adventure enemies (2026-11-08): the owner asked for one sheet with all 20 plus the training dummy, so the
 prompt given in chat asks for a 5 × 5 grid (21 cells used, reading order = `adventure-data.ts` order, then

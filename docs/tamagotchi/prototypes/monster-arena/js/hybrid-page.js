@@ -23,6 +23,25 @@
     ROSTER[id] = { sprite: id, name, el: els[0], hp: 1270 }
     for (const g of groups) g.append(new Option(name, id))
   }
+  // Their own skills (skills/hybrid.js): the button puts that form in our slot, then it casts.
+  const row = document.getElementById('hybrid-skills')
+  if (row)
+    for (const [id, sk] of Object.entries(HYBRID)) {
+      const b = document.createElement('button')
+      b.className = 'el'
+      b.textContent = `${sk.icon} ${ROSTER[sk.hy].name} · ${sk.name}`
+      b.addEventListener('click', () =>
+        run(async () => {
+          if (me.rid !== sk.hy) {
+            pickMe.value = sk.hy
+            me = makeEnt(sk.hy, 0)
+            await wait(500)
+          }
+          await useFire(id, me, foe)
+        })
+      )
+      row.append(b)
+    }
   const box = document.getElementById('hybrid-cards')
   if (box)
     HYBRIDS.forEach(([id, name, els, animal], i) => {

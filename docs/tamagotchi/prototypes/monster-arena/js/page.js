@@ -10,6 +10,7 @@ const GAME_SKILLS = {
   ...DARK,
   ...SHADOW,
   ...RAID,
+  ...HYBRID,
 }
 async function useFire(id, att, def) {
   const s = GAME_SKILLS[id]
@@ -209,7 +210,11 @@ async function autoLoop() {
                         ? SHADOW
                         : FIRE
         const fk = Object.keys(set).filter((k) => !set[k].passive)
-        const k = fk[Math.floor(Math.random() * fk.length)]
+        // a cross-line Fused form uses its own skill half the time
+        const k =
+          HYBRID_OF[me.rid] && Math.random() < 0.5
+            ? HYBRID_OF[me.rid]
+            : fk[Math.floor(Math.random() * fk.length)]
         await run(() => useFire(k, me, foe))
       } else if (!foe.dummy) {
         const list =
@@ -242,7 +247,7 @@ async function autoLoop() {
                             'holy_blade',
                           ]
                         : ['flame_breath', 'flame_lava', 'flame_claw', 'flame_sun']
-        const own = RAID_OF[foe.rid],
+        const own = RAID_OF[foe.rid] || (HYBRID_OF[foe.rid] && [HYBRID_OF[foe.rid]]),
           pool = own || list
         const k = pool[Math.floor(Math.random() * pool.length)]
         await run(() => useFire(k, foe, me))
@@ -1885,8 +1890,8 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
     })
     document.querySelectorAll('.skgroup').forEach((g) => {
       g.hidden =
-        v === 'raid'
-          ? g.dataset.el !== 'raid'
+        v === 'raid' || v === 'hybrid'
+          ? g.dataset.el !== v
           : ELS.includes(v)
             ? g.dataset.el !== v
             : g.dataset.el === 'dark'

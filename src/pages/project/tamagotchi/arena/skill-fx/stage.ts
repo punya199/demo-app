@@ -3,6 +3,7 @@ import { IArenaReplay, IArenaSkill } from '../arena-interface'
 import { BASIC_NAME } from '../replay-anim'
 import { boltLine, BOLT } from './bolt'
 import { castsOf } from './casts'
+import { flourishTierOf, IFlourish, runFlourish } from './flourish'
 import { DARK, darkBurst } from './dark'
 import { EARTH } from './earth'
 import { FIRE, rebirth } from './fire'
@@ -69,6 +70,21 @@ export const AWAKENED_FX_OF: Record<string, string> = {
   fz_shadow_shadow: 'shd_end',
 }
 
+// A skill's flourish (without its timing), or null below Perfect tier. A Fused skill's second colour
+// is its other parent line (fz_<a>_<b>), or gold for an awakened one (fz_<line>_<line>).
+export const flourishOf = (skill: IArenaSkill | undefined): Omit<IFlourish, 'chargeSec'> | null => {
+  if (!skill) return null
+  const tier = flourishTierOf(skill.src, skill.slot)
+  if (!tier) return null
+  const els = [PROTO_EL[skill.el] ?? 'gold']
+  if (tier === 3) {
+    const lines = skill.src.slice('fused_'.length).split('_')
+    const other = lines.find((l) => l !== skill.el)
+    els.push(other ? (PROTO_EL[other] ?? 'gold') : 'gold')
+  }
+  return { tier, kind: skill.kind, els }
+}
+
 // The animation for a game skill id cast by a fighter drawn as `sprite` (raid bosses that share an
 // id each have their own version).
 export const skillFxOf = (id: string, sprite?: string | null): ISkillFx | null => {
@@ -118,9 +134,16 @@ export const createSkillStage = (
   const { fighters, events } = replay
   const ents = fighters.map((f) => newEnt(f.idx, f.team))
   const has = (idx: number, id: string) => !!fighters[idx]?.skills.includes(id)
-  const casts = castsOf(replay, skills)
+  const allCasts = castsOf(replay, skills)
+  const casts = allCasts
     .map((cast) => ({ cast, fx: skillFxOf(cast.skill, fighters[cast.who]?.sprite) }))
     .filter((c) => c.fx)
+  // Grandeur by skill tier on top of every cast of a Perfect-or-higher skill (flourish.ts), also for
+  // skills with no animation of their own.
+  const flourishes = allCasts
+    .map((cast) => ({ cast, f: flourishOf(skills[cast.skill]) }))
+    .filter((c): c is { cast: (typeof allCasts)[number]; f: Omit<IFlourish, 'chargeSec'> } => !!c.f)
+  let nextFlourish = 0
   let nextCast = 0
   let nextEvent = 0
   let lastTick = 0
@@ -225,6 +248,15 @@ export const createSkillStage = (
         }
         att.cast = cast
         void fx.run(att, def).catch(onError)
+      }
+      while (nextFlourish < flourishes.length && flourishes[nextFlourish].cast.startT <= now) {
+        const { cast, f } = flourishes[nextFlourish++]
+        if (cast.releaseT < now - 0.5) continue
+        const att = ents[cast.who]
+        const def = ents[cast.target] ?? att
+        if (!att) continue
+        const chargeSec = Math.max(0, cast.releaseT - cast.startT)
+        void runFlourish(att, def, { ...f, chargeSec }).catch(onError)
       }
       advanceStage(now)
       // charging sparks at the mouth, the release puff, after-images and flashes fading

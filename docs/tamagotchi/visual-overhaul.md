@@ -273,6 +273,17 @@ in our slot and cast; in auto mode a hybrid uses its own skill half the time. No
 `skill-fx/` (the game falls back to element particles for fz_<a>_<b>; the awakened fz_<line>_<line>
 play their line Ultimate animation via `AWAKENED_FX_OF`).
 
+Skill grandeur by tier (2026-11-09, owner: "higher forms' skills should look grander than a baby's, e.g.
+a beam"): `arena/skill-fx/flourish.ts` in the game plays on top of every cast of a Perfect-or-higher skill
+(tier from the skill's `src`, the backend's SKILL_TIER_PCT), also for skills with no animation of their
+own: Perfect a charge ring and a flare; Ultimate a turning magic circle and a light column, then a beam
+to the target (shot/beam/spread/zone), a shockwave (melee/multi/charge) or a pillar (burst/self); Fused
+the same in two colours (other parent line, or gold for an awakened form), a double beam, darker screen
+and more shake. The prototype runs the same code: `js/flourish.js` is generated from flourish.ts plus the
+backend skill table (scratchpad script gen-flourish, logic in this note; regenerate by transpiling
+flourish.ts and swapping scene.* for the page globals), hooked in by `js/flourish-hook.js` (release at the
+skill's castPose release, first hit or end).
+
 Boss fights (2026-11-09, owner): bosses draw 30% bigger (`BOSS_SCALE` in core.js, world boss growth on top)
 and the camera zooms out to `BOSS_ZOOM` 1.45 view widths (`cam.zoom`, eased in page.js) with more room
 above the fighters. The game does the same without a camera: in a boss fight monsters draw at 0.72x and

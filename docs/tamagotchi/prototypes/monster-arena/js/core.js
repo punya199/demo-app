@@ -722,6 +722,20 @@ function drawAura(ctx, a, ox, oy, t, flip, w) {
         ctx.fillStyle = i < 3 ? '#ffffff' : col
         ctx.fillRect(px, py, 2, 2)
       }
+  } else if (a.type === 'twinx') {
+    // cross-line fused forms (hybrid.js): the twin rings in the colours of both parent lines
+    for (const [r, spd, col] of [
+      [a.r, 1, a.cols[0]],
+      [a.r * 0.7, -1.6, a.cols[1]],
+    ])
+      for (let i = 0; i < 40; i++) {
+        const an = t * 1.1 * spd - i * 0.08 * spd,
+          px = x + Math.cos(an) * r,
+          py = y + Math.sin(an) * r * 0.36 + Math.sin(an * 3 + t) * 2
+        ctx.globalAlpha = 0.7 * (1 - i / 40)
+        ctx.fillStyle = i < 3 ? '#ffffff' : col
+        ctx.fillRect(px, py, 2, 2)
+      }
   } else if (a.type === 'ribbons') {
     for (const off of [0, Math.PI])
       for (let i = 0; i < 46; i++) {

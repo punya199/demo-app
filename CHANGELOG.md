@@ -1,3 +1,10 @@
+# [1.63.0](https://github.com/punya199/demo-app/compare/v1.62.1...v1.63.0) (2026-11-09)
+
+
+### Update
+
+* always show the pet slots in the top bar instead of a "เปลี่ยน" dropdown ([7444d93](https://github.com/punya199/demo-app/commit/7444d93bfbcc273ee0478eb65812b080785100dc))
+
 ## [1.62.1](https://github.com/punya199/demo-app/compare/v1.62.0...v1.62.1) (2026-11-09)
 
 

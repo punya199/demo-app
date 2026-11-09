@@ -1,3 +1,10 @@
+# [1.69.0](https://github.com/punya199/demo-app/compare/v1.68.0...v1.69.0) (2026-11-09)
+
+
+### New
+
+* bring the 13 cross-element fused forms and their skill animations into the game ([9221f74](https://github.com/punya199/demo-app/commit/9221f740cad644c8ae89fc996660f93d5fb14a5d))
+
 # [1.68.0](https://github.com/punya199/demo-app/compare/v1.67.0...v1.68.0) (2026-11-09)
 
 

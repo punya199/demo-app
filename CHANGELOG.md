@@ -1,3 +1,10 @@
+## [1.63.2](https://github.com/punya199/demo-app/compare/v1.63.1...v1.63.2) (2026-11-09)
+
+
+### Fix
+
+* tell players a dead, merged or returned pet leaves the arena and rental list ([936cb75](https://github.com/punya199/demo-app/commit/936cb753e9b791e1f3628e34aad753da64ae8f18))
+
 ## [1.63.1](https://github.com/punya199/demo-app/compare/v1.63.0...v1.63.1) (2026-11-09)
 
 

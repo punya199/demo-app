@@ -1912,6 +1912,7 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
       'adv',
       'plan',
       'pfx',
+      'hybrid',
     ].includes(h)
       ? h
       : 'all'

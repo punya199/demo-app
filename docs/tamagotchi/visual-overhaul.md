@@ -14,6 +14,9 @@ asked for this more than once.
   the folder, `files` = every `js/...` path). The repo copy is the source: edit it, check in
   Playwright, republish. From a new session, compare the live files with the repo first (the
   Artifact tool shows a diff on the first publish); don't read the whole page.
+- Publish with the ABSOLUTE `file_path` of the prototype's `index.html`. A relative `index.html`
+  resolves against the working directory (`root` only applies to `files`), and on 2026-11-09 that
+  published the Vite app shell instead: the owner saw a blank white page.
 - Source: `docs/tamagotchi/prototypes/monster-arena/` (split from the old single
   `monster-arena-25d.html` on 2026-11-08, behaviour unchanged). `index.html` is the page (styles and
   HTML), and plain scripts load in this order, sharing globals: `js/engine.js` (palettes, `Spr`,
@@ -254,7 +257,13 @@ reduced by ~9.5×.
 Cross-line fused forms (2026-11-09): the 13 hybrids (`FUSED_FORMS` pairs of two different lines,
 `sprite: null` in the game) have a one-sheet prompt (4 × 4 grid, black grid lines, magenta cells) and a
 per-creature plan of cut parts, walk, attack and skill motion in `docs/tamagotchi/fused-hybrid-prompts.md`.
-Waiting for the owner's pictures.
+The owner's sheet came back right (2026-11-09) and the 13 are on the page as still drafts ("ดูส่วน" →
+"ร่างผสมข้ามธาตุ 13 ตัว", `#hybrid`): `js/sprites/hybrid-bitmaps.js` (added to `ADV_BMP`/`ADV_DESIGN_W`),
+`js/sprites/hybrid.js` (`HYBRIDS`: id, name, the two lines, animal; one 'body' part via `ADV_SPRITE`, FLY
+rig for the phoenix and the owl, hover for the manta) and `js/hybrid-page.js` (cards). Cells cut inside
+the black lines (9 px in), magenta flood-filled from the border, 84 px on the long side, 15 colours; the
+steam and volcano smoke and the outline strokes it left were removed (they become particles). Next, after
+the owner approves: cut the parts listed in `fused-hybrid-prompts.md` and animate.
 
 Adventure enemies (2026-11-08): the owner asked for one sheet with all 20 plus the training dummy, so the
 prompt given in chat asks for a 5 × 5 grid (21 cells used, reading order = `adventure-data.ts` order, then

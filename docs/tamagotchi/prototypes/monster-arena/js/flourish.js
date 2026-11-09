@@ -20,12 +20,13 @@ const FLOURISH = (() => {
   const RANGED = new Set(['shot', 'beam', 'spread', 'zone'])
   const GOLD = ['#ffffff', '#fffad8', '#fff0a0', '#ffd84a', '#c8a030']
   const colsOf = (el) => (el === 'gold' ? GOLD : elCols(el))
-  // A rune circle under a point, turning; r grows with k.
-  const magicCircle = (x, y, R, cols, ms, spin = 1) =>
+  // A rune circle under a fighter's feet (it follows the fighter), turning; r grows with k.
+  const magicCircle = (e, R, cols, ms, spin = 1) =>
     fxs.push({
       age: 0,
       life: ms / 1000,
       draw(c, k) {
+        const { x, y } = anchor(e)
         const g = ease(Math.min(1, k * 2.5)),
           fade = k > 0.85 ? (1 - k) / 0.15 : 1,
           r = R * g
@@ -59,28 +60,6 @@ const FLOURISH = (() => {
         }
         c.closePath()
         c.stroke()
-      },
-    })
-  // A vertical column of light rising through the caster (charge) or bursting up (release).
-  const lightColumn = (e, w, h, cols, ms, a = 0.6) =>
-    fxs.push({
-      age: 0,
-      life: ms / 1000,
-      draw(c, k) {
-        const p = anchor(e),
-          rise = ease(Math.min(1, k * 3)),
-          fade = Math.sin(Math.PI * Math.min(1, k)),
-          g = c.createLinearGradient(0, p.y - h * rise, 0, p.y)
-        g.addColorStop(0, 'rgba(255,255,255,0)')
-        g.addColorStop(0.5, cols[1])
-        g.addColorStop(1, cols[3])
-        c.globalCompositeOperation = 'lighter'
-        c.globalAlpha = a * fade
-        c.fillStyle = g
-        c.fillRect(p.x - w / 2, p.y - h * rise, w, h * rise)
-        c.globalAlpha = 0.9 * fade
-        c.fillStyle = cols[0]
-        c.fillRect(p.x - 1, p.y - h * rise, 2, h * rise)
       },
     })
   // A shockwave ring on the floor at p.
@@ -199,14 +178,13 @@ const FLOURISH = (() => {
       shockwave(p.x, p.y, R * 0.9, a, ms, 1)
       return
     }
-    magicCircle(p.x, p.y, R, a, ms + 350)
+    magicCircle(att, R, a, ms + 350)
     if (f.tier === 3) {
-      magicCircle(p.x, p.y, R * 1.35, b, ms + 350, -1)
+      magicCircle(att, R * 1.35, b, ms + 350, -1)
       void tween(ms, (k) => {
         darken = Math.max(darken, 0.35 * k)
       }).then(() => tween(400, (k) => (darken = 0.35 * (1 - k))))
     }
-    lightColumn(att, 10, 70 * (att.grow || 1), a, ms + 200, 0.4)
     // motes drawn into the caster
     void tween(ms, () => {
       if (Math.random() > 0.7) return
@@ -225,7 +203,7 @@ const FLOURISH = (() => {
       })
     })
   }
-  // The release: a beam, a shockwave or a pillar, by the skill's kind.
+  // The release: a beam, a shockwave or the circle flaring out, by the skill's kind.
   const release = (att, def, f, a, b) => {
     const t = centerOf(def)
     if (f.tier === 1) {
@@ -236,9 +214,11 @@ const FLOURISH = (() => {
     shake = Math.max(shake, big ? 6 : 3)
     flashScreen = Math.max(flashScreen, big ? 0.35 : 0.2)
     if (f.kind === 'self' || f.kind === 'burst') {
+      // no column of light up through the monster (owner, 2026-11-09): the magic circle flares outward
       const p = anchor(att)
-      lightColumn(att, big ? 26 : 18, 140, a, 700, 0.7)
-      if (big) lightColumn(att, 10, 160, b, 700, 0.6)
+      const R = Math.max(18, att.def.size * 0.42) * (att.grow || 1)
+      magicCircle(att, R * 1.3, a, 600)
+      if (big) magicCircle(att, R * 1.7, b, 600, -1)
       shockwave(p.x, p.y, (big ? 90 : 65) * (att.grow || 1), a, 600, big ? 3 : 2)
       return
     }

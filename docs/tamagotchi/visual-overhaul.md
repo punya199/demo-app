@@ -17,6 +17,8 @@ asked for this more than once.
 - Publish with the ABSOLUTE `file_path` of the prototype's `index.html`. A relative `index.html`
   resolves against the working directory (`root` only applies to `files`), and on 2026-11-09 that
   published the Vite app shell instead: the owner saw a blank white page.
+- The page draws only the card and line-up canvases on screen (`onScreen`, an IntersectionObserver in
+  page.js): drawing all ~150 cards of every section each frame made it stutter (owner, 2026-11-09).
 - Source: `docs/tamagotchi/prototypes/monster-arena/` (split from the old single
   `monster-arena-25d.html` on 2026-11-08, behaviour unchanged). `index.html` is the page (styles and
   HTML), and plain scripts load in this order, sharing globals: `js/engine.js` (palettes, `Spr`,
@@ -276,8 +278,10 @@ play their line Ultimate animation via `AWAKENED_FX_OF`).
 Skill grandeur by tier (2026-11-09, owner: "higher forms' skills should look grander than a baby's, e.g.
 a beam"): `arena/skill-fx/flourish.ts` in the game plays on top of every cast of a Perfect-or-higher skill
 (tier from the skill's `src`, the backend's SKILL_TIER_PCT), also for skills with no animation of their
-own: Perfect a charge ring and a flare; Ultimate a turning magic circle and a light column, then a beam
-to the target (shot/beam/spread/zone), a shockwave (melee/multi/charge) or a pillar (burst/self); Fused
+own: Perfect a charge ring and a flare; Ultimate a turning magic circle that follows the caster, then a
+beam to the target (shot/beam/spread/zone), a shockwave (melee/multi/charge) or the circle flaring out
+(burst/self). The owner turned down the column of light up through the monster: magic circles only.
+Fused
 the same in two colours (other parent line, or gold for an awakened form), a double beam, darker screen
 and more shake. The prototype runs the same code: `js/flourish.js` is generated from flourish.ts plus the
 backend skill table by `node scripts/monster-sprites/gen-flourish.cjs` (run from the demo-app root with

@@ -133,7 +133,7 @@ describe('flourish on the replay stage', () => {
     expect(ultimate.shake).toBeGreaterThan(perfect.shake)
   })
 
-  it('raises a pillar for a self skill instead of a beam', async () => {
+  it('flares the magic circle for a self skill instead of a beam', async () => {
     const self = await play(skill({ id: 'zz_s', name: 's', kind: 'self', src: 'flame_ultimate' }))
     expect(self.most).toBeGreaterThan(0)
   })

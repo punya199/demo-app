@@ -854,6 +854,28 @@ function hud(t) {
   sx.restore()
 }
 
+// Which canvases are in view: an IntersectionObserver marks them; a canvas in a hidden section never is.
+const visibleCanvases = new WeakSet()
+const watched = new WeakSet()
+const canvasObserver =
+  'IntersectionObserver' in window
+    ? new IntersectionObserver(
+        (entries) => {
+          for (const en of entries)
+            if (en.isIntersecting) visibleCanvases.add(en.target)
+            else visibleCanvases.delete(en.target)
+        },
+        { rootMargin: '200px' }
+      )
+    : null
+function onScreen(cv) {
+  if (!canvasObserver) return true
+  if (!watched.has(cv)) {
+    watched.add(cv)
+    canvasObserver.observe(cv)
+  }
+  return visibleCanvases.has(cv)
+}
 function frame(dt) {
   clock += dt
   timer += dt
@@ -1148,8 +1170,10 @@ function frame(dt) {
   sx.fillStyle = vg
   sx.fillRect(0, 0, SW, SH)
   hud(clock)
-  for (const c of cards) drawCard(c, dt)
-  for (const L of lineups) drawLineup(L, dt)
+  // Only cards and line-ups on screen are drawn (2026-11-09: drawing every card of every section each
+  // frame made the page stutter once it had a few hundred cards).
+  for (const c of cards) if (onScreen(c.canvas)) drawCard(c, dt)
+  for (const L of lineups) if (onScreen(L.cv)) drawLineup(L, dt)
 }
 function resize() {
   const css = stage.getBoundingClientRect().width || 960

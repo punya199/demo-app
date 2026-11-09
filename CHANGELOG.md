@@ -1,3 +1,10 @@
+## [1.63.1](https://github.com/punya199/demo-app/compare/v1.63.0...v1.63.1) (2026-11-09)
+
+
+### Fix
+
+* add patch note for PvP season reward claim fix (#53) ([b202d81](https://github.com/punya199/demo-app/commit/b202d8100484515b15889ee21b3c0865ecf7cdc2)), closes [#53](https://github.com/punya199/demo-app/issues/53)
+
 # [1.63.0](https://github.com/punya199/demo-app/compare/v1.62.1...v1.63.0) (2026-11-09)
 
 

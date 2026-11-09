@@ -9,6 +9,7 @@ import {
 } from '../core/tamagotchi-helper'
 import { IMonsterData, IWallet, IWikiData } from '../core/tamagotchi-interface'
 import { useMergeMonsters } from '../core/tamagotchi-service'
+import { MonsterSprite } from '../shared/MonsterSprite'
 
 interface IMergeModalProps {
   open: boolean
@@ -69,7 +70,14 @@ export const MergeModal = (props: IMergeModalProps) => {
     <Modal open={open} onCancel={close} title="🧬 รวมร่างมอน" footer={null} destroyOnHidden>
       {isConfirming && first && second && base && form ? (
         <div className="flex flex-col gap-3 text-sm">
-          <div className="text-center text-5xl">{form.emoji}</div>
+          <MonsterSprite
+            className="mx-auto !block"
+            sprite={form.sprite}
+            emoji={form.emoji}
+            size={112}
+            animate
+            label={form.name}
+          />
           <div className="text-center text-lg font-semibold">{form.name}</div>
           <p className="rounded border border-amber-400 p-2 text-amber-700 dark:text-amber-300">
             {first.emoji} {first.displayName} และ {second.emoji} {second.displayName} จะหายไปถาวร
@@ -114,7 +122,13 @@ export const MergeModal = (props: IMergeModalProps) => {
           </div>
           {first && second && form && (
             <div className="rounded border border-slate-200 p-3 dark:border-slate-700">
-              <div className="text-center text-4xl">{form.emoji}</div>
+              <MonsterSprite
+                className="mx-auto !block"
+                sprite={form.sprite}
+                emoji={form.emoji}
+                size={88}
+                label={form.name}
+              />
               <div className="text-center font-semibold">{form.name}</div>
               <div className="mt-1 text-center text-xs text-slate-500 dark:text-slate-400">
                 HP {form.stats.hp} · ATK {form.stats.atk} · DEF {form.stats.def} · SPD{' '}

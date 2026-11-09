@@ -27,7 +27,7 @@ export interface IWikiSpecies {
   stage: EnumMonsterStage
   name: string
   emoji: string
-  // Pixel-art sprite id; null for a form without art (cross-line hybrids).
+  // Pixel-art sprite id; null for a form without art.
   sprite?: string | null
   minWeight: number
   stats: IBattleStats
@@ -41,7 +41,7 @@ export interface IMergeForm {
   lines: [EnumMonsterLine, EnumMonsterLine]
   name: string
   emoji: string
-  // Pixel-art sprite id; null for a hybrid of two lines (no art yet).
+  // Pixel-art sprite id (awakened forms and the 13 hybrids of two lines all have one).
   sprite?: string | null
   stats: IBattleStats
 }

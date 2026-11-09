@@ -46,6 +46,8 @@ export interface IAura {
   x: number
   y: number
   r: number
+  // The two ring colours of a cross-line fused form's 'twinx' aura (its parent lines).
+  cols?: string[]
 }
 
 // [x, y, colour, radius, part?]: with part 'head' or 'body' the glow follows that part's pose.

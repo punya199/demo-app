@@ -5,10 +5,10 @@ Working notes for the next session on the monster game's art. Condensed on 2026-
 
 **Talk to the owner in Thai**, short and concrete: say what changed and where to look on the page.
 
-**Open work (2026-11-09):** branch `claude/tamagotchi-game-expansion-ercfjr` in both repos holds the skill
-tiers, Fused skills, boss zoom, skill grandeur and the hybrid prototype; pushed, **no PR yet**. Ask the
-owner whether to open PRs and merge (deploy the backend first). Next art step the owner may ask for: port
-the 13 hybrids and their skill animations into the game.
+**Open work (2026-11-09):** branch `claude/tamagotchi-game-expansion-ercfjr` in both repos (restarted from
+`main` after PRs #59 / #45 merged) ports the 13 hybrids and their skill animations into the game and switches
+cross-line merging back on; pushed, **no PR yet**. Ask the owner whether to open PRs and merge (deploy the
+backend first).
 
 ## How the owner wants to work
 
@@ -52,7 +52,7 @@ the 13 hybrids and their skill animations into the game.
 | 8 line skills × 8 | Done (each animation matches its game mechanic) |
 | 5 raid bosses (AI pictures, `bmpRig`) + their 10 skills | Done |
 | 20 adventure enemies + dummy (one AI sheet, sized by species) | Done; they use their element's generic skills (owner's decision) |
-| 13 cross-line Fused forms (one AI sheet, 4×4) | Done and animated in the prototype with their own skills (`HYBRID`); not in the game yet |
+| 13 cross-line Fused forms (one AI sheet, 4×4) | Done, animated with their own skills (`HYBRID`), and in the game |
 | Status effects from PixelFX | Trial only (`#pfx`), colours by line; waiting for the owner's verdict |
 
 Art still open: fire line less detailed than the others; Perfect forms have no aura; ค้างคาวถ่าน is too dark.
@@ -73,14 +73,15 @@ Art still open: fire line less detailed than the others; Perfect forms have no a
 - Sprites: `sprites/` is the TS port (`sprite-registry.ts`, `lines/`, `bitmaps/`), pixel-identical to the
   prototype (`sprite-registry.test.ts` vs `sprite-frames.golden.ts`; regenerate with
   `scripts/monster-sprites/bake-prototype-hashes.cjs` on purpose). A prototype sprite change must be
-  ported by hand. Backend sends a `sprite` id with species, enemies, bosses and arena fighters; cross-line
-  hybrids send `null` (emoji) until their art is ported.
+  ported by hand. Backend sends a `sprite` id with species, enemies, bosses and arena fighters. The 13
+  hybrids are `lines/hybrid.ts` + `bitmaps/hybrid-bitmaps.ts` (`hy_*`, backend `HYBRID_SPRITES` in
+  `species-data.ts`); they reuse the adventure rig (`ADV_SPRITE` with an `IAdvSource`) and the `twinx` aura.
 - Screens: `shared/MonsterSprite.tsx` everywhere a pet shows (home, avatars, Dex, evolution tree, …).
   Costumes are switched off (`COSTUMES_ENABLED = false`); their anchors still work.
 - Arena replay: `arena/replay-anim.ts` (poses), `arena/replay-sprites.ts` (sprites, statuses, element
   particles, floors), `arena/skill-fx/` (each skill's animation, converted from the prototype onto
   `runtime.ts`, timed by the server's replay; `stage.ts` schedules casts). Awakened Fused skills play their
-  line Ultimate animation (`AWAKENED_FX_OF`); cross-line `fz_<a>_<b>` skills have no own animation yet.
+  line Ultimate animation (`AWAKENED_FX_OF`); cross-line `fz_<a>_<b>` skills play their own (`hybrid.ts`).
 - Boss fights: prototype bosses draw 30% bigger (`BOSS_SCALE`) and the camera zooms out (`BOSS_ZOOM`
   1.45). The game has no camera: monsters draw at 0.72×, the boss at 1.3× (`fightPxOf`, capped 230 px).
 - Skill grandeur by tier (`arena/skill-fx/flourish.ts`, tier from the skill's `src`): Perfect a charge ring
@@ -101,8 +102,7 @@ Art still open: fire line less detailed than the others; Perfect forms have no a
   `arena-data.ts` directly and copy only new `adv:` k values (see that README). Never run `tune2` with
   the tiers on.
 - Arena PvP fights before the tiers were soft-deleted by a migration (they would replay differently).
-- Cross-line merging may still be switched off in the game (`CROSS_LINE_MERGE_ENABLED` in backend
-  `monster-rules.ts`): check before porting the hybrids.
+- Cross-line merging is on again (`CROSS_LINE_MERGE_ENABLED = true` in backend `monster-rules.ts`).
 
 ## Prototype code notes
 

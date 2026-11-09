@@ -2280,7 +2280,10 @@ const W = 384,
   H = 216 // the camera view
 const WW = W * 3,
   WH = H * 3 // the arena
-const cam = { x: WW / 2 - W / 2, y: WH / 2 - H / 2 }
+// zoom: how many view widths the camera shows (1 normally; a boss fight zooms out so the boss towers over
+// small monsters, BOSS_ZOOM, owner 2026-11-09). page.js eases it towards its target every frame.
+const BOSS_ZOOM = 1.45
+const cam = { x: WW / 2 - W / 2, y: WH / 2 - H / 2, zoom: 1 }
 const stage = document.getElementById('stage')
 const sx = stage.getContext('2d')
 // The world is drawn straight onto the screen canvas through a camera transform: pixel art stays
@@ -2967,7 +2970,9 @@ function makeEnt(rid, side) {
     oy: 0,
     sx: 1,
     sy: 1,
-    grow: 1, // world boss size: the same sprite, a step bigger at each grow stage
+    // Drawn size: bosses BOSS_SCALE bigger than their sprite (owner, 2026-11-09: fused forms looked as big
+    // as bosses), and a world boss a step bigger at each grow stage.
+    grow: boss ? BOSS_SCALE : 1,
     grown: 0,
     alpha: 1,
     flash: 0,
@@ -3075,11 +3080,12 @@ function impactBurst(x, y, col = '#ffffff', n = 14) {
 // World boss grow (game: WORLD_BOSS_GROW_SECS 20 s and 40 s, ATK and DEF +30% each stage). The owner chose to
 // keep the same sprite and make it a little bigger each time (+10% per stage) instead of a new, angrier form.
 const GROW_SECS = [20, 40],
-  GROW_STEP = 0.1
+  GROW_STEP = 0.1,
+  BOSS_SCALE = 1.3
 async function growBoss(e) {
   e.grown++
   const g0 = e.grow,
-    g1 = 1 + GROW_STEP * e.grown
+    g1 = BOSS_SCALE * (1 + GROW_STEP * e.grown)
   showBanner('บอสขยายร่าง!', '#ff6a4a', 1300)
   sayAt(e, 'โจมตี/ป้องกัน +30%', '#ff8a6a', true)
   darken = 0.3

@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { IArenaEvent, IArenaFighterSummary, IArenaReplay } from './arena-interface'
 import { BASIC_NAME } from './replay-anim'
-import { coversOf } from './replay-sprites'
+import {
+  BOSS_FIGHT_BOSS_K,
+  BOSS_FIGHT_MONSTER_K,
+  coversOf,
+  fightPxOf,
+  pxOf,
+} from './replay-sprites'
 
 const replay = (events: Partial<IArenaEvent>[]): IArenaReplay =>
   ({
@@ -52,5 +58,25 @@ describe('coversOf', () => {
     const covers = coversOf(replay([]), animates)
     expect(covers({ t: 5, kind: 'hit', who: 1, skill: BASIC_NAME } as IArenaEvent)).toBe(true)
     expect(covers({ t: 5, kind: 'burst' } as IArenaEvent)).toBe(false)
+  })
+})
+
+describe('fightPxOf', () => {
+  it('keeps the usual scale outside a boss fight', () => {
+    expect(fightPxOf(64, false, false)).toBe(pxOf(64))
+    expect(fightPxOf(96, true, false)).toBe(pxOf(96))
+  })
+
+  it('draws monsters smaller and the boss bigger in a boss fight', () => {
+    expect(fightPxOf(64, false, true)).toBeCloseTo(pxOf(64) * BOSS_FIGHT_MONSTER_K)
+    expect(fightPxOf(96, true, true)).toBeCloseTo(pxOf(96) * BOSS_FIGHT_BOSS_K)
+    // a boss ends up well over twice a monster's size per sprite pixel
+    expect(fightPxOf(96, true, true) / fightPxOf(64, false, true)).toBeGreaterThan(1.4)
+  })
+
+  it('caps a very long boss so it still fits the arena, never below its usual scale', () => {
+    const k = fightPxOf(168, true, true)
+    expect(168 * k).toBeLessThanOrEqual(230)
+    expect(k).toBeGreaterThanOrEqual(pxOf(168))
   })
 })

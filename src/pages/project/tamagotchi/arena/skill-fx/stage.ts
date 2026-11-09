@@ -55,12 +55,27 @@ const LINE_FX: Record<string, ISkillFx> = {
   ...SHADOW,
 }
 
+// An awakened Fused form's own skill (backend fz_<line>_<line>, 2026-11-09) is its line's Ultimate
+// skill made stronger, so it plays that animation. Cross-line fz_<a>_<b> skills have none yet: the
+// replay falls back to the element particles.
+export const AWAKENED_FX_OF: Record<string, string> = {
+  fz_flame_flame: 'flame_sun',
+  fz_tide_tide: 'tide_trident',
+  fz_leaf_leaf: 'leaf_wrath',
+  fz_earth_earth: 'earth_quake',
+  fz_lightning_lightning: 'ltn_bolt',
+  fz_holy_holy: 'holy_sun',
+  fz_dark_dark: 'dark_end',
+  fz_shadow_shadow: 'shd_end',
+}
+
 // The animation for a game skill id cast by a fighter drawn as `sprite` (raid bosses that share an
 // id each have their own version).
 export const skillFxOf = (id: string, sprite?: string | null): ISkillFx | null => {
   // a raid boss's animation is its own: a world boss sharing the skill id keeps the generic look
   const raid = Object.values(RAID).find((s) => s.game === id && s.boss === sprite)
-  return raid ?? (LINE_FX[id] && !LINE_FX[id].passive ? LINE_FX[id] : null)
+  const key = AWAKENED_FX_OF[id] ?? id
+  return raid ?? (LINE_FX[key] && !LINE_FX[key].passive ? LINE_FX[key] : null)
 }
 
 // What the stage needs to know about a fighter each frame (scene units: sprite pixels).

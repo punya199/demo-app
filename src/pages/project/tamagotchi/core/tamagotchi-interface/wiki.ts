@@ -167,6 +167,15 @@ export interface IWikiData {
     timeLimitSec: number
     // Forms that fight with skills, and the wait every skill has after any cast (seconds).
     skilledStages: EnumMonsterStage[]
+    // Skill strength (percent) by the stage of the form that carries the skill. Absent on an older
+    // backend.
+    skillTierPct?: {
+      baby2: number
+      adult: number
+      perfect: number
+      ultimate: number
+      fused: number
+    }
     skillDelaySec: number
     defenseK: number
     maxDefenseReduction: number

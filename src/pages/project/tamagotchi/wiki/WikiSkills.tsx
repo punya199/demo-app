@@ -16,11 +16,30 @@ export const SkillsWikiTab = (props: { wiki: IWikiData }) => {
       <List
         items={[
           `เฉพาะร่าง ${arena.skilledStages.map((stage) => stageLabel[stage]).join(' · ')} ที่ใช้สกิลได้ ไข่และร่างเด็กสู้ด้วยตีธรรมดาอย่างเดียว`,
-          'ทุกตัวมีสกิลประจำร่าง (innate) ใส่ให้เองอัตโนมัติ ร่างผสานใช้สกิลประจำของร่างสูงสุดในสายที่เป็นฐาน',
+          'ทุกตัวมีสกิลประจำร่าง (innate) ใส่ให้เองอัตโนมัติ ร่างผสานทุกตัวมีสกิลของตัวเอง: ร่างผสานธาตุเดียวได้สกิลร่างสุดท้ายของสายที่แรงขึ้นและติดสถานะเพิ่ม ร่างผสานข้ามธาตุได้สกิลที่มีผลของทั้งสองธาตุ',
           'เลือกใส่เพิ่มได้ 2 ช่องสกิล และ 1 ช่องสกิลหลบ ตั้งที่เมนู "สกิล" แยกต่อมอนแต่ละตัว',
           'หลังเปลี่ยนร่าง สกิลที่ใช้ไม่ได้อีกจะถูกถอดออกให้เอง',
         ]}
       />
+      {arena.skillTierPct && (
+        <>
+          <Heading>ความแรงตามขั้นของร่าง</Heading>
+          <p className="text-xs">
+            สกิลแรงตามขั้นของร่างที่เป็นเจ้าของสกิล (ดาเมจ ฮีล โล่ ระยะเวลาสถานะ
+            และค่าของสกิลพาสซีฟ) ใส่ให้มอนตัวไหนก็แรงเท่าเดิม สกิลหลบไม่คูณ
+          </p>
+          <Table
+            head={['ร่างเจ้าของสกิล', 'ความแรง']}
+            rows={[
+              [stageLabel[EnumMonsterStage.BABY_2], `${arena.skillTierPct.baby2}%`],
+              [stageLabel[EnumMonsterStage.ADULT], `${arena.skillTierPct.adult}%`],
+              [stageLabel[EnumMonsterStage.PERFECT], `${arena.skillTierPct.perfect}%`],
+              [stageLabel[EnumMonsterStage.ULTIMATE], `${arena.skillTierPct.ultimate}%`],
+              [stageLabel[EnumMonsterStage.FUSED], `${arena.skillTierPct.fused}%`],
+            ]}
+          />
+        </>
+      )}
       <Heading>ปลดล็อกสกิล</Heading>
       <List
         items={[

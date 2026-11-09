@@ -750,7 +750,7 @@ function hud(t) {
     sx.fill()
     sx.strokeStyle = 'rgba(255,255,255,.55)'
     sx.lineWidth = 1 * u
-    sx.strokeRect(mx + cam.x * f, my + cam.y * f, W * f, H * f)
+    sx.strokeRect(mx + cam.x * f, my + cam.y * f, W * cam.zoom * f, H * cam.zoom * f)
     for (const [e, col] of [
       [me, '#ffb43a'],
       [foe, foe.boss ? '#ff5a3a' : '#39c6ff'],
@@ -810,7 +810,7 @@ function hud(t) {
   sx.textAlign = 'center'
   sx.fillText(label, Wd / 2, 34 * u)
   // floating texts
-  const k = Wd / W
+  const k = Wd / (W * cam.zoom)
   for (const f of texts) {
     const a = 1 - f.age / f.life
     sx.globalAlpha = Math.max(0, a)
@@ -1023,11 +1023,14 @@ function frame(dt) {
   // camera follows the middle of the fight
   const ma = anchor(me),
     fa = anchor(foe)
-  const tx = (ma.x + fa.x) / 2 - W / 2,
-    ty = (ma.y + fa.y) / 2 - H * 0.58
+  cam.zoom += ((foe.boss ? BOSS_ZOOM : 1) - cam.zoom) * Math.min(1, dt * 2)
+  const VW = W * cam.zoom,
+    VH = H * cam.zoom
+  const tx = (ma.x + fa.x) / 2 - VW / 2,
+    ty = (ma.y + fa.y) / 2 - VH * (foe.boss ? 0.7 : 0.58) // a tall boss needs room under the HUD
   const follow = Math.min(1, dt * 2.5)
-  cam.x = Math.max(0, Math.min(WW - W, cam.x + (tx - cam.x) * follow))
-  cam.y = Math.max(0, Math.min(WH - H, cam.y + (ty - cam.y) * follow))
+  cam.x = Math.max(0, Math.min(WW - VW, cam.x + (tx - cam.x) * follow))
+  cam.y = Math.max(0, Math.min(WH - VH, cam.y + (ty - cam.y) * follow))
   const theme = foe.boss
     ? {
         fire: 'lava',
@@ -1042,7 +1045,7 @@ function frame(dt) {
   const shx = reduceMotion ? 0 : (Math.random() - 0.5) * shake,
     shy = reduceMotion ? 0 : (Math.random() - 0.5) * shake
   shake = Math.max(0, shake - dt * 18)
-  const K = stage.width / W
+  const K = stage.width / (W * cam.zoom)
   sx.setTransform(K, 0, 0, K, -(cam.x + shx) * K, -(cam.y + shy) * K)
   sx.imageSmoothingEnabled = false
   sx.globalAlpha = 1

@@ -3,7 +3,7 @@ import { IArenaEvent, IArenaFighterSummary, IArenaReplay, IArenaSkill } from '..
 import { ACT, BASIC_NAME } from '../replay-anim'
 import { castsOf } from './casts'
 import { RAID } from './raid'
-import { createSkillStage, IStagePlace, skillFxOf } from './stage'
+import { AWAKENED_FX_OF, createSkillStage, IStagePlace, skillFxOf } from './stage'
 import { BOLT } from './bolt'
 import { DARK } from './dark'
 import { EARTH } from './earth'
@@ -113,6 +113,14 @@ describe('skillFxOf', () => {
       expect(ids, line).toHaveLength(8)
       for (const id of ids) expect(!!skillFxOf(id), id).toBe(!fx[id].passive)
     }
+  })
+
+  it("plays an awakened Fused form's skill with its line's Ultimate animation", () => {
+    for (const [fused, ult] of Object.entries(AWAKENED_FX_OF)) {
+      expect(skillFxOf(fused)).toBe(skillFxOf(ult))
+      expect(skillFxOf(fused)).not.toBeNull()
+    }
+    expect(skillFxOf('fz_flame_tide')).toBeNull()
   })
 
   it('gives each raid boss its own version of a shared skill', () => {

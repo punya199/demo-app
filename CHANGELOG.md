@@ -1,3 +1,10 @@
+# [1.65.0](https://github.com/punya199/demo-app/compare/v1.64.0...v1.65.0) (2026-11-09)
+
+
+### New
+
+* monthly 28-slot login board ([e49a255](https://github.com/punya199/demo-app/commit/e49a25501b429ff5ee14db94edb91c60aede1571))
+
 # [1.64.0](https://github.com/punya199/demo-app/compare/v1.63.2...v1.64.0) (2026-11-09)
 
 

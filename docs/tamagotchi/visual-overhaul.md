@@ -280,8 +280,8 @@ own: Perfect a charge ring and a flare; Ultimate a turning magic circle and a li
 to the target (shot/beam/spread/zone), a shockwave (melee/multi/charge) or a pillar (burst/self); Fused
 the same in two colours (other parent line, or gold for an awakened form), a double beam, darker screen
 and more shake. The prototype runs the same code: `js/flourish.js` is generated from flourish.ts plus the
-backend skill table (scratchpad script gen-flourish, logic in this note; regenerate by transpiling
-flourish.ts and swapping scene.* for the page globals), hooked in by `js/flourish-hook.js` (release at the
+backend skill table by `node scripts/monster-sprites/gen-flourish.cjs` (run from the demo-app root with
+demo-app-backend checked out beside it; rerun after changing flourish.ts or the skill catalogue), hooked in by `js/flourish-hook.js` (release at the
 skill's castPose release, first hit or end).
 
 Boss fights (2026-11-09, owner): bosses draw 30% bigger (`BOSS_SCALE` in core.js, world boss growth on top)

@@ -4,6 +4,7 @@ import {
   IDexEntry,
   IExpeditionData,
   IExpeditionSummary,
+  ILoginGranted,
   IMonsterData,
   IQuestsData,
   IShopItem,
@@ -112,12 +113,18 @@ export const useClaimLogin = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
-      const { data } = await apiClient.post<IQuestsData & { wallet: IWallet }>(`/quests/login`)
-      return data
+      const { data } = await apiClient.post<
+        IQuestsData & { wallet: IWallet; granted: ILoginGranted }
+      >(`/quests/login`)
+      const { wallet, granted, ...quests } = data
+      return { wallet, granted, quests }
     },
-    onSuccess: ({ wallet, ...quests }) => {
+    onSuccess: ({ wallet, quests }) => {
       queryClient.setQueryData<IQuestsData>(['quests'], quests)
       queryClient.setQueryData<IWallet>(WALLET_KEY, wallet)
+      // A slot can put items in the bag or unlock the monthly costume.
+      queryClient.invalidateQueries({ queryKey: INVENTORY_KEY })
+      queryClient.invalidateQueries({ queryKey: ['costume'] })
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ['quests'] })

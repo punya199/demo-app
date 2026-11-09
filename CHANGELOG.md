@@ -1,3 +1,24 @@
+# [1.67.0](https://github.com/punya199/demo-app/compare/v1.66.0...v1.67.0) (2026-11-09)
+
+
+### Update
+
+* wiki lists the mystery box as a second source of the craft Catalyst ([feff95e](https://github.com/punya199/demo-app/commit/feff95ec5ed0be65977e9d28cc9959937e78214d))
+
+# [1.66.0](https://github.com/punya199/demo-app/compare/v1.65.0...v1.66.0) (2026-11-09)
+
+
+### New
+
+* auto-reload the app when a new release is deployed ([97ef917](https://github.com/punya199/demo-app/commit/97ef917d0c6455d1ca5825a2da998a0731dba642))
+
+# [1.65.0](https://github.com/punya199/demo-app/compare/v1.64.0...v1.65.0) (2026-11-09)
+
+
+### New
+
+* monthly 28-slot login board ([e49a255](https://github.com/punya199/demo-app/commit/e49a25501b429ff5ee14db94edb91c60aede1571))
+
 # [1.64.0](https://github.com/punya199/demo-app/compare/v1.63.2...v1.64.0) (2026-11-09)
 
 

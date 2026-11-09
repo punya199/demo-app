@@ -1,5 +1,6 @@
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AnimatePresence, motion } from 'motion/react'
+import { Button } from 'antd'
 import { Suspense } from 'react'
 import { matchPath, Outlet, useLocation } from 'react-router-dom'
 import { appConfig } from '../config/app-config'
@@ -9,6 +10,7 @@ import { appPath, VOTE_ROUTE_TEMPLATE } from '../config/app-paths'
 import { useGetMe, UserRole } from '../service'
 import { checkRole } from '../utils/helper'
 import { useThemeStore } from '../utils/theme-store'
+import { useVersionCheck } from '../utils/use-version-check'
 import { LoadingSpin } from './LoadingSpin'
 import Navbar from './Navbar'
 import { ScreenSizeIndicator } from './ScreenSizeIndicator'
@@ -42,6 +44,7 @@ const RootLayout = () => {
   const isGame = location.pathname === appPath.gemDiggers()
   const hideAuthenticatedChrome = isPaojiaoLedger || isPublicVote
   const mode = useThemeStore((state) => state.mode)
+  const hasUpdate = useVersionCheck()
 
   return (
     <div className="relative isolate flex h-dvh flex-col bg-slate-50 dark:bg-slate-950">
@@ -71,6 +74,16 @@ const RootLayout = () => {
           </AnimatePresence>
         </Suspense>
       </div>
+      {hasUpdate && (
+        <div className="fixed inset-x-4 top-4 z-50 mx-auto flex max-w-md items-center justify-between gap-3 rounded-lg bg-white p-3 shadow-lg dark:bg-slate-800">
+          <span className="text-sm text-slate-800 dark:text-slate-100">
+            มีเวอร์ชันใหม่แล้ว 🎉 รีโหลดเพื่ออัปเดต
+          </span>
+          <Button type="primary" size="small" onClick={() => window.location.reload()}>
+            รีโหลด
+          </Button>
+        </div>
+      )}
       {!isPaojiaoLedger && !isGame && <ThemeToggle />}
       {appConfig().VITE_IS_DEVELOPMENT && !hideAuthenticatedChrome && <DevTools />}
     </div>

@@ -38,6 +38,7 @@ dist-ssr
 VERSION
 
 public/config/env-config.js
+public/version.json
 
 package-lock.json
 

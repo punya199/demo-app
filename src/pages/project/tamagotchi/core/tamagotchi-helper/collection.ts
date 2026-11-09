@@ -241,7 +241,7 @@ export const craftMaterialSource: Record<string, string> = {
   craft_unique_verdant_heart: 'บอสโลก (รางวัลรายสัปดาห์)',
   craft_unique_reaper_edge: 'บอสโลก (รางวัลรายสัปดาห์)',
   craft_unique_storm_sigil: 'บอสโลก (รางวัลรายสัปดาห์)',
-  craft_catalyst: 'บอสโลก (รางวัลรายสัปดาห์)',
+  craft_catalyst: 'บอสโลก (รางวัลรายสัปดาห์) / กล่องปริศนา M',
 }
 
 // "1:02:03" / "12:03" until `finishAt` (empty-safe: never negative).

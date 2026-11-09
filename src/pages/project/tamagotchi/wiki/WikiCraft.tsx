@@ -35,7 +35,11 @@ const sourceText = (wiki: IWikiData, tier: IWikiData['craft']['materials'][numbe
   }
   const each = tier === 'unique' ? worldBoss.unique : worldBoss.catalyst
   const top = tier === 'unique' ? worldBoss.topUnique : worldBoss.topCatalyst
-  return `บอสโลก รางวัลรายสัปดาห์: ทุกคนที่ร่วม ${each} ชิ้น อันดับ 1–${worldBoss.topRank} เพิ่มอีก ${top}${tier === 'unique' ? ' (ชนิดสุ่ม)' : ''}`
+  const bossText = `บอสโลก รางวัลรายสัปดาห์: ทุกคนที่ร่วม ${each} ชิ้น อันดับ 1–${worldBoss.topRank} เพิ่มอีก ${top}${tier === 'unique' ? ' (ชนิดสุ่ม)' : ''}`
+  // The Catalyst also has a small chance in the size-M mystery box (login calendar, day 27).
+  return tier === 'catalyst'
+    ? `${bossText} · กล่องปริศนาไซส์ M (เช็คอินรายเดือนช่อง 27) มีโอกาสน้อยมาก`
+    : bossText
 }
 
 export const CraftWikiTab = (props: { wiki: IWikiData }) => {

@@ -1,3 +1,10 @@
+## [1.62.1](https://github.com/punya199/demo-app/compare/v1.62.0...v1.62.1) (2026-11-09)
+
+
+### Fix
+
+* drop the old rings round the monsters when they cast skills in the arena ([c2f5178](https://github.com/punya199/demo-app/commit/c2f5178b7e69a91d71d243d3334b5f98da2d66a3))
+
 # [1.62.0](https://github.com/punya199/demo-app/compare/v1.61.0...v1.62.0) (2026-11-08)
 
 

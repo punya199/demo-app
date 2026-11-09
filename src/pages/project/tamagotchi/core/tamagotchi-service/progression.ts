@@ -188,7 +188,7 @@ export const useGetCraft = () =>
     },
   })
 
-// Start, skip and claim all change coin, materials and (on claim) the bag.
+// Start and claim change coin, materials and (on claim) the bag.
 const useCraftMutation = <TInput, TResult>(
   request: (input: TInput) => Promise<TResult>,
   overviewOf: (result: TResult) => ICraftOverview
@@ -215,15 +215,6 @@ export const useStartCraft = () =>
   useCraftMutation(
     async (input: { recipeId: string; useCatalyst: boolean }) => {
       const { data } = await apiClient.post<ICraftOverview>(`/monster/craft/start`, input)
-      return data
-    },
-    (data) => data
-  )
-
-export const useSkipCraft = () =>
-  useCraftMutation(
-    async () => {
-      const { data } = await apiClient.post<ICraftOverview>(`/monster/craft/skip`)
       return data
     },
     (data) => data

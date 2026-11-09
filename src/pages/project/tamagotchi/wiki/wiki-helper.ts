@@ -34,10 +34,6 @@ export const splitStatuses = (statuses: IWikiData['arena']['statuses']) => {
 export const describeCcSteps = (steps: number[]) =>
   steps.map((step) => (step === 0 ? 'ไม่ติด' : `${step}%`)).join(' → ')
 
-// What a Catalyst or a skip costs, as shown on the craft screen: the skip price at the start
-// of a job (the screen shows the live prorated price).
-export const fullSkipCoin = (coin: number, multiplier: number) => Math.ceil(coin * multiplier)
-
 // The 12 craft sets' playstyles (ids as the server's `style`).
 export const craftStyleLabel: Record<string, string> = {
   tank: 'แทงก์',

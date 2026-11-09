@@ -140,7 +140,6 @@ export interface ICraftQueue {
   startedAt: string
   finishAt: string
   status: 'running' | 'ready'
-  skipCoin: number
 }
 
 export interface ICraftOverview {

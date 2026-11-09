@@ -21,7 +21,7 @@
 | วัตถุดิบ | ได้จากการดรอปเท่านั้น (ไม่ได้คืนจากการแยกชิ้น) · บางตัวมาจากบอส/World Boss เท่านั้น |
 | สุ่ม | สูตรตายตัว ผลลัพธ์ตายตัว (ชิ้นไหน เกรดไหน) · **ค่ารองยังสุ่ม** เหมือนของดรอป · Catalyst สุ่มอัปเกรดเกรด มี pity |
 | เพดาน | Mythic ใช้ main stat ×3 เท่าเดิม · พลังที่เพิ่มมาจากค่ารอง/Special |
-| เวลา | คิวเดียว (1 ช่อง) · มี timer · จ่าย Coin เพื่อข้าม |
+| เวลา | คิวเดียว (1 ช่อง) · มี timer · ข้ามเวลาด้วย Coin ไม่ได้ (ถอดออกพร้อมฟีเจอร์ฟาร์ม) |
 | ตีบวก/รีไฟน์ | ใช้ของเดิมทั้งหมด ไม่มีกติกาใหม่ |
 | UI | เมนู "คราฟต์" ใหม่ · เห็นทุกสูตรตั้งแต่แรก · กระเป๋า 200 ช่อง + ตัวกรองตามชื่อเซ็ต |
 | ปล่อย | PvE และ PvP พร้อมกัน ผ่าน balance gate |
@@ -122,7 +122,7 @@
 | Standard | 300 | 30 นาที | Epic | Legendary |
 | Flagship | 800 | 4 ชั่วโมง | Legendary | Mythic |
 
-- ข้ามเวลา: จ่าย Coin = `ceil(2 × coin × เวลาที่เหลือ / เวลาทั้งหมด)` (เวลาที่เหลือ 0 = ฟรี)
+- ข้ามเวลา: **ไม่มีแล้ว** (ถอดออกพร้อมฟาร์ม) ต้องรอจน `finish_at` · ค่า enum `craft_skip` ของ wallet transaction ยังอยู่เพราะประวัติเก่าอ้างถึง
 - ค่าคงที่ทั้งหมดอยู่ที่ `craft-data.ts` และเผยแพร่ผ่าน `GET /monster/wiki`
 
 ## Catalyst และ pity
@@ -143,7 +143,6 @@
 กติกา (ตามแบบ World Boss `claim`: transaction + conditional UPDATE + เวลาจาก `new Date()` ฝั่งเซิร์ฟเวอร์ ไม่เชื่อ client):
 
 - **start:** ตรวจกฎก่อน (สูตรมีจริง, ไม่มีงานค้าง, วัตถุดิบ/Catalyst/Coin พอ) แล้วค่อยตัด: `WalletService.change` (Coin) → `inventoryService.spend` (ทุกวัตถุดิบ) · ไม่พอ = ไม่ตัดอะไรเลย · ตัดก่อนสร้างงานเสมอ
-- **skip:** คำนวณราคาจากเวลาที่เหลือ → ตัด Coin → ตั้ง `finish_at = now`
 - **claim:** ต้อง `finish_at <= now`, `claimed_at IS NULL` (conditional UPDATE กันกดซ้ำ), **กระเป๋าไม่เต็ม** (เต็ม = 409 ข้อความชัดเจน งานยังอยู่ในคิว ไม่หาย) · สุ่มเกรด (Catalyst/pity) + ค่ารอง + Special ด้วยฟังก์ชันเดิม (`rollRandomStats`, `rollSpecialOptions`) · สร้างชิ้นผ่าน `grantItem` · บันทึก `equipment_logs` ประเภท `craft`
 - ห้ามคืนวัตถุดิบ/Coin ถ้าผู้เล่นทิ้งงาน (ไม่มี cancel ใน v1)
 - ไม่มี cron: ทุกอย่าง lazy ตอนอ่าน/กด
@@ -154,7 +153,6 @@
 |---|---|---|---|
 | GET | `/monster/craft` | – | `ICraftOverview` |
 | POST | `/monster/craft/start` | `{ recipeId: string, useCatalyst: boolean }` | `ICraftOverview` |
-| POST | `/monster/craft/skip` | – | `ICraftOverview` |
 | POST | `/monster/craft/claim` | – | `{ item: <รูปแบบ item เดียวกับ GET /monster/equipment>, upgraded: boolean, overview: ICraftOverview }` |
 
 ```ts
@@ -179,7 +177,6 @@ interface ICraftOverview {
     startedAt: string   // ISO
     finishAt: string    // ISO
     status: 'running' | 'ready'
-    skipCoin: number    // 0 เมื่อ ready
   }
   catalyst: {
     owned: number
@@ -212,14 +209,14 @@ spec ใหม่ `craft-balance.spec.ts` (แนวเดียวกับ `pa
 
 ## Test plan
 
-Backend (ทุกอย่างต้องผ่านก่อนเปิด PR): `yarn lint:ci`, `yarn build`, `yarn test` (รวม `battle-engine.golden.spec.ts` **โดยไม่ regenerate**, `arena-engine.spec.ts`), `craft-balance.spec.ts`, spec ใหม่ของ `craft-data`, `equipment-data` (Mythic, set ใหม่), `mergeEffects`/`capEffects`, และ `*.int-spec.ts` ของ craft (start/skip/claim, ไม่พอวัตถุดิบ, กระเป๋าเต็ม, กดซ้ำ, pity) · ถ้ารัน int-spec ไม่ได้ในเครื่อง (ต้องมี Postgres `test`) ให้บอกชัดเจนว่าไม่ได้รัน
+Backend (ทุกอย่างต้องผ่านก่อนเปิด PR): `yarn lint:ci`, `yarn build`, `yarn test` (รวม `battle-engine.golden.spec.ts` **โดยไม่ regenerate**, `arena-engine.spec.ts`), `craft-balance.spec.ts`, spec ใหม่ของ `craft-data`, `equipment-data` (Mythic, set ใหม่), `mergeEffects`/`capEffects`, และ `*.int-spec.ts` ของ craft (start/claim, ไม่พอวัตถุดิบ, กระเป๋าเต็ม, กดซ้ำ, pity) · ถ้ารัน int-spec ไม่ได้ในเครื่อง (ต้องมี Postgres `test`) ให้บอกชัดเจนว่าไม่ได้รัน
 
 Frontend: `yarn lint:ci`, `yarn build`, `yarn test` · test ของ helper (ตัวกรองเซ็ต, label/สี Mythic, คำอธิบายเอฟเฟกต์ใหม่)
 
 ## ขอบเขต Frontend
 
 - เมนูใหม่ "คราฟต์" (`game-menu.ts` + panel `CraftPanel.tsx`) ตาม skill `new-frontend-page` · query/mutation hooks ใน `tamagotchi-service.tsx`, types ใน `tamagotchi-interface.ts` (เติม `MYTHIC` ใน enum)
-- แสดง: รายการสูตรแยกตามเซ็ต (เห็นทุกสูตร, สูตรที่ขาดวัตถุดิบบอกว่าขาดอะไรและดรอปจากไหน) · คิว (นับถอยหลัง, ปุ่มข้าม + ราคา, ปุ่มรับ, เตือนเมื่อกระเป๋าเต็ม) · Catalyst (จำนวน, โอกาส, pity) · ผลที่ได้หลังรับ (เกรด, อัปเกรดหรือไม่) · ลิงก์ไปหน้าอุปกรณ์
+- แสดง: รายการสูตรแยกตามเซ็ต (เห็นทุกสูตร, สูตรที่ขาดวัตถุดิบบอกว่าขาดอะไรและดรอปจากไหน) · คิว (นับถอยหลัง, ปุ่มรับ, เตือนเมื่อกระเป๋าเต็ม) · Catalyst (จำนวน, โอกาส, pity) · ผลที่ได้หลังรับ (เกรด, อัปเกรดหรือไม่) · ลิงก์ไปหน้าอุปกรณ์
 - เกรด Mythic: ชื่อ/สีใน `tamagotchi-helper.ts`, สไตล์พิเศษใน `EquipmentPanel.tsx` (ตอนนี้เช็ก `LEGENDARY` ตรง ๆ)
 - ตัวกรองเซ็ตในหน้าอุปกรณ์ · คำอธิบายเอฟเฟกต์ใหม่ + ชื่อวัตถุดิบ · Wiki แสดงค่าคงที่ craft จาก `GET /monster/wiki`
 - ไม่มีกติกาเกมฝั่ง frontend: ราคา/โอกาส/เวลาอ่านจากเซิร์ฟเวอร์ทั้งหมด
@@ -244,3 +241,13 @@ Frontend: `yarn lint:ci`, `yarn build`, `yarn test` · test ของ helper (�
 - ราคา/เวลา/อัตราดรอปต้องเทียบกับ Coin ต่อชั่วโมงจริงก่อนปล่อย
 - PvP พร้อมกัน: เอฟเฟกต์คุม (slow/stun) เป็นจุดที่พังง่ายที่สุด จึงมีเพดาน stun 15% และพึ่ง DR ของ CC ใน arena ที่มีอยู่แล้ว
 - กระเป๋า 200 ช่อง เพิ่มโหลดรายการในหน้าอุปกรณ์ ตรวจประสิทธิภาพ list ฝั่ง frontend
+
+## เฟอร์นิเจอร์ฟาร์ม (ระดับ 2-3 ใช้คิวนี้)
+
+ฟาร์มอยู่ที่ `monster/farm/` (backend) และเมนู `farm` (frontend) กฎและเหตุผลอยู่ที่ `docs/adr/0001-farm-effects-are-server-side.md` ส่วนนี้บอกเฉพาะจุดที่แตะคิวคราฟต์:
+
+- เฟอร์นิเจอร์ 4 ชนิด (โต๊ะ เสื่อออกกำลัง ห้องน้ำ เตียง) ระดับ 1 ซื้อด้วย Coin (`POST /monster/farm/buy`) ระดับ 2 และ 3 คราฟต์ (`POST /monster/farm/upgrade`, รับของ `POST /monster/farm/claim`)
+- **ใช้คิวเดียวกับอุปกรณ์** (`craft_jobs`, หนึ่งงานที่ยังไม่รับต่อผู้เล่น): ระหว่างคราฟต์เฟอร์นิเจอร์ เริ่มคราฟต์อุปกรณ์ไม่ได้ และกลับกัน · `recipe_id` ของเฟอร์นิเจอร์คือ `farm_<kind>:<tier>` สูตรอยู่ใน `farm/farm-data.ts` แยกจาก `CRAFT_RECIPES` เพราะไม่มี slot/เกรด
+- ระดับ 2: 300 Coin · 30 นาที · เอสเซนซ์ตามชนิด ×3 + เศษรูน ×1 · ระดับ 3: 800 Coin · 4 ชม. · เอสเซนซ์ ×4 + เศษรูน ×2 + Catalyst ×1 (เอสเซนซ์: โต๊ะ=ใบไม้ เสื่อ=ดิน ห้องน้ำ=น้ำ เตียง=แสง)
+- **สำเร็จแน่นอน:** ไม่มีสุ่ม ไม่มี pity และ Catalyst เป็นวัตถุดิบธรรมดา · กดรับไม่ต้องมีที่ว่างในกระเป๋า ระดับเดิมทำงานตลอดช่วงรอ
+- ก่อนซื้อหรือรับของ เซิร์ฟเวอร์ tick สัตว์ทุกตัวถึงตอนนั้นก่อน (`lockAndTickLiving`) เพื่อไม่ให้เวลาที่ผ่านมาแล้วถูกคิดย้อนหลังด้วยเฟอร์นิเจอร์ใหม่

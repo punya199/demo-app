@@ -56,7 +56,6 @@ const wiki = {
     },
     catalystChance: 0.15,
     pityAfterFails: 8,
-    skipCoinMultiplier: 2,
     adventureEssence: { chance: 0.06, min: 1, max: 2, areaElement: { coast: 'tide' } },
     raidCores: { normal: 1, hard: 2, nightmare: 3 },
     worldBoss: { unique: 1, catalyst: 1, topRank: 3, topUnique: 1, topCatalyst: 1 },

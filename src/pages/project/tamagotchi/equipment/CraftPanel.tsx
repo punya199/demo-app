@@ -9,7 +9,6 @@ import {
   useGetCraft,
   useGetEquipment,
   useGetWiki,
-  useSkipCraft,
   useStartCraft,
 } from '../core/tamagotchi-service'
 
@@ -36,7 +35,6 @@ export const CraftPanel = (props: ICraftPanelProps) => {
   const { data: wiki } = useGetWiki()
   const { data: equipment } = useGetEquipment()
   const { mutate: start, isPending: isStarting } = useStartCraft()
-  const { mutate: skip, isPending: isSkipping } = useSkipCraft()
   const { mutate: claim, isPending: isClaiming } = useClaimCraft()
   const [useCatalyst, setUseCatalyst] = useState(false)
   const [result, setResult] = useState<ICraftClaimResult | null>(null)
@@ -46,7 +44,7 @@ export const CraftPanel = (props: ICraftPanelProps) => {
     return <Spin />
   }
 
-  const isBusy = isStarting || isSkipping || isClaiming
+  const isBusy = isStarting || isClaiming
   const { queue, catalyst } = data
   const queued = queue ? data.recipes.find((recipe) => recipe.id === queue.recipeId) : undefined
   // The server flips `status`; the clock only enables the claim button a moment earlier.
@@ -116,15 +114,6 @@ export const CraftPanel = (props: ICraftPanelProps) => {
               {isReady ? 'เสร็จแล้ว' : formatCountdown(queue.finishAt, now)}
             </div>
             <div className="flex flex-wrap gap-2">
-              {!isReady && (
-                <Button
-                  size="small"
-                  disabled={isBusy || data.coin < queue.skipCoin}
-                  onClick={() => skip(undefined, { onError })}
-                >
-                  ข้ามเวลา 🪙 {queue.skipCoin}
-                </Button>
-              )}
               <Button
                 size="small"
                 type="primary"

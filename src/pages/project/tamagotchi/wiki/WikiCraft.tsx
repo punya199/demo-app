@@ -1,11 +1,4 @@
-import {
-  craftSetsUsing,
-  craftStyleLabel,
-  describeCareBonus,
-  fullSkipCoin,
-  percent,
-  times,
-} from './wiki-helper'
+import { craftSetsUsing, craftStyleLabel, describeCareBonus, percent, times } from './wiki-helper'
 import { Heading, List, Table } from './WikiParts'
 import {
   describePctBonus,
@@ -62,14 +55,14 @@ export const CraftWikiTab = (props: { wiki: IWikiData }) => {
         items={[
           'คราฟต์ได้ทีละ 1 ชิ้น (คิวเดียว) เลือกสูตรของชิ้นที่ต้องการ ใช้วัตถุดิบและเหรียญตั้งแต่ตอนเริ่ม แล้วรอเวลา ได้ครบแล้วกดรับ ไม่มีรอบยกเลิกและไม่คืนวัตถุดิบ',
           'เห็นทุกสูตรตั้งแต่ต้น สูตรที่ขาดวัตถุดิบจะบอกว่าขาดอะไรและได้จากไหน เซ็ตเรือธงต้องมีวัตถุดิบเฉพาะจากบอสโลก',
-          `ข้ามเวลารอได้ด้วยเหรียญ: ราคาเต็ม ${times(craft.skipCoinMultiplier)} ของค่าคราฟต์ ลดตามเวลาที่เหลือ (ครบเวลาแล้วฟรี)`,
+          'ต้องรอจนครบเวลา ข้ามเวลาด้วยเหรียญไม่ได้ (ระหว่างรอเล่นอย่างอื่นได้ตามปกติ)',
           `กดรับต้องมีที่ว่างในกระเป๋าอุปกรณ์ (${equipment.capacity} ชิ้น) ถ้าเต็มจะรับไม่ได้แต่งานยังอยู่ในคิว ไม่หาย`,
           'ค่ารองและ Special ของชิ้นที่ได้สุ่มบนเซิร์ฟเวอร์เหมือนชิ้นดรอป ชิ้นคราฟต์ตีบวก รีไฟน์ และแยกชิ้นส่วนได้เหมือนชิ้นอื่น (แยกแล้วได้หิน ไม่ได้วัตถุดิบคราฟต์คืน)',
           'แท็บ "วัตถุดิบ" ในกระเป๋าแสดงวัตถุดิบที่มีทั้งหมด และกรองอุปกรณ์ตามชื่อเซ็ตได้',
         ]}
       />
       <Table
-        head={['ระดับ', 'เหรียญ', 'เวลารอ', 'เกรดที่ได้', 'เกรดสูงสุด (Catalyst)', 'ราคาข้ามเต็ม']}
+        head={['ระดับ', 'เหรียญ', 'เวลารอ', 'เกรดที่ได้', 'เกรดสูงสุด (Catalyst)']}
         rows={[
           ['มาตรฐาน', standard],
           ['เรือธง', flagship],
@@ -81,7 +74,6 @@ export const CraftWikiTab = (props: { wiki: IWikiData }) => {
             formatAge(row.minutes),
             gradeLabel[row.baseGrade],
             gradeLabel[row.maxGrade],
-            `🪙 ${fullSkipCoin(row.coin, craft.skipCoinMultiplier)}`,
           ]
         })}
       />

@@ -1,4 +1,5 @@
 import type { EnumMonsterLine, EnumMonsterStage, IBattleStats, IFighter } from './monster'
+import type { EnumFurnitureKind } from './farm'
 import type {
   EnumEquipmentSlot,
   EnumEquipmentGrade,
@@ -201,6 +202,15 @@ export interface IWikiData {
     statusNumbers: { ccWindowSec: number; ccSteps: number[]; poisonMaxStacks: number }
   }
   // Craft (phase 5.6): every number the craft screen and its guide page use.
+  // The Farm: bonus on a care timer's minutes by tier (index 0 = none), and what tiers 2 and 3 cost.
+  farm: {
+    buyCoin: number
+    craft: Record<
+      '2' | '3',
+      { coin: number; minutes: number; essence: number; rune: number; catalyst: number }
+    >
+    furniture: { kind: EnumFurnitureKind; bonus: number[]; essence: string }[]
+  }
   petCore: { stages: EnumMonsterStage[]; perReturn: number; itemPrefix: string }
   dummy: { fightSec: number; defMax: number; defenseK: number; maxDefenseReduction: number }
   craft: {
@@ -210,7 +220,6 @@ export interface IWikiData {
     >
     catalystChance: number
     pityAfterFails: number
-    skipCoinMultiplier: number
     adventureEssence: {
       chance: number
       min: number

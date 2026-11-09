@@ -1,3 +1,10 @@
+# [1.70.0](https://github.com/punya199/demo-app/compare/v1.69.0...v1.70.0) (2026-11-09)
+
+
+### New
+
+* Farm screen with furniture that stretches the care timers, crafted tiers, no craft skip ([c5ea72c](https://github.com/punya199/demo-app/commit/c5ea72cbbb708cc084541a9424b28b6b39b95623))
+
 # [1.69.0](https://github.com/punya199/demo-app/compare/v1.68.0...v1.69.0) (2026-11-09)
 
 

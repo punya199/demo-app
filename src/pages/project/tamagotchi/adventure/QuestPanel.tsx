@@ -1,6 +1,7 @@
-import { Button, Card, Progress, Spin } from 'antd'
+import { Button, Card, message, Progress, Spin } from 'antd'
 import { ResetCountdown } from '../shared/ResetCountdown'
 import { IQuest, IQuestsData } from '../core/tamagotchi-interface'
+import { loginRewardParts } from './login-reward'
 import { useClaimLogin, useClaimQuest, useGetQuests } from '../core/tamagotchi-service'
 
 interface IQuestPanelProps {
@@ -21,6 +22,7 @@ const rewardLabel = (reward: {
 const LoginCard = (props: { login: IQuestsData['login']; onError: (error: unknown) => void }) => {
   const { login, onError } = props
   const { mutate: claim, isPending } = useClaimLogin()
+  const isComplete = !login.reward
   return (
     <Card size="small" className="dark:border-slate-700 dark:bg-slate-900">
       <div className="flex flex-col gap-3">
@@ -28,25 +30,31 @@ const LoginCard = (props: { login: IQuestsData['login']; onError: (error: unknow
           <span className="text-3xl">📅</span>
           <div className="flex-1">
             <div className="font-medium text-slate-900 dark:text-slate-100">
-              เข้าสู่ระบบรายวัน (ติดต่อกัน {login.streak} วัน)
+              เข้าสู่ระบบรายเดือน (รับแล้ว {login.claimed}/{login.rewards.length} วัน)
             </div>
             <div className="text-xs text-slate-500 dark:text-slate-400">
-              ขาดวันไหนเริ่มนับวันที่ 1 ใหม่ · วันที่ 7 ได้รางวัลใหญ่
+              ขาดวันไหนไม่เป็นไร รับต่อช่องถัดไปได้เลย · รีเซ็ตทุกวันที่ 1 ของเดือน
             </div>
           </div>
           <Button
             type="primary"
-            disabled={login.claimedToday || isPending}
-            onClick={() => claim(undefined, { onError })}
+            disabled={login.claimedToday || isComplete || isPending}
+            onClick={() =>
+              claim(undefined, {
+                onError,
+                onSuccess: ({ granted }) =>
+                  message.success(`ได้รับ ${loginRewardParts(granted).join(' · ')}`),
+              })
+            }
           >
-            {login.claimedToday ? 'รับแล้ว' : `รับ ${rewardLabel(login.reward)}`}
+            {isComplete ? 'ครบเดือนแล้ว' : login.claimedToday ? 'รับแล้ว' : 'รับรางวัล'}
           </Button>
         </div>
-        <div className="grid grid-cols-7 gap-1 text-center text-xs">
+        <div className="grid grid-cols-4 gap-1 text-center text-xs sm:grid-cols-7">
           {login.rewards.map((reward, index) => {
             const day = index + 1
             const isDone = login.claimedToday ? day <= login.day : day < login.day
-            const isNext = !login.claimedToday && day === login.day
+            const isNext = !login.claimedToday && !isComplete && day === login.day
             return (
               <div
                 key={day}
@@ -59,7 +67,11 @@ const LoginCard = (props: { login: IQuestsData['login']; onError: (error: unknow
                 }`}
               >
                 <div>วัน {day}</div>
-                <div>{isDone ? '✓' : rewardLabel(reward)}</div>
+                {isDone ? (
+                  <div>✓</div>
+                ) : (
+                  loginRewardParts(reward).map((part) => <div key={part}>{part}</div>)
+                )}
               </div>
             )
           })}

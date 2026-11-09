@@ -15,6 +15,16 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: 'next',
+    releasedAt: '2026-11-09T13:15:29Z',
+    changes: [
+      {
+        kind: 'new',
+        text: 'เข้าสู่ระบบรายเดือน 28 ช่อง 📅 รับรางวัลทีละช่อง ขาดวันไหนก็ไม่เสียความคืบหน้า รีเซ็ตทุกวันที่ 1 ของเดือน มีทั้งเหรียญ เพชร ไอเทม กล่องสุ่ม 🎁 และชุดแต่งตัวประจำเดือน 🌟 เมื่อรับครบ 28 ช่อง',
+      },
+    ],
+  },
+  {
     version: '1.64.0',
     releasedAt: '2026-11-09T12:53:59Z',
     changes: [

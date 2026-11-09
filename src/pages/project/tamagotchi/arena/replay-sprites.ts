@@ -18,6 +18,17 @@ import { createSkillStage, IStagePlace } from './skill-fx/stage'
 export const PX = 1.5
 const BOSS_PX = 1.2
 export const pxOf = (size: number) => (size >= 96 ? BOSS_PX : PX)
+// A boss fight "zooms out" (owner, 2026-11-09): the monsters draw smaller and the boss bigger, so the
+// boss towers over them. The arena itself has no camera, so this is done with each fighter's scale.
+export const BOSS_FIGHT_MONSTER_K = 0.72
+export const BOSS_FIGHT_BOSS_K = 1.3
+// ...but no boss grows wider than this (world px), so the long raid shark still fits.
+const BOSS_MAX_W = 230
+export const fightPxOf = (size: number, isBoss: boolean, bossFight: boolean) => {
+  if (!bossFight) return pxOf(size)
+  if (!isBoss) return pxOf(size) * BOSS_FIGHT_MONSTER_K
+  return Math.min(pxOf(size) * BOSS_FIGHT_BOSS_K, Math.max(pxOf(size), BOSS_MAX_W / size))
+}
 // The fighter's position is its body centre; its feet stand this far below (world px).
 export const FOOT_DROP = 18
 
@@ -146,11 +157,12 @@ export const createSpriteLayer = (
   const shown: ({ white: CanvasImageSource } | null)[] = fighters.map(() => null)
   scene.frameOf = (e) => shown[e.idx] ?? null
   const covered = coversOf(replay, stage.animates)
+  const bossFight = fighters.some((f) => f.boss)
   const drawn: (IDrawn | null)[] = fighters.map((f) => {
     if (!hasSprite(f.sprite)) return null
     const def = SPRITES[f.sprite]
     const still = getSpriteFrame(f.sprite, 'idle', 0)
-    return { def, foot: still?.foot ?? def.size - 2, px: pxOf(def.size) }
+    return { def, foot: still?.foot ?? def.size - 2, px: fightPxOf(def.size, !!f.boss, bossFight) }
   })
   const emitAcc: number[][] = fighters.map(() => [])
   let seen = -1

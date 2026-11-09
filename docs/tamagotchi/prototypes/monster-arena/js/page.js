@@ -10,6 +10,7 @@ const GAME_SKILLS = {
   ...DARK,
   ...SHADOW,
   ...RAID,
+  ...HYBRID,
 }
 async function useFire(id, att, def) {
   const s = GAME_SKILLS[id]
@@ -209,7 +210,11 @@ async function autoLoop() {
                         ? SHADOW
                         : FIRE
         const fk = Object.keys(set).filter((k) => !set[k].passive)
-        const k = fk[Math.floor(Math.random() * fk.length)]
+        // a cross-line Fused form uses its own skill half the time
+        const k =
+          HYBRID_OF[me.rid] && Math.random() < 0.5
+            ? HYBRID_OF[me.rid]
+            : fk[Math.floor(Math.random() * fk.length)]
         await run(() => useFire(k, me, foe))
       } else if (!foe.dummy) {
         const list =
@@ -242,7 +247,7 @@ async function autoLoop() {
                             'holy_blade',
                           ]
                         : ['flame_breath', 'flame_lava', 'flame_claw', 'flame_sun']
-        const own = RAID_OF[foe.rid],
+        const own = RAID_OF[foe.rid] || (HYBRID_OF[foe.rid] && [HYBRID_OF[foe.rid]]),
           pool = own || list
         const k = pool[Math.floor(Math.random() * pool.length)]
         await run(() => useFire(k, foe, me))
@@ -750,7 +755,7 @@ function hud(t) {
     sx.fill()
     sx.strokeStyle = 'rgba(255,255,255,.55)'
     sx.lineWidth = 1 * u
-    sx.strokeRect(mx + cam.x * f, my + cam.y * f, W * f, H * f)
+    sx.strokeRect(mx + cam.x * f, my + cam.y * f, W * cam.zoom * f, H * cam.zoom * f)
     for (const [e, col] of [
       [me, '#ffb43a'],
       [foe, foe.boss ? '#ff5a3a' : '#39c6ff'],
@@ -810,7 +815,7 @@ function hud(t) {
   sx.textAlign = 'center'
   sx.fillText(label, Wd / 2, 34 * u)
   // floating texts
-  const k = Wd / W
+  const k = Wd / (W * cam.zoom)
   for (const f of texts) {
     const a = 1 - f.age / f.life
     sx.globalAlpha = Math.max(0, a)
@@ -849,6 +854,28 @@ function hud(t) {
   sx.restore()
 }
 
+// Which canvases are in view: an IntersectionObserver marks them; a canvas in a hidden section never is.
+const visibleCanvases = new WeakSet()
+const watched = new WeakSet()
+const canvasObserver =
+  'IntersectionObserver' in window
+    ? new IntersectionObserver(
+        (entries) => {
+          for (const en of entries)
+            if (en.isIntersecting) visibleCanvases.add(en.target)
+            else visibleCanvases.delete(en.target)
+        },
+        { rootMargin: '200px' }
+      )
+    : null
+function onScreen(cv) {
+  if (!canvasObserver) return true
+  if (!watched.has(cv)) {
+    watched.add(cv)
+    canvasObserver.observe(cv)
+  }
+  return visibleCanvases.has(cv)
+}
 function frame(dt) {
   clock += dt
   timer += dt
@@ -1023,11 +1050,14 @@ function frame(dt) {
   // camera follows the middle of the fight
   const ma = anchor(me),
     fa = anchor(foe)
-  const tx = (ma.x + fa.x) / 2 - W / 2,
-    ty = (ma.y + fa.y) / 2 - H * 0.58
+  cam.zoom += ((foe.boss ? BOSS_ZOOM : 1) - cam.zoom) * Math.min(1, dt * 2)
+  const VW = W * cam.zoom,
+    VH = H * cam.zoom
+  const tx = (ma.x + fa.x) / 2 - VW / 2,
+    ty = (ma.y + fa.y) / 2 - VH * (foe.boss ? 0.7 : 0.58) // a tall boss needs room under the HUD
   const follow = Math.min(1, dt * 2.5)
-  cam.x = Math.max(0, Math.min(WW - W, cam.x + (tx - cam.x) * follow))
-  cam.y = Math.max(0, Math.min(WH - H, cam.y + (ty - cam.y) * follow))
+  cam.x = Math.max(0, Math.min(WW - VW, cam.x + (tx - cam.x) * follow))
+  cam.y = Math.max(0, Math.min(WH - VH, cam.y + (ty - cam.y) * follow))
   const theme = foe.boss
     ? {
         fire: 'lava',
@@ -1042,7 +1072,7 @@ function frame(dt) {
   const shx = reduceMotion ? 0 : (Math.random() - 0.5) * shake,
     shy = reduceMotion ? 0 : (Math.random() - 0.5) * shake
   shake = Math.max(0, shake - dt * 18)
-  const K = stage.width / W
+  const K = stage.width / (W * cam.zoom)
   sx.setTransform(K, 0, 0, K, -(cam.x + shx) * K, -(cam.y + shy) * K)
   sx.imageSmoothingEnabled = false
   sx.globalAlpha = 1
@@ -1140,8 +1170,10 @@ function frame(dt) {
   sx.fillStyle = vg
   sx.fillRect(0, 0, SW, SH)
   hud(clock)
-  for (const c of cards) drawCard(c, dt)
-  for (const L of lineups) drawLineup(L, dt)
+  // Only cards and line-ups on screen are drawn (2026-11-09: drawing every card of every section each
+  // frame made the page stutter once it had a few hundred cards).
+  for (const c of cards) if (onScreen(c.canvas)) drawCard(c, dt)
+  for (const L of lineups) if (onScreen(L.cv)) drawLineup(L, dt)
 }
 function resize() {
   const css = stage.getBoundingClientRect().width || 960
@@ -1882,8 +1914,8 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
     })
     document.querySelectorAll('.skgroup').forEach((g) => {
       g.hidden =
-        v === 'raid'
-          ? g.dataset.el !== 'raid'
+        v === 'raid' || v === 'hybrid'
+          ? g.dataset.el !== v
           : ELS.includes(v)
             ? g.dataset.el !== v
             : g.dataset.el === 'dark'
@@ -1911,6 +1943,8 @@ for (const [id, [from, meta, desc]] of Object.entries(LEAF_INFO)) {
       'raid',
       'adv',
       'plan',
+      'pfx',
+      'hybrid',
     ].includes(h)
       ? h
       : 'all'

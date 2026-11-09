@@ -75,7 +75,7 @@ Issues live in this repo's GitHub Issues (via `gh` CLI). See `docs/agents/issue-
 
 ### Monster visual overhaul (ongoing)
 
-The new 2.5D pixel-art look for the monster game is a standalone prototype, not yet in the game. Before any work on it, read `docs/tamagotchi/visual-overhaul.md`: it holds the owner's working rules (reply in Thai, still drafts before animation, three options after two rejections), the live Artifact URL, what each line's status is, and the skill/species renames still to apply to `demo-app-backend`.
+The monster game's 2.5D pixel art is designed in a prototype Artifact and ported into the game. Before any art or skill-visual work, read `docs/tamagotchi/visual-overhaul.md`: the owner's working rules (reply in Thai, still drafts before animation, three options after two rejections), how to publish the Artifact, what is done, and where each piece lives in the game.
 
 ### Domain docs
 

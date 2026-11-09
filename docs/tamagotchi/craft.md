@@ -63,11 +63,11 @@
 | 3 | `executioner` | ชุดเพชฌฆาต | เบิร์สต์ | **Flagship** | atk +8% | `executeBonus` 0.4, `critDamage` 0.10 |
 | 4 | `marksman` | ชุดพลแม่นปืน | คริ | Standard | atk +6% | `critChance` 0.15, `defDownOnBasic` 45 |
 | 5 | `tempo` | ชุดจังหวะลม | ความเร็ว | Standard | spd +8% | `firstStrike` 1, `slowOnBasic` 50, `cooldownCut` 0.3 |
-| 6 | `mirage` | ชุดมายาภาพ | หลบ | Standard | spd +6% | `evasion` 0.10, `retort` 0.5 (ทำให้ผู้ตีบอดอย่างเดียว ไม่สวนดาเมจ) |
+| 6 | `mirage` | ชุดมายาภาพ | หลบ | Standard | spd +6% | `evasion` 0.12 (0.10 ก่อน 2026-11-09), `retort` 0.5 (ทำให้ผู้ตีบอดอย่างเดียว ไม่สวนดาเมจ) |
 | 7 | `venomancer` | ชุดพิษพรายน้ำ | Damage over time | Standard | atk +6% | `poisonOnBasic` 35, `poisonBonus` 0.12 |
-| 8 | `tempest_binder` | ชุดพันธนาการพายุ | คุมเกม | **Flagship** | spd +8% | `slowOnBasic` 40, `stunOnBasic` 14, `cooldownCut` 0.2 |
+| 8 | `tempest_binder` | ชุดพันธนาการพายุ | คุมเกม | **Flagship** | spd +8% | `slowOnBasic` 40, `stunOnBasic` 14, `cooldownCut` 0.17 (0.2 ก่อน 2026-11-09) |
 | 9 | `thornmail` | ชุดเกราะหนาม | สะท้อน | Standard | def +8% | `thorns` 0.15, `shieldPct` 0.03 |
-| 10 | `aegis_oracle` | ชุดโหราผู้พิทักษ์ | ซัพพอร์ต | Standard | hp +8% | `shieldRefresh` 0.05, `curseOnBasic` 25 |
+| 10 | `aegis_oracle` | ชุดโหราผู้พิทักษ์ | ซัพพอร์ต | Standard | hp +8% | `shieldRefresh` 0.05, `curseOnBasic` 20 (25 ก่อน 2026-11-09) |
 | 11 | `caretaker` | ชุดผู้ดูแล | ดูแลสัตว์เลี้ยง | Standard | hp +5% · care: `slowHunger` 10, `tidyPet` 15 | `regenPct` 0.13 |
 | 12 | `wayfarer` | ชุดนักเดินทาง | ดูแล/สำรวจ | Standard | hp +5% · care: `staminaSaver` 10, `treasureNose` 10 | `shieldPct` 0.14 |
 
@@ -80,7 +80,7 @@
 - **Tempo** ต้องเพิ่ม `cooldownCut`: มีแค่ firstStrike + slow แล้วชนะได้ไม่เกิน ~33%
 - **Mirage** `retort` ทำแค่ทำให้บอด (power 0): ถ้าสวนดาเมจทุกครั้ง ชนะ ~75% ที่ทุกค่าโอกาส
 - **เซ็ตดูแล (11, 12)** ต้องแรงกว่าที่ตั้งใจไว้มากถึงจะแตะ 45% เพราะ 2 ชิ้นให้แค่ hp +5% — ตัวเลขนี้ตัดสินใจทางดีไซน์ได้ (ดู PR) ไม่ใช่ข้อบังคับ
-- อัตราชนะที่วัดได้ (seed 1–2, ทุกสาย, ทั้งสองฝั่ง, Ultimate + Epic +10, 224 แมตช์ต่อเซ็ต) อยู่ในคอมเมนต์ของ `craft-balance.spec.ts` · bulwark 48.2 · evergreen 50.4 · executioner 49.6 · marksman 49.6 · tempo 52.7 · mirage 47.3 · venomancer 49.6 · tempest_binder 48.2 · thornmail 49.6 · aegis_oracle 51.8 · caretaker 45.1 · wayfarer 46.4 (%) · ขยับ ±3 จุดตาม seed, tempest_binder แตะ 56% ในชุด seed นอกตัวอย่าง
+- อัตราชนะที่วัดได้ (seed 1–2, ทุกสาย, ทั้งสองฝั่ง, Ultimate + Epic +10, 224 แมตช์ต่อเซ็ต) อยู่ในคอมเมนต์ของ `craft-balance.spec.ts` · bulwark 48.2 · evergreen 50.4 · executioner 49.6 · marksman 49.6 · tempo 52.7 · mirage 47.3 · venomancer 49.6 · tempest_binder 48.2 · thornmail 49.6 · aegis_oracle 51.8 · caretaker 45.1 · wayfarer 46.4 (%) · ขยับ ±3 จุดตาม seed, tempest_binder แตะ 56% ในชุด seed นอกตัวอย่าง · หลังสกิลคูณตามขั้น (2026-11-09) วัดใหม่: bulwark 47.3 · evergreen 50.4 · executioner 51.8 · marksman 50.9 · tempo 49.6 · mirage 47.8 · venomancer 49.1 · tempest_binder 53.1 · thornmail 52.2 · aegis_oracle 52.7 · caretaker 43.8 · wayfarer 45.1 (ปรับ mirage, tempest_binder, aegis_oracle)
 
 ## เอฟเฟกต์ใหม่ (arena เท่านั้น)
 

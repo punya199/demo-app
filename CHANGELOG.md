@@ -1,3 +1,10 @@
+# [1.67.0](https://github.com/punya199/demo-app/compare/v1.66.0...v1.67.0) (2026-11-09)
+
+
+### Update
+
+* wiki lists the mystery box as a second source of the craft Catalyst ([feff95e](https://github.com/punya199/demo-app/commit/feff95ec5ed0be65977e9d28cc9959937e78214d))
+
 # [1.66.0](https://github.com/punya199/demo-app/compare/v1.65.0...v1.66.0) (2026-11-09)
 
 

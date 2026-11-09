@@ -26,7 +26,8 @@ import { ActivePetBar } from './page/ActivePetBar'
 import { GameMenu } from './page/GameMenu'
 import { useMenuFromHash, usePatchUnread } from './page/game-menu-hooks'
 import { showError } from './page/show-error'
-import { HallOfFame, TamagotchiGame } from './page/TamagotchiGame'
+import { HallOfFamePanel } from './page/HallOfFamePanel'
+import { TamagotchiGame } from './page/TamagotchiGame'
 
 import { useGetMyMonster, useGetWallet } from './core/tamagotchi-service'
 
@@ -53,12 +54,7 @@ const GameShell = () => {
   }, [speciesId, queryClient])
 
   const panels: Record<GameMenuKey, ReactNode> = {
-    care: (
-      <div className="flex flex-col items-center gap-8">
-        <TamagotchiGame isChoosingEgg={isChoosingEgg} setIsChoosingEgg={setIsChoosingEgg} />
-        <HallOfFame />
-      </div>
-    ),
+    care: <TamagotchiGame isChoosingEgg={isChoosingEgg} setIsChoosingEgg={setIsChoosingEgg} />,
     equipment: <EquipmentPanel monster={monster} coin={coin} onError={showError} />,
     skills: <SkillsPanel monster={monster} onError={showError} />,
     passive: <PassivePanel onError={showError} />,
@@ -74,6 +70,7 @@ const GameShell = () => {
     quests: <QuestPanel onError={showError} />,
     friends: <FriendsPanel monster={monster} onError={showError} />,
     dex: <DexPanel />,
+    'hall-of-fame': <HallOfFamePanel />,
     wiki: <WikiPanel />,
     'patch-notes': <PatchNotesPanel />,
   }

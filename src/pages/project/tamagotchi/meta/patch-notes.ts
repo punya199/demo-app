@@ -15,6 +15,16 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: 'next',
+    releasedAt: '',
+    changes: [
+      {
+        kind: 'update',
+        text: 'วิกิแท็บคราฟต์บอกแล้วว่า Catalyst 🧿 ได้จากกล่องปริศนาไซส์ M ของเช็คอินรายเดือน (ช่อง 27) ด้วย ไม่ได้มีแค่รางวัลบอสโลกรายสัปดาห์',
+      },
+    ],
+  },
+  {
     version: '1.66.0',
     releasedAt: '2026-11-09T13:41:26Z',
     changes: [

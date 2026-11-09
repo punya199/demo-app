@@ -131,6 +131,7 @@ describe('CraftWikiTab', () => {
     expect(screen.getByText(/อัปเกรดพลาดติดกัน 8 ครั้ง/)).toBeTruthy()
     expect(screen.getByText(/เกรด มิธิก/)).toBeTruthy()
     expect(screen.getByText('🧿 ตัวเร่งคราฟต์')).toBeTruthy()
+    expect(screen.getByText(/กล่องปริศนาไซส์ M/)).toBeTruthy()
     // The earth essence is used by Bulwark only; the area list falls back to "random".
     expect(screen.getAllByText('ชุดปราการศิลา').length).toBeGreaterThan(0)
     expect(screen.getByText(/ทุ่งหญ้า → สุ่ม/)).toBeTruthy()

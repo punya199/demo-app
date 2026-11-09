@@ -24,8 +24,8 @@ const hashAnim = (id: string, name: AnimName) => {
 }
 
 describe('sprite registry', () => {
-  it('has all 133 sprites of the prototype', () => {
-    expect(Object.keys(SPRITES)).toHaveLength(133)
+  it('has all 146 sprites of the prototype', () => {
+    expect(Object.keys(SPRITES)).toHaveLength(146)
     expect(hasSprite('sunking')).toBe(true)
     expect(hasSprite('nope')).toBe(false)
     expect(hasSprite(null)).toBe(false)
@@ -38,6 +38,8 @@ describe('sprite registry', () => {
     expect(spriteLine('nameless')).toBe('shadow')
     expect(spriteLine('advgolem')).toBe('earth')
     expect(spriteLine('dummy')).toBe('fire')
+    expect(spriteLine('hy_steam')).toBe('fire')
+    expect(spriteLine('hy_balance')).toBe('holy')
   })
 
   it('swings bigger sprites wider', () => {

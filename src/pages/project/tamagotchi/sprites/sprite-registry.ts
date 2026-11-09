@@ -7,6 +7,7 @@ import { DARK_SPRITES } from './lines/dark'
 import { EARTH_SPRITES } from './lines/earth'
 import { FIRE_SPRITES } from './lines/fire'
 import { HOLY_SPRITES } from './lines/holy'
+import { HYBRID_EL, HYBRID_SPRITES } from './lines/hybrid'
 import { LEAF_SPRITES } from './lines/leaf'
 import { RAID_SPRITES } from './lines/raid'
 import { SHADOW_SPRITES } from './lines/shadow'
@@ -14,7 +15,7 @@ import { WATER_SPRITES } from './lines/water'
 import type { IPose, ISpriteDef } from './sprite-types'
 
 // Every monster sprite by id: the eight lines (forms, awakened fused form, world boss), the raid
-// bosses, the adventure enemies and the training dummy. The backend sends these ids as `sprite`.
+// bosses, the adventure enemies, the training dummy and the 13 cross-line fused forms (hy_*). The backend sends these ids as `sprite`.
 
 export type SpriteLine = 'fire' | 'water' | 'leaf' | 'earth' | 'bolt' | 'holy' | 'dark' | 'shadow'
 
@@ -43,7 +44,8 @@ export const SPRITES: Record<string, ISpriteDef> = Object.assign(
   {},
   ...LINE_SPRITES.map(([, defs]) => defs),
   RAID_SPRITES,
-  ADVENTURE_SPRITES
+  ADVENTURE_SPRITES,
+  HYBRID_SPRITES
 )
 
 const SPRITE_LINE: Record<string, SpriteLine> = {
@@ -52,6 +54,7 @@ const SPRITE_LINE: Record<string, SpriteLine> = {
   ),
   ...RAID_LINE,
   ...(ADV_EL as Record<string, SpriteLine>),
+  ...(HYBRID_EL as Record<string, SpriteLine>),
 }
 
 export const hasSprite = (id: string | null | undefined): id is string => !!id && id in SPRITES

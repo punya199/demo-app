@@ -195,6 +195,21 @@ export function drawAura(
       for (let d = a.r + 2; d < a.r + (i % 2 ? 5 : 8); d++)
         ctx.fillRect(Math.round(x + Math.cos(an) * d), Math.round(y + Math.sin(an) * d), 1, 1)
     }
+  } else if (a.type === 'twinx') {
+    // cross-line fused forms (lines/hybrid.ts): the twin rings in the colours of both parent lines
+    const cols = a.cols ?? ['#ffffff', '#ffffff']
+    for (const [r, spd, col] of [
+      [a.r, 1, cols[0]],
+      [a.r * 0.7, -1.6, cols[1]],
+    ] as const)
+      for (let i = 0; i < 40; i++) {
+        const an = t * 1.1 * spd - i * 0.08 * spd,
+          px = x + Math.cos(an) * r,
+          py = y + Math.sin(an) * r * 0.36 + Math.sin(an * 3 + t) * 2
+        ctx.globalAlpha = 0.7 * (1 - i / 40)
+        ctx.fillStyle = i < 3 ? '#ffffff' : col
+        ctx.fillRect(px, py, 2, 2)
+      }
   } else if (a.type === 'motes' || a.type === 'twinh') {
     const rings: [number, number, string[]][] =
       a.type === 'twinh'

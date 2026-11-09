@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { IArenaEvent, IArenaFighterSummary, IArenaReplay, IArenaSkill } from '../arena-interface'
 import { ACT, BASIC_NAME } from '../replay-anim'
 import { castsOf } from './casts'
+import { HYBRID } from './hybrid'
 import { RAID } from './raid'
 import { AWAKENED_FX_OF, createSkillStage, IStagePlace, skillFxOf } from './stage'
 import { BOLT } from './bolt'
@@ -120,7 +121,16 @@ describe('skillFxOf', () => {
       expect(skillFxOf(fused)).toBe(skillFxOf(ult))
       expect(skillFxOf(fused)).not.toBeNull()
     }
-    expect(skillFxOf('fz_flame_tide')).toBeNull()
+  })
+
+  it("plays each cross-line Fused form's own skill, one per hybrid sprite", () => {
+    const ids = Object.keys(HYBRID)
+    expect(ids).toHaveLength(13)
+    for (const id of ids) {
+      expect(id).toMatch(/^fz_[a-z]+_[a-z]+$/)
+      expect(skillFxOf(id)).toBe(HYBRID[id])
+    }
+    expect(new Set(Object.values(HYBRID).map((s) => s.hy)).size).toBe(13)
   })
 
   it('gives each raid boss its own version of a shared skill', () => {
@@ -139,6 +149,7 @@ describe('skill stage', () => {
         .map(([id, s]) => [id, s.name, null] as const)
     ),
     ...Object.values(RAID).map((s) => [s.game as string, s.name, s.boss ?? null] as const),
+    ...Object.entries(HYBRID).map(([id, s]) => [id, s.name, s.hy] as const),
   ]
 
   it.each(every)('plays %s from wind-up to the end without errors', async (id, name, sprite) => {

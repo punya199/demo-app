@@ -2,7 +2,7 @@ import { ADV_BMP } from '../bitmaps/adventure-bitmaps'
 import { bmpRig } from '../engine/bmp-rig'
 import { BIPED, BLOB, FLY, QUAD, SWIM } from '../engine/rigs'
 import { glowMouth } from '../engine/shapes'
-import type { PartOffset } from '../engine/bmp-rig'
+import type { IRigBitmap, PartOffset } from '../engine/bmp-rig'
 import type { Pt } from '../engine/spr'
 import type { IEmitter, IGlow, IPose, IRig, ISpriteDef } from '../sprite-types'
 
@@ -88,11 +88,18 @@ export type AdvPart =
       span: number,
     ]
 
-export type AdvId = keyof typeof ADV_DESIGN_W
+export type AdvId = keyof typeof ADV_DESIGN_W | (string & {})
 
-export function advRig(id: AdvId, parts: AdvPart[]) {
-  const b = ADV_BMP[id],
-    k = b.rows[0].length / ADV_DESIGN_W[id],
+// A bitmap and the width its part cuts were measured on (another set of creatures, e.g. the hybrids,
+// passes its own; the adventure enemies' come from ADV_BMP / ADV_DESIGN_W).
+export interface IAdvSource {
+  b: IRigBitmap
+  w: number
+}
+
+export function advRig(id: AdvId, parts: AdvPart[], src?: IAdvSource) {
+  const b = src ? src.b : ADV_BMP[id],
+    k = b.rows[0].length / (src ? src.w : ADV_DESIGN_W[id as keyof typeof ADV_DESIGN_W]),
     tests = parts.filter((p): p is Exclude<AdvPart, ['body']> => p.length > 1)
   const part = (x: number, y: number) => {
     for (const p of tests) if (p[1](x / k, y / k)) return p[0]
@@ -141,7 +148,7 @@ export function advRig(id: AdvId, parts: AdvPart[]) {
 }
 
 // Where an enemy's mouth and particle emitters are, on its design grid.
-interface IAdvExtra {
+export interface IAdvExtra {
   mouth?: Pt
   emit?: IEmitter[]
   hover?: number
@@ -157,9 +164,10 @@ export function ADV_SPRITE(
   id: AdvId,
   rig: IRig,
   parts: AdvPart[],
-  extra: IAdvExtra = {}
+  extra: IAdvExtra = {},
+  src?: IAdvSource
 ): ISpriteDef {
-  const R = advRig(id, parts),
+  const R = advRig(id, parts, src),
     w = R.b.rows[0].length,
     h = R.b.rows.length,
     size = Math.ceil((Math.max(w, h) + 6) / 8) * 8,

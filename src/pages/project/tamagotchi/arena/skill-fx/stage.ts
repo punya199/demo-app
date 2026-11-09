@@ -8,6 +8,7 @@ import { DARK, darkBurst } from './dark'
 import { EARTH } from './earth'
 import { FIRE, rebirth } from './fire'
 import { HOLY, lastStandFx } from './holy'
+import { HYBRID } from './hybrid'
 import { entBark, LEAF } from './leaf'
 import { RAID } from './raid'
 import {
@@ -54,11 +55,12 @@ const LINE_FX: Record<string, ISkillFx> = {
   ...HOLY,
   ...DARK,
   ...SHADOW,
+  ...HYBRID,
 }
 
 // An awakened Fused form's own skill (backend fz_<line>_<line>, 2026-11-09) is its line's Ultimate
-// skill made stronger, so it plays that animation. Cross-line fz_<a>_<b> skills have none yet: the
-// replay falls back to the element particles.
+// skill made stronger, so it plays that animation. Cross-line fz_<a>_<b> skills have their own
+// (hybrid.ts).
 export const AWAKENED_FX_OF: Record<string, string> = {
   fz_flame_flame: 'flame_sun',
   fz_tide_tide: 'tide_trident',

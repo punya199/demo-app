@@ -92,6 +92,39 @@ export interface ISpriteLayer {
   floor: HTMLCanvasElement
   // Whether a skill animation is drawing team's projectile itself (hide the server's orb).
   hidesProjectiles: (team: number) => boolean
+  // Whether fighter who's skill of this name plays its own animation.
+  animates: (who: number, name: string) => boolean
+  // Whether an event belongs to a cast with its own animation (or is a basic hit), so the caller
+  // skips its plain circles and lines for it.
+  covers: (e: IArenaEvent) => boolean
+}
+
+// Which events belong to a cast with its own skill animation (or are basic hits, which have their
+// own impact): the generic particles, circles and lines stay out of their way. A burst, beam or
+// zone carries no skill name, so it counts when it lands within 3 s after such a cast's release.
+export const coversOf = (
+  replay: IArenaReplay,
+  animates: (who: number, name: string) => boolean
+): ((e: IArenaEvent) => boolean) => {
+  const { events, fighters } = replay
+  const animated = new Set(
+    events
+      .filter((e) => e.kind === 'skill' && e.who !== undefined)
+      .filter((e) => animates(e.who as number, e.skill ?? ''))
+      .map((e) => `${e.who}:${e.skill}`)
+  )
+  const busyUntil: number[][] = fighters.map(() => [])
+  for (const e of events)
+    if (e.kind === 'skill' && animated.has(`${e.who}:${e.skill}`))
+      busyUntil[e.who as number].push(e.t)
+  return (e) => {
+    if (e.who === undefined) return false
+    if (e.kind === 'hit') return e.skill === BASIC_NAME || animated.has(`${e.who}:${e.skill}`)
+    if (e.kind === 'skill') return animated.has(`${e.who}:${e.skill}`)
+    if (e.kind === 'burst' || e.kind === 'beam' || e.kind === 'zone' || e.kind === 'zoneHit')
+      return (busyUntil[e.who] ?? []).some((t) => e.t >= t - 2 && e.t <= t + 3 * 20)
+    return false
+  }
 }
 
 export const createSpriteLayer = (
@@ -112,25 +145,7 @@ export const createSpriteLayer = (
   )
   const shown: ({ white: CanvasImageSource } | null)[] = fighters.map(() => null)
   scene.frameOf = (e) => shown[e.idx] ?? null
-  // Fighters' casts that have their own animation: the generic particles stay out of their way.
-  const animated = new Set(
-    events
-      .filter((e) => e.kind === 'skill' && e.who !== undefined)
-      .filter((e) => stage.animates(e.who as number, e.skill ?? ''))
-      .map((e) => `${e.who}:${e.skill}`)
-  )
-  const busyUntil: number[][] = fighters.map(() => [])
-  for (const e of events)
-    if (e.kind === 'skill' && animated.has(`${e.who}:${e.skill}`))
-      busyUntil[e.who as number].push(e.t)
-  const covered = (e: IArenaEvent) => {
-    if (e.who === undefined) return false
-    if (e.kind === 'hit') return e.skill === BASIC_NAME || animated.has(`${e.who}:${e.skill}`)
-    if (e.kind === 'skill') return animated.has(`${e.who}:${e.skill}`)
-    if (e.kind === 'burst' || e.kind === 'beam' || e.kind === 'zoneHit')
-      return busyUntil[e.who].some((t) => e.t >= t - 2 && e.t <= t + 3 * 20)
-    return false
-  }
+  const covered = coversOf(replay, stage.animates)
   const drawn: (IDrawn | null)[] = fighters.map((f) => {
     if (!hasSprite(f.sprite)) return null
     const def = SPRITES[f.sprite]
@@ -523,6 +538,8 @@ export const createSpriteLayer = (
       flash: scene.flashScreen,
     }),
     hidesProjectiles: (team) => stage.hidesProjectiles(team),
+    animates: (who, name) => stage.animates(who, name),
+    covers: covered,
   }
 }
 

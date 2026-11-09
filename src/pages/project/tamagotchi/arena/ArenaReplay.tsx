@@ -101,10 +101,17 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
     const stunBit = stunIdx >= 0 ? 1 << stunIdx : 0
     // The pixel-art layer loads on demand; until then (or for a fighter without art) the emoji shows.
     let layer: ISpriteLayer | null = null
+    // Zones (by aim point) whose skill animation draws the zone itself.
+    let ownZones = new Set<string>()
     let cancelled = false
     void import('./replay-sprites')
       .then((m) => {
-        if (!cancelled) layer = m.createSpriteLayer(replay, skills)
+        if (cancelled) return
+        const l = m.createSpriteLayer(replay, skills)
+        ownZones = new Set(
+          events.filter((e) => e.kind === 'zone' && l.covers(e)).map((e) => `${e.x},${e.y}`)
+        )
+        layer = l
       })
       .catch(() => {})
     let places: IPlace[] = []
@@ -173,6 +180,7 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
 
       for (const z of f0.z) {
         const [x, y, r, left, total, el] = z as [number, number, number, number, number, string]
+        if (ownZones.has(`${x},${y}`)) continue
         const c = colorOf(el)
         ctx.setLineDash([7, 6])
         ctx.strokeStyle = c
@@ -189,6 +197,10 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
       for (const e of events) {
         const age = (tick - e.t) / ARENA_TICK
         if (age < 0 || age > 0.5) continue
+        // a skill with its own animation draws its burst, zone and beam itself, and a sprite's other
+        // bursts show as element particles (no ring round its body)
+        if (layer?.covers(e)) continue
+        if (e.kind === 'burst' && e.who !== undefined && layer?.has(e.who)) continue
         const a = 1 - age / 0.5
         const c = colorOf(e.el ?? (e.who !== undefined ? fighters[e.who]?.el : 'neutral'))
         if (
@@ -285,7 +297,9 @@ export const ArenaReplay = (props: IArenaReplayProps) => {
           Math.PI * 2
         )
         ctx.fill()
-        if (act === 1 && !ko) {
+        // A sprite shows its wind-up with its cast pose (and the skill's own animation or element
+        // particles), so the plain rings are for emoji fighters only.
+        if (act === 1 && !ko && !sprite) {
           const total = skill?.wind ?? 7
           const prog = 1 - actT / total
           const c = skill

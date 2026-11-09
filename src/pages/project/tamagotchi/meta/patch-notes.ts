@@ -15,6 +15,16 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: 'next',
+    releasedAt: '2026-11-09T06:15:00Z',
+    changes: [
+      {
+        kind: 'update',
+        text: 'แถบมอนด้านบนแสดงช่องมอนทุกตัวตลอดเวลาแล้ว ไม่ต้องกดปุ่ม "เปลี่ยน" เพื่อเปิดรายการก่อน แตะช่องไหนก็สลับไปเล่นกับตัวนั้นได้ทันที',
+      },
+    ],
+  },
+  {
     version: '1.62.1',
     releasedAt: '2026-11-09T06:14:50Z',
     changes: [

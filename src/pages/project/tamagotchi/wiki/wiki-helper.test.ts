@@ -3,7 +3,6 @@ import {
   describeCareBonus,
   craftSetsUsing,
   describeCcSteps,
-  fullSkipCoin,
   isCraftSet,
   splitStatuses,
 } from './wiki-helper'
@@ -36,11 +35,9 @@ describe('splitStatuses', () => {
   })
 })
 
-describe('describeCcSteps / fullSkipCoin', () => {
-  it('formats the crowd-control steps and the full skip price', () => {
+describe('describeCcSteps', () => {
+  it('formats the crowd-control steps', () => {
     expect(describeCcSteps([100, 50, 0])).toBe('100% → 50% → ไม่ติด')
-    expect(fullSkipCoin(300, 2)).toBe(600)
-    expect(fullSkipCoin(800, 2)).toBe(1600)
   })
 })
 

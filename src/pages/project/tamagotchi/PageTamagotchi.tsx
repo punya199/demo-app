@@ -15,6 +15,7 @@ import { WorldBossPanel } from './boss/WorldBossPanel'
 import { DummyPanel } from './arena/DummyPanel'
 import { RaidPanel } from './boss/RaidPanel'
 import { CraftPanel } from './equipment/CraftPanel'
+import { FarmPanel } from './farm/FarmPanel'
 import { PvpPanel } from './arena/PvpPanel'
 import { QuestPanel } from './adventure/QuestPanel'
 import { ShopPanel } from './social/ShopPanel'
@@ -61,6 +62,7 @@ const GameShell = () => {
     costume: <CostumePanel monster={monster} onError={showError} />,
     shop: <ShopPanel monster={monster} coin={coin} onError={showError} />,
     craft: <CraftPanel onError={showError} />,
+    farm: <FarmPanel onError={showError} />,
     adventure: <AdventurePanel monster={monster} onError={showError} />,
     expedition: <ExpeditionPanel monster={monster} onError={showError} />,
     raid: <RaidPanel monster={monster} onError={showError} />,

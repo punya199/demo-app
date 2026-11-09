@@ -2,6 +2,7 @@ import { Collapse, Spin } from 'antd'
 import { IWikiData } from '../core/tamagotchi-interface'
 import { useGetWiki } from '../core/tamagotchi-service'
 import { CraftWikiTab } from './WikiCraft'
+import { FarmWikiTab } from './WikiFarm'
 import { ResetWikiTab } from './WikiReset'
 import { SkillsWikiTab } from './WikiSkills'
 import { StartWikiTab, CareWikiTab, OnlineWikiTab, StaminaWikiTab } from './WikiBasics'
@@ -38,6 +39,7 @@ const buildSections = (wiki: IWikiData) => [
     : []),
   { key: 'equipment', label: '🛡️ อุปกรณ์และตีบวก', children: <EquipmentWikiTab wiki={wiki} /> },
   { key: 'craft', label: '🔨 คราฟต์', children: <CraftWikiTab wiki={wiki} /> },
+  { key: 'farm', label: '🏡 ฟาร์ม', children: <FarmWikiTab wiki={wiki} /> },
   { key: 'raid', label: '👹 บอสและชุดเซ็ต', children: <RaidWikiTab wiki={wiki} /> },
   { key: 'world-boss', label: '🌩️ บอสโลก', children: <WorldBossWikiTab wiki={wiki} /> },
   {

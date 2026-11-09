@@ -9,6 +9,7 @@ export type GameMenuKey =
   | 'costume'
   | 'shop'
   | 'craft'
+  | 'farm'
   | 'adventure'
   | 'expedition'
   | 'raid'
@@ -48,6 +49,7 @@ const ALL_MENU: IGameMenuGroup[] = [
       { key: 'costume', label: 'ชุดแต่งตัว', emoji: '👕' },
       { key: 'shop', label: 'ร้านค้า', emoji: '🛒' },
       { key: 'craft', label: 'คราฟต์', emoji: '🔨' },
+      { key: 'farm', label: 'ฟาร์ม', emoji: '🏡' },
     ],
   },
   {

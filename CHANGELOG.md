@@ -1,3 +1,24 @@
+# [1.68.0](https://github.com/punya199/demo-app/compare/v1.67.0...v1.68.0) (2026-11-09)
+
+
+### New
+
+* animate the 13 cross-line fused forms in the arena prototype ([bdb99b7](https://github.com/punya199/demo-app/commit/bdb99b78b9b41b31e9383e080772980e1ad792f4))
+* animate the 13 cross-line Fused forms' own skills in the arena prototype ([6451a49](https://github.com/punya199/demo-app/commit/6451a49153c67e12675dedd8df7f57dc6b32b81a))
+* show the 13 cross-line fused forms as still drafts in the arena prototype ([cd3a82a](https://github.com/punya199/demo-app/commit/cd3a82a70e992da103a45bb1c6b5d270f5d697e9))
+
+### Update
+
+* condense the monster art notes to what the next session needs ([fa7bdb3](https://github.com/punya199/demo-app/commit/fa7bdb342a8ce12d345e0164678ae0453bf7590a))
+* drop the light column from high-tier skills and keep the magic circle on the caster ([9706e6d](https://github.com/punya199/demo-app/commit/9706e6d23be2433e613b59d1e42b473d60b7184e))
+* keep the prototype flourish generator in the repo ([e3d0676](https://github.com/punya199/demo-app/commit/e3d067605196e6a1961d8ac7240af02c7b46c6ca))
+* make high-tier skills grander with magic circles, beams and shockwaves ([655b89b](https://github.com/punya199/demo-app/commit/655b89b337a8b5b71b07a1f2fef9235b7a9c4747))
+* note the open branch work in the art notes ([a51d39b](https://github.com/punya199/demo-app/commit/a51d39b9b8b8def114e48c7333703d4dec09268b))
+* point CLAUDE.md at the condensed art notes ([c78222c](https://github.com/punya199/demo-app/commit/c78222cbda5a1d7ede5bc786fd4f9a8aa164b2ff))
+* show skill strength by stage, play awakened Fused skills, and make bosses tower over monsters ([e2e9732](https://github.com/punya199/demo-app/commit/e2e9732979852bd994d34c15fc3954371c026a0f))
+* tint the PixelFX trial by element and add art prompts for the 13 cross-line fused forms ([e17131d](https://github.com/punya199/demo-app/commit/e17131d2b92e9e4e8e8e93cc8786b8a11b268e51))
+* try PixelFX status and hit effects on our monsters in the arena prototype ([977a924](https://github.com/punya199/demo-app/commit/977a924657bb487fc7366fbd0db19d57827ed5fc))
+
 # [1.67.0](https://github.com/punya199/demo-app/compare/v1.66.0...v1.67.0) (2026-11-09)
 
 

@@ -143,6 +143,7 @@ const serverMessageLabel: Record<string, string> = {
   'Skip 1 to 10 runs at a time': 'ข้ามได้ครั้งละ 1–10 รอบ',
   'You do not have this item': 'ไม่มีไอเทมนี้ในกระเป๋า',
   'Login reward was already claimed today': 'วันนี้รับรางวัลเข้าสู่ระบบไปแล้ว',
+  'All login rewards this month were already claimed': 'เดือนนี้รับรางวัลเข้าสู่ระบบครบแล้ว',
   'Quest is not complete or was already claimed': 'ภารกิจยังไม่สำเร็จ หรือรับรางวัลไปแล้ว',
 }
 

@@ -50,6 +50,18 @@ export interface IQuest {
 export interface ILoginReward {
   coin: number
   gem: number
+  items?: { itemId: string; qty: number }[]
+  // Mystery box size, opened on the spot when the slot is claimed.
+  box?: 'S' | 'M' | 'L'
+  costume?: string
+}
+
+// What a login claim actually paid (box prizes included).
+export interface ILoginGranted {
+  coin: number
+  gem: number
+  items: { itemId: string; qty: number }[]
+  costume: string | null
 }
 
 export interface IQuestsData {
@@ -59,10 +71,12 @@ export interface IQuestsData {
   weekly: { week: string; resetsAt: string; quests: IQuest[] }
   login: {
     claimedToday: boolean
-    streak: number
-    // 1-based day in the 7-day cycle: today's reward if claimed, otherwise the next one.
+    // Claims made this month.
+    claimed: number
+    // 1-based slot of the 28-day board: today's reward if claimed, otherwise the next one.
     day: number
-    reward: ILoginReward
+    // Null once all 28 slots are claimed.
+    reward: ILoginReward | null
     rewards: ILoginReward[]
   }
 }

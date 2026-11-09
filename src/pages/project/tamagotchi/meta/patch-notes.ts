@@ -15,6 +15,16 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: 'next',
+    releasedAt: '2026-11-09T12:00:00Z',
+    changes: [
+      {
+        kind: 'fix',
+        text: 'แก้ปัญหากดรับรางวัลซีซันสังเวียนไม่ได้ (ขึ้นข้อผิดพลาด) ตอนนี้รับรางวัลซีซันรายสัปดาห์ได้ตามปกติแล้ว',
+      },
+    ],
+  },
+  {
     version: '1.63.0',
     releasedAt: '2026-11-09T06:39:16Z',
     changes: [

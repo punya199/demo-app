@@ -570,8 +570,11 @@ td.st { white-space: nowrap; color: var(--muted) }
   <section aria-labelledby="pfx-h" data-group="pfx" id="pfx-sec" style="order:27">
     <div class="eyebrow">ทดลองไลบรารีเอฟเฟกต์</div>
     <h2 id="pfx-h">PixelFX บนมอนของเรา: สถานะ 7 แบบ + โดนตี 2 แบบ</h2>
-    <p class="lede">เอฟเฟกต์จาก PixelFX (โอเพนซอร์ส MIT) ที่ตรงกับสถานะในเกม เอฟเฟกต์สถานะของ PixelFX วาดตามเงาร่างของตัวละคร เราจึงส่งรูปมอนของเราให้แทนหุ่นของเขา ไฟ พิษ และดาวจึงเกาะตามรูปร่างมอนแต่ละตัว ยังไม่ได้ปรับสีหรือขนาดใด ๆ เป็นค่าตั้งต้นของเขาทั้งหมด มอนยืนนิ่ง เอฟเฟกต์เล่นวน เลือกมอนได้ด้านล่าง</p>
-    <label class="sel">มอน<select id="pfx-pick"></select></label>
+    <p class="lede">เอฟเฟกต์จาก PixelFX (โอเพนซอร์ส MIT) ที่ตรงกับสถานะในเกม เอฟเฟกต์สถานะของ PixelFX วาดตามเงาร่างของตัวละคร เราจึงส่งรูปมอนของเราให้แทนหุ่นของเขา ไฟ พิษ และดาวจึงเกาะตามรูปร่างมอนแต่ละตัว สีปรับตามธาตุของมอนที่เลือก (ทุกเอฟเฟกต์ใช้ชุดสีเดียวกันของธาตุนั้น) ขนาดยังเป็นค่าตั้งต้นของเขา มอนยืนนิ่ง เอฟเฟกต์เล่นวน เลือกมอนได้ด้านล่าง</p>
+    <div class="row" style="align-items:flex-end">
+      <label class="sel">มอน<select id="pfx-pick"></select></label>
+      <label class="hint" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="pfx-tint" checked> สีตามธาตุของมอน (ปิดเพื่อดูสีเดิมของ PixelFX)</label>
+    </div>
     <div class="pfx-grid" id="pfx-cards"></div>
   </section>
   <section aria-labelledby="plan-h" data-group="plan" style="order:27">

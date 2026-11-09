@@ -174,7 +174,9 @@ stun, slow, haste, rage, curse) and two hit effects (hit-spark, crit-hit), on on
 - `js/pixelfx-trial.js` turns a monster's idle frame into a PixelFX actor (`mask`, `pixels`,
   `head`, `chest`, feet at 0,0), so the status effects wrap our silhouette instead of PixelFX's
   dummy. Each tile draws the effect's back layer, our sprite, then its front layer.
-- Colours and sizes are PixelFX's defaults; nothing tuned. Waiting for the owner's verdict before
+- Colours follow the picked monster's line (2026-11-09, owner's request): one dark-to-bright ramp per
+  line (`RAMP` in `pixelfx-trial.js`) is passed as `palette`, which PixelFX resamples for every effect;
+  a checkbox shows PixelFX's own colours. Sizes are still PixelFX's defaults. Waiting for the owner's verdict before
   anything goes into the game (it would need a canvas bridge in `ArenaReplay`, the actor built from
   each sprite, and shield/regen drawn by us or from its holy effects).
 
@@ -248,6 +250,11 @@ shark 160×64; Dracula 72), native size plus an 8× upscale, and a pose with lim
 the body so it can be cut into parts. Its pictures are not on a clean grid and have ~150+ colours,
 so always reduce them; the shark came out 160×64 as asked, the golem about 860×960 and had to be
 reduced by ~9.5×.
+
+Cross-line fused forms (2026-11-09): the 13 hybrids (`FUSED_FORMS` pairs of two different lines,
+`sprite: null` in the game) have a one-sheet prompt (4 × 4 grid, black grid lines, magenta cells) and a
+per-creature plan of cut parts, walk, attack and skill motion in `docs/tamagotchi/fused-hybrid-prompts.md`.
+Waiting for the owner's pictures.
 
 Adventure enemies (2026-11-08): the owner asked for one sheet with all 20 plus the training dummy, so the
 prompt given in chat asks for a 5 × 5 grid (21 cells used, reading order = `adventure-data.ts` order, then

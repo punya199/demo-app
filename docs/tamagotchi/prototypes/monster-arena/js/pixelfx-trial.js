@@ -64,15 +64,38 @@
     },
   ]
   const MONS = [
-    ['sunking', 'เพลิง'],
-    ['whaleking', 'วารี'],
-    ['forestdeer', 'พฤกษ์'],
-    ['mountturtle', 'ศิลา'],
-    ['thunderking', 'อสนี'],
-    ['sunqilin', 'รัศมี'],
-    ['spiderqueen', 'รัตติกาล'],
-    ['knightlord', 'เงา'],
+    ['sunking', 'เพลิง', 'fire'],
+    ['whaleking', 'วารี', 'water'],
+    ['forestdeer', 'พฤกษ์', 'leaf'],
+    ['mountturtle', 'ศิลา', 'earth'],
+    ['thunderking', 'อสนี', 'bolt'],
+    ['sunqilin', 'รัศมี', 'holy'],
+    ['spiderqueen', 'รัตติกาล', 'dark'],
+    ['knightlord', 'เงา', 'shadow'],
   ].filter(([id]) => SPRITES[id])
+  const EL_OF = Object.fromEntries(MONS.map(([id, , el]) => [id, el]))
+  // Each line's colour ramp, dark to bright. PixelFX resamples a ramp to each effect's own length,
+  // so one ramp recolours every effect (only the main palette; smoke and char stay as they are).
+  const RAMP = {
+    fire: ['#3a0e08', '#7a1a0c', '#c4300f', '#f2561d', '#ff8a2a', '#ffc23d', '#ffe58a', '#fff6d8'],
+    water: ['#0a1a3d', '#123a78', '#1d63b0', '#2f8fe0', '#4fc0f4', '#8ee0ff', '#c8f4ff', '#ffffff'],
+    leaf: ['#0e2410', '#1c4a1a', '#2f7a24', '#4fae32', '#7cd448', '#b2ec6a', '#e0fca8', '#fbffe8'],
+    earth: ['#24160a', '#4a2e14', '#7a4c22', '#a8713a', '#cf9a52', '#e9c27a', '#f8e2ae', '#fff8e6'],
+    bolt: ['#1a1440', '#2c2a7a', '#3f4fc0', '#5a86f0', '#ffd84a', '#ffe880', '#fff4b8', '#ffffff'],
+    holy: ['#3a2a10', '#6e5220', '#a8822e', '#e0b440', '#f7d860', '#fff0a0', '#fffad8', '#ffffff'],
+    dark: ['#1a0a24', '#3a1048', '#621a6e', '#8c2a8c', '#c03a7a', '#e86a8a', '#f8a8c0', '#ffe0ea'],
+    shadow: [
+      '#0e0c1c',
+      '#221c3a',
+      '#3a2e60',
+      '#5a468e',
+      '#8064c0',
+      '#a890e0',
+      '#d0c4f4',
+      '#f4f0ff',
+    ],
+  }
+  let tint = true
   const W = 128,
     H = 128,
     FOOT = 112
@@ -153,6 +176,7 @@
     const o = t.hit
       ? { x: W / 2 + a.chest[0] - 6, y: FOOT + a.chest[1], seed: 7 }
       : { x: W / 2, y: FOOT, actor: a, seed: 3 }
+    if (tint && RAMP[EL_OF[tile.mon]]) o.palette = RAMP[EL_OF[tile.mon]]
     tile.fx = PFX.createFx(mod, o)
     tile.age = 0
   }
@@ -219,6 +243,12 @@
       makeFx(tile)
       tiles.push(tile)
     })
+    const tintBox = document.getElementById('pfx-tint')
+    if (tintBox)
+      tintBox.addEventListener('change', () => {
+        tint = tintBox.checked
+        for (const tile of tiles) makeFx(tile)
+      })
     pick.addEventListener('change', () => {
       for (const tile of tiles) {
         tile.mon = pick.value

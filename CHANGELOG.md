@@ -1,3 +1,10 @@
+# [1.66.0](https://github.com/punya199/demo-app/compare/v1.65.0...v1.66.0) (2026-11-09)
+
+
+### New
+
+* auto-reload the app when a new release is deployed ([97ef917](https://github.com/punya199/demo-app/commit/97ef917d0c6455d1ca5825a2da998a0731dba642))
+
 # [1.65.0](https://github.com/punya199/demo-app/compare/v1.64.0...v1.65.0) (2026-11-09)
 
 

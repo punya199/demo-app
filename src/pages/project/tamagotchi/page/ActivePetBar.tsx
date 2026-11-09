@@ -1,5 +1,4 @@
 import { Button } from 'antd'
-import { useState } from 'react'
 import { elementLabel, MAX_HEARTS, stageLabel, toHearts } from '../core/tamagotchi-helper'
 import { EnumMonsterStage, IMonsterData } from '../core/tamagotchi-interface'
 import { useSelectMonster } from '../core/tamagotchi-service'
@@ -12,9 +11,8 @@ const MonsterSlots = (props: {
   selectedId: string | undefined
   max: number
   onNewEgg: () => void
-  onSelected: () => void
 }) => {
-  const { monsters, selectedId, max, onNewEgg, onSelected } = props
+  const { monsters, selectedId, max, onNewEgg } = props
   const { mutate: select, isPending } = useSelectMonster()
   return (
     <div className="grid grid-cols-4 gap-2">
@@ -41,11 +39,9 @@ const MonsterSlots = (props: {
             type={monster.id === selectedId ? 'primary' : 'default'}
             disabled={isPending}
             className="!h-auto !py-2"
-            onClick={() =>
-              monster.id === selectedId
-                ? onSelected()
-                : select(monster.id, { onError: showError, onSuccess: onSelected })
-            }
+            onClick={() => {
+              if (monster.id !== selectedId) select(monster.id, { onError: showError })
+            }}
           >
             <span className="flex flex-col items-center leading-tight">
               {monster.isSick ? (
@@ -70,7 +66,6 @@ export const ActivePetBar = (props: {
   onNewEgg: () => void
 }) => {
   const { monster, monsters, max, onNewEgg } = props
-  const [isPicking, setIsPicking] = useState(false)
   const isEgg = monster?.stage === EnumMonsterStage.EGG
 
   return (
@@ -114,27 +109,14 @@ export const ActivePetBar = (props: {
             <div className="text-sm text-slate-500 dark:text-slate-400">ยังไม่มีมอน</div>
           )}
         </div>
-        {monsters.length > 0 && (
-          <Button
-            size="small"
-            onClick={() => setIsPicking((value) => !value)}
-            aria-expanded={isPicking}
-          >
-            เปลี่ยน {isPicking ? '▴' : '▾'}
-          </Button>
-        )}
       </div>
-      {isPicking && (
+      {monsters.length > 0 && (
         <div className="mt-2">
           <MonsterSlots
             monsters={monsters}
             selectedId={monster?.id}
             max={max}
-            onNewEgg={() => {
-              setIsPicking(false)
-              onNewEgg()
-            }}
-            onSelected={() => setIsPicking(false)}
+            onNewEgg={onNewEgg}
           />
         </div>
       )}

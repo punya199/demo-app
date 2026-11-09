@@ -1,3 +1,24 @@
+# [1.64.0](https://github.com/punya199/demo-app/compare/v1.63.2...v1.64.0) (2026-11-09)
+
+
+### Update
+
+* move Hall of Fame to its own menu ([20f781a](https://github.com/punya199/demo-app/commit/20f781a677aa6d68d76c53c85fb767222c30f329))
+
+## [1.63.2](https://github.com/punya199/demo-app/compare/v1.63.1...v1.63.2) (2026-11-09)
+
+
+### Fix
+
+* tell players a dead, merged or returned pet leaves the arena and rental list ([936cb75](https://github.com/punya199/demo-app/commit/936cb753e9b791e1f3628e34aad753da64ae8f18))
+
+## [1.63.1](https://github.com/punya199/demo-app/compare/v1.63.0...v1.63.1) (2026-11-09)
+
+
+### Fix
+
+* add patch note for PvP season reward claim fix (#53) ([b202d81](https://github.com/punya199/demo-app/commit/b202d8100484515b15889ee21b3c0865ecf7cdc2)), closes [#53](https://github.com/punya199/demo-app/issues/53)
+
 # [1.63.0](https://github.com/punya199/demo-app/compare/v1.62.1...v1.63.0) (2026-11-09)
 
 

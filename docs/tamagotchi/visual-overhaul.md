@@ -53,7 +53,7 @@ backend first).
 | 5 raid bosses (AI pictures, `bmpRig`) + their 10 skills | Done |
 | 20 adventure enemies + dummy (one AI sheet, sized by species) | Done; they use their element's generic skills (owner's decision) |
 | 13 cross-line Fused forms (one AI sheet, 4×4) | Done, animated with their own skills (`HYBRID`), and in the game |
-| Lightning line remodel (adult → awakened Fused; egg and babies unchanged) | Done (2026-11-10): AI sheet 9 × 6, idle column reduced (`js/sprites/bolt-new-bitmaps.js`), cut into parts in `js/sprites/bolt-new.js`, which replaces the hand-drawn `tbird` … `bfused` (removed from `bolt.js`; same ids, so the line, arena and skills use them). The line's 8 skills were kept (they already match the sheet's actions). **Not ported to the game yet** |
+| Lightning line remodel (adult → awakened Fused; egg and babies unchanged) | Done (2026-11-10): AI sheet 9 × 6, idle column reduced (`js/sprites/bolt-new-bitmaps.js`), cut into parts in `js/sprites/bolt-new.js`, which replaces the hand-drawn `tbird` … `bfused` (removed from `bolt.js`; same ids, so the line, arena and skills use them). The line's 8 skills were kept (they already match the sheet's actions). In the game: `sprites/bitmaps/bolt-bitmaps.ts` + `sprites/lines/bolt-remodel.ts` (spread into `BOLT_SPRITES`); backend ids unchanged |
 | Status effects from PixelFX | Trial only (`#pfx`), colours by line; waiting for the owner's verdict |
 
 Art still open: fire line less detailed than the others; Perfect forms have no aura; ค้างคาวถ่าน is too dark.

@@ -160,8 +160,8 @@
 }
 // The awakened form plays the AI's own frames (bolt-frames.js) instead of a cut-up still.
 SPRITES.bfused = FRAME_SPRITE('bfused', QUAD, {
-  aura: { type: 'twinb', x: 60, y: 114, r: 30 },
-  mouth: [103, 42],
-  glows: [[86, 60, '#ffffff', 6]],
+  aura: { type: 'twinb', x: 64, y: 122, r: 30 },
+  mouth: [108, 42],
+  glows: [[91, 60, '#ffffff', 6]],
   emit: [{ x: 10, y: 60, type: 'zap', rate: 3 }],
 })

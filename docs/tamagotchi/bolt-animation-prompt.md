@@ -75,7 +75,29 @@ ART STYLE
    core pulses. MOVE: heavy walk, wings half open. ATTACK: rears back, front-claw slam. SKILL: wings and
    tails spread, chest core blazes white, head thrusts forward roaring.
 
+## In-between frames (smoother motion)
+
+Six frames per move play at about 4–5 a second, which reads as choppy. A second sheet with the frame halfway
+between each pair doubles it to 12 per row (`FRAME_SPRITE` takes any number of frames per row; the
+reduction interleaves the two sheets). Attach the creature's first sheet:
+
+```
+The attached image is a pixel-art sprite sheet: 5 rows × 6 frames of one creature
+(rows: idle, move, attack, skill, hurt).
+Draw a NEW sheet of IN-BETWEEN frames with the exact same layout: 5 rows × 6 columns, same cell size,
+solid pure-black grid lines, flat #FF00FF magenta background, no text.
+- Cell (row R, column C) is the frame exactly HALFWAY between frame C and frame C+1 of row R in the
+  attached sheet.
+- For column 6: in rows 1 and 2 (loops) it is halfway between frame 6 and frame 1; in rows 3, 4 and 5 it
+  is halfway between frame 6 and the row's frame 1 as well (the move returns to the idle pose).
+- Every part moves only half of the way it moves between the two frames: legs, wings, tails, head.
+- Same creature, same size, same position in the cell, same ground line, same palette, same 1-pixel
+  outline, facing right. Do not redesign, zoom, crop or move the whole creature.
+- No new effects; keep only the sparks or glow on the body that the two neighbouring frames already have.
+```
+
 ## Results
 
 - 9 Awakened Thunder (bfused), first trial: consistent design; rows came at different sizes (scaled to
-  match in the reduction); the hurt row barely recoils.
+  match in the reduction); the hurt row barely recoils. The idle, move and hurt frames drift up to 4 px sideways, so the
+  reduction slides them back to line the head and chest up (attack and skill keep their lunge).

@@ -54,6 +54,7 @@ backend first).
 | 20 adventure enemies + dummy (one AI sheet, sized by species) | Done; they use their element's generic skills (owner's decision) |
 | 13 cross-line Fused forms (one AI sheet, 4×4) | Done, animated with their own skills (`HYBRID`), and in the game |
 | Lightning line remodel (adult → awakened Fused; egg and babies unchanged) | Done (2026-11-10): AI sheet 9 × 6, idle column reduced (`js/sprites/bolt-new-bitmaps.js`), cut into parts in `js/sprites/bolt-new.js`, which replaces the hand-drawn `tbird` … `bfused` (removed from `bolt.js`; same ids, so the line, arena and skills use them). The line's 8 skills were kept (they already match the sheet's actions). In the game: `sprites/bitmaps/bolt-bitmaps.ts` + `sprites/lines/bolt-remodel.ts` (spread into `BOLT_SPRITES`); backend ids unchanged |
+| Lightning line, frame-by-frame | The cut-part motion looked odd to the owner: each form is now animated by an AI sheet (5 × 6 frames, prompt and per-creature notes in `bolt-animation-prompt.md`, stills to attach in `bolt-refs/`) and played by `FRAME_SPRITE` (`js/sprites/bolt-frames.js`; `getFrame` passes the animation name and progress to `draw`). อสนีผู้ตื่น done as the trial, **waiting for the owner's verdict**; the other 8 still use cut parts. Not in the game yet |
 | Status effects from PixelFX | Trial only (`#pfx`), colours by line; waiting for the owner's verdict |
 
 Art still open: fire line less detailed than the others; Perfect forms have no aura; ค้างคาวถ่าน is too dark.

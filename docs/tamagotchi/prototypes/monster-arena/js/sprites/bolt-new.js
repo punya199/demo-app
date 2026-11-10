@@ -143,25 +143,6 @@
         ],
       },
     ],
-    bfused: [
-      QUAD,
-      [
-        ['wing', (x, y) => x <= 40 && y <= 40, 'swing', 'wing', 40, 42, 0.6, -3, 40],
-        ['tail', (x, y) => x <= 22 && y >= 44, 'swing', 'tail', 23, 56, 0, -1.5, 22],
-        ['legBL', (x, y) => x >= 16 && x <= 27 && y >= 72, 'leg', 'bl', 72, 85],
-        ['legFL', (x, y) => x >= 40 && x <= 49 && y >= 72, 'leg', 'fl', 72, 85],
-        ['body'],
-        ['legBF', (x, y) => x >= 28 && x <= 39 && y >= 72, 'leg', 'bf', 72, 85],
-        ['legFF', (x, y) => x >= 50 && y >= 72, 'leg', 'ff', 72, 85],
-        ['head', (x, y) => x >= 44 && y >= 12 && y <= 44, 'rigid', 'head', 0.7, 2],
-      ],
-      {
-        aura: { type: 'twinb', x: 44, y: 84, r: 30 },
-        mouth: [61, 36],
-        glows: [[40, 50, '#ffffff', 6, 'body']],
-        emit: [{ x: 6, y: 64, type: 'zap', rate: 3 }],
-      },
-    ],
   }
   for (const [old, [rig, parts, extra]] of Object.entries(NEW_BOLT)) {
     const id = 'nb_' + old,
@@ -177,3 +158,10 @@
     SPRITES[old] = def
   }
 }
+// The awakened form plays the AI's own frames (bolt-frames.js) instead of a cut-up still.
+SPRITES.bfused = FRAME_SPRITE('bfused', QUAD, {
+  aura: { type: 'twinb', x: 60, y: 114, r: 30 },
+  mouth: [103, 42],
+  glows: [[86, 60, '#ffffff', 6]],
+  emit: [{ x: 10, y: 60, type: 'zap', rate: 3 }],
+})

@@ -171,8 +171,9 @@ function getFrame(def, name, i) {
   i = ((i % A.n) + A.n) % A.n
   if (!list[i]) {
     const s = new Spr(def.size, def.size),
-      P = scalePose(fullPose(A.pose(def.rig, A.loop ? i / A.n : i / (A.n - 1))), def.amp)
-    def.draw(s, P)
+      t = A.loop ? i / A.n : i / (A.n - 1),
+      P = scalePose(fullPose(A.pose(def.rig, t)), def.amp)
+    def.draw(s, P, name, t) // frame-by-frame sprites (bolt-frames.js) pick their frame from name and t
     list[i] = s.bake()
     list[i].pose = P // kept so a glow tagged with a body part can follow it
   }

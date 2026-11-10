@@ -6,7 +6,7 @@
 /* eslint-disable */
 const fs=require('fs'),path=require('path');
 const dir=process.argv[2]||path.join(__dirname,'../../docs/tamagotchi/prototypes/monster-arena');
-const files=['engine.js','sprites/fire.js','sprites/water.js','sprites/leaf.js','sprites/raid-bitmaps.js','sprites/raid.js','sprites/adventure-bitmaps.js','sprites/adventure.js','sprites/hybrid-bitmaps.js','sprites/hybrid.js','sprites/earth.js','sprites/bolt.js','sprites/holy.js','sprites/dark.js','sprites/shadow.js'];
+const files=['engine.js','sprites/fire.js','sprites/water.js','sprites/leaf.js','sprites/raid-bitmaps.js','sprites/raid.js','sprites/adventure-bitmaps.js','sprites/adventure.js','sprites/hybrid-bitmaps.js','sprites/hybrid.js','sprites/earth.js','sprites/bolt.js','sprites/bolt-new-bitmaps.js','sprites/bolt-new.js','sprites/holy.js','sprites/dark.js','sprites/shadow.js'];
 const core=fs.readFileSync(path.join(dir,'js/core.js'),'utf8');
 const animSrc=core.slice(core.indexOf('const lerp ='), core.indexOf('const SHADOW_IDS'));
 let captured=null;

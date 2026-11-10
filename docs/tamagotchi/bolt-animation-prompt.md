@@ -104,5 +104,6 @@ solid pure-black grid lines, flat #FF00FF magenta background, no text.
 - 7 Thunderbird King (thunderking), one-sheet 12-frame prompt: the AI drew an 8 x 8 sheet at 1024 px, padded
   rows with idle frames, stood on the ground in the idle rows and drew one effect-only cell. Usable cells
   picked by hand (idle 16, flying 16, attack 8, skill 8, hurt 8) and mapped onto the approved still's palette
-  (its own colours washed out). The 8 x 8 layout this AI prefers is in the reply of 2026-11-10; ask for
+  (its own colours washed out). The owner found it worse than the cut-part version, so it was reverted.
+  The 8 x 8 layout this AI prefers is in the reply of 2026-11-10; ask for
   2048 px or more.

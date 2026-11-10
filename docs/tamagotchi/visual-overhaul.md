@@ -53,6 +53,7 @@ backend first).
 | 5 raid bosses (AI pictures, `bmpRig`) + their 10 skills | Done |
 | 20 adventure enemies + dummy (one AI sheet, sized by species) | Done; they use their element's generic skills (owner's decision) |
 | 13 cross-line Fused forms (one AI sheet, 4×4) | Done, animated with their own skills (`HYBRID`), and in the game |
+| Lightning line remodel (9 forms, adult → awakened Fused; egg and babies unchanged) | AI sheet 9 × 6 (idle, idle, move, wind-up, release, hurt) in; idle column reduced to still drafts (`nb_*`, `js/sprites/bolt-new*.js`, section at the top of the bolt group); **waiting for the owner's verdict**, then cut parts and animate from the sheet's action frames |
 | Status effects from PixelFX | Trial only (`#pfx`), colours by line; waiting for the owner's verdict |
 
 Art still open: fire line less detailed than the others; Perfect forms have no aura; ค้างคาวถ่าน is too dark.

@@ -15,6 +15,16 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: 'next',
+    releasedAt: '',
+    changes: [
+      {
+        kind: 'fix',
+        text: 'สัตว์เลี้ยงร่างผสาน (Fused) ลงสนามประลองและตั้งเป็นผู้ช่วยได้แล้ว คู่ต่อสู้เป็นร่างผสานด้วยกัน หากยังมีไม่พอจะเจอนักประลองเงาระดับ Ultimate',
+      },
+    ],
+  },
+  {
     version: '1.70.0',
     releasedAt: '2026-11-09T14:54:17Z',
     changes: [

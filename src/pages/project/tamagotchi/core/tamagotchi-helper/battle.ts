@@ -145,6 +145,17 @@ const serverMessageLabel: Record<string, string> = {
   'Login reward was already claimed today': 'วันนี้รับรางวัลเข้าสู่ระบบไปแล้ว',
   'All login rewards this month were already claimed': 'เดือนนี้รับรางวัลเข้าสู่ระบบครบแล้ว',
   'Quest is not complete or was already claimed': 'ภารกิจยังไม่สำเร็จ หรือรับรางวัลไปแล้ว',
+  'Listing not found': 'ไม่พบประกาศขายนี้',
+  'This listing is no longer available': 'ประกาศนี้ขายไปแล้วหรือหมดเวลา',
+  'You can not buy your own monster': 'ซื้อมอนของตัวเองไม่ได้',
+  'Only a monster in its perfect form or beyond can be sold': 'ขายได้ตั้งแต่ร่างสมบูรณ์ขึ้นไป',
+  'A monster bought on the market can not be resold yet':
+    'มอนที่เพิ่งซื้อมา ขายต่อได้หลังครบ 24 ชั่วโมง',
+  'Keep at least one monster to play with': 'ต้องเหลือมอนไว้เล่นอย่างน้อย 1 ตัว',
+  'Bring the monster back from its expedition first': 'รับมอนกลับจากการสำรวจก่อน',
+  'You have too many active listings': 'ประกาศขายครบจำนวนสูงสุดแล้ว',
+  'Price is outside the allowed range': 'ราคาอยู่นอกช่วงที่กำหนด',
+  'Daily market purchase limit reached': 'ซื้อครบจำนวนต่อวันแล้ว',
 }
 
 export const toThaiErrorMessage = (serverMessage: unknown) =>

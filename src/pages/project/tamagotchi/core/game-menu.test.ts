@@ -4,7 +4,7 @@ import { COSTUMES_ENABLED, GAME_MENU, parseMenuHash } from './game-menu'
 describe('game menu', () => {
   it('lists every screen once', () => {
     const keys = GAME_MENU.flatMap((group) => group.items.map((item) => item.key))
-    expect(keys).toHaveLength(COSTUMES_ENABLED ? 20 : 19)
+    expect(keys).toHaveLength(COSTUMES_ENABLED ? 21 : 20)
     expect(new Set(keys).size).toBe(keys.length)
   })
 

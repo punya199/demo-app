@@ -48,6 +48,27 @@ export const ReturnHomeWikiTab = (props: { wiki: IWikiData }) => {
   )
 }
 
+export const MarketWikiTab = (props: { wiki: IWikiData }) => {
+  const { market } = props.wiki
+  return (
+    <>
+      <Heading>ตลาดมอน</Heading>
+      <List
+        items={[
+          'ซื้อขายมอนระหว่างผู้เล่นด้วย 💎 เพชร ที่เมนู "ตลาดมอน" ผู้ซื้อเห็นผู้ขายเป็นชื่อที่แสดงเท่านั้น',
+          `ขายได้ตั้งแต่ ${market.stages.map((stage) => stageLabel[stage]).join(' / ')} และต้องเหลือมอนไว้เล่นอย่างน้อย 1 ตัว มอนที่ออกสำรวจอยู่ขายไม่ได้`,
+          `ตั้งราคาได้ ${Math.round(market.priceMinRatio * 100)}–${Math.round(market.priceMaxRatio * 100)}% ของราคาแนะนำ ซึ่งคิดจากร่าง ธาตุ (สายวิญญาณแพงกว่า) และค่าสุ่มของมอน`,
+          `ผู้ขายถูกหักค่าธรรมเนียม ${Math.round(market.feeRate * 100)}% ของราคาตอนขายได้ ไม่มีค่าลงประกาศ`,
+          `ประกาศอยู่ได้ ${market.listingHours} ชั่วโมง ยกเลิกเองได้ฟรีเมื่อไรก็ได้ หมดเวลาแล้วมอนกลับมาให้เอง ลงขายพร้อมกันได้ ${market.maxActiveListings} ตัว`,
+          'มอนที่ลงขายจะถูกหยุดเวลา ใช้งานไม่ได้ และอุปกรณ์ที่สวมอยู่กลับเข้ากระเป๋า ส่วนมอนที่ลงขายยังนับในช่องเลี้ยงสูงสุด',
+          'ผู้ซื้อได้มอนพร้อมเลเวล ค่าพลัง และชื่อเดิม เปลี่ยนชื่อได้ทันที แต่หัวใจหิว/สุขภาพถูกรีเซ็ตเป็นครึ่งหนึ่ง และชุดแต่งตัวอยู่กับผู้ขาย',
+          `มอนที่ซื้อมาขายต่อได้หลังผ่านไป ${market.resaleCooldownHours} ชั่วโมง ซื้อได้ไม่เกิน ${market.maxBuysPerDay} ตัวใน ${market.buyWindowHours} ชั่วโมง`,
+        ]}
+      />
+    </>
+  )
+}
+
 export const CostumeWikiTab = () => {
   return (
     <>

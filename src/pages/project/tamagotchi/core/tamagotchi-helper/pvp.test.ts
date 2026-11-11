@@ -85,6 +85,7 @@ describe('getPvpBlocker', () => {
       'เปลี่ยนทีมป้องกันได้อีกครั้งใน 20 นาที'
     )
     expect(getDefenseBlocker(monster(), status(), now)).toBeNull()
+    expect(getDefenseBlocker(monster({ stage: EnumMonsterStage.FUSED }), status(), now)).toBeNull()
     expect(getDefenseBlocker(monster({ stage: EnumMonsterStage.EGG }), status(), now)).toBe(
       'ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้'
     )

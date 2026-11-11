@@ -12,7 +12,7 @@ import {
 import { gradeLabel, statLabel, toPercent } from './equipment'
 
 const PVP_STAGES = [EnumMonsterStage.ADULT, EnumMonsterStage.PERFECT, EnumMonsterStage.ULTIMATE]
-// The World Boss and the arena take every grown form, fused ones included (support units do not).
+// The arena, the World Boss and support units take every grown form, fused ones included.
 const WORLD_BOSS_STAGES = [...PVP_STAGES, EnumMonsterStage.FUSED]
 
 // Mirrors the server's arena checks so the button explains itself.
@@ -218,7 +218,7 @@ export const getSupportBlocker = (
   support: ISupportUnit | null | undefined,
   now: Date
 ): string | null => {
-  if (!monster || monster.diedAt || !PVP_STAGES.includes(monster.stage)) {
+  if (!monster || monster.diedAt || !WORLD_BOSS_STAGES.includes(monster.stage)) {
     return 'ต้องเป็นร่างโตขึ้นไปถึงตั้งเป็นตัวซัพพอร์ตได้'
   }
   if (support && new Date(support.readyAt) > now) {

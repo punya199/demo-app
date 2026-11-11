@@ -1,3 +1,10 @@
+# [1.71.0](https://github.com/punya199/demo-app/compare/v1.70.1...v1.71.0) (2026-11-11)
+
+
+### New
+
+* add farm room redesign prototype sheet ([a9e435c](https://github.com/punya199/demo-app/commit/a9e435c85815a7f749f7dcfaaa7d84910e3d33fb))
+
 ## [1.70.1](https://github.com/punya199/demo-app/compare/v1.70.0...v1.70.1) (2026-11-11)
 
 

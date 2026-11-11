@@ -212,6 +212,17 @@ export interface IWikiData {
     furniture: { kind: EnumFurnitureKind; bonus: number[]; essence: string }[]
   }
   petCore: { stages: EnumMonsterStage[]; perReturn: number; itemPrefix: string }
+  market: {
+    stages: EnumMonsterStage[]
+    feeRate: number
+    priceMinRatio: number
+    priceMaxRatio: number
+    listingHours: number
+    maxActiveListings: number
+    resaleCooldownHours: number
+    maxBuysPerDay: number
+    buyWindowHours: number
+  }
   dummy: { fightSec: number; defMax: number; defenseK: number; maxDefenseReduction: number }
   craft: {
     tiers: Record<

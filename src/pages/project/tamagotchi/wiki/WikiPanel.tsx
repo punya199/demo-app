@@ -8,7 +8,13 @@ import { SkillsWikiTab } from './WikiSkills'
 import { StartWikiTab, CareWikiTab, OnlineWikiTab, StaminaWikiTab } from './WikiBasics'
 import { EvolutionWikiTab, PotentialWikiTab } from './WikiEvolution'
 import { BattleWikiTab, AdventureWikiTab, IdleWikiTab } from './WikiBattle'
-import { PassiveWikiTab, ReturnHomeWikiTab, CostumeWikiTab, EconomyWikiTab } from './WikiProgress'
+import {
+  PassiveWikiTab,
+  ReturnHomeWikiTab,
+  MarketWikiTab,
+  CostumeWikiTab,
+  EconomyWikiTab,
+} from './WikiProgress'
 import { EquipmentWikiTab, RaidWikiTab } from './WikiEquipment'
 import { WorldBossWikiTab, BossDetailWikiTab } from './WikiBosses'
 import { SocialWikiTab, PvpWikiTab } from './WikiSocialPvp'
@@ -34,6 +40,7 @@ const buildSections = (wiki: IWikiData) => [
     label: '🌠 กลับดาว (แกนสัตว์เลี้ยง)',
     children: <ReturnHomeWikiTab wiki={wiki} />,
   },
+  { key: 'market', label: '🏪 ตลาดมอน', children: <MarketWikiTab wiki={wiki} /> },
   ...(COSTUMES_ENABLED
     ? [{ key: 'costume', label: '👗 ชุดแต่งตัว', children: <CostumeWikiTab /> }]
     : []),

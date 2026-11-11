@@ -19,6 +19,7 @@ import { FarmPanel } from './farm/FarmPanel'
 import { PvpPanel } from './arena/PvpPanel'
 import { QuestPanel } from './adventure/QuestPanel'
 import { ShopPanel } from './social/ShopPanel'
+import { MarketPanel } from './market/MarketPanel'
 import { SkillsPanel } from './pet/SkillsPanel'
 import { WikiPanel } from './wiki/WikiPanel'
 import { PatchNotesPanel } from './meta/PatchNotesPanel'
@@ -61,6 +62,7 @@ const GameShell = () => {
     passive: <PassivePanel onError={showError} />,
     costume: <CostumePanel monster={monster} onError={showError} />,
     shop: <ShopPanel monster={monster} coin={coin} onError={showError} />,
+    market: <MarketPanel gem={wallet?.gem ?? 0} onError={showError} />,
     craft: <CraftPanel onError={showError} />,
     farm: <FarmPanel onError={showError} />,
     adventure: <AdventurePanel monster={monster} onError={showError} />,

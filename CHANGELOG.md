@@ -1,3 +1,10 @@
+# [1.73.0](https://github.com/punya199/demo-app/compare/v1.72.1...v1.73.0) (2026-11-11)
+
+
+### New
+
+* add buy x10 buttons to the shop ([c52b131](https://github.com/punya199/demo-app/commit/c52b131a4cea11d705e114e77e2ab156c854f43d))
+
 ## [1.72.1](https://github.com/punya199/demo-app/compare/v1.72.0...v1.72.1) (2026-11-11)
 
 

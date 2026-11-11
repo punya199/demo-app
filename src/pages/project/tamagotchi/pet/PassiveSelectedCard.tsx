@@ -14,6 +14,9 @@ interface IPassiveSelectedCardProps {
   canDrop: boolean
   poolLeft: number
   branch: string[]
+  // Gems the drop adds to the save price (0 = free).
+  dropCost: number
+  branchCost: number
   pickHint: string | null
   edit: (next: IPassiveDraft) => void
   toggleNode: (node: IPassiveNode) => void
@@ -23,8 +26,8 @@ interface IPassiveSelectedCardProps {
 
 export const PassiveSelectedCard = (props: IPassiveSelectedCardProps) => {
   const { selected, current, savedMasteries, masteryRepickPrice, isOwned, isAscend } = props
-  const { canTake, canDrop, poolLeft, branch, pickHint, edit, toggleNode, dropBranch, focus } =
-    props
+  const { canTake, canDrop, poolLeft, branch, dropCost, branchCost, pickHint } = props
+  const { edit, toggleNode, dropBranch, focus } = props
   const masteries = current.masteries
   // Passive nodes are owned through nodeIds, ascendancy ones through ascendancyNodeIds.
   const passiveOwned = current.nodeIds.includes(selected.id)
@@ -82,6 +85,11 @@ export const PassiveSelectedCard = (props: IPassiveSelectedCardProps) => {
         </div>
       )}
       {pickHint && <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{pickHint}</p>}
+      {isAscend && canDrop && dropCost > 0 && (
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+          ถอนโหนดเส้นทางสูงสุดนับเป็นการเริ่มเส้นทางใหม่ ต้องจ่าย 💎 {dropCost}
+        </p>
+      )}
       {selected.id !== PASSIVE_HUB && (
         <div className="mt-2 flex flex-wrap gap-2">
           {!isOwned && (
@@ -96,12 +104,12 @@ export const PassiveSelectedCard = (props: IPassiveSelectedCardProps) => {
           )}
           {isOwned && (
             <Button size="small" disabled={!canDrop} onClick={() => toggleNode(selected)}>
-              ถอนโหนดนี้
+              ถอนโหนดนี้{dropCost > 0 && ` 💎 ${dropCost}`}
             </Button>
           )}
           {branch.length > 1 && (
             <Button size="small" onClick={() => dropBranch()}>
-              ถอนทั้งสาย ({branch.length})
+              ถอนทั้งสาย ({branch.length}){branchCost > 0 && ` 💎 ${branchCost}`}
             </Button>
           )}
           <Button size="small" onClick={() => focus(selected)}>

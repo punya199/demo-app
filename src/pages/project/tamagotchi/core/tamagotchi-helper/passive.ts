@@ -52,24 +52,10 @@ export const canAllocatePassive = (nodes: IPassiveNode[], owned: string[], nodeI
   )
 }
 
-export const canDeallocatePassive = (nodes: IPassiveNode[], owned: string[], nodeId: string) => {
-  if (!owned.includes(nodeId)) {
-    return false
-  }
-  const rest = new Set(owned.filter((id) => id !== nodeId))
-  const seen = new Set([PASSIVE_HUB])
-  const stack = [PASSIVE_HUB]
-  while (stack.length) {
-    const node = nodes.find((entry) => entry.id === stack.pop())
-    for (const id of node?.adj ?? []) {
-      if (rest.has(id) && !seen.has(id)) {
-        seen.add(id)
-        stack.push(id)
-      }
-    }
-  }
-  return [...rest].every((id) => seen.has(id))
-}
+// A single node can go only when everything else you own stays connected to the hub, i.e. its
+// branch is just itself. (Same rule as the server's canDeallocate.)
+export const canDeallocatePassive = (nodes: IPassiveNode[], owned: string[], nodeId: string) =>
+  getPassiveBranch(nodes, owned, nodeId).length === 1
 
 // Total of every effect over the owned nodes (plus the picked mastery options), in the order of
 // passiveEffectLabel.
@@ -199,6 +185,15 @@ export const getPassiveSaveCost = (
   const total = respec + repicks * prices.masteryRepick + (restarted ? prices.ascendancyReset : 0)
   return { removed, respec, repicks, restarted, total }
 }
+
+// Gems an edit adds to (or, if negative, takes off) the save price: `to` priced against `saved`
+// minus `from` priced against `saved`. Lets a button say what pressing it will cost.
+export const getDraftChangeCost = (
+  saved: IPassiveDraft,
+  from: IPassiveDraft,
+  to: IPassiveDraft,
+  prices: Parameters<typeof getPassiveSaveCost>[2]
+) => getPassiveSaveCost(saved, to, prices).total - getPassiveSaveCost(saved, from, prices).total
 
 // How a draft differs from what is saved, for the "unsaved changes" bar.
 export const diffPassiveDraft = (saved: IPassiveDraft, draft: IPassiveDraft) => {

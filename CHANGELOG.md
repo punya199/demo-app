@@ -1,3 +1,10 @@
+## [1.73.1](https://github.com/punya199/demo-app/compare/v1.73.0...v1.73.1) (2026-11-11)
+
+
+### Fix
+
+* let Fused pets be set as a support unit from the UI ([ef86530](https://github.com/punya199/demo-app/commit/ef86530bde422e4c5c7b2672bda2b3f6efeadd2e))
+
 # [1.73.0](https://github.com/punya199/demo-app/compare/v1.72.1...v1.73.0) (2026-11-11)
 
 

@@ -1,3 +1,10 @@
+# [1.72.0](https://github.com/punya199/demo-app/compare/v1.71.0...v1.72.0) (2026-11-11)
+
+
+### New
+
+* redesign the farm room in pixel art with tap-to-upgrade furniture ([454b6b0](https://github.com/punya199/demo-app/commit/454b6b0ce1916695f79eb38d0e12b650327a9edb))
+
 # [1.71.0](https://github.com/punya199/demo-app/compare/v1.70.1...v1.71.0) (2026-11-11)
 
 

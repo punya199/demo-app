@@ -15,6 +15,16 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: 'next',
+    releasedAt: '2026-11-11T16:21:32Z',
+    changes: [
+      {
+        kind: 'update',
+        text: 'ปรับสมดุล NPC ในสนามประลองให้แข็งแกร่งขึ้น สู้ได้สูสีกับมอนที่ใส่ชุดคราฟต์ (ก่อนหน้านี้มอนที่ใส่ชุดชนะ NPC ทุกตัวแทบทุกครั้ง)',
+      },
+    ],
+  },
+  {
     version: '1.73.1',
     releasedAt: '2026-11-11T16:07:28Z',
     changes: [

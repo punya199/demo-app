@@ -26,5 +26,7 @@ describe('FarmWikiTab', () => {
     expect(screen.getByText('+100%')).toBeTruthy()
     expect(screen.getByText('🍃 เอสเซนซ์ใบไม้')).toBeTruthy()
     expect(screen.getByText(/ข้ามเวลาด้วยเหรียญไม่ได้/)).toBeTruthy()
+    expect(screen.getByText(/มีคิวของตัวเอง แยกจากคิวคราฟต์อุปกรณ์/)).toBeTruthy()
+    expect(screen.getByText(/แตะเฟอร์นิเจอร์เพื่อซื้อหรืออัปเกรด/)).toBeTruthy()
   })
 })

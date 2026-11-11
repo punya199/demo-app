@@ -1,25 +1,36 @@
-import { useEffect, useRef } from 'react'
+import { MouseEvent, useEffect, useRef } from 'react'
 import { farmActivity, farmActivityLabel, petLabel } from '../core/tamagotchi-helper'
-import { IMonsterData } from '../core/tamagotchi-interface'
+import { EnumFurnitureKind, IMonsterData } from '../core/tamagotchi-interface'
 import { useSprites } from '../shared/sprite-loader'
-import { drawCaption, drawPile, drawRoom } from './farm-room-draw'
+import { drawCaption, drawPile, drawRoom, drawSparkle } from './farm-room-draw'
+import { PieceKind, pieceAt, PieceStates } from './farm-room-layout'
 import { FarmTiers, IRoomPet, newRoomPet, ROOM_H, ROOM_W, stepRoomPet } from './farm-room-sim'
 
 const SCALE = 2
 
 interface IFarmRoomProps {
   monsters: IMonsterData[]
-  tiers: FarmTiers
+  pieces: PieceStates
+  // Set when an upgrade was just claimed: the room sparkles over that piece for a moment.
+  sparkle: { kind: PieceKind; at: number } | null
+  onPick: (kind: PieceKind) => void
 }
+
+const tiersOf = (pieces: PieceStates): FarmTiers => ({
+  [EnumFurnitureKind.TABLE]: pieces.table.tier,
+  [EnumFurnitureKind.GYM]: pieces.gym.tier,
+  [EnumFurnitureKind.TOILET]: pieces.toilet.tier,
+  [EnumFurnitureKind.BED]: pieces.bed.tier,
+})
 
 // The Farm room: every living pet doing what its server state calls for. It only draws; the care
 // numbers are the server's (docs/adr/0001-farm-effects-are-server-side.md).
 export const FarmRoom = (props: IFarmRoomProps) => {
-  const { monsters, tiers } = props
+  const { monsters, pieces, sparkle, onPick } = props
   const sprites = useSprites()
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const latest = useRef({ monsters, tiers })
-  latest.current = { monsters, tiers }
+  const latest = useRef({ monsters, pieces, sparkle })
+  latest.current = { monsters, pieces, sparkle }
   const pets = useRef(new Map<string, IRoomPet>())
 
   useEffect(() => {
@@ -33,11 +44,12 @@ export const FarmRoom = (props: IFarmRoomProps) => {
       // Reduced motion: pets jump to where they belong instead of walking there.
       const dt = reduced ? 100 : Math.min(0.1, (now - last) / 1000)
       last = now
-      const { monsters: list, tiers: owned } = latest.current
+      const { monsters: list, pieces: furniture, sparkle: burst } = latest.current
+      const owned = tiersOf(furniture)
       const t = now / 1000
       ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0)
       ctx.imageSmoothingEnabled = false
-      drawRoom(ctx, owned)
+      drawRoom(ctx, furniture, reduced ? 0 : t)
 
       const alive = new Set(list.map((monster) => monster.id))
       for (const id of [...pets.current.keys()]) if (!alive.has(id)) pets.current.delete(id)
@@ -106,15 +118,27 @@ export const FarmRoom = (props: IFarmRoomProps) => {
           drawCaption(ctx, x, y - 34, petLabel(monster.name, monster.nickname))
         }
       }
+      if (burst && !reduced) drawSparkle(ctx, burst.kind, (Date.now() - burst.at) / 1000)
       raf = requestAnimationFrame(draw)
     }
     raf = requestAnimationFrame(draw)
     return () => cancelAnimationFrame(raf)
   }, [sprites])
 
+  // Tap a piece of furniture. The panel also lists the pieces as buttons for keyboard users.
+  const pick = (event: MouseEvent<HTMLCanvasElement>) => {
+    const box = event.currentTarget.getBoundingClientRect()
+    const kind = pieceAt(
+      ((event.clientX - box.left) / box.width) * ROOM_W,
+      ((event.clientY - box.top) / box.height) * ROOM_H
+    )
+    if (kind) onPick(kind)
+  }
+
   return (
     <canvas
       ref={canvasRef}
+      onClick={pick}
       width={ROOM_W * SCALE}
       height={ROOM_H * SCALE}
       role="img"

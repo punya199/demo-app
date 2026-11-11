@@ -15,7 +15,7 @@ export interface IFarmMaterial {
 }
 
 export interface IFarmUpgrade {
-  // Tier 1 is bought with coins; tiers 2 and 3 are crafted in the shared craft queue.
+  // Tier 1 is bought with coins; tiers 2 and 3 are crafted in the furniture craft queue.
   via: 'buy' | 'craft'
   toTier: number
   coin: number
@@ -45,8 +45,6 @@ export interface IFarmQueue {
 export interface IFarmData {
   furniture: IFarmFurniture[]
   queue: IFarmQueue | null
-  // An equipment craft holds the shared queue, so a furniture craft cannot start.
-  queueBusy: boolean
   effects: {
     fullnessDrain: number
     strengthDrain: number

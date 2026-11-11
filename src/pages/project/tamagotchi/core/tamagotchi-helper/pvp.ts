@@ -12,7 +12,7 @@ import {
 import { gradeLabel, statLabel, toPercent } from './equipment'
 
 const PVP_STAGES = [EnumMonsterStage.ADULT, EnumMonsterStage.PERFECT, EnumMonsterStage.ULTIMATE]
-// The World Boss takes every grown form, fused ones included (the arena does not).
+// The World Boss and the arena take every grown form, fused ones included (support units do not).
 const WORLD_BOSS_STAGES = [...PVP_STAGES, EnumMonsterStage.FUSED]
 
 // Mirrors the server's arena checks so the button explains itself.
@@ -23,7 +23,7 @@ export const getPvpBlocker = (
   if (!monster || monster.diedAt) {
     return 'ต้องมีมอนที่มีชีวิต'
   }
-  if (!PVP_STAGES.includes(monster.stage)) {
+  if (!WORLD_BOSS_STAGES.includes(monster.stage)) {
     return 'ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้'
   }
   if (monster.isSick) {
@@ -46,7 +46,7 @@ export const getDefenseBlocker = (
   status: IPvpStatus | undefined,
   now: Date
 ): string | null => {
-  if (!monster || monster.diedAt || !PVP_STAGES.includes(monster.stage)) {
+  if (!monster || monster.diedAt || !WORLD_BOSS_STAGES.includes(monster.stage)) {
     return 'ต้องเป็นร่างโตขึ้นไปถึงเข้าสนามได้'
   }
   if (status?.defense && new Date(status.defense.readyAt) > now) {

@@ -1,3 +1,10 @@
+# [1.75.0](https://github.com/punya199/demo-app/compare/v1.74.0...v1.75.0) (2026-11-11)
+
+
+### New
+
+* pet market screen, wiki tab and patch note ([fe014ee](https://github.com/punya199/demo-app/commit/fe014ee81a01480befe127dadba8a8d1e479b357))
+
 # [1.74.0](https://github.com/punya199/demo-app/compare/v1.73.1...v1.74.0) (2026-11-11)
 
 

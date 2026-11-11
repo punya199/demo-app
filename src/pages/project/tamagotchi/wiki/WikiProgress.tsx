@@ -91,6 +91,9 @@ export const EconomyWikiTab = (props: { wiki: IWikiData }) => {
           item.description,
         ])}
       />
+      <p className="text-xs text-slate-500">
+        ปุ่มซื้อ x10 คิดราคาเท่าซื้อทีละชิ้น x10 (ไม่มีส่วนลด) ใช้ได้กับของที่จ่ายด้วยเหรียญ
+      </p>
       <Heading>ภารกิจประจำวัน (รีเซ็ตเที่ยงคืนเวลาไทย)</Heading>
       <Table
         head={['ภารกิจ', 'รางวัล']}

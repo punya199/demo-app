@@ -140,9 +140,10 @@ export const useEnhance = () => {
 export const useBuyEquipmentBox = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async () => {
-      const { data } = await apiClient.post<{ wallet: IWallet; item: IEquipmentItem }>(
-        `/shop/buy-box`
+    mutationFn: async (quantity?: number) => {
+      const { data } = await apiClient.post<{ wallet: IWallet; items: IEquipmentItem[] }>(
+        `/shop/buy-box`,
+        { quantity }
       )
       return data
     },
@@ -159,10 +160,10 @@ export const useBuyEquipmentBox = () => {
 export const useBuyMaterial = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (itemId: string) => {
+    mutationFn: async ({ itemId, quantity }: { itemId: string; quantity?: number }) => {
       const { data } = await apiClient.post<IInventoryResponse & { wallet: IWallet }>(
         `/shop/buy-material`,
-        { itemId }
+        { itemId, quantity }
       )
       return data
     },

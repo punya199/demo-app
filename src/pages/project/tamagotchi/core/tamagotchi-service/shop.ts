@@ -33,9 +33,10 @@ export const useGetShopItems = () => {
 export const useBuyShopItem = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (itemId: string) => {
+    mutationFn: async ({ itemId, quantity }: { itemId: string; quantity?: number }) => {
       const { data } = await apiClient.post<IInventoryResponse & { wallet: IWallet }>(`/shop/buy`, {
         itemId,
+        quantity,
       })
       return data
     },

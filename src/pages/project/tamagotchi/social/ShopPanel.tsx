@@ -15,6 +15,9 @@ import {
   useUseInventoryItem,
 } from '../core/tamagotchi-service'
 
+// Mirrors the server's SHOP_BUY_MAX_QUANTITY: x10 costs ten times the single price.
+const BULK = 10
+
 interface IShopPanelProps {
   monster: IMonsterData | null
   coin: number
@@ -32,7 +35,7 @@ export const ShopPanel = (props: IShopPanelProps) => {
   const { mutate: buyBox, isPending: isBuyingBox } = useBuyEquipmentBox()
   const { mutate: buyMaterial, isPending: isBuyingMaterial } = useBuyMaterial()
   const { data: equipmentData } = useGetEquipment()
-  const [opened, setOpened] = useState<IEquipmentItem | null>(null)
+  const [opened, setOpened] = useState<IEquipmentItem[]>([])
 
   if (isLoading) {
     return <Spin />
@@ -66,9 +69,18 @@ export const ShopPanel = (props: IShopPanelProps) => {
                   <Button
                     size="small"
                     disabled={!!buyBlocker || isBuying}
-                    onClick={() => buy(item.id, { onError })}
+                    onClick={() => buy({ itemId: item.id }, { onError })}
                   >
                     ซื้อ 🪙 {item.price}
+                  </Button>
+                </Tooltip>
+                <Tooltip title={getShopBlocker(item.price * BULK, coin)}>
+                  <Button
+                    size="small"
+                    disabled={!!getShopBlocker(item.price * BULK, coin) || isBuying}
+                    onClick={() => buy({ itemId: item.id, quantity: BULK }, { onError })}
+                  >
+                    ซื้อ x{BULK} 🪙 {item.price * BULK}
                   </Button>
                 </Tooltip>
                 <Tooltip title={quantity === 0 ? 'ไม่มีในกระเป๋า' : useBlocker}>
@@ -107,16 +119,28 @@ export const ShopPanel = (props: IShopPanelProps) => {
                     .join(' · ')}
                 </div>
               </div>
-              <Tooltip title={getShopBlocker(equipment.boxPrice, coin)}>
-                <Button
-                  disabled={!!getShopBlocker(equipment.boxPrice, coin) || isBuyingBox}
-                  onClick={() =>
-                    buyBox(undefined, { onError, onSuccess: ({ item }) => setOpened(item) })
-                  }
-                >
-                  ซื้อ 🪙 {equipment.boxPrice}
-                </Button>
-              </Tooltip>
+              <div className="flex flex-col gap-1">
+                <Tooltip title={getShopBlocker(equipment.boxPrice, coin)}>
+                  <Button
+                    disabled={!!getShopBlocker(equipment.boxPrice, coin) || isBuyingBox}
+                    onClick={() =>
+                      buyBox(undefined, { onError, onSuccess: ({ items }) => setOpened(items) })
+                    }
+                  >
+                    ซื้อ 🪙 {equipment.boxPrice}
+                  </Button>
+                </Tooltip>
+                <Tooltip title={getShopBlocker(equipment.boxPrice * BULK, coin)}>
+                  <Button
+                    disabled={!!getShopBlocker(equipment.boxPrice * BULK, coin) || isBuyingBox}
+                    onClick={() =>
+                      buyBox(BULK, { onError, onSuccess: ({ items }) => setOpened(items) })
+                    }
+                  >
+                    ซื้อ x{BULK} 🪙 {equipment.boxPrice * BULK}
+                  </Button>
+                </Tooltip>
+              </div>
             </div>
           </Card>
           {equipment.materials.map((material) => {
@@ -145,14 +169,30 @@ export const ShopPanel = (props: IShopPanelProps) => {
                       {material.description}
                     </div>
                   </div>
-                  <Tooltip title={blocker}>
-                    <Button
-                      disabled={!!blocker || isBuyingMaterial}
-                      onClick={() => buyMaterial(material.id, { onError })}
-                    >
-                      ซื้อ {isGem ? '💎' : isToken ? '🎖️' : '🪙'} {material.price}
-                    </Button>
-                  </Tooltip>
+                  <div className="flex flex-col gap-1">
+                    <Tooltip title={blocker}>
+                      <Button
+                        disabled={!!blocker || isBuyingMaterial}
+                        onClick={() => buyMaterial({ itemId: material.id }, { onError })}
+                      >
+                        ซื้อ {isGem ? '💎' : isToken ? '🎖️' : '🪙'} {material.price}
+                      </Button>
+                    </Tooltip>
+                    {!isGem && !isToken && (
+                      <Tooltip title={getShopBlocker(material.price * BULK, coin)}>
+                        <Button
+                          disabled={
+                            !!getShopBlocker(material.price * BULK, coin) || isBuyingMaterial
+                          }
+                          onClick={() =>
+                            buyMaterial({ itemId: material.id, quantity: BULK }, { onError })
+                          }
+                        >
+                          ซื้อ x{BULK} 🪙 {material.price * BULK}
+                        </Button>
+                      </Tooltip>
+                    )}
+                  </div>
                 </div>
               </Card>
             )
@@ -160,26 +200,28 @@ export const ShopPanel = (props: IShopPanelProps) => {
         </>
       )}
       <Modal
-        open={!!opened}
+        open={opened.length > 0}
         title="🎁 เปิดกล่องสุ่มได้"
-        footer={<Button onClick={() => setOpened(null)}>ตกลง</Button>}
-        onCancel={() => setOpened(null)}
+        footer={<Button onClick={() => setOpened([])}>ตกลง</Button>}
+        onCancel={() => setOpened([])}
       >
-        {opened && (
-          <div className="flex flex-col gap-2">
-            <ItemLine
-              item={opened}
-              set={equipmentData?.sets.find((set) => set.setId === opened.setId)}
-            />
-            <CompareLine
-              item={opened}
-              worn={equipmentData?.items.find(
-                (it) => isWornBy(it, equipmentData.monsterId) && it.slot === opened.slot
-              )}
-            />
-            <p className="text-xs text-slate-500">เก็บไว้ในกระเป๋าอุปกรณ์แล้ว</p>
-          </div>
-        )}
+        <div className="flex max-h-[60vh] flex-col gap-3 overflow-y-auto">
+          {opened.map((item) => (
+            <div key={item.id} className="flex flex-col gap-2">
+              <ItemLine
+                item={item}
+                set={equipmentData?.sets.find((set) => set.setId === item.setId)}
+              />
+              <CompareLine
+                item={item}
+                worn={equipmentData?.items.find(
+                  (it) => isWornBy(it, equipmentData.monsterId) && it.slot === item.slot
+                )}
+              />
+            </div>
+          ))}
+          <p className="text-xs text-slate-500">เก็บไว้ในกระเป๋าอุปกรณ์แล้ว</p>
+        </div>
       </Modal>
     </div>
   )

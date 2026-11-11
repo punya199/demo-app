@@ -243,6 +243,7 @@ describe('friends and rental helpers', () => {
   it('explains why a support unit cannot be set yet', () => {
     const now = new Date('2026-01-01T00:10:00Z')
     expect(getSupportBlocker(monster(), null, now)).toBeNull()
+    expect(getSupportBlocker(monster({ stage: EnumMonsterStage.FUSED }), null, now)).toBeNull()
     expect(getSupportBlocker(monster({ stage: EnumMonsterStage.BABY_2 }), null, now)).toBe(
       'ต้องเป็นร่างโตขึ้นไปถึงตั้งเป็นตัวซัพพอร์ตได้'
     )

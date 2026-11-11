@@ -15,6 +15,16 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
+    version: 'next',
+    releasedAt: '2026-11-11T16:01:00Z',
+    changes: [
+      {
+        kind: 'fix',
+        text: 'มอนร่างผสานตั้งเป็นตัวซัพพอร์ตให้เพื่อนเช่าได้แล้ว (ก่อนหน้านี้ปุ่มถูกล็อกทั้งที่ระบบรองรับ)',
+      },
+    ],
+  },
+  {
     version: '1.73.0',
     releasedAt: '2026-11-11T15:55:50Z',
     changes: [

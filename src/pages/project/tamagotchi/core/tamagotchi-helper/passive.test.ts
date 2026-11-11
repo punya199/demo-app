@@ -14,6 +14,7 @@ import {
   canAllocateAscendancyNode,
   getBranchRespecCost,
   getRespecCost,
+  getDraftChangeCost,
 } from '.'
 import { IBattleEvent, IPassiveDraft, IPassiveNode } from '../tamagotchi-interface'
 
@@ -199,5 +200,85 @@ describe('passive draft and save', () => {
     expect(getAscendancyPathOf([])).toBeNull()
     expect(canDropAscendancyNode(nodes, ids, 'v2-asc-warden-02')).toBe(true)
     expect(canDropAscendancyNode(nodes, ids, 'v2-asc-warden-01')).toBe(false)
+  })
+})
+
+// The tree is a mesh, so these use several branches off the hub, listed so the search must visit
+// nodes that come before the one it removes (a 2-node chain cannot show that).
+describe('canDeallocatePassive on a branching tree', () => {
+  const node = (id: string, adj: string[]) => ({ id, adj, fx: {} }) as IPassiveNode
+  const nodes = [
+    node('hub', ['r6', 'r7']),
+    node('r6', ['hub', 'x']),
+    node('r7', ['hub', 's1']),
+    node('s1', ['r7', 's2', 'l']),
+    node('s2', ['s1', 's3']),
+    node('s3', ['s2']),
+    node('l', ['s1']),
+    node('x', ['r6']),
+  ]
+
+  it('lets a root go when the rest hangs off another root', () => {
+    expect(canDeallocatePassive(nodes, ['r6', 'r7', 's1'], 'r6')).toBe(true)
+  })
+
+  it('refuses a node that other nodes hang off, and says how many go with it', () => {
+    const owned = ['r7', 's1', 's2', 's3', 'l']
+    expect(canDeallocatePassive(nodes, owned, 's1')).toBe(false)
+    expect(getPassiveBranch(nodes, owned, 's1').sort()).toEqual(['l', 's1', 's2', 's3'])
+  })
+
+  it('lets any leaf go and nothing that is not owned', () => {
+    const owned = ['r7', 's1', 's2', 's3', 'l']
+    expect(canDeallocatePassive(nodes, owned, 's3')).toBe(true)
+    expect(canDeallocatePassive(nodes, owned, 'l')).toBe(true)
+    expect(canDeallocatePassive(nodes, owned, 'x')).toBe(false)
+  })
+
+  it('agrees with the branch for every owned node of a larger tree', () => {
+    const owned = ['r6', 'x', 'r7', 's1', 's2', 's3', 'l']
+    for (const id of owned) {
+      expect(canDeallocatePassive(nodes, owned, id)).toBe(
+        getPassiveBranch(nodes, owned, id).length === 1
+      )
+    }
+    expect(owned.filter((id) => canDeallocatePassive(nodes, owned, id)).sort()).toEqual([
+      'l',
+      's3',
+      'x',
+    ])
+  })
+})
+
+describe('getDraftChangeCost', () => {
+  const prices = {
+    respec: { freeLeft: 1, gemPrice: 1 },
+    masteryRepick: 1,
+    ascendancyReset: 20,
+  }
+  const saved: IPassiveDraft = {
+    nodeIds: ['a', 'b', 'c'],
+    masteries: {},
+    ascendancyNodeIds: ['v2-asc-striker-00', 'v2-asc-striker-01'],
+  }
+
+  it('is free inside the free refunds and 1 gem per point after', () => {
+    const one = { ...saved, nodeIds: ['a', 'b'] }
+    const two = { ...saved, nodeIds: ['a'] }
+    expect(getDraftChangeCost(saved, saved, one, prices)).toBe(0)
+    expect(getDraftChangeCost(saved, one, two, prices)).toBe(1)
+  })
+
+  it('charges the whole reset for dropping one ascendancy node', () => {
+    const next = { ...saved, ascendancyNodeIds: ['v2-asc-striker-00'] }
+    expect(getDraftChangeCost(saved, saved, next, prices)).toBe(20)
+    // Dropping a second one in the same draft adds nothing: the reset is already paid.
+    const none = { ...saved, ascendancyNodeIds: [] }
+    expect(getDraftChangeCost(saved, next, none, prices)).toBe(0)
+  })
+
+  it('is negative when an edit puts a node back', () => {
+    const removed = { ...saved, nodeIds: ['a'] }
+    expect(getDraftChangeCost(saved, removed, saved, prices)).toBe(-1)
   })
 })

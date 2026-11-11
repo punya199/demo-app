@@ -7,6 +7,7 @@ import {
   canDropAscendancyNode,
   diffPassiveDraft,
   getAscendancyPathOf,
+  getDraftChangeCost,
   getPassiveBranch,
   getPassiveSaveCost,
   PASSIVE_HUB,
@@ -49,7 +50,8 @@ export const PassivePanel = (props: IPassivePanelProps) => {
   const { mutate: save, isPending: isSaving } = usePassiveSave()
   // The tree being edited. null = nothing changed, so what the server sent is what is shown.
   const [draft, setDraft] = useState<IPassiveDraft | null>(null)
-  const [notice, setNotice] = useState<string | null>(null)
+  // The "why not" message belongs to the node that was tapped; it is not shown under another one.
+  const [notice, setNotice] = useState<{ id: string; text: string } | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 })
@@ -131,11 +133,12 @@ export const PassivePanel = (props: IPassivePanelProps) => {
   const viewBox = `${view.x - size / 2} ${view.y - size / 2} ${size} ${size}`
 
   const diff = diffPassiveDraft(saved, current)
-  const cost = getPassiveSaveCost(saved, current, {
+  const prices = {
     respec: refunds,
     masteryRepick: ascendancy.masteryRepickPrice,
     ascendancyReset: ascendancy.resetPrice,
-  })
+  }
+  const cost = getPassiveSaveCost(saved, current, prices)
 
   const isAscend = selected.kind === 'ascend'
   const canTake = isAscend
@@ -194,7 +197,7 @@ export const PassivePanel = (props: IPassivePanelProps) => {
     }
     const blocker = whyNot(node)
     if (blocker) {
-      setNotice(blocker)
+      setNotice({ id: node.id, text: blocker })
       return
     }
     if (node.kind === 'ascend') {
@@ -210,7 +213,20 @@ export const PassivePanel = (props: IPassivePanelProps) => {
       edit({ ...current, nodeIds: [...allocated, node.id] })
     }
   }
-  const pickHint = notice ?? whyNot(selected)
+  const pickHint = notice?.id === selected.id ? notice.text : whyNot(selected)
+  // Gems that pressing "ถอนโหนดนี้" / "ถอนทั้งสาย" adds to the save price.
+  const dropCost = isOwned(selected.id)
+    ? getDraftChangeCost(
+        saved,
+        current,
+        isAscend
+          ? { ...current, ascendancyNodeIds: ascendancyIds.filter((id) => id !== selected.id) }
+          : withoutNodes([selected.id]),
+        prices
+      )
+    : 0
+  const branchCost =
+    branch.length > 1 ? getDraftChangeCost(saved, current, withoutNodes(branch), prices) : 0
 
   // Pan with one pointer, pinch with two; a press that barely moved still counts as a tap.
   const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {
@@ -441,6 +457,8 @@ export const PassivePanel = (props: IPassivePanelProps) => {
         canDrop={canDrop}
         poolLeft={poolLeft}
         branch={branch}
+        dropCost={dropCost}
+        branchCost={branchCost}
         pickHint={pickHint}
         edit={edit}
         toggleNode={toggleNode}

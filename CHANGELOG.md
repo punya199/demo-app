@@ -1,3 +1,10 @@
+## [1.72.1](https://github.com/punya199/demo-app/compare/v1.72.0...v1.72.1) (2026-11-11)
+
+
+### Fix
+
+* let Fused pets set a PvP defense team and challenge from the UI ([29c6888](https://github.com/punya199/demo-app/commit/29c6888793932dbfa18719b0634c526ea0294aed))
+
 # [1.72.0](https://github.com/punya199/demo-app/compare/v1.71.0...v1.72.0) (2026-11-11)
 
 

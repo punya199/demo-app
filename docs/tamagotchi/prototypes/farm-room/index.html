@@ -1,0 +1,329 @@
+<title>Farm Room Drafts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one column. The room on top, a gallery of every furniture state, then the tap-to-open drawer.
+   Art on the canvases keeps one warm-lit palette in both themes (the owner's decision); only the page chrome themes. */
+:root {
+  --bg: #f3efe8; --card: #fffdf8; --fg: #2b2118; --muted: #6f6254; --line: #ddd2c1; --accent: #b4531e;
+  --ok: #2f7d3a; --bad: #c0392b; --field: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17120e; --card: #221b15; --fg: #f1e8da; --muted: #b3a493; --line: #3a2f25; --accent: #e8905a;
+    --ok: #7ccf86; --bad: #ff8a7a; --field: #2c231b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17120e; --card: #221b15; --fg: #f1e8da; --muted: #b3a493; --line: #3a2f25; --accent: #e8905a;
+  --ok: #7ccf86; --bad: #ff8a7a; --field: #2c231b; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font-family: 'Prompt', system-ui, sans-serif; line-height: 1.5;
+  padding-block: 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+h1 { font-size: 22px; margin: 0; } h2 { font-size: 16px; margin: 0 0 8px; } p { margin: 0; color: var(--muted); font-size: 13px; }
+section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+canvas { display: block; width: 100%; image-rendering: pixelated; border-radius: 6px; cursor: pointer; }
+.controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+.controls label { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 2px; }
+.controls div { display: flex; gap: 4px; }
+select, button { font: inherit; font-size: 13px; min-height: 34px; border-radius: 8px; border: 1px solid var(--line); background: var(--field); color: var(--fg); padding: 0 8px; }
+select { flex: 1; min-width: 0; }
+button { cursor: pointer; }
+button.primary { background: #1677ff; border-color: #1677ff; color: #fff; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.gallery figure { margin: 0; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gallery canvas { cursor: default; }
+.gallery figcaption { font-size: 11px; color: var(--muted); text-align: center; }
+.drawers { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.drawer { border: 1px solid var(--line); border-radius: 12px 12px 0 0; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--field); min-width: 0; }
+.drawer .grab { width: 36px; height: 4px; border-radius: 2px; background: var(--line); align-self: center; }
+.drawer .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tag { font-size: 12px; padding: 0 7px; line-height: 20px; border-radius: 4px; border: 1px solid #b7eb8f; background: #f6ffed; color: #389e0d; }
+.tag.off { border-color: var(--line); background: transparent; color: var(--muted); }
+.small { font-size: 12px; color: var(--muted); }
+.ok { color: var(--ok); } .bad { color: var(--bad); }
+.proposal { font-size: 13px; color: var(--fg); margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+
+<main>
+  <h1>Farm Room Drafts</h1>
+  <p>Still drafts only, no animation yet. The 4 furniture spots keep their current coordinates (420×280 room grid, drawn ×2), so pet pathing does not change. Pets are left out of this sheet. Tap a piece in the room to open the drawer.</p>
+
+  <section>
+    <h2>Room</h2>
+    <canvas id="room" width="840" height="560" aria-label="Farm room draft"></canvas>
+    <div class="controls" id="controls"></div>
+  </section>
+
+  <section>
+    <h2>Every state of every piece</h2>
+    <p>Ghost (not owned), tiers 1 to 3, tier 1 while upgrading to tier 2 (hammer and countdown), and tier 2 ready to claim.</p>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <section>
+    <h2>Tap drawer (replaces the card grid)</h2>
+    <p>Same strings and numbers as today's cards. Bottom drawer on mobile, right-hand drawer on desktop.</p>
+    <div class="drawers">
+      <div class="drawer" aria-label="Buy drawer">
+        <div class="grab"></div>
+        <div class="row"><b>เตียง</b><span class="tag off">ยังไม่มี</span></div>
+        <div>หิวนานขึ้นกว่าจะป่วย (เวลาป่วย) <b>+0%</b></div>
+        <div class="small">ระดับ 1: <b>+25%</b> · ซื้อได้เลย</div>
+        <button class="primary" type="button">ซื้อ 🪙 240</button>
+      </div>
+      <div class="drawer" aria-label="Upgrade drawer">
+        <div class="grab"></div>
+        <div class="row"><b>โต๊ะอาหาร</b><span class="tag">ระดับ 1/3</span></div>
+        <div>ความอิ่มลดช้าลง (เวลาหิว) <b>+15%</b></div>
+        <div class="small">ระดับ 2: <b>+30%</b> · คราฟต์ 30 นาที (รอจนครบ ข้ามไม่ได้)</div>
+        <div class="small"><span class="ok">🍃 เอสเซนซ์ใบไม้ 3/3</span> &nbsp; <span class="bad">🔷 เศษรูนพิทักษ์ 0/1</span></div>
+        <div class="small">ขาด: 🔷 เศษรูนพิทักษ์ ×1 (บอส (Raid))</div>
+        <button class="primary" type="button" disabled>เริ่มคราฟต์ 🪙 300</button>
+        <div class="small">ระหว่างรอ ระดับเดิมยังใช้งานได้ตามปกติ</div>
+      </div>
+    </div>
+    <p id="picked">Tap a piece in the room to see its drawer here.</p>
+    <div class="drawer" id="live" style="max-width:420px"></div>
+  </section>
+
+  <section>
+    <h2>Backend proposal: separate furniture queue</h2>
+    <ol class="proposal">
+      <li><b>Cause:</b> <code>craft_jobs</code> has one unique partial index on <code>user_id</code> (<code>claimed_at IS NULL</code>), and both <code>craft.service.ts</code> and <code>farm.service.ts</code> read it through an unfiltered <code>findActiveJob</code>. So one slot is shared and each side blocks the other.</li>
+      <li><b>Schema:</b> add <code>kind varchar NOT NULL DEFAULT 'equipment'</code> to <code>craft_jobs</code>. Backfill <code>'furniture'</code> where <code>recipe_id LIKE 'farm\_%'</code>. Replace the index with a unique partial index on <code>(user_id, kind)</code>. <code>down</code> reverses it, and fails if a player holds two active jobs.</li>
+      <li><b>Code:</b> both <code>findActiveJob</code> helpers add <code>kind</code> to the filter. Each <code>save</code> sets its kind. <code>startUpgrade</code> and <code>start</code> then conflict only with their own kind. Remove <code>queueBusy</code> from <code>IFarmView</code> and the front-end type and alert. <code>canStart</code> checks only the furniture slot.</li>
+      <li><b>Risk:</b> a job in flight at deploy time keeps working (its kind is derived from the recipe id). Numbers, recipes and times are untouched. Existing specs that assert the shared-queue conflict change to assert the separate slots.</li>
+    </ol>
+  </section>
+</main>
+
+<script>
+// ---- room grid (same as farm-room-sim.ts) and spots/footprints (same as farm-room-draw.ts) ----
+const W = 420, H = 280, S = 2
+const KINDS = ['bed', 'table', 'gym', 'toilet']
+const NAME = { bed: 'เตียง', table: 'โต๊ะอาหาร', gym: 'เสื่อออกกำลัง', toilet: 'ห้องน้ำ' }
+const FOOT = { bed: [10, 32, 92, 54], table: [236, 70, 108, 52], gym: [150, 218, 80, 40], toilet: [360, 150, 52, 42] }
+const BONUS = { bed: [0, 25, 50, 100], table: [0, 15, 30, 50], gym: [0, 15, 30, 50], toilet: [0, 15, 30, 50] }
+const EFFECT = { bed: 'หิวนานขึ้นกว่าจะป่วย (เวลาป่วย)', table: 'ความอิ่มลดช้าลง (เวลาหิว)', gym: 'ความแข็งแรงลดช้าลง (เวลาอ่อนแรง)', toilet: 'อึออกช้าลง (เวลาอึ)' }
+
+// ---- pixel helpers: 1 px dark outline, light from the top-left (hi on top/left, lo on bottom/right) ----
+const OL = '#2a1a10'
+const M = (c, hi, lo) => ({ c, hi, lo })
+const WOOD = M('#8a5a33', '#b07a4a', '#5e3a1c'), OAK = M('#a8744a', '#c99468', '#774c28')
+const BLUE = M('#4d86b8', '#7fb0dc', '#2f5f8c'), NAVY = M('#3d6fa3', '#6fa2d6', '#264d78')
+const GOLD = M('#d9a21b', '#f6d56a', '#9c6a0a'), CREAM = M('#f1e8d2', '#fffaf0', '#c9bb9a')
+const GREEN = M('#7fb069', '#a3d18c', '#3e6b2e'), WINE = M('#7b3148', '#a3516c', '#4d1c2d')
+const STONE = M('#a9a9a0', '#cfcfc6', '#74746c'), PORC = M('#f4f4f0', '#ffffff', '#c4c4bc')
+const CLAY = M('#b4531e', '#e07a3f', '#7a3410'), DARK = M('#4a4a52', '#71717c', '#2a2a30')
+let g
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h) }
+const box = (x, y, w, h, m) => {
+  R(x, y, w, h, OL); R(x + 1, y + 1, w - 2, h - 2, m.c)
+  R(x + 1, y + 1, w - 2, 1, m.hi); R(x + 1, y + 1, 1, h - 2, m.hi)
+  R(x + 1, y + h - 2, w - 2, 1, m.lo); R(x + w - 2, y + 1, 1, h - 2, m.lo)
+}
+const bowl = (x, y, m) => { box(x, y, 34, 14, m); R(x + 3, y + 3, 28, 8, '#c98a3a'); R(x + 5, y + 4, 24, 3, '#e8c45a') }
+
+// ---- one draw function per piece, tier adds parts. Origin = footprint top-left ----
+const PIECE = {
+  bed(t) {
+    if (t === 1) { // plain cot
+      box(0, 8, 92, 46, WOOD); box(4, 12, 84, 30, CREAM); box(7, 16, 24, 16, PORC)
+      box(34, 16, 54, 26, BLUE); R(35, 17, 52, 4, BLUE.hi); box(0, 42, 92, 12, OAK)
+    } else if (t === 2) { // frame with headboard, quilt
+      box(0, 0, 10, 54, OAK); box(8, 10, 84, 44, NAVY); box(12, 14, 76, 28, CREAM)
+      box(14, 17, 20, 11, PORC); box(14, 29, 20, 11, PORC); box(38, 16, 50, 26, BLUE)
+      for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) R(40 + i * 12, 18 + j * 8, 6, 4, BLUE.hi)
+      box(8, 42, 84, 12, NAVY)
+    } else { // canopy
+      box(6, 14, 80, 40, WINE); box(10, 18, 72, 26, CREAM); box(12, 20, 20, 11, PORC); box(12, 32, 20, 11, PORC)
+      box(36, 20, 46, 22, M('#8a3a9a', '#b25fc4', '#5a2266')); R(37, 29, 44, 2, GOLD.c); R(55, 24, 4, 4, GOLD.hi)
+      box(6, 42, 80, 12, GOLD); R(44, 46, 4, 4, '#ff6b8a')
+      R(6, 6, 12, 24, '#a8324a'); R(8, 6, 3, 24, '#c4506a'); R(74, 6, 12, 24, '#a8324a'); R(76, 6, 3, 24, '#c4506a')
+      box(0, 0, 6, 54, GOLD); box(86, 0, 6, 54, GOLD); box(0, 0, 92, 6, GOLD); R(2, -3, 2, 2, '#fff6c0'); R(88, -3, 2, 2, '#fff6c0')
+    }
+  },
+  table(t) {
+    if (t === 1) {
+      box(0, 30, 108, 14, WOOD); box(4, 44, 8, 8, WOOD); box(96, 44, 8, 8, WOOD); box(0, 0, 108, 32, OAK)
+      bowl(14, 12, CLAY); bowl(58, 12, CLAY)
+    } else if (t === 2) { // blue cloth, ceramic bowls, fruit
+      box(4, 44, 8, 8, WOOD); box(96, 44, 8, 8, WOOD); box(0, 28, 108, 18, NAVY)
+      for (let x = 0; x < 108; x += 12) R(x + 1, 43, 10, 3, BLUE.hi)
+      box(0, 0, 108, 32, BLUE); bowl(14, 12, CREAM); bowl(58, 12, CREAM)
+      box(96, 8, 8, 8, M('#c0392b', '#e8604f', '#7d1f16')); box(88, 12, 8, 8, M('#e3b23c', '#f6d56a', '#9c6a0a'))
+    } else { // gilded banquet
+      box(4, 44, 8, 8, GOLD); box(96, 44, 8, 8, GOLD); box(0, 28, 108, 18, CREAM); R(1, 41, 106, 4, GOLD.c); R(1, 41, 106, 1, GOLD.hi)
+      box(0, 0, 108, 32, CREAM); R(3, 3, 102, 1, GOLD.c); R(3, 28, 102, 1, GOLD.c); R(3, 3, 1, 26, GOLD.c); R(104, 3, 1, 26, GOLD.c)
+      bowl(14, 12, GOLD); bowl(58, 12, GOLD)
+      R(50, 20, 8, 3, GOLD.c); R(53, 8, 3, 12, '#fffaf0'); R(53, 4, 3, 4, '#ffb43a'); R(54, 5, 1, 2, '#fff2a0')
+    }
+  },
+  gym(t) {
+    const mat = t === 1 ? GREEN : t === 2 ? BLUE : GOLD
+    box(0, 8, 80, 32, mat); R(16, 22, 48, 2, mat.lo)
+    if (t === 2) for (const x of [8, 48]) { R(x + 4, 18, 20, 3, '#9aa0a8'); box(x, 13, 6, 12, DARK); box(x + 22, 13, 6, 12, DARK) }
+    if (t === 3) {
+      box(3, 11, 74, 26, GREEN); R(16, 22, 48, 2, GREEN.lo)
+      box(4, -26, 5, 38, DARK); box(71, -26, 5, 38, DARK); R(4, -23, 72, 3, '#cfd6dc'); R(4, -23, 72, 1, '#fff')
+      R(38, -20, 2, 9, '#555'); box(31, -11, 16, 24, M('#b23a3a', '#d96363', '#7a2020')); R(31, -3, 16, 2, '#7a2020')
+    }
+  },
+  toilet(t) {
+    const body = t === 1 ? STONE : t === 2 ? PORC : CREAM
+    box(4, 0, 44, 14, body); box(0, 14, 52, 28, body)
+    const seat = t === 1 ? M('#e8e8e0', '#fff', '#b6b6ae') : t === 2 ? BLUE : GOLD
+    box(6, 18, 40, 18, seat); R(12, 22, 28, 10, t === 1 ? '#7aa3b8' : '#9fd3e8'); R(14, 23, 8, 2, '#fff')
+    if (t >= 2) R(5, 10, 42, 2, t === 2 ? BLUE.c : GOLD.c)
+    if (t === 2) { R(36, -5, 8, 5, CLAY.c); R(36, -5, 8, 1, CLAY.hi); R(37, -10, 2, 5, GREEN.c); R(41, -9, 2, 4, GREEN.hi) }
+    if (t === 3) { box(14, -8, 24, 10, GOLD); R(24, -5, 4, 4, '#ff6b8a'); R(1, 15, 50, 2, GOLD.c); R(30, 24, 2, 2, '#fff') }
+  },
+}
+const SAMPLE_TIME = { bed: '1:24:10', table: '0:12:40', gym: '3:02:05', toilet: '0:25:30' }
+
+function badge(cx, cy, color, glyph) {
+  R(cx - 8, cy - 8, 16, 16, OL); R(cx - 7, cy - 7, 14, 14, color); R(cx - 7, cy - 7, 14, 1, 'rgba(255,255,255,.45)')
+  if (glyph === 'plus') { R(cx - 4, cy - 1, 9, 2, '#fff'); R(cx - 1, cy - 4, 2, 9, '#fff') }
+  if (glyph === 'hammer') { R(cx - 4, cy - 5, 8, 4, '#e6ebf0'); R(cx - 1, cy - 1, 3, 7, '#8a5a33') }
+  if (glyph === 'check') for (const [dx, dy] of [[-4, 0], [-2, 2], [0, 0], [2, -2], [4, -4]]) R(cx + dx - 1, cy + dy, 2, 2, '#fff')
+}
+function pill(cx, y, text) {
+  g.font = '600 8px Prompt, system-ui, sans-serif'; g.textAlign = 'center'
+  const w = Math.ceil(g.measureText(text).width) + 8
+  R(cx - w / 2 - 1, y, w + 2, 13, OL); R(cx - w / 2, y + 1, w, 11, '#fbf5e9'); g.fillStyle = '#2a1a10'; g.fillText(text, cx, y + 9)
+}
+
+// Silhouette of the tier 1 piece, cached per kind: the ghost shown on a spot the player does not own yet.
+const ghosts = {}
+function ghostOf(kind) {
+  if (ghosts[kind]) return ghosts[kind]
+  const [, , w, h] = FOOT[kind], pad = 40
+  const c = document.createElement('canvas'); c.width = w + pad * 2; c.height = h + pad + 20
+  const keep = g; g = c.getContext('2d'); g.save(); g.translate(pad, pad); PIECE[kind](1); g.restore()
+  const img = g.getImageData(0, 0, c.width, c.height), d = img.data
+  for (let i = 0; i < d.length; i += 4) {
+    if (!d[i + 3]) continue
+    const dark = d[i] + d[i + 1] + d[i + 2] < 220
+    d[i] = dark ? 96 : 176; d[i + 1] = dark ? 124 : 198; d[i + 2] = dark ? 150 : 220; d[i + 3] = dark ? 190 : 120
+  }
+  g.putImageData(img, 0, 0); g = keep
+  return (ghosts[kind] = { c, pad })
+}
+
+// state = { tier: 0..3, status: 'idle' | 'building' | 'ready' }
+function drawPiece(kind, st, x, y) {
+  const [, , w, h] = FOOT[kind]
+  g.save(); g.translate(x, y)
+  g.fillStyle = 'rgba(40,20,5,.24)'; g.fillRect(3, h - 1, w - 4, 4)
+  if (!st.tier) {
+    const gh = ghostOf(kind); g.drawImage(gh.c, -gh.pad, -gh.pad); badge(w / 2, h / 2, '#3d9a4a', 'plus')
+  } else {
+    PIECE[kind](st.tier)
+    if (st.status === 'building') {
+      for (let i = 0; i < w - 2; i += 8) { R(1 + i, h - 4, Math.min(4, w - 2 - i), 3, '#f2c230'); R(5 + i, h - 4, Math.min(4, w - 6 - i), 3, OL) }
+      badge(w - 8, 4, '#c98a12', 'hammer'); pill(w / 2, -12, SAMPLE_TIME[kind])
+    }
+    if (st.status === 'ready') { badge(w - 8, 4, '#2f9e44', 'check'); pill(w / 2, -12, 'รับของ') }
+  }
+  g.restore()
+}
+
+// ---- room backdrop: wallpaper, wainscot, planked floor with depth shading, rug, window, wall props ----
+function backdrop() {
+  R(0, 0, W, 74, '#c9a074')
+  for (let x = 0; x < W; x += 14) R(x, 0, 7, 50, '#c39a6d')
+  R(0, 46, W, 4, 'rgba(60,30,10,.12)'); R(0, 50, W, 3, '#6b4423'); R(0, 50, W, 1, '#8a5a33')
+  R(0, 53, W, 17, '#a8744a')
+  for (let x = 0; x < W; x += 42) { R(x + 4, 56, 34, 11, '#9a6a3f'); R(x + 4, 56, 34, 1, '#c99468'); R(x + 4, 66, 34, 1, '#6b4423') }
+  R(0, 70, W, 4, '#5e3a1c'); R(0, 70, W, 1, '#8a5a33')
+  for (let r = 0, y = 74; y < H; r++, y += 16) {
+    R(0, y, W, 16, r % 2 ? '#d1af7e' : '#d9b98a')
+    for (let x = r % 2 ? 30 : 0; x < W; x += 60) R(x, y, 1, 16, 'rgba(90,55,25,.35)')
+    R(0, y + 15, W, 1, 'rgba(90,55,25,.3)')
+  }
+  R(0, 74, W, 3, 'rgba(0,0,0,.28)'); R(0, 77, W, 8, 'rgba(60,30,10,.14)'); R(0, 85, W, 10, 'rgba(60,30,10,.06)')
+  // rug
+  R(110, 130, 190, 56, '#5d2538'); R(113, 133, 184, 50, '#8a3a52'); R(119, 139, 172, 38, '#e8d3a0'); R(123, 143, 164, 30, '#8a3a52')
+  for (let x = 134; x < 280; x += 22) { R(x, 152, 8, 8, '#e8d3a0'); R(x + 2, 154, 4, 4, '#d9a21b') }
+  for (let x = 112; x < 300; x += 4) { R(x, 186, 2, 3, '#e8d3a0'); R(x, 127, 2, 3, '#e8d3a0') }
+  // window with curtains and a patch of light on the floor
+  g.fillStyle = 'rgba(255,244,200,.14)'; g.beginPath(); g.moveTo(186, 78); g.lineTo(230, 78); g.lineTo(296, 168); g.lineTo(214, 168); g.fill()
+  box(180, 12, 56, 42, WOOD); R(184, 16, 48, 34, '#bfe4f2'); R(184, 16, 48, 12, '#9fd3e8'); R(206, 16, 4, 34, WOOD.c); R(184, 31, 48, 3, WOOD.c)
+  R(190, 36, 10, 6, 'rgba(255,255,255,.5)'); R(177, 53, 62, 4, OL); R(178, 53, 60, 3, OAK.c)
+  box(172, 10, 12, 42, M('#b8484f', '#d9707a', '#7d2a30')); box(232, 10, 12, 42, M('#b8484f', '#d9707a', '#7d2a30'))
+  // wall props
+  box(118, 16, 30, 24, WOOD); R(121, 19, 24, 18, '#7fa6c4'); R(121, 30, 24, 7, GREEN.c); R(136, 22, 5, 5, '#f6d56a')
+  R(256, 40, 62, 4, OL); R(257, 40, 60, 3, OAK.c)
+  R(262, 30, 10, 10, CLAY.c); R(262, 30, 10, 2, CLAY.hi); R(264, 24, 6, 6, GREEN.c); R(266, 21, 2, 4, GREEN.hi)
+  R(282, 32, 8, 8, '#9fd3e8'); R(284, 30, 4, 2, OL); R(298, 34, 14, 6, BLUE.c); R(298, 34, 14, 1, BLUE.hi)
+}
+function floorBowl() { box(176, 190, 28, 10, CLAY); R(179, 192, 22, 4, '#c98a3a') }
+
+const state = Object.fromEntries(KINDS.map((k, i) => [k, { tier: [1, 2, 0, 1][i], status: i === 1 ? 'ready' : i === 3 ? 'building' : 'idle' }]))
+const room = document.getElementById('room')
+function drawRoom() {
+  g = room.getContext('2d'); g.setTransform(S, 0, 0, S, 0, 0); g.imageSmoothingEnabled = false
+  backdrop()
+  if (!state.table.tier) floorBowl()
+  for (const k of ['bed', 'table', 'toilet', 'gym']) drawPiece(k, state[k], FOOT[k][0], FOOT[k][1])
+}
+
+// ---- controls ----
+const controls = document.getElementById('controls')
+for (const k of KINDS) {
+  const label = document.createElement('label'); label.textContent = NAME[k]
+  const row = document.createElement('div')
+  const tier = document.createElement('select'), status = document.createElement('select')
+  tier.id = `tier-${k}`; status.id = `status-${k}`; tier.setAttribute('aria-label', `${NAME[k]} tier`); status.setAttribute('aria-label', `${NAME[k]} status`)
+  tier.innerHTML = '<option value="0">ghost</option><option value="1">tier 1</option><option value="2">tier 2</option><option value="3">tier 3</option>'
+  status.innerHTML = '<option value="idle">idle</option><option value="building">upgrading</option><option value="ready">ready</option>'
+  const sync = () => {
+    state[k].tier = +tier.value; state[k].status = status.value
+    status.disabled = state[k].tier === 0 || state[k].tier === 3 && status.value === 'idle'
+    if (state[k].tier === 0) { status.value = 'idle'; state[k].status = 'idle' }
+    drawRoom()
+  }
+  tier.value = state[k].tier; status.value = state[k].status
+  tier.onchange = sync; status.onchange = sync
+  row.append(tier, status); label.append(row); controls.append(label)
+}
+
+// ---- gallery: ghost, t1, t2, t3, t1 building, t2 ready ----
+const COLS = [['ghost', { tier: 0 }], ['tier 1', { tier: 1 }], ['tier 2', { tier: 2 }], ['tier 3', { tier: 3 }], ['tier 1, upgrading', { tier: 1, status: 'building' }], ['tier 2, ready', { tier: 2, status: 'ready' }]]
+const gallery = document.getElementById('gallery')
+for (const k of KINDS) for (const [name, st] of COLS) {
+  const fig = document.createElement('figure'), c = document.createElement('canvas')
+  c.width = 300; c.height = 220; fig.append(c)
+  const cap = document.createElement('figcaption'); cap.textContent = `${NAME[k]} · ${name}`; fig.append(cap); gallery.append(fig)
+  g = c.getContext('2d'); g.setTransform(S, 0, 0, S, 0, 0); g.imageSmoothingEnabled = false
+  R(0, 0, 150, 110, '#d9b98a'); for (let y = 0; y < 110; y += 16) R(0, y + 15, 150, 1, 'rgba(90,55,25,.3)')
+  const [, , w, h] = FOOT[k]
+  drawPiece(k, { status: 'idle', ...st }, Math.round((150 - w) / 2), 110 - h - 12)
+}
+
+// ---- tap a piece: show its drawer ----
+const live = document.getElementById('live'), picked = document.getElementById('picked')
+function showDrawer(k) {
+  const s = state[k], next = s.tier + 1
+  const tag = s.tier ? `<span class="tag">ระดับ ${s.tier}/3</span>` : '<span class="tag off">ยังไม่มี</span>'
+  let body
+  if (s.status === 'ready') body = '<div class="small">เสร็จแล้ว</div><button class="primary" type="button">รับของ</button>'
+  else if (s.status === 'building') body = `<div class="small">กำลังคราฟต์ → ระดับ ${next}</div><div style="font-size:22px">${SAMPLE_TIME[k]}</div><div class="small">ระหว่างรอ ระดับเดิมยังใช้งานได้ตามปกติ</div>`
+  else if (s.tier >= 3) body = '<div class="small ok">ระดับสูงสุดแล้ว</div>'
+  else body = `<div class="small">ระดับ ${next}: <b>+${BONUS[k][next]}%</b> · ${next === 1 ? 'ซื้อได้เลย' : next === 2 ? 'คราฟต์ 30 นาที (รอจนครบ ข้ามไม่ได้)' : 'คราฟต์ 4 ชม. (รอจนครบ ข้ามไม่ได้)'}</div><button class="primary" type="button">${next === 1 ? 'ซื้อ 🪙 240' : next === 2 ? 'เริ่มคราฟต์ 🪙 300' : 'เริ่มคราฟต์ 🪙 800'}</button>`
+  live.innerHTML = `<div class="grab"></div><div class="row"><b>${NAME[k]}</b>${tag}</div><div>${EFFECT[k]} <b>+${BONUS[k][s.tier]}%</b></div>${body}`
+  picked.textContent = `Drawer for: ${NAME[k]}`
+}
+room.addEventListener('click', (e) => {
+  const r = room.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W, y = (e.clientY - r.top) / r.height * H
+  for (const k of ['gym', 'toilet', 'table', 'bed']) {
+    const [fx, fy, fw, fh] = FOOT[k]
+    if (x >= fx && x <= fx + fw && y >= fy - 12 && y <= fy + fh) return showDrawer(k)
+  }
+})
+const start = () => { drawRoom(); showDrawer('table') }
+document.fonts && document.fonts.ready ? document.fonts.ready.then(start) : start()
+</script>

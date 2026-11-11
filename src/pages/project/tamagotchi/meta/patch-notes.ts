@@ -15,8 +15,8 @@ export interface IPatchNote {
 
 export const PATCH_NOTES: IPatchNote[] = [
   {
-    version: 'next',
-    releasedAt: '2026-11-11T13:32:52Z',
+    version: '1.70.1',
+    releasedAt: '2026-11-11T13:37:15Z',
     changes: [
       {
         kind: 'fix',

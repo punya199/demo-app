@@ -1,3 +1,12 @@
+## [1.70.1](https://github.com/punya199/demo-app/compare/v1.70.0...v1.70.1) (2026-11-11)
+
+
+### Fix
+
+* add patch note for Fused pets in PvP ([3918567](https://github.com/punya199/demo-app/commit/391856790e6c100c602059b3497dbfb5841460bd))
+* give the unreleased patch note a valid time so the patch-notes test passes ([3c15744](https://github.com/punya199/demo-app/commit/3c157448d5eeb2b688b1b738ce5bf50b569800c1))
+* let passive tree nodes be taken back one by one and show the gem price on the buttons ([ccbd057](https://github.com/punya199/demo-app/commit/ccbd05748e6e265a88d5bb33f664a1ce6dd10888))
+
 # [1.70.0](https://github.com/punya199/demo-app/compare/v1.69.0...v1.70.0) (2026-11-09)
 
 

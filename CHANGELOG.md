@@ -1,3 +1,10 @@
+# [1.74.0](https://github.com/punya199/demo-app/compare/v1.73.1...v1.74.0) (2026-11-11)
+
+
+### Update
+
+* add patch note for PvP NPC rebalance (#68) ([1e704a0](https://github.com/punya199/demo-app/commit/1e704a081b1014535a8b90cbe3a112b7d0de6bf4)), closes [#68](https://github.com/punya199/demo-app/issues/68)
+
 ## [1.73.1](https://github.com/punya199/demo-app/compare/v1.73.0...v1.73.1) (2026-11-11)
 
 

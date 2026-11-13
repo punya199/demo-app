@@ -22,8 +22,10 @@ import {
   INCOME_EVERY,
   ROUNDS,
   START_HP,
+  STAGES,
   type EnemyKind,
 } from './config'
+import { advantagePct, HERO_ELEMENT } from './elements'
 import { DEFAULT_MAX_TICKS, TICK_MS, createState, step, type SimInput, type SimState } from './sim'
 
 const run = (state: SimState, ticks: number): SimState => {
@@ -218,7 +220,14 @@ describe('boss', () => {
     const archerHit = HEROES.archer.damage
     expect(mageHit).toBeGreaterThan(archerHit) // same level and no neighbours: raw damage ordering
     expect(dealt(bossRound(open, 'mage'))).toBe(
-      Math.max(1, Math.floor((mageHit * BOSS_WEAK_DAMAGE_PCT) / 100) - ENEMIES.boss.armor)
+      Math.max(
+        1,
+        Math.floor(
+          (Math.floor((mageHit * advantagePct(HERO_ELEMENT.mage, STAGES[0].boss.element)) / 100) *
+            BOSS_WEAK_DAMAGE_PCT) /
+            100
+        ) - ENEMIES.boss.armor
+      )
     )
     expect(dealt(bossRound(0, 'archer'))).toBeLessThan(dealt(bossRound(open, 'archer')))
   })

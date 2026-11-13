@@ -1,4 +1,4 @@
-import type { PoolEntry, SimInput } from '../../../../td-sim/src'
+import type { CoreEntry, PoolEntry, SimInput } from '../../../../td-sim/src'
 
 export interface ITdBattleStart {
   battleId: string
@@ -6,6 +6,8 @@ export interface ITdBattleStart {
   stageId: number
   /** Owned heroes snapshotted at start; the server replays with the same pool. */
   pool: PoolEntry[]
+  /** Equipped cores snapshotted at start; the server replays with the same cores. */
+  cores: CoreEntry[]
   expiresAt: string
 }
 
@@ -17,6 +19,8 @@ export interface ITdBattleResult {
   stars: number
   gems: number
   firstClear: boolean
+  /** The core a first clear granted, if any. */
+  core?: CoreEntry | null
   balances: { coins: number }
 }
 

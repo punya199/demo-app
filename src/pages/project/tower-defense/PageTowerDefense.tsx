@@ -17,6 +17,7 @@ import { keyAction, pointerToLogical } from './input'
 import { canvasBackingSize, layoutFor, layoutMode, type LayoutMode } from './layout'
 import { draw } from './render'
 import { skillLabel, t, type Lang } from './strings'
+import { TdEnergy } from './TdEnergy'
 
 type Hud = Pick<SimState, 'gold' | 'hp' | 'round' | 'status' | 'offer'>
 
@@ -200,7 +201,7 @@ const PageTowerDefense = () => {
             <ArrowLeftOutlined className="text-lg" />
           </Link>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">{t(lang, 'title')}</h1>
-          <span className="w-4" />
+          <TdEnergy />
         </div>
         <div className="flex w-full justify-between text-sm font-semibold text-slate-900 dark:text-slate-100">
           <span>🪙 {hud.gold}</span>

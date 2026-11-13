@@ -63,6 +63,17 @@ React 18 + TypeScript SPA (Vite 6) — a multi-tool app bundling several unrelat
 - Tests use Vitest + Testing Library (`jsdom` env, setup file `src/test/setup.ts`); co-locate `*.test.ts(x)` next to the file under test.
 - **Tamagotchi changes (any player-visible change):** (1) add a Thai player-facing entry to `src/pages/project/tamagotchi/meta/patch-notes.ts`; (2) update the in-game wiki (`wiki.ts` in the backend + `WikiPanel.tsx` here); (3) add or update tests for any new helper or engine code.
 
+## Tower Defense (td)
+
+Spec and tickets: `docs/tower-defense/` (`SPEC.md` is the source of truth for rules, economy and milestones).
+
+- **`td-sim/` is the single source of truth for game rules.** It is pure TypeScript (no DOM, React or Nest; lint and its own tsconfig enforce this) with a seeded RNG and fixed-step ticks. The page only renders and records inputs; the server replays `{seed, inputLog}` and ignores any client-reported result.
+- **Never hand-edit the backend's copy** at `demo-app-backend/src/libs/td-sim`. After any change under `td-sim/`, run `node scripts/sync-td-sim.mjs <path-to-backend>` and commit the copy in the backend repo. `yarn td-sim:check` (lint, tsc, vitest in a plain node environment) and the `td-sim` workflow's drift check must both pass. Merge the backend PR first, or the drift check fails.
+- **Golden hashes**: any rule change that alters the hashed state changes the golden replay hash. Rebaseline it deliberately, in its own commit, and say why.
+- **All game numbers live in config** (the `td-sim` config plus the backend's `*.config.ts`). The wiki reads them from config; never type a number into UI text by hand. Server-only numbers are described as "the server decides".
+- Pages are Thai-first, with the wiki also in English; strings live in `strings.ts`.
+- Player-visible td changes: add a Thai entry to `td-patch-notes.ts` and update the wiki data helpers. The tamagotchi rule above applies only to the monster game.
+
 ## Agent skills
 
 ### Project skills

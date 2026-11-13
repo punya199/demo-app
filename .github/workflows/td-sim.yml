@@ -33,6 +33,5 @@ jobs:
         with:
           repository: punya199/demo-app-backend
           path: backend
-          # The backend repo is private: create a read-only token secret with this name.
-          token: ${{ secrets.TD_BACKEND_READ_TOKEN }}
+          # The backend repo is public, so no token is needed.
       - run: node scripts/sync-td-sim.mjs backend --check

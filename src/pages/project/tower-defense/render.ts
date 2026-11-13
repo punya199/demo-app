@@ -1,5 +1,6 @@
 import {
   CHARGE_SCALE,
+  type EnemyKind,
   HEROES,
   PENALTY_TILES,
   SOURCE_TILE,
@@ -12,6 +13,15 @@ import { layoutFor, type Layout } from './layout'
 
 // Shapes only: every hero is a coloured polygon, no image assets.
 const HERO_COLOR: Record<HeroId, string> = { archer: '#22c55e', mage: '#a855f7', knight: '#f59e0b' }
+const ENEMY_COLOR: Record<EnemyKind, string> = {
+  grunt: '#e11d48',
+  runner: '#fb923c',
+  tank: '#7f1d1d',
+  armored: '#94a3b8',
+  swarmer: '#f472b6',
+  elite: '#facc15',
+  boss: '#7c3aed',
+}
 const SIDES: Record<HeroId, number> = { archer: 3, mage: 5, knight: 4 }
 
 function polygon(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, sides: number) {
@@ -43,9 +53,9 @@ export function draw(
   const cy = LANE.y + LANE.height / 2
   for (const e of s.enemies) {
     const x = Math.min(enemyX(e.pos), LANE.x + LANE.width)
-    ctx.fillStyle = '#e11d48'
+    ctx.fillStyle = ENEMY_COLOR[e.kind]
     ctx.beginPath()
-    ctx.arc(x, cy, 10, 0, Math.PI * 2)
+    ctx.arc(x, cy, e.kind === 'boss' ? 16 : e.kind === 'tank' ? 12 : 10, 0, Math.PI * 2)
     ctx.fill()
     ctx.fillStyle = '#fff'
     ctx.font = '10px sans-serif'

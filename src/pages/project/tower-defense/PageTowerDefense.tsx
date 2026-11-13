@@ -2,19 +2,23 @@ import { ArrowLeftOutlined } from '@ant-design/icons'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
+  BOSS_ROUND,
+  ROUND_COUNT,
   SUMMON_COST,
   START_HP,
-  TICK_MS,
   createState,
   step,
   type SimInput,
   type SimState,
 } from '../../../../td-sim/src'
 import { appPath } from '../../../config/app-paths'
+import { advance } from './clock'
 import { keyAction, pointerToLogical } from './input'
 import { canvasBackingSize, layoutFor, layoutMode, type LayoutMode } from './layout'
 import { draw } from './render'
-import { t, type Lang } from './strings'
+import { skillLabel, t, type Lang } from './strings'
+
+type Hud = Pick<SimState, 'gold' | 'hp' | 'round' | 'status' | 'offer'>
 
 const newSeed = () => (Math.random() * 0x100000000) >>> 0
 
@@ -27,7 +31,13 @@ const PageTowerDefense = () => {
   const paused = useRef(false)
   const speed = useRef(1)
   const selected = useRef(-1)
-  const [hud, setHud] = useState({ gold: 0, hp: START_HP, lost: false })
+  const [hud, setHud] = useState<Hud>({
+    gold: 0,
+    hp: START_HP,
+    round: 0,
+    status: 'running',
+    offer: [],
+  })
   const [view, setView] = useState({ paused: false, fast: false })
   const [lang, setLang] = useState<Lang>('th')
   const [mode, setMode] = useState<LayoutMode>(() => layoutMode(window.innerWidth))
@@ -67,20 +77,21 @@ const PageTowerDefense = () => {
     let acc = 0
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame)
-      // cap the catch-up so a background tab does not fast-forward the run
-      acc += Math.min(now - last, 250) * (paused.current ? 0 : speed.current)
+      const next = advance(acc, now - last, speed.current, paused.current)
+      acc = next.acc
       last = now
       let s = stateRef.current
-      while (acc >= TICK_MS) {
-        acc -= TICK_MS
-        s = step(s, pending.current.splice(0))
-      }
+      for (let i = 0; i < next.ticks; i++) s = step(s, pending.current.splice(0))
       stateRef.current = s
       draw(ctx, s, layout, selected.current)
       setHud((h) =>
-        h.gold === s.gold && h.hp === s.hp && h.lost === (s.status === 'lost')
+        h.gold === s.gold &&
+        h.hp === s.hp &&
+        h.round === s.round &&
+        h.status === s.status &&
+        h.offer === s.offer
           ? h
-          : { gold: s.gold, hp: s.hp, lost: s.status === 'lost' }
+          : { gold: s.gold, hp: s.hp, round: s.round, status: s.status, offer: s.offer }
       )
     }
     raf = requestAnimationFrame(frame)
@@ -115,6 +126,10 @@ const PageTowerDefense = () => {
       selected.current = -1
       pending.current.push({ tick, type: 'summon', tile })
     }
+  }, [])
+
+  const pick = useCallback((index: number) => {
+    pending.current.push({ tick: stateRef.current.tick, type: 'pick', index })
   }, [])
 
   const restart = useCallback(() => {
@@ -189,6 +204,11 @@ const PageTowerDefense = () => {
         </div>
         <div className="flex w-full justify-between text-sm font-semibold text-slate-900 dark:text-slate-100">
           <span>🪙 {hud.gold}</span>
+          <span>
+            {hud.round === BOSS_ROUND
+              ? t(lang, 'boss')
+              : t(lang, 'round', { n: hud.round + 1, total: ROUND_COUNT })}
+          </span>
           <span>❤️ {hud.hp}</span>
         </div>
         <div className="relative w-full">
@@ -198,9 +218,21 @@ const PageTowerDefense = () => {
             className="w-full touch-none rounded bg-slate-900"
             style={{ aspectRatio: `${layout.view.width} / ${layout.view.height}` }}
           />
-          {hud.lost && (
+          {hud.offer.length > 0 && hud.status === 'running' && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded bg-black/70 p-4 text-white">
+              <div className="text-xl font-bold">{t(lang, 'pickTitle')}</div>
+              {hud.offer.map((id, i) => (
+                <button key={id} className={`${btn} w-full max-w-xs`} onClick={() => pick(i)}>
+                  {skillLabel(lang, id)}
+                </button>
+              ))}
+            </div>
+          )}
+          {hud.status !== 'running' && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded bg-black/70 text-white">
-              <div className="text-2xl font-bold">{t(lang, 'lost')}</div>
+              <div className="text-2xl font-bold">
+                {t(lang, hud.status === 'won' ? 'won' : 'lost')}
+              </div>
               <button className={btn} onClick={restart}>
                 {t(lang, 'playAgain')}
               </button>

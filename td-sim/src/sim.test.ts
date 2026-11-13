@@ -1,6 +1,19 @@
 import { describe, expect, it } from 'vitest'
-import { START_GOLD, SUMMON_COST, TILE_COUNT } from './config'
-import { createState, step } from './sim'
+import {
+  ENEMY_SPEED,
+  LANE_LENGTH,
+  SPAWN_EVERY,
+  START_GOLD,
+  START_HP,
+  SUMMON_COST,
+  TILE_COUNT,
+} from './config'
+import { createState, step, type SimState } from './sim'
+
+const run = (state: SimState, ticks: number): SimState => {
+  for (let i = 0; i < ticks; i++) state = step(state, [])
+  return state
+}
 
 describe('summon', () => {
   it('spends run-gold and puts a gear on the chosen free tile', () => {
@@ -21,5 +34,30 @@ describe('summon', () => {
       { tick: 0, type: 'summon', tile: 0 },
     ])
     expect(broke.gears).toHaveLength(0)
+  })
+})
+
+describe('lane', () => {
+  it('spawns enemies that walk toward the HQ', () => {
+    const s = run(createState(1), 10)
+    expect(s.enemies).toHaveLength(1)
+    const before = s.enemies[0].pos
+    expect(run(s, 5).enemies[0].pos).toBe(before + 5 * ENEMY_SPEED)
+  })
+
+  it('keeps spawning on a fixed schedule', () => {
+    expect(run(createState(1), SPAWN_EVERY + 5).spawned).toBe(2)
+  })
+
+  it('costs HQ health when an enemy leaks, and ends the run at zero', () => {
+    const leaking = { ...createState(1), enemies: [{ id: 0, pos: LANE_LENGTH - 1, hp: 5 }] }
+    const s = step(leaking, [])
+    expect(s.hp).toBe(START_HP - 1)
+    expect(s.enemies.some((e) => e.id === 0)).toBe(false)
+
+    const dying = step({ ...leaking, hp: 1 }, [])
+    expect(dying.hp).toBe(0)
+    expect(dying.status).toBe('lost')
+    expect(step(dying, [{ tick: dying.tick, type: 'summon', tile: 0 }])).toBe(dying)
   })
 })

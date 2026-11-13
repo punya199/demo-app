@@ -1,4 +1,17 @@
-import { HERO_IDS, INCOME_EVERY, START_GOLD, START_HP, SUMMON_COST, TILE_COUNT, type HeroId } from './config'
+import {
+  ENEMY_BASE_HP,
+  ENEMY_HP_PER_SPAWN,
+  ENEMY_SPEED,
+  HERO_IDS,
+  INCOME_EVERY,
+  LANE_LENGTH,
+  SPAWN_EVERY,
+  START_GOLD,
+  START_HP,
+  SUMMON_COST,
+  TILE_COUNT,
+  type HeroId,
+} from './config'
 import { createRng } from './rng'
 
 /** Fixed timestep: one tick is 50 ms of game time. Rendering interpolates; the sim never reads a clock. */
@@ -54,6 +67,7 @@ export function createState(seed: number): SimState {
 
 /** Advance one tick, applying the inputs stamped with the current tick. */
 export function step(state: SimState, inputs: readonly SimInput[]): SimState {
+  if (state.status !== 'running') return state
   const rng = createRng(0, state.rng)
   let gold = state.gold
   const gears = [...state.gears]
@@ -68,7 +82,32 @@ export function step(state: SimState, inputs: readonly SimInput[]): SimState {
     gears.push({ tile: input.tile, hero: HERO_IDS[rng.int(HERO_IDS.length)], cooldown: 0 })
   }
   if (state.tick % INCOME_EVERY === 0) gold += 1
-  return { ...state, tick: state.tick + 1, rng: rng.state(), gold, gears }
+
+  let spawned = state.spawned
+  let enemies = state.enemies
+  if (state.tick % SPAWN_EVERY === 0) {
+    enemies = [
+      ...enemies,
+      { id: spawned, pos: 0, hp: ENEMY_BASE_HP + ENEMY_HP_PER_SPAWN * spawned },
+    ]
+    spawned++
+  }
+
+  enemies = enemies.map((e) => ({ ...e, pos: e.pos + ENEMY_SPEED }))
+  const leaked = enemies.filter((e) => e.pos >= LANE_LENGTH).length
+  enemies = enemies.filter((e) => e.pos < LANE_LENGTH)
+  const hp = Math.max(0, state.hp - leaked)
+
+  return {
+    tick: state.tick + 1,
+    rng: rng.state(),
+    gold,
+    hp,
+    status: hp === 0 ? 'lost' : 'running',
+    spawned,
+    enemies,
+    gears,
+  }
 }
 
 function assertValidReplay(replay: Replay, maxTicks: number): void {

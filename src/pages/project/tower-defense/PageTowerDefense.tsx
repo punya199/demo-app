@@ -154,7 +154,7 @@ const PageTowerDefense = () => {
     setNet({ phase: 'starting' })
     startBattle()
       .then((b) => {
-        stateRef.current = createState(b.seed)
+        stateRef.current = createState(b.seed, b.pool)
         battle.current = { id: b.battleId, seed: b.seed }
         setNet({ phase: 'ready' })
       })

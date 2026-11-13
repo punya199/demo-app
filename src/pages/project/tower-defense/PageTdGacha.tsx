@@ -11,6 +11,7 @@ import {
 } from './td-gacha'
 import { useGetTdGacha, usePullTdGacha } from './td-gacha-query'
 import { useGetTdProfile } from './td-profile-query'
+import { TdHeroStarUp } from './TdHeroStarUp'
 
 const RARITY_LABEL: Record<TdRarity, string> = {
   common: 'ธรรมดา',
@@ -44,6 +45,8 @@ const PageTdGacha = () => {
   const { config, state } = data
   const gems = profile?.balances.gems ?? 0
   const nameOf = (id: string) => config.heroes.find((h) => h.id === id)?.name ?? id
+  const shards = profile?.balances.shards ?? 0
+  const stars = new Map(state.ownedHeroes.map((h) => [h.heroId, h.starLevel]))
   const owned = new Set(state.ownedHeroIds)
 
   return (
@@ -57,8 +60,8 @@ const PageTdGacha = () => {
           <ArrowLeftOutlined className="text-lg" />
         </Link>
         <h1 className="text-xl font-bold">สุ่มฮีโร่</h1>
-        <span role="status" aria-label="เพชร">
-          💎 {gems}
+        <span role="status" aria-label="เพชรและเศษ">
+          💎 {gems} · 🧩 {shards}
         </span>
       </div>
 
@@ -127,6 +130,14 @@ const PageTdGacha = () => {
               <div className={RARITY_COLOR[h.rarity]}>{RARITY_LABEL[h.rarity]}</div>
               <div>{h.name}</div>
               <small>{ROLE_LABEL[h.role]}</small>
+              {stars.has(h.id) && (
+                <TdHeroStarUp
+                  heroId={h.id}
+                  starLevel={stars.get(h.id)!}
+                  shards={shards}
+                  config={config}
+                />
+              )}
             </li>
           ))}
         </ul>

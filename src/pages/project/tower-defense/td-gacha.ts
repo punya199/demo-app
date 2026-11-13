@@ -17,6 +17,8 @@ export interface ITdGachaConfig {
   pityLimit: number
   duplicateShards: Record<TdRarity, number>
   heroes: ITdHeroDef[]
+  /** Shards for each star step: index 0 is star 1 -> 2. Its length plus one is the top star. */
+  starUpCosts: number[]
 }
 
 export interface ITdGacha {
@@ -26,6 +28,7 @@ export interface ITdGacha {
     pullsUntilLegendary: number
     freePullAvailable: boolean
     ownedHeroIds: string[]
+    ownedHeroes: { heroId: string; starLevel: number }[]
   }
 }
 
@@ -50,4 +53,20 @@ export const pullAvailability = (
 ) => {
   if (mode === 'free') return freePullAvailable
   return gems >= (mode === 'ten' ? config.tenCost : config.singleCost)
+}
+
+export interface ITdStarUpResult {
+  heroId: string
+  starLevel: number
+  cost: number
+  balances: { shards: number }
+}
+
+/** Cost of the next star, or null at the top star. Only a convenience for the button; the server re-checks. */
+export const nextStarCost = (starLevel: number, config: ITdGachaConfig): number | null =>
+  config.starUpCosts[starLevel - 1] ?? null
+
+export const canStarUp = (starLevel: number, shards: number, config: ITdGachaConfig) => {
+  const cost = nextStarCost(starLevel, config)
+  return cost !== null && shards >= cost
 }

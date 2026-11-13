@@ -1,8 +1,10 @@
-import type { SimInput } from '../../../../td-sim/src'
+import type { PoolEntry, SimInput } from '../../../../td-sim/src'
 
 export interface ITdBattleStart {
   battleId: string
   seed: number
+  /** Owned heroes snapshotted at start; the server replays with the same pool. */
+  pool: PoolEntry[]
   expiresAt: string
 }
 

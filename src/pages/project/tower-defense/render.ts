@@ -1,8 +1,7 @@
 import {
-  CHARGE_SCALE,
   type EnemyKind,
-  HEROES,
   PENALTY_TILES,
+  fullCooldown,
   SOURCE_TILE,
   TILE_COUNT,
   linkedTiles,
@@ -12,7 +11,24 @@ import {
 import { layoutFor, type Layout } from './layout'
 
 // Shapes only: every hero is a coloured polygon, no image assets.
-const HERO_COLOR: Record<HeroId, string> = { archer: '#22c55e', mage: '#a855f7', knight: '#f59e0b' }
+const HERO_COLOR: Record<HeroId, string> = {
+  archer: '#22c55e',
+  mage: '#a855f7',
+  knight: '#f59e0b',
+  // gacha heroes: colour by role (aoe purple, support teal, dps orange), shape by rarity
+  'cinder-witch': '#a855f7',
+  'frost-herald': '#a855f7',
+  'storm-caller': '#a855f7',
+  'sun-oracle': '#a855f7',
+  'moss-healer': '#14b8a6',
+  'tide-bard': '#14b8a6',
+  'iron-warden': '#14b8a6',
+  'dawn-priestess': '#14b8a6',
+  'twig-archer': '#f97316',
+  'ember-lancer': '#f97316',
+  'glacier-sniper': '#f97316',
+  'void-blade': '#f97316',
+}
 const ENEMY_COLOR: Record<EnemyKind, string> = {
   grunt: '#e11d48',
   runner: '#fb923c',
@@ -22,7 +38,23 @@ const ENEMY_COLOR: Record<EnemyKind, string> = {
   elite: '#facc15',
   boss: '#7c3aed',
 }
-const SIDES: Record<HeroId, number> = { archer: 3, mage: 5, knight: 4 }
+const SIDES: Record<HeroId, number> = {
+  archer: 3,
+  mage: 5,
+  knight: 4,
+  'cinder-witch': 3,
+  'frost-herald': 4,
+  'storm-caller': 5,
+  'sun-oracle': 6,
+  'moss-healer': 3,
+  'tide-bard': 4,
+  'iron-warden': 5,
+  'dawn-priestess': 6,
+  'twig-archer': 3,
+  'ember-lancer': 4,
+  'glacier-sniper': 5,
+  'void-blade': 6,
+}
 
 function polygon(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, sides: number) {
   ctx.beginPath()
@@ -98,7 +130,7 @@ export function draw(
     ctx.textAlign = 'center'
     ctx.fillText(String(g.level), r.x + r.size / 2, r.y + r.size / 2 + 4)
     // charge bar: fills as a linked gear charges
-    const ready = 1 - g.cooldown / (HEROES[g.hero].cooldown * CHARGE_SCALE)
+    const ready = 1 - g.cooldown / fullCooldown(g.hero, g.star)
     ctx.fillRect(r.x + 8, r.y + r.size - 8, (r.size - 16) * ready, 3)
   }
 }

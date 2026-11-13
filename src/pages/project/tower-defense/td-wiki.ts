@@ -118,4 +118,3 @@ export const wikiSections = (lang: Lang, input: IWikiInput): IWikiSection[] => {
     ),
   }))
 }
-

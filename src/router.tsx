@@ -31,6 +31,7 @@ const PageTdStages = lazy(() => import('./pages/project/tower-defense/PageTdStag
 const PageTdGoals = lazy(() => import('./pages/project/tower-defense/PageTdGoals'))
 const PageTdCores = lazy(() => import('./pages/project/tower-defense/PageTdCores'))
 const PageTdRelics = lazy(() => import('./pages/project/tower-defense/PageTdRelics'))
+const PageTdGuide = lazy(() => import('./pages/project/tower-defense/PageTdGuide'))
 const PageGemDiggers = lazy(() => import('./pages/project/gem-diggers/PageGemDiggers'))
 const PageTamagotchi = lazy(() => import('./pages/project/tamagotchi/PageTamagotchi'))
 const PageAllBill = lazy(() => import('./pages/project/checkbill/PageAllBill'))
@@ -113,6 +114,7 @@ export const router = createBrowserRouter([
       { path: appPath.towerDefenseGoals(), element: <PageTdGoals /> },
       { path: appPath.towerDefenseCores(), element: <PageTdCores /> },
       { path: appPath.towerDefenseRelics(), element: <PageTdRelics /> },
+      { path: appPath.towerDefenseGuide(), element: <PageTdGuide /> },
       { path: appPath.tamagotchi(), element: <PageTamagotchi /> },
       {
         path: appPath.checkBillPageCreate(),

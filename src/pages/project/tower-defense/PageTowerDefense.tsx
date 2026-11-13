@@ -252,6 +252,9 @@ const PageTowerDefense = () => {
         <Link to={appPath.towerDefenseRelics()} className={`${btn} text-center`}>
           {t(lang, 'relics')}
         </Link>
+        <Link to={appPath.towerDefenseGuide()} className={`${btn} text-center`}>
+          {t(lang, 'wiki_open')}
+        </Link>
       </nav>
       <div className="flex min-w-0 flex-1 flex-col items-center gap-3">
         <div className="flex w-full items-center justify-between">

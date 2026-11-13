@@ -60,7 +60,10 @@ describe('wikiSections', () => {
 
   it('leaves no placeholder, undefined or NaN, even before the server data has loaded', () => {
     for (const lang of ['th', 'en'] as const) {
-      for (const input of [{ gacha, energy }, { gacha: undefined, energy: undefined }]) {
+      for (const input of [
+        { gacha, energy },
+        { gacha: undefined, energy: undefined },
+      ]) {
         expect(text(lang, input as never)).not.toMatch(/\{\w+\}|undefined|NaN/)
       }
     }

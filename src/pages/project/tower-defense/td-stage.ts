@@ -25,3 +25,9 @@ export const starRow = (stars: number): string =>
 
 export const stageStatus = (stage: ITdStage): 'locked' | 'new' | 'cleared' =>
   !stage.unlocked ? 'locked' : stage.cleared ? 'cleared' : 'new'
+
+/** Stars a stage needs before the sweep button shows; the server enforces the same rule. */
+export const SWEEP_MIN_STARS = 3
+
+export const canSweep = (stage: ITdStage): boolean =>
+  stage.unlocked && stage.stars >= SWEEP_MIN_STARS

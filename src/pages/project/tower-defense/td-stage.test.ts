@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { STAGE_COUNT } from '../../../../td-sim/src'
 import { buildStartBody } from './td-battle'
-import { parseStageParam, starRow, stageStatus, type ITdStage } from './td-stage'
+import { canSweep, parseStageParam, starRow, stageStatus, type ITdStage } from './td-stage'
 
 describe('parseStageParam', () => {
   it('reads a valid stage number from the query string', () => {
@@ -41,5 +41,21 @@ describe('stageStatus', () => {
     expect(stageStatus(stage({ unlocked: false }))).toBe('locked')
     expect(stageStatus(stage({}))).toBe('new')
     expect(stageStatus(stage({ cleared: true, stars: 1 }))).toBe('cleared')
+  })
+})
+
+describe('canSweep', () => {
+  const stage = (stars: number, unlocked = true): ITdStage => ({
+    stageId: 1,
+    stars,
+    cleared: stars >= 1,
+    unlocked,
+    firstClearGems: 150,
+  })
+  it('is offered only on an unlocked 3-star stage', () => {
+    expect(canSweep(stage(3))).toBe(true)
+    expect(canSweep(stage(2))).toBe(false)
+    expect(canSweep(stage(0))).toBe(false)
+    expect(canSweep(stage(3, false))).toBe(false)
   })
 })

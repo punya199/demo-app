@@ -2,7 +2,8 @@ import { ArrowLeftOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
 import { appPath } from '../../../config/app-paths'
 import { TdEnergy } from './TdEnergy'
-import { stageStatus, starRow } from './td-stage'
+import { TdSweepButton } from './TdSweepButton'
+import { canSweep, stageStatus, starRow } from './td-stage'
 import { useGetTdStages } from './td-stage-query'
 
 const card =
@@ -46,12 +47,15 @@ const PageTdStages = () => {
             {status === 'locked' ? (
               <span aria-label="ล็อก">🔒</span>
             ) : (
-              <Link
-                to={`${appPath.towerDefense()}?stage=${s.stageId}`}
-                className="rounded bg-slate-700 px-4 py-2 text-sm text-white hover:bg-slate-600 dark:bg-slate-800"
-              >
-                {status === 'cleared' ? 'เล่นอีกครั้ง' : 'เล่น'} (⚡ {data.energyCost})
-              </Link>
+              <div className="flex flex-col items-end gap-2">
+                <Link
+                  to={`${appPath.towerDefense()}?stage=${s.stageId}`}
+                  className="rounded bg-slate-700 px-4 py-2 text-sm text-white hover:bg-slate-600 dark:bg-slate-800"
+                >
+                  {status === 'cleared' ? 'เล่นอีกครั้ง' : 'เล่น'} (⚡ {data.energyCost})
+                </Link>
+                {canSweep(s) && <TdSweepButton stageId={s.stageId} energyCost={data.energyCost} />}
+              </div>
             )}
           </div>
         )

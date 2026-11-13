@@ -1,4 +1,13 @@
-import { HEROES, TILE_COUNT, type HeroId, type SimState } from '../../../../td-sim/src'
+import {
+  CHARGE_SCALE,
+  HEROES,
+  PENALTY_TILES,
+  SOURCE_TILE,
+  TILE_COUNT,
+  linkedTiles,
+  type HeroId,
+  type SimState,
+} from '../../../../td-sim/src'
 import { LANE, VIEW, enemyX, tileRect } from './layout'
 
 // Shapes only: every hero is a coloured polygon, no image assets.
@@ -17,7 +26,7 @@ function polygon(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: numbe
   ctx.closePath()
 }
 
-export function draw(ctx: CanvasRenderingContext2D, s: SimState): void {
+export function draw(ctx: CanvasRenderingContext2D, s: SimState, selected = -1): void {
   ctx.clearRect(0, 0, VIEW.width, VIEW.height)
 
   // lane + HQ
@@ -40,18 +49,40 @@ export function draw(ctx: CanvasRenderingContext2D, s: SimState): void {
 
   // board
   const gearAt = new Map(s.gears.map((g) => [g.tile, g]))
+  const linked = linkedTiles(s.gears)
   for (let i = 0; i < TILE_COUNT; i++) {
     const r = tileRect(i)
     ctx.fillStyle = (Math.floor(i / 5) + (i % 5)) % 2 ? '#1e293b' : '#273449'
     ctx.fillRect(r.x, r.y, r.size, r.size)
+    if (PENALTY_TILES.includes(i)) {
+      ctx.fillStyle = 'rgba(239,68,68,0.25)'
+      ctx.fillRect(r.x, r.y, r.size, r.size)
+      ctx.fillStyle = '#fca5a5'
+      ctx.font = '10px sans-serif'
+      ctx.textAlign = 'left'
+      ctx.fillText('-2', r.x + 4, r.y + 12)
+    }
+    if (i === SOURCE_TILE) {
+      ctx.fillStyle = '#facc15'
+      ctx.fillRect(r.x + 8, r.y + r.size - 3, r.size - 16, 3)
+    }
+    if (i === selected) {
+      ctx.strokeStyle = '#fff'
+      ctx.strokeRect(r.x + 1, r.y + 1, r.size - 2, r.size - 2)
+    }
     const g = gearAt.get(i)
     if (!g) continue
+    ctx.globalAlpha = linked.has(i) ? 1 : 0.35
     ctx.fillStyle = HERO_COLOR[g.hero]
     polygon(ctx, r.x + r.size / 2, r.y + r.size / 2, 22, SIDES[g.hero])
     ctx.fill()
-    // cooldown bar: fills as the gear recharges
-    const ready = 1 - g.cooldown / HEROES[g.hero].cooldown
+    ctx.globalAlpha = 1
     ctx.fillStyle = '#fff'
+    ctx.font = 'bold 12px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(String(g.level), r.x + r.size / 2, r.y + r.size / 2 + 4)
+    // charge bar: fills as a linked gear charges
+    const ready = 1 - g.cooldown / (HEROES[g.hero].cooldown * CHARGE_SCALE)
     ctx.fillRect(r.x + 8, r.y + r.size - 8, (r.size - 16) * ready, 3)
   }
 }

@@ -25,6 +25,7 @@ const PageTowerDefense = () => {
   const pending = useRef<SimInput[]>([])
   const paused = useRef(false)
   const speed = useRef(1)
+  const selected = useRef(-1)
   const [hud, setHud] = useState({ gold: 0, hp: START_HP, lost: false })
   const [view, setView] = useState({ paused: false, fast: false })
 
@@ -51,7 +52,7 @@ const PageTowerDefense = () => {
         s = step(s, pending.current.splice(0))
       }
       stateRef.current = s
-      draw(ctx, s)
+      draw(ctx, s, selected.current)
       setHud((h) =>
         h.gold === s.gold && h.hp === s.hp && h.lost === (s.status === 'lost')
           ? h
@@ -69,12 +70,27 @@ const PageTowerDefense = () => {
       ((e.clientX - rect.left) / rect.width) * VIEW.width,
       ((e.clientY - rect.top) / rect.height) * VIEW.height
     )
-    if (tile >= 0) pending.current.push({ tick: stateRef.current.tick, type: 'summon', tile })
+    if (tile < 0) return
+    const tick = stateRef.current.tick
+    const at = (t: number) => stateRef.current.gears.find((g) => g.tile === t)
+    const from = selected.current
+    const a = at(from)
+    const b = at(tile)
+    if (a && b && from !== tile && a.hero === b.hero && a.level === b.level) {
+      pending.current.push({ tick, type: 'merge', from, to: tile })
+      selected.current = -1
+    } else if (b) {
+      selected.current = tile === from ? -1 : tile
+    } else {
+      selected.current = -1
+      pending.current.push({ tick, type: 'summon', tile })
+    }
   }, [])
 
   const restart = () => {
     stateRef.current = createState(newSeed())
     pending.current = []
+    selected.current = -1
   }
   const togglePause = () => {
     paused.current = !paused.current
@@ -121,7 +137,8 @@ const PageTowerDefense = () => {
         )}
       </div>
       <p className="text-xs text-slate-500 dark:text-slate-400">
-        แตะช่องว่างเพื่อเรียกเฟือง ({SUMMON_COST} ทอง)
+        แตะช่องว่างเพื่อเรียกเฟือง ({SUMMON_COST} ทอง) · เฟืองต้องต่อกับแหล่งพลังงาน (แถบเหลือง) ·
+        แตะเฟืองแล้วแตะเฟืองเหมือนกันเพื่อรวม
       </p>
       <div className="flex gap-2">
         <button className={btn} onClick={togglePause}>

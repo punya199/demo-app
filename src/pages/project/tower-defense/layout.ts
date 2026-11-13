@@ -14,8 +14,8 @@ export const BOARD = {
 
 export function tileRect(tile: number): { x: number; y: number; size: number } {
   return {
-    x: BOARD.x + (tile % COLS) * (TILE),
-    y: BOARD.y + Math.floor(tile / COLS) * (TILE),
+    x: BOARD.x + (tile % COLS) * TILE,
+    y: BOARD.y + Math.floor(tile / COLS) * TILE,
     size: TILE,
   }
 }

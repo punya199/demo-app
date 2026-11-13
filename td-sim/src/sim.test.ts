@@ -53,7 +53,12 @@ describe('lane', () => {
   })
 
   it('costs HQ health when an enemy leaks, and ends the run at zero', () => {
-    const leaking = { ...createState(1), tick: 1, spawned: 1, enemies: [{ id: 0, pos: LANE_LENGTH - 1, hp: 5 }] }
+    const leaking = {
+      ...createState(1),
+      tick: 1,
+      spawned: 1,
+      enemies: [{ id: 0, pos: LANE_LENGTH - 1, hp: 5 }],
+    }
     const s = step(leaking, [])
     expect(s.hp).toBe(START_HP - 1)
     expect(s.enemies.some((e) => e.id === 0)).toBe(false)
@@ -91,7 +96,12 @@ describe('firing', () => {
 
   it('a kill removes the enemy and pays gold', () => {
     const s = step(
-      { ...base, gold: 0, gears: [archer], enemies: [{ id: 0, pos: 500, hp: HEROES.archer.damage }] },
+      {
+        ...base,
+        gold: 0,
+        gears: [archer],
+        enemies: [{ id: 0, pos: 500, hp: HEROES.archer.damage }],
+      },
       []
     )
     expect(s.enemies).toHaveLength(0)

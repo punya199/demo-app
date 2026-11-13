@@ -11,6 +11,7 @@ export const appPath = {
   randomCard: generatePath('/random-card'),
   omamaGame: generatePath('/omama'),
   gemDiggers: generatePath('/gem-diggers'),
+  towerDefense: generatePath('/tower-defense'),
   tamagotchi: generatePath('/monster'),
   checkBillPage: generatePath('/check-bill'),
   checkBillPageCreate: generatePath('/check-bill/create'),

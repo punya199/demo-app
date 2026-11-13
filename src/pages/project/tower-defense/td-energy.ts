@@ -5,7 +5,7 @@ export interface ITdProfile {
 
 // Matches the server's rule (+1 per 6 minutes); only used to keep the countdown moving between
 // fetches. The server stays the source of truth and every refetch replaces this estimate.
-const REGEN_SECONDS = 6 * 60
+export const REGEN_SECONDS = 6 * 60
 
 export const liveEnergy = (profile: ITdProfile, fetchedAtMs: number, nowMs: number) => {
   const { current, cap, secondsToNext } = profile.energy

@@ -6,6 +6,7 @@ import {
   ROUND_COUNT,
   SUMMON_COST,
   START_HP,
+  canMerge,
   createState,
   step,
   type SimInput,
@@ -23,6 +24,7 @@ import { battleErrorKind } from './td-battle'
 import { parseStageParam } from './td-stage'
 import { useFinishTdBattle, useStartTdBattle } from './td-battle-query'
 
+type FinishBody = Parameters<ReturnType<typeof useFinishTdBattle>['mutateAsync']>[0]
 type Hud = Pick<SimState, 'gold' | 'hp' | 'round' | 'status' | 'offer'>
 
 // "Tower Defense": canvas + rAF loop around the pure td-sim. React only renders
@@ -33,6 +35,11 @@ const PageTowerDefense = () => {
   const stateRef = useRef<SimState>(createState(0))
   const battle = useRef<{ id: string; seed: number } | null>(null)
   const log = useRef<SimInput[]>([])
+  // The finished battle's payload, kept until the server accepts it so a failed finish can be retried.
+  const unsent = useRef<FinishBody | null>(null)
+  // Phase of the server round trip, readable from callbacks without stale closures; requestId drops stale responses.
+  const netPhase = useRef<TdNet['phase']>('starting')
+  const requestId = useRef(0)
   const booted = useRef(false)
   const [net, setNet] = useState<TdNet>({ phase: 'starting' })
   // The stage comes from the stage list (?stage=N); the server refuses a locked one.
@@ -118,7 +125,13 @@ const PageTowerDefense = () => {
   }, [layout])
 
   const onPointerDown = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (paused.current || !battle.current || stateRef.current.status !== 'running') return
+    if (
+      paused.current ||
+      !battle.current ||
+      stateRef.current.status !== 'running' ||
+      stateRef.current.phase === 'draft'
+    )
+      return
     const l = layoutRef.current
     const { x, y } = pointerToLogical(
       e.clientX,
@@ -133,7 +146,7 @@ const PageTowerDefense = () => {
     const from = selected.current
     const a = at(from)
     const b = at(tile)
-    if (a && b && from !== tile && a.hero === b.hero && a.level === b.level) {
+    if (a && b && from !== tile && canMerge(a, b)) {
       pending.current.push({ tick, type: 'merge', from, to: tile })
       selected.current = -1
     } else if (b) {
@@ -148,21 +161,50 @@ const PageTowerDefense = () => {
     pending.current.push({ tick: stateRef.current.tick, type: 'pick', index })
   }, [])
 
+  const setPhase = useCallback((n: TdNet) => {
+    netPhase.current = n.phase
+    setNet(n)
+  }, [])
+
+  // When the run ends, send the seed and the input log; the server replays it and pays the coins.
+  // The payload is kept until the server accepts it, so a failed request can be retried as is.
+  const submitFinish = useCallback(() => {
+    const body = unsent.current
+    if (!body || netPhase.current === 'finishing') return
+    const id = ++requestId.current
+    setPhase({ phase: 'finishing' })
+    finishBattle(body)
+      .then((r) => {
+        if (id !== requestId.current) return
+        unsent.current = null
+        setPhase({ phase: 'paid', coins: r.coins, stars: r.stars, gems: r.gems })
+      })
+      .catch(() => id === requestId.current && setPhase({ phase: 'finish-error' }))
+  }, [finishBattle, setPhase])
+
   // Every battle, including the first and every restart, is started on the server and spends energy.
+  // Ignored while a request is in flight; while a finished battle is still unpaid it retries that payout instead.
   const restart = useCallback(() => {
+    if (netPhase.current === 'starting' || netPhase.current === 'finishing') return
+    if (unsent.current) return submitFinish()
+    const id = ++requestId.current
     battle.current = null
     pending.current = []
     log.current = []
     selected.current = -1
-    setNet({ phase: 'starting' })
+    setPhase({ phase: 'starting' })
     startBattle(stageId)
       .then((b) => {
+        if (id !== requestId.current) return
         stateRef.current = createState(b.seed, b.pool, b.stageId, b.cores, b.relics)
         battle.current = { id: b.battleId, seed: b.seed }
-        setNet({ phase: 'ready' })
+        setPhase({ phase: 'ready' })
       })
-      .catch((e) => setNet({ phase: 'start-error', kind: battleErrorKind(e) }))
-  }, [startBattle, stageId])
+      .catch(
+        (e) =>
+          id === requestId.current && setPhase({ phase: 'start-error', kind: battleErrorKind(e) })
+      )
+  }, [startBattle, stageId, submitFinish, setPhase])
 
   useEffect(() => {
     if (booted.current) return
@@ -170,21 +212,18 @@ const PageTowerDefense = () => {
     restart()
   }, [restart])
 
-  // When the run ends, send the seed and the input log; the server replays it and pays the coins.
   useEffect(() => {
     const b = battle.current
     if (hud.status === 'running' || !b) return
     battle.current = null
-    setNet({ phase: 'finishing' })
-    finishBattle({
+    unsent.current = {
       battleId: b.id,
       seed: b.seed,
       ticks: stateRef.current.tick,
       inputs: log.current,
-    })
-      .then((r) => setNet({ phase: 'paid', coins: r.coins, stars: r.stars, gems: r.gems }))
-      .catch(() => setNet({ phase: 'finish-error' }))
-  }, [hud.status, finishBattle])
+    }
+    submitFinish()
+  }, [hud.status, submitFinish])
   const togglePause = useCallback(() => {
     paused.current = !paused.current
     setView((v) => ({ ...v, paused: paused.current }))

@@ -48,7 +48,7 @@ export const TdBattleNotice = ({
       className="flex w-full items-center justify-center gap-3 rounded bg-slate-200 px-3 py-2 text-sm font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100"
     >
       <span>{text}</span>
-      {net.phase === 'start-error' && (
+      {(net.phase === 'start-error' || net.phase === 'finish-error') && (
         <button className="rounded bg-slate-700 px-3 py-1 text-white" onClick={onRetry}>
           {t(lang, 'netRetry')}
         </button>

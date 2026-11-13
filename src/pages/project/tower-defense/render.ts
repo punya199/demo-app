@@ -8,7 +8,7 @@ import {
   type HeroId,
   type SimState,
 } from '../../../../td-sim/src'
-import { LANE, VIEW, enemyX, tileRect } from './layout'
+import { layoutFor, type Layout } from './layout'
 
 // Shapes only: every hero is a coloured polygon, no image assets.
 const HERO_COLOR: Record<HeroId, string> = { archer: '#22c55e', mage: '#a855f7', knight: '#f59e0b' }
@@ -26,7 +26,13 @@ function polygon(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: numbe
   ctx.closePath()
 }
 
-export function draw(ctx: CanvasRenderingContext2D, s: SimState, selected = -1): void {
+export function draw(
+  ctx: CanvasRenderingContext2D,
+  s: SimState,
+  layout: Layout = layoutFor('phone'),
+  selected = -1
+): void {
+  const { view: VIEW, lane: LANE, enemyX, tileRect } = layout
   ctx.clearRect(0, 0, VIEW.width, VIEW.height)
 
   // lane + HQ

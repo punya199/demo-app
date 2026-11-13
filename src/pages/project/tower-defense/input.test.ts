@@ -19,6 +19,9 @@ describe('keyAction', () => {
 describe('pointerToLogical', () => {
   it('maps client coords through the canvas rect to logical space', () => {
     const rect = { left: 10, top: 20, width: 180, height: 260 }
-    expect(pointerToLogical(100, 150, rect, { width: 360, height: 520 })).toEqual({ x: 180, y: 260 })
+    expect(pointerToLogical(100, 150, rect, { width: 360, height: 520 })).toEqual({
+      x: 180,
+      y: 260,
+    })
   })
 })

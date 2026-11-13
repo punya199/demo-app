@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { LANE_LENGTH, TILE_COUNT } from '../../../../td-sim/src'
-import { BOARD, LANE, canvasBackingSize, enemyX, layoutFor, layoutMode, tileAt, tileRect } from './layout'
+import {
+  BOARD,
+  LANE,
+  canvasBackingSize,
+  enemyX,
+  layoutFor,
+  layoutMode,
+  tileAt,
+  tileRect,
+} from './layout'
 
 describe('layout', () => {
   it('tileAt finds the tile under a point, row-major', () => {

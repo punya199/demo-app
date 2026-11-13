@@ -1,6 +1,12 @@
 export type KeyAction = 'pause' | 'speed' | 'restart' | 'lang'
 
-const KEYS: Record<string, KeyAction> = { p: 'pause', ' ': 'pause', f: 'speed', r: 'restart', l: 'lang' }
+const KEYS: Record<string, KeyAction> = {
+  p: 'pause',
+  ' ': 'pause',
+  f: 'speed',
+  r: 'restart',
+  l: 'lang',
+}
 
 export const keyAction = (key: string): KeyAction | null => KEYS[key.toLowerCase()] ?? null
 

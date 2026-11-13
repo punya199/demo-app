@@ -19,6 +19,7 @@ import { createState, step, type Gear, type SimState } from './sim'
 const gear = (tile: number, over: Partial<Gear> = {}): Gear => ({
   tile,
   hero: 'archer',
+  star: 1,
   level: 1,
   cooldown: HEROES.archer.cooldown * CHARGE_SCALE,
   ...over,

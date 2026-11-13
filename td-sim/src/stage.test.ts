@@ -178,7 +178,7 @@ describe('skill draft', () => {
     spawned: 1,
     gold: 0,
     skills,
-    gears: [{ tile: SOURCE_TILE, hero: 'archer', level: 1, cooldown: 0 }],
+    gears: [{ tile: SOURCE_TILE, hero: 'archer', star: 1, level: 1, cooldown: 0 }],
     enemies: [{ id: 0, kind: 'grunt', pos: 500, hp: kill ? 1 : 1000 }],
   })
 
@@ -207,7 +207,7 @@ describe('boss', () => {
     roundTick,
     roundSpawned: 1,
     spawned: 1,
-    gears: [{ tile: SOURCE_TILE, hero, level: 1, cooldown: 0 }],
+    gears: [{ tile: SOURCE_TILE, hero, star: 1, level: 1, cooldown: 0 }],
     enemies: [{ id: 0, kind: 'boss', pos: 100, hp: bossHp }],
   })
   const dealt = (s: SimState) => 100000 - step(s, []).enemies[0].hp

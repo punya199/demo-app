@@ -84,7 +84,7 @@ describe('lane', () => {
 
 describe('firing', () => {
   const base = { ...createState(1), tick: 1, spawned: 1, roundTick: 1, roundSpawned: 1 }
-  const archer = { tile: SOURCE_TILE, hero: 'archer' as const, level: 1, cooldown: 0 }
+  const archer = { tile: SOURCE_TILE, hero: 'archer' as const, star: 1, level: 1, cooldown: 0 }
   const ALONE = outputOf(archer, [archer]).damage
   const FULL = HEROES.archer.cooldown * CHARGE_SCALE
 

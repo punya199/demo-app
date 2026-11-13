@@ -1,3 +1,4 @@
+import { HERO_IDS, INCOME_EVERY, START_GOLD, START_HP, SUMMON_COST, TILE_COUNT, type HeroId } from './config'
 import { createRng } from './rng'
 
 /** Fixed timestep: one tick is 50 ms of game time. Rendering interpolates; the sim never reads a clock. */
@@ -5,17 +6,31 @@ export const TICK_MS = 50
 /** Server-side ceiling on replay length (about 10 minutes of game time). */
 export const DEFAULT_MAX_TICKS = 12_000
 
-// ponytail: placeholder world (income + spend) to prove the tick loop; battle rules replace it in ticket 02.
-export interface SimInput {
-  tick: number
-  type: 'spend'
-  amount: number
+export type SimInput = { tick: number; type: 'summon'; tile: number }
+
+export interface Gear {
+  tile: number
+  hero: HeroId
+  /** Ticks until the next shot. */
+  cooldown: number
+}
+
+export interface Enemy {
+  id: number
+  /** Lane-units walked, 0 to LANE_LENGTH. */
+  pos: number
+  hp: number
 }
 
 export interface SimState {
   tick: number
   rng: number
   gold: number
+  hp: number
+  status: 'running' | 'lost'
+  spawned: number
+  enemies: Enemy[]
+  gears: Gear[]
 }
 
 export interface Replay {
@@ -25,17 +40,35 @@ export interface Replay {
 }
 
 export function createState(seed: number): SimState {
-  return { tick: 0, rng: seed >>> 0, gold: 0 }
+  return {
+    tick: 0,
+    rng: seed >>> 0,
+    gold: START_GOLD,
+    hp: START_HP,
+    status: 'running',
+    spawned: 0,
+    enemies: [],
+    gears: [],
+  }
 }
 
 /** Advance one tick, applying the inputs stamped with the current tick. */
 export function step(state: SimState, inputs: readonly SimInput[]): SimState {
   const rng = createRng(0, state.rng)
-  let gold = state.gold + 1 + rng.int(3)
+  let gold = state.gold
+  const gears = [...state.gears]
   for (const input of inputs) {
-    if (input.amount <= gold) gold -= input.amount
+    const free =
+      Number.isInteger(input.tile) &&
+      input.tile >= 0 &&
+      input.tile < TILE_COUNT &&
+      !gears.some((g) => g.tile === input.tile)
+    if (!free || gold < SUMMON_COST) continue
+    gold -= SUMMON_COST
+    gears.push({ tile: input.tile, hero: HERO_IDS[rng.int(HERO_IDS.length)], cooldown: 0 })
   }
-  return { tick: state.tick + 1, rng: rng.state(), gold }
+  if (state.tick % INCOME_EVERY === 0) gold += 1
+  return { ...state, tick: state.tick + 1, rng: rng.state(), gold, gears }
 }
 
 function assertValidReplay(replay: Replay, maxTicks: number): void {

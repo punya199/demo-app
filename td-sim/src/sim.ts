@@ -140,12 +140,12 @@ function assertValidReplay(replay: Replay, maxTicks: number): void {
   }
   let prev = 0
   for (const input of inputs) {
-    if (input?.type !== 'spend') throw new RangeError('unknown input type')
+    if (input?.type !== 'summon') throw new RangeError('unknown input type')
     if (!Number.isInteger(input.tick) || input.tick < prev || input.tick >= ticks) {
       throw new RangeError('input ticks must be integers, in order, and within the replay')
     }
-    if (!Number.isInteger(input.amount) || input.amount < 0) {
-      throw new RangeError('spend amount must be a non-negative integer')
+    if (!Number.isInteger(input.tile) || input.tile < 0 || input.tile >= TILE_COUNT) {
+      throw new RangeError('summon tile must be an integer on the board')
     }
     prev = input.tick
   }
@@ -156,7 +156,7 @@ export function runReplay(replay: Replay, opts: { maxTicks?: number } = {}): Sim
   assertValidReplay(replay, opts.maxTicks ?? DEFAULT_MAX_TICKS)
   let state = createState(replay.seed)
   let i = 0
-  while (state.tick < replay.ticks) {
+  while (state.tick < replay.ticks && state.status === 'running') {
     const now: SimInput[] = []
     while (i < replay.inputs.length && replay.inputs[i].tick === state.tick)
       now.push(replay.inputs[i++])
@@ -167,7 +167,16 @@ export function runReplay(replay: Replay, opts: { maxTicks?: number } = {}): Sim
 
 /** FNV-1a over a fixed-order string form of the state: a cheap, engine-independent fingerprint. */
 export function hashState(state: SimState): string {
-  const text = `${state.tick}|${state.rng}|${state.gold}`
+  const text = JSON.stringify([
+    state.tick,
+    state.rng,
+    state.gold,
+    state.hp,
+    state.status,
+    state.spawned,
+    state.enemies.map((e) => [e.id, e.pos, e.hp]),
+    state.gears.map((g) => [g.tile, g.hero, g.cooldown]),
+  ])
   let h = 0x811c9dc5
   for (let i = 0; i < text.length; i++) {
     h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0

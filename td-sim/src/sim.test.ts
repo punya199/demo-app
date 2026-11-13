@@ -10,7 +10,8 @@ import {
   SUMMON_COST,
   TILE_COUNT,
 } from './config'
-import { createState, step, type SimState } from './sim'
+import { GOLDEN_HASH, GOLDEN_REPLAY } from './golden'
+import { createState, hashState, runReplay, step, type SimState } from './sim'
 
 const run = (state: SimState, ticks: number): SimState => {
   for (let i = 0; i < ticks; i++) state = step(state, [])
@@ -99,5 +100,53 @@ describe('firing', () => {
 
   it('does nothing when the lane is empty', () => {
     expect(step({ ...base, gears: [archer] }, []).gears[0].cooldown).toBe(0)
+  })
+})
+
+describe('runReplay', () => {
+  const replay = {
+    seed: 5,
+    ticks: 600,
+    inputs: [
+      { tick: 0, type: 'summon' as const, tile: 3 },
+      { tick: 10, type: 'summon' as const, tile: 4 },
+    ],
+  }
+
+  it('is deterministic for the same seed and inputs', () => {
+    expect(hashState(runReplay(replay))).toBe(hashState(runReplay(replay)))
+  })
+
+  it('differs for a different seed', () => {
+    expect(hashState(runReplay({ ...replay, seed: 6 }))).not.toBe(hashState(runReplay(replay)))
+  })
+
+  it('runs the requested ticks, or stops when the run is lost', () => {
+    expect(runReplay({ seed: 1, ticks: 37, inputs: [] }).tick).toBe(37)
+    const lost = runReplay({ seed: 1, ticks: 5000, inputs: [] })
+    expect(lost.status).toBe('lost')
+    expect(lost.tick).toBeLessThan(5000)
+  })
+
+  it('rejects a log longer than the tick cap', () => {
+    expect(() => runReplay({ seed: 1, ticks: 101, inputs: [] }, { maxTicks: 100 })).toThrow(
+      RangeError
+    )
+  })
+
+  it('rejects malformed input logs', () => {
+    const bad = (inputs: unknown[]) =>
+      runReplay({ seed: 1, ticks: 20, inputs: inputs as never }, { maxTicks: 100 })
+    const summon = (tick: number, tile: number) => ({ tick, type: 'summon', tile })
+    expect(() => bad([summon(5, 1), summon(4, 1)])).toThrow(RangeError)
+    expect(() => bad([summon(20, 1)])).toThrow(RangeError)
+    expect(() => bad([summon(1.5, 1)])).toThrow(RangeError)
+    expect(() => bad([summon(1, 1.5)])).toThrow(RangeError)
+    expect(() => bad([summon(1, -1)])).toThrow(RangeError)
+    expect(() => bad([{ tick: 1, type: 'bogus', tile: 1 }])).toThrow(RangeError)
+  })
+
+  it('matches the golden replay hash', () => {
+    expect(hashState(runReplay(GOLDEN_REPLAY))).toBe(GOLDEN_HASH)
   })
 })

@@ -5,11 +5,14 @@ export const GOLDEN_REPLAY: Replay = {
   seed: 20260101,
   ticks: 600,
   inputs: [
-    { tick: 20, type: 'spend', amount: 10 },
-    { tick: 20, type: 'spend', amount: 5 },
-    { tick: 300, type: 'spend', amount: 100000 },
-    { tick: 599, type: 'spend', amount: 40 },
+    { tick: 0, type: 'summon', tile: 0 },
+    { tick: 0, type: 'summon', tile: 1 },
+    { tick: 60, type: 'summon', tile: 6 },
+    { tick: 60, type: 'summon', tile: 6 },
+    { tick: 200, type: 'summon', tile: 12 },
+    { tick: 599, type: 'summon', tile: 29 },
   ],
 }
 
-export const GOLDEN_HASH = 'f8c90a95'
+/** Rebaselined in ticket 02: the sim became the real battle (summon, lane, firing). */
+export const GOLDEN_HASH = '4085d72c'

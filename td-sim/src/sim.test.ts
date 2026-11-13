@@ -14,7 +14,16 @@ import {
   TILE_COUNT,
 } from './config'
 import { GOLDEN_HASH, GOLDEN_REPLAY } from './golden'
-import { createState, hashState, runReplay, step, type SimInput, type SimState } from './sim'
+import {
+  MAX_DRAFT_TICKS,
+  MAX_REPLAY_INPUTS,
+  createState,
+  hashState,
+  runReplay,
+  step,
+  type SimInput,
+  type SimState,
+} from './sim'
 
 /** Step a run, always taking the first draft offer, with `moves` supplying any other inputs each tick. */
 const play = (seed: number, ticks: number, moves: (s: SimState) => SimInput[]): SimState => {
@@ -156,6 +165,25 @@ describe('runReplay', () => {
     expect(() => runReplay({ seed: 1, ticks: 101, inputs: [] }, { maxTicks: 100 })).toThrow(
       RangeError
     )
+  })
+
+  it('does not count draft ticks against the tick ceiling, but caps them and the input log', () => {
+    const beforeDraft = GOLDEN_REPLAY.inputs.filter((i) => i.tick < 725)
+    const idle = {
+      seed: GOLDEN_REPLAY.seed,
+      ticks: 1600,
+      inputs: [...beforeDraft, { tick: 1500, type: 'pick' as const, index: 0 }],
+    }
+    expect(runReplay(idle, { maxTicks: 1000 }).round).toBe(1) // 1600 total ticks, under 1000 of them fighting
+    expect(() => runReplay({ ...idle, ticks: 1100 + MAX_DRAFT_TICKS }, { maxTicks: 1000 })).toThrow(
+      RangeError
+    )
+    const spam = Array.from({ length: MAX_REPLAY_INPUTS + 1 }, () => ({
+      tick: 0,
+      type: 'summon' as const,
+      tile: 1,
+    }))
+    expect(() => runReplay({ seed: 1, ticks: 10, inputs: spam })).toThrow(RangeError)
   })
 
   it('rejects malformed input logs', () => {

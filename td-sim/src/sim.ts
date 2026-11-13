@@ -53,6 +53,10 @@ import { createRng } from './rng'
 export const TICK_MS = 50
 /** Server-side ceiling on replay length (about 10 minutes of game time). */
 export const DEFAULT_MAX_TICKS = 12_000
+/** Idle time spent in skill drafts (one per cleared round) does not count against DEFAULT_MAX_TICKS, but is capped on its own: about 1 minute per draft. */
+export const MAX_DRAFT_TICKS = BOSS_ROUND * 1200
+/** Longest accepted input log; the backend finish DTO caps the body at the same number. */
+export const MAX_REPLAY_INPUTS = 2000
 
 export type SimInput =
   | { tick: number; type: 'summon'; tile: number }
@@ -411,9 +415,11 @@ function assertValidReplay(replay: Replay, maxTicks: number): void {
   )
     throw new RangeError('stage must be an integer from 1 to STAGE_COUNT')
   if (!Number.isInteger(seed)) throw new RangeError('seed must be an integer')
-  if (!Number.isInteger(ticks) || ticks < 0 || ticks > maxTicks) {
-    throw new RangeError(`ticks must be an integer in [0, ${maxTicks}]`)
+  if (!Number.isInteger(ticks) || ticks < 0 || ticks > maxTicks + MAX_DRAFT_TICKS) {
+    throw new RangeError(`ticks must be an integer in [0, ${maxTicks + MAX_DRAFT_TICKS}]`)
   }
+  if (!Array.isArray(inputs) || inputs.length > MAX_REPLAY_INPUTS)
+    throw new RangeError(`inputs must be a list of at most ${MAX_REPLAY_INPUTS}`)
   let prev = 0
   for (const input of inputs) {
     if (input?.type !== 'summon' && input?.type !== 'merge' && input?.type !== 'pick')
@@ -440,7 +446,13 @@ export function runReplay(replay: Replay, opts: { maxTicks?: number } = {}): Sim
   assertValidReplay(replay, opts.maxTicks ?? DEFAULT_MAX_TICKS)
   let state = createState(replay.seed, replay.pool, replay.stage, replay.cores, replay.relics)
   let i = 0
+  let fightTicks = 0
+  let draftTicks = 0
   while (state.tick < replay.ticks && state.status === 'running') {
+    if (state.phase === 'draft') draftTicks++
+    else fightTicks++
+    if (fightTicks > (opts.maxTicks ?? DEFAULT_MAX_TICKS) || draftTicks > MAX_DRAFT_TICKS)
+      throw new RangeError('replay is too long')
     const now: SimInput[] = []
     while (i < replay.inputs.length && replay.inputs[i].tick === state.tick)
       now.push(replay.inputs[i++])

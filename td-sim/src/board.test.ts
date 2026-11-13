@@ -103,6 +103,8 @@ describe('merge', () => {
     refuse([gear(0), gear(1, { hero: 'mage' })], 0, 1)
     refuse([gear(0), gear(1, { level: 2 })], 0, 1)
     refuse([gear(0, { level: MAX_LEVEL }), gear(1, { level: MAX_LEVEL })], 0, 1)
+    refuse([gear(0, { star: 1 }), gear(1, { star: 2 })], 0, 1)
+    refuse([gear(0, { mod: 0 }), gear(1, { mod: 1 })], 0, 1)
     refuse([gear(0)], 0, 0)
     refuse([gear(0)], 0, 1)
   })

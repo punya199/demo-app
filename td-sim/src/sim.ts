@@ -1,4 +1,4 @@
-import { linkedTiles, outputOf, touchingSides } from './board'
+import { canMerge, linkedTiles, outputOf, touchingSides } from './board'
 import {
   BOSS_ROUND,
   CHARGE_BASE,
@@ -17,7 +17,6 @@ import {
   LANE_LENGTH,
   MAX_CRIT_PCT,
   MAX_GEAR_MOD,
-  MAX_LEVEL,
   MAX_STAR,
   RELICS,
   RELIC_IDS,
@@ -274,7 +273,7 @@ export function step(state: SimState, inputs: readonly SimInput[]): SimState {
       if (from < 0 || to < 0 || from === to) continue
       const a = gears[from]
       const b = gears[to]
-      if (a.hero !== b.hero || a.level !== b.level || a.level >= MAX_LEVEL) continue
+      if (!canMerge(a, b)) continue
       gears[to] = { ...b, level: b.level + 1, cooldown: fullCooldown(b.hero, b.star) }
       gears.splice(from, 1)
       continue

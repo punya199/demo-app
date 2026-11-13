@@ -157,7 +157,7 @@ const PageTowerDefense = () => {
     setNet({ phase: 'starting' })
     startBattle(stageId)
       .then((b) => {
-        stateRef.current = createState(b.seed, b.pool, b.stageId, b.cores)
+        stateRef.current = createState(b.seed, b.pool, b.stageId, b.cores, b.relics)
         battle.current = { id: b.battleId, seed: b.seed }
         setNet({ phase: 'ready' })
       })
@@ -248,6 +248,9 @@ const PageTowerDefense = () => {
         </Link>
         <Link to={appPath.towerDefenseCores()} className={`${btn} text-center`}>
           {t(lang, 'cores')}
+        </Link>
+        <Link to={appPath.towerDefenseRelics()} className={`${btn} text-center`}>
+          {t(lang, 'relics')}
         </Link>
       </nav>
       <div className="flex min-w-0 flex-1 flex-col items-center gap-3">

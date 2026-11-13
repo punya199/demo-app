@@ -1,4 +1,4 @@
-import type { CoreEntry, PoolEntry, SimInput } from '../../../../td-sim/src'
+import type { CoreEntry, PoolEntry, RelicId, SimInput } from '../../../../td-sim/src'
 
 export interface ITdBattleStart {
   battleId: string
@@ -8,6 +8,8 @@ export interface ITdBattleStart {
   pool: PoolEntry[]
   /** Equipped cores snapshotted at start; the server replays with the same cores. */
   cores: CoreEntry[]
+  /** Unlocked relics snapshotted at start; the server replays with the same relics. */
+  relics: RelicId[]
   expiresAt: string
 }
 

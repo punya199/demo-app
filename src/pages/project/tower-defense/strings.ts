@@ -17,6 +17,7 @@ const th = {
   gacha: 'สุ่มฮีโร่',
   goals: 'ภารกิจ',
   cores: 'คอร์ธาตุ',
+  relics: 'เรลิก',
   round: 'รอบ {n}/{total}',
   boss: 'บอส!',
   won: 'ชนะแล้ว!',
@@ -38,6 +39,10 @@ const th = {
   skill_bounty: 'ค่าหัวศัตรู +2 ทอง',
   skill_bank: 'รับทอง +25 ทันที',
   skill_repair: 'ซ่อมฐาน +3',
+  'skill_ember-surge': 'เรลิกไฟ: แม่มดเถ้าถ่านแรงขึ้น +50%',
+  'skill_glacial-edge': 'เรลิกน้ำแข็ง: ผู้ประกาศน้ำแข็งแรงขึ้น +50%',
+  'skill_verdant-bloom': 'เรลิกธรรมชาติ: หมอมอสแรงขึ้น +50%',
+  'skill_void-rend': 'เรลิกกายภาพ: ดาบว่างเปล่าแรงขึ้น +50%',
 } as const
 
 export const STRINGS: Record<Lang, Record<keyof typeof th, string>> = {
@@ -57,6 +62,7 @@ export const STRINGS: Record<Lang, Record<keyof typeof th, string>> = {
     gacha: 'Summon',
     goals: 'Goals',
     cores: 'Cores',
+    relics: 'Relics',
     round: 'Round {n}/{total}',
     boss: 'Boss!',
     won: 'Victory!',
@@ -78,6 +84,10 @@ export const STRINGS: Record<Lang, Record<keyof typeof th, string>> = {
     skill_bounty: 'Kill bounty +2 gold',
     skill_bank: 'Gain 25 gold now',
     skill_repair: 'Repair HQ +3',
+    'skill_ember-surge': 'Fire relic: Cinder Witch +50% damage',
+    'skill_glacial-edge': 'Ice relic: Frost Herald +50% damage',
+    'skill_verdant-bloom': 'Nature relic: Moss Healer +50% damage',
+    'skill_void-rend': 'Physical relic: Void Blade +50% damage',
   },
 }
 

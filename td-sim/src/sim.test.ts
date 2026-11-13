@@ -50,7 +50,7 @@ describe('lane', () => {
   })
 
   it('costs HQ health when an enemy leaks, and ends the run at zero', () => {
-    const leaking = { ...createState(1), enemies: [{ id: 0, pos: LANE_LENGTH - 1, hp: 5 }] }
+    const leaking = { ...createState(1), tick: 1, spawned: 1, enemies: [{ id: 0, pos: LANE_LENGTH - 1, hp: 5 }] }
     const s = step(leaking, [])
     expect(s.hp).toBe(START_HP - 1)
     expect(s.enemies.some((e) => e.id === 0)).toBe(false)

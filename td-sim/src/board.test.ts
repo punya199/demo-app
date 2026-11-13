@@ -29,7 +29,7 @@ const world = (gears: Gear[], over: Partial<SimState> = {}): SimState => ({
   ...createState(1),
   tick: 1,
   spawned: 1,
-  enemies: [{ id: 0, pos: 500, hp: 100000 }],
+  enemies: [{ id: 0, kind: 'grunt' as const, pos: 500, hp: 100000 }],
   gears,
   ...over,
 })
@@ -138,7 +138,7 @@ describe('resonance', () => {
   it('crits deal extra damage; a gear with no resonance never crits', () => {
     const damages = (gears: Gear[]) => {
       const seen = new Set<number>()
-      let s = world(gears, { enemies: [{ id: 0, pos: 0, hp: 1e9 }] })
+      let s = world(gears, { enemies: [{ id: 0, kind: 'grunt' as const, pos: 0, hp: 1e9 }] })
       for (let i = 0; i < 400; i++) {
         const before = s.enemies[0].hp
         s = {

@@ -3,19 +3,27 @@ import { outputOf } from './board'
 import {
   CHARGE_BASE,
   CHARGE_SCALE,
-  ENEMY_SPEED,
+  ENEMIES,
   HEROES,
-  KILL_REWARD,
   LANE_LENGTH,
   SOURCE_TILE,
-  SPAWN_EVERY,
+  ROUNDS,
   START_GOLD,
   START_HP,
   SUMMON_COST,
   TILE_COUNT,
 } from './config'
 import { GOLDEN_HASH, GOLDEN_REPLAY } from './golden'
-import { createState, hashState, runReplay, step, type SimState } from './sim'
+import { createState, hashState, runReplay, step, type SimInput, type SimState } from './sim'
+
+/** Step a run, always taking the first draft offer, with `moves` supplying any other inputs each tick. */
+const play = (seed: number, ticks: number, moves: (s: SimState) => SimInput[]): SimState => {
+  let s = createState(seed)
+  while (s.tick < ticks && s.status === 'running') {
+    s = step(s, s.phase === 'draft' ? [{ tick: s.tick, type: 'pick', index: 0 }] : moves(s))
+  }
+  return s
+}
 
 const run = (state: SimState, ticks: number): SimState => {
   for (let i = 0; i < ticks; i++) state = step(state, [])
@@ -49,11 +57,11 @@ describe('lane', () => {
     const s = run(createState(1), 10)
     expect(s.enemies).toHaveLength(1)
     const before = s.enemies[0].pos
-    expect(run(s, 5).enemies[0].pos).toBe(before + 5 * ENEMY_SPEED)
+    expect(run(s, 5).enemies[0].pos).toBe(before + 5 * ENEMIES.grunt.speed)
   })
 
   it('keeps spawning on a fixed schedule', () => {
-    expect(run(createState(1), SPAWN_EVERY + 5).spawned).toBe(2)
+    expect(run(createState(1), ROUNDS[0].every + 5).spawned).toBe(2)
   })
 
   it('costs HQ health when an enemy leaks, and ends the run at zero', () => {
@@ -61,7 +69,7 @@ describe('lane', () => {
       ...createState(1),
       tick: 1,
       spawned: 1,
-      enemies: [{ id: 0, pos: LANE_LENGTH - 1, hp: 5 }],
+      enemies: [{ id: 0, kind: 'grunt' as const, pos: LANE_LENGTH - 1, hp: 5 }],
     }
     const s = step(leaking, [])
     expect(s.hp).toBe(START_HP - 1)
@@ -75,7 +83,7 @@ describe('lane', () => {
 })
 
 describe('firing', () => {
-  const base = { ...createState(1), tick: 1, spawned: 1 }
+  const base = { ...createState(1), tick: 1, spawned: 1, roundTick: 1, roundSpawned: 1 }
   const archer = { tile: SOURCE_TILE, hero: 'archer' as const, level: 1, cooldown: 0 }
   const ALONE = outputOf(archer, [archer]).damage
   const FULL = HEROES.archer.cooldown * CHARGE_SCALE
@@ -86,8 +94,8 @@ describe('firing', () => {
         ...base,
         gears: [archer],
         enemies: [
-          { id: 0, pos: 500, hp: 50 },
-          { id: 1, pos: 100, hp: 50 },
+          { id: 0, kind: 'grunt' as const, pos: 500, hp: 50 },
+          { id: 1, kind: 'grunt' as const, pos: 100, hp: 50 },
         ],
       },
       []
@@ -106,12 +114,12 @@ describe('firing', () => {
         ...base,
         gold: 0,
         gears: [archer],
-        enemies: [{ id: 0, pos: 500, hp: ALONE }],
+        enemies: [{ id: 0, kind: 'grunt' as const, pos: 500, hp: ALONE }],
       },
       []
     )
     expect(s.enemies).toHaveLength(0)
-    expect(s.gold).toBe(KILL_REWARD)
+    expect(s.gold).toBe(ENEMIES.grunt.reward)
   })
 
   it('does nothing when the lane is empty', () => {
@@ -139,9 +147,9 @@ describe('runReplay', () => {
 
   it('runs the requested ticks, or stops when the run is lost', () => {
     expect(runReplay({ seed: 1, ticks: 37, inputs: [] }).tick).toBe(37)
-    const lost = runReplay({ seed: 1, ticks: 5000, inputs: [] })
+    const lost = play(1, 12_000, () => [])
     expect(lost.status).toBe('lost')
-    expect(lost.tick).toBeLessThan(5000)
+    expect(lost.tick).toBeLessThan(12_000)
   })
 
   it('rejects a log longer than the tick cap', () => {
@@ -166,6 +174,9 @@ describe('runReplay', () => {
     const end = runReplay(GOLDEN_REPLAY)
     expect(end.gears.find((g) => g.tile === 26)?.level).toBe(2)
     expect(end.gears.some((g) => g.tile === 21)).toBe(false)
+    // both drafts were taken at the ticks the log says, and the run is back in a fight
+    expect(end.skills).toHaveLength(2)
+    expect([end.round, end.phase]).toEqual([2, 'fight'])
     expect(end.gears.find((g) => g.tile === 0)?.cooldown).toBe(
       HEROES[end.gears.find((g) => g.tile === 0)!.hero].cooldown * CHARGE_SCALE
     )

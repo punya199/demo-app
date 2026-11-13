@@ -13,6 +13,7 @@ export const appPath = {
   gemDiggers: generatePath('/gem-diggers'),
   towerDefense: generatePath('/tower-defense'),
   towerDefenseGacha: generatePath('/tower-defense/gacha'),
+  towerDefenseStages: generatePath('/tower-defense/stages'),
   tamagotchi: generatePath('/monster'),
   checkBillPage: generatePath('/check-bill'),
   checkBillPageCreate: generatePath('/check-bill/create'),

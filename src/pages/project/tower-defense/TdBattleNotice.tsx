@@ -1,11 +1,12 @@
 import { t, type Lang } from './strings'
+import { starRow } from './td-stage'
 
 export type TdNet =
   | { phase: 'starting' }
   | { phase: 'ready' }
-  | { phase: 'start-error'; kind: 'energy' | 'other' }
+  | { phase: 'start-error'; kind: 'energy' | 'locked' | 'other' }
   | { phase: 'finishing' }
-  | { phase: 'paid'; coins: number }
+  | { phase: 'paid'; coins: number; stars: number; gems: number }
   | { phase: 'finish-error' }
 
 // Status line for the server round trip of a battle (start, finish, payout). Rendered under the
@@ -24,11 +25,22 @@ export const TdBattleNotice = ({
     net.phase === 'starting'
       ? t(lang, 'netStarting')
       : net.phase === 'start-error'
-        ? t(lang, net.kind === 'energy' ? 'netNoEnergy' : 'netStartError')
+        ? t(
+            lang,
+            net.kind === 'energy'
+              ? 'netNoEnergy'
+              : net.kind === 'locked'
+                ? 'netLocked'
+                : 'netStartError'
+          )
         : net.phase === 'finishing'
           ? t(lang, 'netFinishing')
           : net.phase === 'paid'
-            ? t(lang, 'netPaid', { n: net.coins })
+            ? t(lang, net.gems > 0 ? 'netPaidClear' : 'netPaid', {
+                n: net.coins,
+                stars: starRow(net.stars),
+                gems: net.gems,
+              })
             : t(lang, 'netFinishError')
   return (
     <div

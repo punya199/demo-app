@@ -1,6 +1,6 @@
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   BOSS_ROUND,
   ROUND_COUNT,
@@ -20,6 +20,7 @@ import { skillLabel, t, type Lang } from './strings'
 import { TdEnergy } from './TdEnergy'
 import { TdBattleNotice, type TdNet } from './TdBattleNotice'
 import { battleErrorKind } from './td-battle'
+import { parseStageParam } from './td-stage'
 import { useFinishTdBattle, useStartTdBattle } from './td-battle-query'
 
 type Hud = Pick<SimState, 'gold' | 'hp' | 'round' | 'status' | 'offer'>
@@ -34,6 +35,8 @@ const PageTowerDefense = () => {
   const log = useRef<SimInput[]>([])
   const booted = useRef(false)
   const [net, setNet] = useState<TdNet>({ phase: 'starting' })
+  // The stage comes from the stage list (?stage=N); the server refuses a locked one.
+  const stageId = parseStageParam(useSearchParams()[0].get('stage'))
   const startBattle = useStartTdBattle().mutateAsync
   const finishBattle = useFinishTdBattle().mutateAsync
   const pending = useRef<SimInput[]>([])
@@ -152,14 +155,14 @@ const PageTowerDefense = () => {
     log.current = []
     selected.current = -1
     setNet({ phase: 'starting' })
-    startBattle()
+    startBattle(stageId)
       .then((b) => {
-        stateRef.current = createState(b.seed, b.pool)
+        stateRef.current = createState(b.seed, b.pool, b.stageId)
         battle.current = { id: b.battleId, seed: b.seed }
         setNet({ phase: 'ready' })
       })
       .catch((e) => setNet({ phase: 'start-error', kind: battleErrorKind(e) }))
-  }, [startBattle])
+  }, [startBattle, stageId])
 
   useEffect(() => {
     if (booted.current) return
@@ -179,7 +182,7 @@ const PageTowerDefense = () => {
       ticks: stateRef.current.tick,
       inputs: log.current,
     })
-      .then((r) => setNet({ phase: 'paid', coins: r.coins }))
+      .then((r) => setNet({ phase: 'paid', coins: r.coins, stars: r.stars, gems: r.gems }))
       .catch(() => setNet({ phase: 'finish-error' }))
   }, [hud.status, finishBattle])
   const togglePause = useCallback(() => {
@@ -234,6 +237,9 @@ const PageTowerDefense = () => {
         <button className={btn} onClick={toggleLang}>
           {t(lang, 'lang')}
         </button>
+        <Link to={appPath.towerDefenseStages()} className={`${btn} text-center`}>
+          {t(lang, 'stages')}
+        </Link>
         <Link to={appPath.towerDefenseGacha()} className={`${btn} text-center`}>
           {t(lang, 'gacha')}
         </Link>

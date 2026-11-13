@@ -18,6 +18,9 @@ describe('battleErrorKind', () => {
   it('maps a 409 on start to the energy message', () => {
     expect(battleErrorKind({ response: { status: 409 } })).toBe('energy')
   })
+  it('maps a 403 on start to the locked-stage message', () => {
+    expect(battleErrorKind({ response: { status: 403 } })).toBe('locked')
+  })
   it('maps everything else to a generic error', () => {
     expect(battleErrorKind({ response: { status: 500 } })).toBe('other')
     expect(battleErrorKind(new Error('offline'))).toBe('other')

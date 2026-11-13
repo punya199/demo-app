@@ -13,9 +13,11 @@ import {
   type EnemyKind,
   type HeroId,
 } from './config'
+import { GOLDEN_ELEMENT_HASH, GOLDEN_ELEMENT_REPLAY } from './golden'
 import { advantagePct, coreBonusPct, ENEMY_ELEMENT, HERO_ELEMENT } from './elements'
 import {
   createState,
+  hashState,
   runReplay,
   step,
   type CoreEntry,
@@ -179,5 +181,16 @@ describe('elemental balance replays', () => {
     expect(cores).toHaveLength(1)
     expect(none).toHaveLength(0)
     expect(mismatched).toEqual(base)
+  })
+})
+
+describe('golden element replay', () => {
+  it('matches its pinned hash', () => {
+    expect(hashState(runReplay(GOLDEN_ELEMENT_REPLAY))).toBe(GOLDEN_ELEMENT_HASH)
+  })
+
+  it('the cores change the outcome: the same log without them hashes differently', () => {
+    const bare = { ...GOLDEN_ELEMENT_REPLAY, cores: [] }
+    expect(hashState(runReplay(bare))).not.toBe(GOLDEN_ELEMENT_HASH)
   })
 })

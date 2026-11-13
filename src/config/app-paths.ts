@@ -14,6 +14,7 @@ export const appPath = {
   towerDefense: generatePath('/tower-defense'),
   towerDefenseGacha: generatePath('/tower-defense/gacha'),
   towerDefenseStages: generatePath('/tower-defense/stages'),
+  towerDefenseGoals: generatePath('/tower-defense/goals'),
   tamagotchi: generatePath('/monster'),
   checkBillPage: generatePath('/check-bill'),
   checkBillPageCreate: generatePath('/check-bill/create'),

@@ -243,6 +243,9 @@ const PageTowerDefense = () => {
         <Link to={appPath.towerDefenseGacha()} className={`${btn} text-center`}>
           {t(lang, 'gacha')}
         </Link>
+        <Link to={appPath.towerDefenseGoals()} className={`${btn} text-center`}>
+          {t(lang, 'goals')}
+        </Link>
       </nav>
       <div className="flex min-w-0 flex-1 flex-col items-center gap-3">
         <div className="flex w-full items-center justify-between">

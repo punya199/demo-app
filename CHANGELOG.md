@@ -1,3 +1,64 @@
+# [1.76.0](https://github.com/punya199/demo-app/compare/v1.75.0...v1.76.0) (2026-11-13)
+
+
+### Fix
+
+* td boss that leaks past the HQ now loses the battle instead of counting as cleared ([a8ba476](https://github.com/punya199/demo-app/commit/a8ba4761686d46be6bc7b791cd0476c9f40984a0))
+* td merge requires equal hero, level, star and mod through one shared predicate ([12502aa](https://github.com/punya199/demo-app/commit/12502aa05c2795f734d7f8eb4b3bc0c9c52462c1))
+* td page guards restart while a request is in flight, keeps an unpaid battle for retry, ignores taps during a skill draft and shares the merge predicate ([db76e97](https://github.com/punya199/demo-app/commit/db76e971479c57effb236494312b6bb62ab5e35f))
+* td replay caps the input log and no longer charges skill-draft idle time against the tick ceiling ([3357456](https://github.com/punya199/demo-app/commit/33574565b625a544fa838b144b4c5477882c419c))
+* td-sim check runs in a plain node environment so CI does not load jsdom ([eeb4133](https://github.com/punya199/demo-app/commit/eeb413386b085102d0c5da63db314f939783cffd))
+* td-sim drift check needs no token because the backend repo is public ([fbf5c1f](https://github.com/punya199/demo-app/commit/fbf5c1fff35eacadabebfb97c3b9bb74046a3af3))
+* td-sim leak test fixture ([00fda5b](https://github.com/punya199/demo-app/commit/00fda5b1ce26e9742f6c36f2f54b910e8417bb1e))
+
+### New
+
+* merge td energy display ([186e112](https://github.com/punya199/demo-app/commit/186e112ce3369ab4d891ac151c7c7d48b4859b13))
+* merge td responsive layout ([4d0e0ce](https://github.com/punya199/demo-app/commit/4d0e0cee7f61ce30372e2c801666661970d490cc))
+* show the energy badge on the Tower Defense page ([b86b493](https://github.com/punya199/demo-app/commit/b86b4933205e85e5ac69bbd0e126751f507107a6))
+* td cores screen (4 slots, equip, ledger-paid promotion, element advantage note) and battle start carries the equipped cores ([31f8e12](https://github.com/punya199/demo-app/commit/31f8e126c483b5878f18a698ef65853d40a8eec9))
+* td energy display (profile query and live countdown) ([e23f272](https://github.com/punya199/demo-app/commit/e23f2721f32a69c09ecc83d3a3e7b306d783adb3))
+* td gear mod upgrade buttons on the hero list (spend coins, show level and cost) ([bf6c8ee](https://github.com/punya199/demo-app/commit/bf6c8eeea1eac3ca6a3f551bd31341ce8496afb5))
+* td goals screen (daily goals, 7-day track, achievements, claims via the server) ([01a5ea8](https://github.com/punya199/demo-app/commit/01a5ea8f14beccf35df55414990997f9e1496b16))
+* td guide page with Thai patch notes and in-game wiki, linked from the game menu ([85376d7](https://github.com/punya199/demo-app/commit/85376d7eab15aaba03b0e49dac6ad27c3d097d40))
+* td owned-hero battle pool wiring and hero star-up UI ([0572ac3](https://github.com/punya199/demo-app/commit/0572ac3585430eb23d8b0c576a3bca52986c8789))
+* td page responsive layout, resize-observed canvas, keyboard shortcuts, Thai/English strings ([230cf7f](https://github.com/punya199/demo-app/commit/230cf7f49223ef1893175c378816eac1ef63a72e))
+* td relics screen (unlock for the matching hero and core, exclusive draft skill labels) and battle start carries the unlocked relics ([f0569fa](https://github.com/punya199/demo-app/commit/f0569fa9792f217547e595f6caf3b356bd80ec1d))
+* td responsive layout, string tables and input mapping ([70e288d](https://github.com/punya199/demo-app/commit/70e288d50f8a8c7b2f2ee6ce99794bbdc3a09014))
+* td stage list screen, battle start takes a stage id, stars and first-clear gems shown after a win ([4737c9d](https://github.com/punya199/demo-app/commit/4737c9d10fdb514e6e791260b2d549512cb1499c))
+* td sweep button on the stage list (3-star stages, server decides cost and reward) ([fec610f](https://github.com/punya199/demo-app/commit/fec610fb851765b38bc3979b95953baae44edd39))
+* td wiki data helpers and Thai/English wiki strings, numbers read from td-sim config and server data ([511bfb0](https://github.com/punya199/demo-app/commit/511bfb0dc3d95eb60d48d528d7b78cfcc4ad23e7))
+* td-sim charging, adjacency output, -2 tiles, merge and Resonance; golden rebaselined ([bc34a07](https://github.com/punya199/demo-app/commit/bc34a076aa2253fed2d4c3478314afcb260d6509))
+* td-sim elements and cores (four elements with advantage rule, hero and enemy elements, equipped cores boost their element, cores join the hashed state; golden hash rebaselined in the next commit) ([f98d171](https://github.com/punya199/demo-app/commit/f98d171ee51d9aa3468493854cc0981ef62f0b74))
+* td-sim enemy lane, leak and HQ health ([c16868c](https://github.com/punya199/demo-app/commit/c16868cc03ce01fdddcbbac85d01f0efc80cc9c9))
+* td-sim full stage with 7 rounds, 7 enemy types, boss, skill draft and win; golden rebaselined ([25ad93c](https://github.com/punya199/demo-app/commit/25ad93cbc581287eb1189e45eb74635ae2dd4dad))
+* td-sim gear mod level (per-hero damage bonus carried in the pool snapshot) ([cd0e101](https://github.com/punya199/demo-app/commit/cd0e1015bd60208b3cd946691e20dac2fc8b0243))
+* td-sim gears fire at lane enemies ([4f300e9](https://github.com/punya199/demo-app/commit/4f300e9270609d7e1880a1eb63b27b8ee2330d28))
+* td-sim hero pool and star level (summon from owned heroes, stronger skill at star 3) ([f243d9e](https://github.com/punya199/demo-app/commit/f243d9ec921c164113f026c49f56d6623515c723))
+* td-sim relics (exclusive skills join the draft and boost their hero, relics in the replay and state hash) ([fd4e5b5](https://github.com/punya199/demo-app/commit/fd4e5b5788b0cdc979880bc6532f85529390f9b1))
+* td-sim replay validates summon inputs; golden rebaselined ([dc8e96d](https://github.com/punya199/demo-app/commit/dc8e96db281aca1f7e67040721b3f76c8c8db7da))
+* td-sim seeded RNG ([c79007b](https://github.com/punya199/demo-app/commit/c79007b37e9bf1d55b4ba167f3ac6f7e591ce398))
+* td-sim stages (three stages with their own enemy mix and boss), stage joins the state hash ([466d763](https://github.com/punya199/demo-app/commit/466d76315e01ed7d6ccc403ccf54318c8a4b4040))
+* td-sim summon rule for gears ([f03c1b5](https://github.com/punya199/demo-app/commit/f03c1b54fd3706b1df6a2a3c3eac4b19c212c807))
+* td-sim tick loop, replay, purity lint, sync script and CI ([6bcd3e4](https://github.com/punya199/demo-app/commit/6bcd3e46754e455e49da97df311bab4675cf9027))
+* Tower Defense board shows source, -2 tiles, levels, links; tap two identical gears to merge ([c8a9299](https://github.com/punya199/demo-app/commit/c8a9299e8da73e59d0dc4cf4ac7528a9b47dca1d))
+* tower defense canvas layout helpers ([6f470e4](https://github.com/punya199/demo-app/commit/6f470e4681c19aff05795c1385e0ffd66786a5b0))
+* tower defense design spec and tickets ([1121358](https://github.com/punya199/demo-app/commit/1121358485c0c2f72559261f55a053e492b1bc86))
+* Tower Defense first playable page, route and Games card ([ec01dad](https://github.com/punya199/demo-app/commit/ec01dad959c459eb28eb4c4877a1035b4980a4e2))
+* Tower Defense gacha screen with rates, pity and pull results ([a5ebcfa](https://github.com/punya199/demo-app/commit/a5ebcfa937bcb6af8618e08d2351467640681b48))
+* Tower Defense shows rounds, boss, skill draft, win screen and typed enemies; pause and 2x go through a tested clock ([18b6296](https://github.com/punya199/demo-app/commit/18b62962e753b8de73437b8a4e524836f2623dfe))
+* Tower Defense starts and finishes battles through the server, which replays the input log and pays the coins ([3931b99](https://github.com/punya199/demo-app/commit/3931b996a6d050f262f69ef407944f4c3eef1e4d))
+
+### Update
+
+* merge tower-defense integration into charging/merge ticket; board features with responsive layout and strings ([a3dcb5b](https://github.com/punya199/demo-app/commit/a3dcb5b69fa25c29ff2b19d0da323a61fc1de125))
+* rebaseline td-sim golden hash to 90918d58 (stage joins the hash) ([f4c668b](https://github.com/punya199/demo-app/commit/f4c668bac8e5ffc82558cf3bcf1eb237398c4f4d))
+* rebaseline td-sim golden hash to bbe1c4eb for the star and pool state ([0a28b19](https://github.com/punya199/demo-app/commit/0a28b19ad293c0b096371a3b2d56ca156679ea12))
+* rebaseline td-sim golden hash to e2675163 for the gear mod state ([e5f05a2](https://github.com/punya199/demo-app/commit/e5f05a2f8975368def9bb4fff63fe65654456e6c))
+* td-sim CI checks that the backend copy has not drifted ([d03bbaa](https://github.com/punya199/demo-app/commit/d03bbaad7cae0ffe028497e12466188b19d92898))
+* td-sim golden hash rebaselined for elements and cores, plus a pinned elemental-balance replay ([903ea08](https://github.com/punya199/demo-app/commit/903ea0862e22c47b37afba67c3a637e69c18fd9f))
+* td-sim golden hashes rebaselined for relics in the hashed state ([89a522d](https://github.com/punya199/demo-app/commit/89a522d3f97cdadb4bcd8b44f4d507281133dcb4))
+
 # [1.75.0](https://github.com/punya199/demo-app/compare/v1.74.0...v1.75.0) (2026-11-11)
 
 

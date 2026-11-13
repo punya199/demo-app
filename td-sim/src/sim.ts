@@ -3,6 +3,8 @@ import {
   ENEMY_HP_PER_SPAWN,
   ENEMY_SPEED,
   HERO_IDS,
+  HEROES,
+  KILL_REWARD,
   INCOME_EVERY,
   LANE_LENGTH,
   SPAWN_EVERY,
@@ -93,6 +95,26 @@ export function step(state: SimState, inputs: readonly SimInput[]): SimState {
     spawned++
   }
 
+  // ponytail: gears reach the whole lane and always hit the front-most enemy; range and targeting rules come later.
+  enemies = enemies.map((e) => ({ ...e }))
+  const firing = gears.map((g) => ({ ...g }))
+  for (const gear of firing) {
+    if (gear.cooldown > 0) {
+      gear.cooldown--
+      continue
+    }
+    let target: Enemy | undefined
+    for (const e of enemies) if (!target || e.pos > target.pos) target = e
+    if (!target) continue
+    const hero = HEROES[gear.hero]
+    target.hp -= hero.damage
+    gear.cooldown = hero.cooldown
+    if (target.hp <= 0) {
+      gold += KILL_REWARD
+      enemies = enemies.filter((e) => e !== target)
+    }
+  }
+
   enemies = enemies.map((e) => ({ ...e, pos: e.pos + ENEMY_SPEED }))
   const leaked = enemies.filter((e) => e.pos >= LANE_LENGTH).length
   enemies = enemies.filter((e) => e.pos < LANE_LENGTH)
@@ -106,7 +128,7 @@ export function step(state: SimState, inputs: readonly SimInput[]): SimState {
     status: hp === 0 ? 'lost' : 'running',
     spawned,
     enemies,
-    gears,
+    gears: firing,
   }
 }
 

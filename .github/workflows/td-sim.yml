@@ -1,0 +1,37 @@
+name: td-sim
+
+on:
+  push:
+    paths: ['td-sim/**', 'scripts/sync-td-sim.mjs', '.github/workflows/td-sim.yml']
+  pull_request:
+    paths: ['td-sim/**', 'scripts/sync-td-sim.mjs', '.github/workflows/td-sim.yml']
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable && yarn install --immutable
+      - run: yarn td-sim:check
+
+  backend-sync:
+    # Fails when the backend's copy of td-sim has drifted from this repo.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/checkout@v4
+        with:
+          repository: punya199/demo-app-backend
+          path: backend
+          # The backend repo is public, so no token is needed.
+      - run: node scripts/sync-td-sim.mjs backend --check

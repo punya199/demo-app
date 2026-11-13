@@ -65,5 +65,33 @@ export default tseslint.config(
       'no-console': 'warn',
       '@typescript-eslint/no-deprecated': 'error',
     },
-  }
+  },
+  {
+    // td-sim is shared with the backend: pure TypeScript, relative imports only, no DOM globals.
+    files: ['td-sim/**/*.ts'],
+    languageOptions: { globals: {} },
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '^[^.]',
+              message: 'td-sim must be pure: relative imports only (no packages, DOM or Nest).',
+            },
+          ],
+        },
+      ],
+      'no-restricted-globals': [
+        'error',
+        'window',
+        'document',
+        'navigator',
+        'localStorage',
+        'fetch',
+      ],
+    },
+  },
+  // Tests stay in the frontend repo and may import the test runner.
+  { files: ['td-sim/**/*.test.ts'], rules: { 'no-restricted-imports': 'off' } }
 )

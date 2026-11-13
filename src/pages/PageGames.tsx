@@ -36,6 +36,12 @@ const games: IGameCard[] = [
     emoji: '🥚',
     path: appPath.tamagotchi(),
   },
+  {
+    title: 'ป้องกันฐาน',
+    description: 'เรียกเฟืองฮีโร่ยิงศัตรูก่อนถึงฐาน',
+    emoji: '⚙️',
+    path: appPath.towerDefense(),
+  },
 ]
 
 const containerVariants: Variants = {

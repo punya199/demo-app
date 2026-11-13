@@ -25,6 +25,13 @@ const PageRegister = lazy(() => import('./pages/PageRegister'))
 const PageGames = lazy(() => import('./pages/PageGames'))
 const CardGame = lazy(() => import('./pages/project/random-card/CardGame'))
 const PageOmama = lazy(() => import('./pages/project/omama-game/PageOmama'))
+const PageTowerDefense = lazy(() => import('./pages/project/tower-defense/PageTowerDefense'))
+const PageTdGacha = lazy(() => import('./pages/project/tower-defense/PageTdGacha'))
+const PageTdStages = lazy(() => import('./pages/project/tower-defense/PageTdStages'))
+const PageTdGoals = lazy(() => import('./pages/project/tower-defense/PageTdGoals'))
+const PageTdCores = lazy(() => import('./pages/project/tower-defense/PageTdCores'))
+const PageTdRelics = lazy(() => import('./pages/project/tower-defense/PageTdRelics'))
+const PageTdGuide = lazy(() => import('./pages/project/tower-defense/PageTdGuide'))
 const PageGemDiggers = lazy(() => import('./pages/project/gem-diggers/PageGemDiggers'))
 const PageTamagotchi = lazy(() => import('./pages/project/tamagotchi/PageTamagotchi'))
 const PageAllBill = lazy(() => import('./pages/project/checkbill/PageAllBill'))
@@ -101,6 +108,13 @@ export const router = createBrowserRouter([
       },
       { path: appPath.omamaGame(), element: <PageOmama /> },
       { path: appPath.gemDiggers(), element: <PageGemDiggers /> },
+      { path: appPath.towerDefense(), element: <PageTowerDefense /> },
+      { path: appPath.towerDefenseGacha(), element: <PageTdGacha /> },
+      { path: appPath.towerDefenseStages(), element: <PageTdStages /> },
+      { path: appPath.towerDefenseGoals(), element: <PageTdGoals /> },
+      { path: appPath.towerDefenseCores(), element: <PageTdCores /> },
+      { path: appPath.towerDefenseRelics(), element: <PageTdRelics /> },
+      { path: appPath.towerDefenseGuide(), element: <PageTdGuide /> },
       { path: appPath.tamagotchi(), element: <PageTamagotchi /> },
       {
         path: appPath.checkBillPageCreate(),

@@ -19,6 +19,8 @@ export interface ITdGachaConfig {
   heroes: ITdHeroDef[]
   /** Shards for each star step: index 0 is star 1 -> 2. Its length plus one is the top star. */
   starUpCosts: number[]
+  /** Coins for each gear mod step: index 0 is level 0 -> 1. Its length is the top level. */
+  gearModCosts: number[]
 }
 
 export interface ITdGacha {
@@ -28,7 +30,7 @@ export interface ITdGacha {
     pullsUntilLegendary: number
     freePullAvailable: boolean
     ownedHeroIds: string[]
-    ownedHeroes: { heroId: string; starLevel: number }[]
+    ownedHeroes: { heroId: string; starLevel: number; modLevel: number }[]
   }
 }
 
@@ -69,4 +71,20 @@ export const nextStarCost = (starLevel: number, config: ITdGachaConfig): number 
 export const canStarUp = (starLevel: number, shards: number, config: ITdGachaConfig) => {
   const cost = nextStarCost(starLevel, config)
   return cost !== null && shards >= cost
+}
+
+export interface ITdGearUpgradeResult {
+  heroId: string
+  modLevel: number
+  cost: number
+  balances: { coins: number }
+}
+
+/** Coins for the next gear mod level, or null at the top level. Only a convenience for the button; the server re-checks. */
+export const nextGearCost = (modLevel: number, config: ITdGachaConfig): number | null =>
+  config.gearModCosts[modLevel] ?? null
+
+export const canUpgradeGear = (modLevel: number, coins: number, config: ITdGachaConfig) => {
+  const cost = nextGearCost(modLevel, config)
+  return cost !== null && coins >= cost
 }

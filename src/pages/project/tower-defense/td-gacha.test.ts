@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
   canStarUp,
+  canUpgradeGear,
   formatRate,
+  nextGearCost,
   nextStarCost,
   pullAvailability,
   type ITdGachaConfig,
@@ -15,6 +17,7 @@ const config: ITdGachaConfig = {
   duplicateShards: { common: 10, rare: 25, epic: 60, legendary: 150 },
   heroes: [],
   starUpCosts: [20, 50, 100, 200],
+  gearModCosts: [30, 60, 120],
 }
 
 describe('formatRate', () => {
@@ -49,5 +52,19 @@ describe('star-up button', () => {
     expect(canStarUp(1, 20, config)).toBe(true)
     expect(canStarUp(1, 19, config)).toBe(false)
     expect(canStarUp(5, 9999, config)).toBe(false)
+  })
+})
+
+describe('gear mod button', () => {
+  it('shows the cost of the next mod level, and none at the top level', () => {
+    expect(nextGearCost(0, config)).toBe(30)
+    expect(nextGearCost(2, config)).toBe(120)
+    expect(nextGearCost(3, config)).toBeNull()
+  })
+
+  it('needs at least the exact coin cost, and never at the top level', () => {
+    expect(canUpgradeGear(0, 30, config)).toBe(true)
+    expect(canUpgradeGear(0, 29, config)).toBe(false)
+    expect(canUpgradeGear(3, 9999, config)).toBe(false)
   })
 })

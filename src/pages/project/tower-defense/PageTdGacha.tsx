@@ -11,6 +11,7 @@ import {
 } from './td-gacha'
 import { useGetTdGacha, usePullTdGacha } from './td-gacha-query'
 import { useGetTdProfile } from './td-profile-query'
+import { TdGearMod } from './TdGearMod'
 import { TdHeroStarUp } from './TdHeroStarUp'
 
 const RARITY_LABEL: Record<TdRarity, string> = {
@@ -46,6 +47,8 @@ const PageTdGacha = () => {
   const gems = profile?.balances.gems ?? 0
   const nameOf = (id: string) => config.heroes.find((h) => h.id === id)?.name ?? id
   const shards = profile?.balances.shards ?? 0
+  const coins = profile?.balances.coins ?? 0
+  const mods = new Map(state.ownedHeroes.map((h) => [h.heroId, h.modLevel]))
   const stars = new Map(state.ownedHeroes.map((h) => [h.heroId, h.starLevel]))
   const owned = new Set(state.ownedHeroIds)
 
@@ -137,6 +140,9 @@ const PageTdGacha = () => {
                   shards={shards}
                   config={config}
                 />
+              )}
+              {mods.has(h.id) && (
+                <TdGearMod heroId={h.id} modLevel={mods.get(h.id)!} coins={coins} config={config} />
               )}
             </li>
           ))}

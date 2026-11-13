@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest'
+import { outputOf } from './board'
 import {
+  CHARGE_BASE,
+  CHARGE_SCALE,
   ENEMY_SPEED,
   HEROES,
   KILL_REWARD,
   LANE_LENGTH,
+  SOURCE_TILE,
   SPAWN_EVERY,
   START_GOLD,
   START_HP,
@@ -72,7 +76,9 @@ describe('lane', () => {
 
 describe('firing', () => {
   const base = { ...createState(1), tick: 1, spawned: 1 }
-  const archer = { tile: 0, hero: 'archer' as const, cooldown: 0 }
+  const archer = { tile: SOURCE_TILE, hero: 'archer' as const, level: 1, cooldown: 0 }
+  const ALONE = outputOf(archer, [archer]).damage
+  const FULL = HEROES.archer.cooldown * CHARGE_SCALE
 
   it('a gear damages the enemy furthest along the lane, then cools down', () => {
     const s = step(
@@ -86,12 +92,12 @@ describe('firing', () => {
       },
       []
     )
-    expect(s.enemies.find((e) => e.id === 0)?.hp).toBe(50 - HEROES.archer.damage)
+    expect(s.enemies.find((e) => e.id === 0)?.hp).toBe(50 - ALONE)
     expect(s.enemies.find((e) => e.id === 1)?.hp).toBe(50)
-    expect(s.gears[0].cooldown).toBe(HEROES.archer.cooldown)
+    expect(s.gears[0].cooldown).toBe(FULL)
     const next = step(s, [])
-    expect(next.enemies.find((e) => e.id === 0)?.hp).toBe(50 - HEROES.archer.damage)
-    expect(next.gears[0].cooldown).toBe(HEROES.archer.cooldown - 1)
+    expect(next.enemies.find((e) => e.id === 0)?.hp).toBe(50 - ALONE)
+    expect(next.gears[0].cooldown).toBe(FULL - CHARGE_BASE)
   })
 
   it('a kill removes the enemy and pays gold', () => {
@@ -100,7 +106,7 @@ describe('firing', () => {
         ...base,
         gold: 0,
         gears: [archer],
-        enemies: [{ id: 0, pos: 500, hp: HEROES.archer.damage }],
+        enemies: [{ id: 0, pos: 500, hp: ALONE }],
       },
       []
     )
@@ -154,6 +160,15 @@ describe('runReplay', () => {
     expect(() => bad([summon(1, 1.5)])).toThrow(RangeError)
     expect(() => bad([summon(1, -1)])).toThrow(RangeError)
     expect(() => bad([{ tick: 1, type: 'bogus', tile: 1 }])).toThrow(RangeError)
+  })
+
+  it('the golden replay exercises merge, linking and an unlinked gear', () => {
+    const end = runReplay(GOLDEN_REPLAY)
+    expect(end.gears.find((g) => g.tile === 26)?.level).toBe(2)
+    expect(end.gears.some((g) => g.tile === 21)).toBe(false)
+    expect(end.gears.find((g) => g.tile === 0)?.cooldown).toBe(
+      HEROES[end.gears.find((g) => g.tile === 0)!.hero].cooldown * CHARGE_SCALE
+    )
   })
 
   it('matches the golden replay hash', () => {

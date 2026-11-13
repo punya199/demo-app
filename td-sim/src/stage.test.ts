@@ -20,6 +20,7 @@ import {
   ENEMY_BASE_HP,
   HP_GROWTH_PCT,
   INCOME_EVERY,
+  LANE_LENGTH,
   ROUNDS,
   START_HP,
   STAGES,
@@ -215,6 +216,18 @@ describe('boss', () => {
   const dealt = (s: SimState) => 100000 - step(s, []).enemies[0].hp
   const open = BOSS_SHIELD_TICKS // first tick of an unshielded window
 
+  it('a boss that walks off the lane loses the battle instead of counting as cleared', () => {
+    const s = step(
+      {
+        ...bossRound(0, 'archer'),
+        gears: [],
+        enemies: [{ id: 0, kind: 'boss', pos: LANE_LENGTH - 1, hp: 100000 }],
+      },
+      []
+    )
+    expect([s.status, s.hp]).toEqual(['lost', 0])
+  })
+
   it('takes extra damage from its weak hero, and less while shielded', () => {
     const mageHit = HEROES.mage.damage
     const archerHit = HEROES.archer.damage
@@ -245,7 +258,7 @@ describe('boss', () => {
     expect(step(won, [{ tick: won.tick, type: 'summon', tile: 0 }])).toBe(won)
   })
 
-  it('the boss reaching the HQ hurts a lot', () => {
+  it('the boss reaching the HQ loses the battle', () => {
     const s = step(
       {
         ...bossRound(open, 'archer'),
@@ -254,7 +267,7 @@ describe('boss', () => {
       },
       []
     )
-    expect(s.hp).toBe(START_HP - ENEMIES.boss.leak)
+    expect([s.status, s.hp]).toEqual(['lost', 0])
   })
 })
 

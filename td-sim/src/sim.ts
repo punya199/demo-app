@@ -340,8 +340,10 @@ export function step(state: SimState, inputs: readonly SimInput[]): SimState {
   enemies = enemies.map((e) => ({ ...e, pos: e.pos + ENEMIES[e.kind].speed }))
   let leaked = 0
   for (const e of enemies) if (e.pos >= LANE_LENGTH) leaked += ENEMIES[e.kind].leak
+  // a boss that reaches the HQ ends the run: "boss absent" must only ever mean "boss killed"
+  const bossLeaked = enemies.some((e) => e.kind === 'boss' && e.pos >= LANE_LENGTH)
   enemies = enemies.filter((e) => e.pos < LANE_LENGTH)
-  const hp = Math.max(0, state.hp - leaked)
+  const hp = bossLeaked ? 0 : Math.max(0, state.hp - leaked)
 
   const roundDone = roundSpawned >= plan.enemies.length && !enemies.some((e) => e.kind === 'boss')
   const cleared = roundDone && (state.round === BOSS_ROUND || enemies.length === 0)

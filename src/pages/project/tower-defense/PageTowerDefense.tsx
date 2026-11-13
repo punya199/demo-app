@@ -18,16 +18,24 @@ import { canvasBackingSize, layoutFor, layoutMode, type LayoutMode } from './lay
 import { draw } from './render'
 import { skillLabel, t, type Lang } from './strings'
 import { TdEnergy } from './TdEnergy'
+import { TdBattleNotice, type TdNet } from './TdBattleNotice'
+import { battleErrorKind } from './td-battle'
+import { useFinishTdBattle, useStartTdBattle } from './td-battle-query'
 
 type Hud = Pick<SimState, 'gold' | 'hp' | 'round' | 'status' | 'offer'>
-
-const newSeed = () => (Math.random() * 0x100000000) >>> 0
 
 // "Tower Defense": canvas + rAF loop around the pure td-sim. React only renders
 // the chrome; the sim state lives in a ref and is stepped at a fixed timestep.
 const PageTowerDefense = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const stateRef = useRef<SimState>(createState(newSeed()))
+  // The seed comes from the server (POST /td/battles); nothing steps until a battle has started.
+  const stateRef = useRef<SimState>(createState(0))
+  const battle = useRef<{ id: string; seed: number } | null>(null)
+  const log = useRef<SimInput[]>([])
+  const booted = useRef(false)
+  const [net, setNet] = useState<TdNet>({ phase: 'starting' })
+  const startBattle = useStartTdBattle().mutateAsync
+  const finishBattle = useFinishTdBattle().mutateAsync
   const pending = useRef<SimInput[]>([])
   const paused = useRef(false)
   const speed = useRef(1)
@@ -78,11 +86,15 @@ const PageTowerDefense = () => {
     let acc = 0
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame)
-      const next = advance(acc, now - last, speed.current, paused.current)
+      const next = advance(acc, now - last, speed.current, paused.current || !battle.current)
       acc = next.acc
       last = now
       let s = stateRef.current
-      for (let i = 0; i < next.ticks; i++) s = step(s, pending.current.splice(0))
+      for (let i = 0; i < next.ticks; i++) {
+        const inputs = pending.current.splice(0)
+        log.current.push(...inputs)
+        s = step(s, inputs)
+      }
       stateRef.current = s
       draw(ctx, s, layout, selected.current)
       setHud((h) =>
@@ -103,7 +115,7 @@ const PageTowerDefense = () => {
   }, [layout])
 
   const onPointerDown = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (paused.current || stateRef.current.status !== 'running') return
+    if (paused.current || !battle.current || stateRef.current.status !== 'running') return
     const l = layoutRef.current
     const { x, y } = pointerToLogical(
       e.clientX,
@@ -133,11 +145,43 @@ const PageTowerDefense = () => {
     pending.current.push({ tick: stateRef.current.tick, type: 'pick', index })
   }, [])
 
+  // Every battle, including the first and every restart, is started on the server and spends energy.
   const restart = useCallback(() => {
-    stateRef.current = createState(newSeed())
+    battle.current = null
     pending.current = []
+    log.current = []
     selected.current = -1
-  }, [])
+    setNet({ phase: 'starting' })
+    startBattle()
+      .then((b) => {
+        stateRef.current = createState(b.seed)
+        battle.current = { id: b.battleId, seed: b.seed }
+        setNet({ phase: 'ready' })
+      })
+      .catch((e) => setNet({ phase: 'start-error', kind: battleErrorKind(e) }))
+  }, [startBattle])
+
+  useEffect(() => {
+    if (booted.current) return
+    booted.current = true
+    restart()
+  }, [restart])
+
+  // When the run ends, send the seed and the input log; the server replays it and pays the coins.
+  useEffect(() => {
+    const b = battle.current
+    if (hud.status === 'running' || !b) return
+    battle.current = null
+    setNet({ phase: 'finishing' })
+    finishBattle({
+      battleId: b.id,
+      seed: b.seed,
+      ticks: stateRef.current.tick,
+      inputs: log.current,
+    })
+      .then((r) => setNet({ phase: 'paid', coins: r.coins }))
+      .catch(() => setNet({ phase: 'finish-error' }))
+  }, [hud.status, finishBattle])
   const togglePause = useCallback(() => {
     paused.current = !paused.current
     setView((v) => ({ ...v, paused: paused.current }))
@@ -243,6 +287,7 @@ const PageTowerDefense = () => {
             </div>
           )}
         </div>
+        <TdBattleNotice net={net} lang={lang} onRetry={restart} />
         <p className="text-xs text-slate-500 dark:text-slate-400">
           {t(lang, 'hint', { n: SUMMON_COST })}
         </p>
